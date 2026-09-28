@@ -1,0 +1,310 @@
+/* Eerste dans v1 — bruiloftsontwerp. Opening: twee paleisdeuren, verzegeld met een lakzegel op een lint; na een tik breekt het
+   zegel en zwaaien de deuren open. Daarachter een balzaal met een boograam, zuilen, een kroonluchter, een bloemenslinger en een
+   getekend bruidspaar dat zacht danst. Tekeningen: tools/eerste_dans/maak_tekeningen.py. Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Pinyon Script"; src: url("../../../fonts/pinyon-script-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../../../fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 300 800; font-display: swap; }
+
+body {
+  --ed-script: "Pinyon Script", "Great Vibes", cursive;
+  --ed-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --ed-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ed-w: min(100vw, 560px);
+  --inv-bg: var(--ed-bg);
+  --inv-text: var(--ed-ink);
+  --inv-muted: var(--ed-muted);
+  --inv-accent: var(--ed-accent);
+  --inv-accent-contrast: var(--ed-accent-ink);
+  --inv-font-body: var(--ed-serif);
+  --inv-font-ui: var(--ed-ui);
+  --inv-focus: var(--ed-accent);
+  --inv-radius: 14px;
+  --inv-surface-2: color-mix(in srgb, var(--ed-bg-2) 70%, var(--ed-line));
+  --inv-btn-border: color-mix(in srgb, var(--ed-accent) 55%, transparent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--ed-accent) 10%, transparent);
+  --inv-field-bg: var(--ed-bg);
+  --inv-field-text: var(--ed-ink);
+  --inv-field-border: color-mix(in srgb, var(--ed-ink) 28%, transparent);
+  --inv-music-bg: linear-gradient(180deg, #FFF6E2, #E4C88E);
+  --inv-music-text: #2B2010;
+  --inv-music-border: rgba(120, 90, 30, .35);
+  --inv-photo-bg: var(--ed-bg-2);
+  --fx-pulse: var(--ed-gold);
+  background: var(--ed-bg);
+  color: var(--ed-ink);
+  font-family: var(--ed-serif);
+  font-size: 1.16rem;
+  font-weight: 500;
+  /* De meegeleverde Cormorant heeft alleen oude cijfers (1 lijkt op I); getallen staan daarom in DM Sans. */
+  font-variant-numeric: lining-nums;
+}
+
+/* ================================================================ tekeningen */
+.ed-goud { fill: var(--ed-gold); }
+.ed-goudlijn { fill: none; stroke: var(--ed-gold); stroke-width: 2.2; stroke-linecap: round; }
+.ed-kaars { fill: #FFF9EE; }
+.ed-vlam { fill: #FFC66B; }
+.ed-kristaldraad { fill: none; stroke: color-mix(in srgb, var(--ed-gold) 70%, #fff); stroke-width: .6; }
+.ed-kristal { fill: rgba(255, 255, 255, .95); stroke: color-mix(in srgb, var(--ed-bloem-2) 45%, #9FB4CC); stroke-width: .6; }
+.ed-bloem, .ed-bloem-2 { stroke: rgba(255, 255, 255, .35); stroke-width: .4; }
+.ed-bloem { fill: var(--ed-bloem); }
+.ed-bloem-2 { fill: var(--ed-bloem-2); }
+.ed-bloem-schaduw { fill: color-mix(in srgb, var(--ed-bloem-2) 70%, #000); opacity: .25; }
+.ed-hart { fill: rgba(255, 255, 255, .8); }
+.ed-roos { fill: #FFFDF8; stroke: #EDE4D8; stroke-width: .5; }
+.ed-roos-2 { fill: #FBF5EC; stroke: #E6DACB; stroke-width: .5; }
+.ed-roos-3 { fill: #F4EADB; stroke: #E1D2BE; stroke-width: .5; }
+.ed-roos-hart { fill: #E9D9BF; }
+.ed-roos-schaduw { fill: rgba(60, 40, 30, .12); }
+.ed-blad { fill: var(--ed-blad); }
+.ed-blad-2 { fill: var(--ed-blad-2); }
+.ed-ceintuur { fill: var(--ed-gold); }
+.ed-vloerschaduw { fill: rgba(30, 30, 50, .14); }
+.ed-paar__svg, .ed-kroon__svg, .ed-slinger__svg { display: block; width: 100%; height: auto; overflow: visible; }
+/* Draaipunten voor de beweging (in coördinaten van de tekening). */
+.ed-dans { transform-box: view-box; transform-origin: 170px 424px; }
+.ed-rok { transform-box: view-box; transform-origin: 188px 210px; }
+.ed-sluier { transform-box: view-box; transform-origin: 198px 72px; }
+
+/* ================================================================ openingsscherm: paleisdeuren met een lakzegel */
+.ed-cover { overflow: hidden; color: var(--ed-cover-ink); --fx-bg: var(--ed-page);
+  background: radial-gradient(60% 45% at 50% 50%, #FFFDF6, color-mix(in srgb, var(--ed-sky) 60%, #fff) 60%, var(--ed-page)); }
+.ed-deuren { position: absolute; inset: 0; perspective: 1600px; }
+.ed-deur {
+  position: absolute; top: 0; bottom: 0; width: 50.5%; display: flex; flex-direction: column; gap: 3%; padding: 7% 7% 8%;
+  background: linear-gradient(90deg, var(--ed-door-2), var(--ed-door) 12%, var(--ed-door) 88%, var(--ed-door-2));
+  box-shadow: inset 0 0 0 6px color-mix(in srgb, var(--ed-gold) 50%, var(--ed-door)), inset 0 0 0 7px var(--ed-gold);
+  transition: transform 1.35s cubic-bezier(.45, .05, .25, 1) .55s; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+}
+.ed-deur--links { left: 0; transform-origin: 0 50%; }
+.ed-deur--rechts { right: 0; transform-origin: 100% 50%; }
+/* Twee panelen per deur met een gouden sierlijst; bovenaan een boog. */
+.ed-paneel {
+  flex: 1; border-radius: 6px; border: 2px solid color-mix(in srgb, var(--ed-gold) 80%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ed-door) 70%, #fff), var(--ed-door));
+  box-shadow: inset 0 0 0 5px var(--ed-door), inset 0 0 0 6px color-mix(in srgb, var(--ed-gold) 45%, transparent), 0 1px 0 rgba(255, 255, 255, .8);
+}
+.ed-paneel:first-child { flex: 1.6; border-radius: 999px 999px 6px 6px; }
+.ed-greep { position: absolute; top: 50%; width: 7px; height: 13%; border-radius: 6px; background: linear-gradient(90deg, #8A6A2E, var(--ed-gold) 40%, #F6E3B0 55%, var(--ed-gold) 75%); box-shadow: 0 2px 4px rgba(0, 0, 0, .25); }
+.ed-deur--links .ed-greep { right: 9%; }
+.ed-deur--rechts .ed-greep { left: 9%; }
+.ed-cover__boven { position: absolute; left: 0; right: 0; top: max(10vh, 4.6rem); z-index: 3; padding: 0 1.4rem; text-align: center; }
+.ed-cover__kicker { margin: 0; font: 600 .72rem var(--ed-ui); letter-spacing: .32em; text-transform: uppercase; color: var(--ed-gold-2); }
+.ed-cover__namen { margin: .25rem auto 0; max-width: 20rem; font: 400 clamp(2.5rem, 11.5vw, 3.3rem)/1.15 var(--ed-script); text-wrap: balance; text-shadow: 0 1px 0 rgba(255, 255, 255, .8); }
+.ed-amp { font: italic 400 .6em var(--ed-serif); color: var(--ed-gold-2); }
+
+/* Het zegel op een zijden lint over de naad tussen de deuren. */
+.ed-zegel {
+  --s: clamp(86px, 24vw, 108px);
+  position: absolute; left: 50%; top: 58%; z-index: 4; width: var(--s); height: var(--s); translate: -50% -50%;
+  display: grid; place-items: center; text-decoration: none; -webkit-tap-highlight-color: transparent;
+}
+.ed-zegel__lint {
+  position: absolute; left: 50%; top: 50%; width: 100vw; height: 16px; translate: -50% -50%; z-index: -1;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ed-seal-2) 80%, #fff), var(--ed-seal-2) 45%, color-mix(in srgb, var(--ed-seal) 85%, #000));
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .15); transition: scale .6s ease .25s, opacity .6s ease .25s;
+}
+.ed-zegel__was {
+  position: relative; display: grid; place-items: center; width: 100%; height: 100%;
+  border-radius: 47% 53% 50% 50% / 52% 48% 52% 48%;
+  background: radial-gradient(circle at 34% 30%, var(--ed-seal-2), var(--ed-seal) 58%, color-mix(in srgb, var(--ed-seal) 78%, #000) 100%);
+  box-shadow: inset 0 -4px 8px rgba(0, 0, 0, .3), inset 0 4px 6px rgba(255, 255, 255, .25), 0 10px 18px -8px rgba(0, 0, 0, .5);
+}
+.ed-zegel__was::before { content: ""; position: absolute; inset: 16%; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--ed-seal-ink) 45%, transparent); box-shadow: inset 0 1px 3px rgba(0, 0, 0, .3); }
+.ed-zegel__mono { position: relative; font: 400 calc(var(--s) * .34)/1 var(--ed-script); color: var(--ed-seal-ink); padding-top: .12em; text-shadow: 0 -1px 0 rgba(0, 0, 0, .35), 0 1px 0 rgba(255, 255, 255, .25); }
+.ed-zegel__mono .seal-motief { display: block; width: calc(var(--s) * .36); height: auto; margin-top: -.1em; }
+.ed-zegel .fx-pulse::after, .ed-zegel.fx-pulse::after { border-radius: 50%; }
+.ed-zegel:focus-visible { outline: none; }
+.ed-zegel:focus-visible .ed-zegel__was { outline: 2px solid var(--ed-accent); outline-offset: 6px; }
+@media (hover: hover) { .ed-zegel:hover .ed-zegel__was { scale: 1.04; } }
+.fx-motion .ed-zegel__was { animation: ed-adem 4.5s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes ed-adem { 0%, 100% { scale: 1; } 50% { scale: 1.035; } }
+
+.ed-cover__onder { position: absolute; left: 0; right: 0; bottom: max(5vh, env(safe-area-inset-bottom)); z-index: 3; display: flex; flex-direction: column; align-items: center; gap: .6rem; }
+.ed-cover__hint { margin: 0; padding: .35rem .9rem; border-radius: 999px; background: color-mix(in srgb, var(--ed-door) 85%, transparent); font: 600 .74rem var(--ed-ui); letter-spacing: .22em; text-transform: uppercase; color: var(--ed-muted); }
+.ed-cover__music {
+  display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: .55rem 1.2rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--ed-accent) 55%, transparent); background: color-mix(in srgb, var(--ed-bg) 85%, transparent); color: var(--ed-ink); font: 600 .86rem var(--ed-ui);
+}
+.ed-cover__music:focus-visible { outline: 2px solid var(--ed-accent); outline-offset: 3px; }
+
+/* ---------------------------------------------------------------- openen: zegel breekt, lint valt, deuren zwaaien open */
+.is-opening :is(.ed-cover__boven, .ed-cover__onder) { opacity: 0; transition: opacity .35s ease; }
+.is-opening .ed-zegel__was { animation: ed-breek .6s cubic-bezier(.5, 0, .3, 1) forwards; }
+@keyframes ed-breek { 0% { scale: 1; opacity: 1; } 35% { scale: .9; } 100% { scale: 1.5; opacity: 0; rotate: 14deg; } }
+.is-opening .ed-zegel__lint { scale: 0 1; opacity: 0; }
+.fx-motion.is-opening .ed-deur--links { transform: rotateY(-104deg); }
+.fx-motion.is-opening .ed-deur--rechts { transform: rotateY(104deg); }
+.is-opening .ed-cover { opacity: 0; transition: opacity .55s ease 1.9s; }
+.is-opening-reduced .ed-cover { transition: opacity .25s ease; }
+
+/* ================================================================ de uitnodiging: de balzaal */
+.inv-eerste-dans .inv-main { position: relative; z-index: 1; }
+.ed-hero {
+  position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center;
+  height: 100vh; height: 100svh; min-height: 600px; padding: 0 1.2rem; text-align: center; background: var(--ed-page);
+}
+/* In het voorbeeld staat er een balk boven; dan past de hele zaal (met het paar) nog in het eerste scherm. */
+html:not(.inv-embed) body:has(.inv-banner) .ed-hero { height: calc(100svh - var(--inv-banner-h, 3.9rem)); }
+.ed-zaal { position: absolute; inset: 0; z-index: 0; }
+.ed-zaal > span { position: absolute; }
+/* Hoog boograam met lucht en een sprosse-raster, zacht verlicht. */
+.ed-raam {
+  left: 14%; right: 14%; top: 7%; bottom: 20%; border-radius: 999px 999px 0 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(25% - 1px), rgba(255, 255, 255, .8) calc(25% - 1px) 25%),
+    repeating-linear-gradient(180deg, transparent 0 calc(16% - 1px), rgba(255, 255, 255, .7) calc(16% - 1px) 16%),
+    radial-gradient(90% 60% at 50% 30%, #FFFFFF, color-mix(in srgb, var(--ed-sky) 80%, #fff) 60%, var(--ed-sky));
+  box-shadow: inset 0 0 0 7px #FFFFFF, inset 0 0 0 8px color-mix(in srgb, var(--ed-gold) 55%, transparent), 0 0 60px 20px rgba(255, 255, 255, .6);
+}
+.ed-zuil {
+  top: 4%; bottom: 20%; width: 11%;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, .04) 0 2px, transparent 2px 9px),
+    linear-gradient(90deg, color-mix(in srgb, var(--ed-door-2) 80%, #fff), #FFFFFF 45%, var(--ed-door-2));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ed-gold) 30%, transparent);
+}
+.ed-zuil--links { left: 1.5%; }
+.ed-zuil--rechts { right: 1.5%; }
+.ed-zuil::before, .ed-zuil::after { content: ""; position: absolute; left: -12%; right: -12%; height: 3.2%; background: linear-gradient(180deg, #FFFFFF, var(--ed-door-2)); border-bottom: 2px solid color-mix(in srgb, var(--ed-gold) 60%, transparent); }
+.ed-zuil::before { top: 0; }
+.ed-zuil::after { bottom: 0; border-bottom: 0; border-top: 2px solid color-mix(in srgb, var(--ed-gold) 60%, transparent); }
+/* Glanzende marmeren vloer. */
+.ed-vloer {
+  left: 0; right: 0; bottom: 0; height: 20%;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .7), transparent 40%),
+    repeating-linear-gradient(100deg, transparent 0 38px, rgba(0, 0, 0, .04) 38px 39px),
+    linear-gradient(180deg, color-mix(in srgb, var(--ed-door-2) 70%, #fff), var(--ed-door-2));
+  box-shadow: 0 -1px 0 color-mix(in srgb, var(--ed-gold) 50%, transparent);
+}
+.ed-hero__fx { z-index: 1; }
+.ed-slinger { position: absolute; left: -4%; right: -4%; top: -1.5%; z-index: 2; pointer-events: none; }
+.ed-kroon { position: relative; z-index: 3; width: min(40vw, 170px); margin-top: .4rem; filter: drop-shadow(0 6px 8px rgba(80, 60, 20, .25)); }
+.ed-hero__tekst { position: relative; z-index: 3; margin-top: .2rem; padding: .6rem 1.2rem .7rem; max-width: 23rem; border-radius: 22px;
+  background: radial-gradient(closest-side, color-mix(in srgb, #fff 82%, transparent), color-mix(in srgb, #fff 55%, transparent) 70%, transparent); }
+.ed-kicker { margin: 0 0 .2rem; font: 600 .72rem var(--ed-ui); letter-spacing: .3em; text-transform: uppercase; color: var(--ed-gold-2); }
+.ed-names { margin: 0; font: 400 clamp(2.7rem, 12.5vw, 3.8rem)/1.05 var(--ed-script); color: var(--ed-accent); word-spacing: .1em; text-wrap: balance; overflow-wrap: anywhere; }
+.ed-names__one, .ed-names__two { display: block; }
+.ed-names__amp { display: block; margin: -.1em 0; font: italic 400 .45em/1.2 var(--ed-serif); color: var(--ed-gold-2); }
+.ed-names--long { font-size: clamp(2.5rem, 11.5vw, 3.4rem); }
+.ed-names--xlong { font-size: clamp(2rem, 9vw, 2.8rem); }
+.ed-hero__members { margin: .4rem 0 0; font: italic 500 1.1rem var(--ed-serif); }
+.ed-hero__date { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .3rem .8rem; margin: .8rem 0 0; font: 600 .7rem var(--ed-ui); letter-spacing: .2em; text-transform: uppercase; color: var(--ed-muted); }
+.ed-hero__num { font: 400 1.05rem var(--ed-ui); letter-spacing: .14em; color: var(--ed-ink); padding: .1rem .8rem; border-inline: 1px solid color-mix(in srgb, var(--ed-gold) 70%, transparent); }
+.ed-hero__venue { margin: .5rem 0 0; font: italic 600 1.15rem var(--ed-serif); color: var(--ed-ink); }
+.ed-paar { position: relative; z-index: 3; flex: 1 1 0; min-height: 210px; display: flex; justify-content: center; align-items: flex-end; margin-bottom: 2.4rem; }
+.ed-paar .ed-paar__svg { width: auto; height: 100%; max-width: min(84vw, 360px); }
+.ed-scroll { position: absolute !important; bottom: .7rem; left: 50%; z-index: 4; translate: -50% 0; display: flex; flex-direction: column; align-items: center; font: 600 .64rem var(--ed-ui); letter-spacing: .24em; text-transform: uppercase; color: var(--ed-muted); text-decoration: none; }
+
+/* Beweging: het paar wiegt, de rok zwiert, de sluier waait, de kristallen fonkelen. */
+.fx-motion .ed-dans { animation: ed-dans 7s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .ed-rok { animation: ed-rok 3.5s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .ed-sluier { animation: ed-sluier 4.2s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .ed-kroon { animation: ed-kroon 6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .ed-kristal--0 { animation: ed-fonkel 2.4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .ed-kristal--2 { animation: ed-fonkel 3.1s ease-in-out .8s infinite; animation-play-state: var(--fx-play, running); }
+@keyframes ed-dans { 0%, 100% { transform: translateX(-3px) rotate(-1.4deg); } 50% { transform: translateX(3px) rotate(1.4deg); } }
+@keyframes ed-rok { 0%, 100% { transform: skewX(-2.5deg) scaleX(1); } 50% { transform: skewX(2.5deg) scaleX(1.02); } }
+@keyframes ed-sluier { 0%, 100% { transform: rotate(-1.5deg) scaleX(1); } 50% { transform: rotate(2.5deg) scaleX(1.05); } }
+@keyframes ed-kroon { 0%, 100% { rotate: -1deg; } 50% { rotate: 1deg; } }
+@keyframes ed-fonkel { 0%, 100% { opacity: .55; } 50% { opacity: 1; fill: #FFFFFF; } }
+.ed-kroon { transform-origin: 50% 0; }
+
+/* ---------------------------------------------------------------- secties */
+.ed-body { position: relative; }
+.ed-sec { position: relative; padding: clamp(3.2rem, 13vw, 4.6rem) clamp(1.25rem, 6.5vw, 2.6rem); text-align: center; }
+.ed-sec:nth-child(even) { background: var(--ed-bg-2); }
+.ed-h2 { margin: 0 0 1.4rem; font: 400 clamp(2.5rem, 11vw, 3.2rem)/1.15 var(--ed-script); color: var(--ed-accent); text-wrap: balance; }
+.ed-intro__tagline { margin: 0 auto; max-width: 24rem; font: italic 500 clamp(1.3rem, 5.4vw, 1.55rem)/1.45 var(--ed-serif); text-wrap: balance; }
+.ed-intro__tagline::before, .ed-intro__tagline::after { content: ""; display: block; width: 64px; height: 10px; margin: .9rem auto; background: radial-gradient(circle, var(--ed-gold) 0 3px, transparent 3.5px) center / 10px 10px no-repeat, linear-gradient(90deg, transparent, var(--ed-gold) 30%, var(--ed-gold) 70%, transparent) center / 100% 1px no-repeat; }
+
+/* De datum onder een boog, als een klein raam van de balzaal. */
+.ed-boog {
+  display: grid; justify-items: center; gap: .15rem; width: min(62vw, 230px); margin: .4rem auto 0; padding: 2.6rem 1rem 1.4rem;
+  border-radius: 999px 999px 14px 14px; border: 2px solid var(--ed-gold); background: var(--ed-bg);
+  box-shadow: inset 0 0 0 6px var(--ed-bg), inset 0 0 0 7px color-mix(in srgb, var(--ed-gold) 45%, transparent), 0 20px 34px -26px rgba(40, 30, 20, .5);
+}
+.ed-boog__dag, .ed-boog__jaar { font: 600 .66rem var(--ed-ui); letter-spacing: .24em; text-transform: uppercase; color: var(--ed-muted); }
+.ed-boog__num { font: 300 clamp(3rem, 14vw, 3.7rem)/1 var(--ed-ui); letter-spacing: -.02em; color: var(--ed-ink); }
+.ed-boog__maand { font: 400 clamp(1.9rem, 8vw, 2.3rem)/1 var(--ed-script); color: var(--ed-accent); }
+.ed-date__tijd { margin: 1.3rem 0 0; font: italic 500 1.25rem var(--ed-serif); }
+
+/* Welkom en verhaal */
+.ed-foto figure, figure.ed-foto { margin: 0; }
+.ed-letter__photo { max-width: 320px; margin: 0 auto 1.8rem; padding: 8px; background: #fff; box-shadow: 0 0 0 1px color-mix(in srgb, var(--ed-gold) 50%, transparent), 0 20px 34px -24px rgba(40, 30, 20, .5); border-radius: 200px 200px 6px 6px; }
+.ed-letter__photo .ph { aspect-ratio: 3 / 4; border-radius: 196px 196px 3px 3px; overflow: hidden; }
+.ed-letter__text, .ed-story__text { max-width: 26rem; margin: 0 auto; line-height: 1.65; }
+.ed-letter__text p { margin: 0 0 .9rem; }
+.ed-letter__text p:first-child { font: 400 2rem/1.25 var(--ed-script); color: var(--ed-accent); }
+
+/* Programma: gouden tijdlijn met ruitjes */
+.ed-tijdlijn { position: relative; list-style: none; margin: 0 auto; padding: 0; max-width: 24rem; display: grid; gap: 1.5rem; text-align: left; }
+.ed-tijdlijn::before { content: ""; position: absolute; left: 13px; top: 8px; bottom: 8px; width: 1px; background: linear-gradient(transparent, var(--ed-gold) 8%, var(--ed-gold) 92%, transparent); }
+.ed-tl { position: relative; display: grid; grid-template-columns: 28px 1fr; gap: 1rem; align-items: start; }
+.ed-tl__ruit { width: 16px; height: 16px; margin: 6px; rotate: 45deg; border: 2px solid var(--ed-gold); background: var(--ed-bg); box-shadow: 0 0 0 3px var(--ed-bg); }
+.ed-sec:nth-child(even) .ed-tl__ruit { background: var(--ed-bg-2); box-shadow: 0 0 0 3px var(--ed-bg-2); }
+.ed-tl__tijd { margin: 0; font: 600 .74rem var(--ed-ui); letter-spacing: .18em; color: var(--ed-gold-2); }
+.ed-tl__titel { margin: .1rem 0 0; font: italic 600 1.4rem/1.25 var(--ed-serif); }
+.ed-tl__desc { margin: .2rem 0 0; color: var(--ed-muted); line-height: 1.45; }
+
+/* Aftellen */
+.ed-count .cd__num { font: 300 clamp(2.1rem, 10vw, 2.8rem)/1.05 var(--ed-ui); color: var(--ed-accent); }
+.ed-count .cd__label { margin-top: .3rem; font: 600 .64rem var(--ed-ui); letter-spacing: .2em; text-transform: uppercase; }
+.ed-count .inv-actions { margin-top: 1.6rem; }
+
+/* Locatie, dresscode, foto's, praktisch */
+.ed-place__venue { margin: 0; font: italic 600 clamp(1.6rem, 7vw, 2rem)/1.2 var(--ed-serif); color: var(--ed-accent); }
+.ed-place__address { margin: .5rem 0 0; font-style: normal; line-height: 1.55; }
+.ed-place__when { margin: 1rem 0 1.5rem; color: var(--ed-muted); }
+.ed-kleuren { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin: 0 0 1.3rem; padding: 0; }
+.ed-kleur { width: 46px; height: 46px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c) 55%, #fff), var(--c) 60%); box-shadow: 0 0 0 3px var(--ed-bg), 0 0 0 4.5px var(--ed-gold), 0 8px 14px -8px rgba(0, 0, 0, .45); }
+.ed-dress__text { max-width: 24rem; margin: 0 auto .6rem; }
+.ed-photos { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; max-width: 460px; margin: 0 auto; padding: 0; }
+.ed-photos .ed-foto { padding: 6px; background: #fff; border-radius: 120px 120px 4px 4px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--ed-gold) 45%, transparent), 0 14px 24px -18px rgba(40, 30, 20, .5); }
+.ed-photos .ph { aspect-ratio: 4 / 5; border-radius: 116px 116px 2px 2px; overflow: hidden; }
+.ed-photos figcaption { padding-top: .4rem; font: italic 500 1rem var(--ed-serif); color: var(--ed-muted); }
+.ed-practical__list { display: grid; gap: 1.2rem; max-width: 26rem; margin: 0 auto; }
+.ed-practical__item dt { font: 600 .74rem var(--ed-ui); letter-spacing: .18em; text-transform: uppercase; color: var(--ed-gold-2); }
+.ed-practical__item dd { margin: .3rem 0 0; }
+
+/* Aanmelden, contact, afsluiting */
+.ed-card { max-width: 440px; margin: 0 auto; padding: 1.8rem clamp(1.1rem, 5vw, 1.7rem) 1.6rem; text-align: left; background: var(--ed-bg); border: 1px solid color-mix(in srgb, var(--ed-gold) 55%, transparent); border-radius: 16px; box-shadow: 0 0 0 5px var(--ed-bg), 0 0 0 6px color-mix(in srgb, var(--ed-gold) 25%, transparent), 0 24px 44px -32px rgba(40, 30, 20, .5); }
+.ed-card .rsvp__deadline { font-style: italic; font-size: 1.1rem; }
+.ed-contact__name { margin: .4rem 0 .2rem; font: 400 2rem var(--ed-script); color: var(--ed-accent); }
+.ed-closing__kroon { width: min(34vw, 130px); margin: 0 auto .6rem; }
+.ed-closing__wish { margin: 0; font: 400 clamp(2.6rem, 11vw, 3.3rem)/1.1 var(--ed-script); color: var(--ed-accent); }
+.ed-closing__text { max-width: 24rem; margin: .8rem auto 0; }
+.ed-closing .inv-share { margin-top: 1.8rem; }
+.inv-eerste-dans .music__toggle, .inv-eerste-dans .fx-toggle { box-shadow: 0 8px 22px -6px rgba(40, 25, 10, .4), inset 0 1px 0 rgba(255, 255, 255, .6); }
+.inv-eerste-dans .music__toggle { background: linear-gradient(180deg, #FFF6E2, #E4C88E); }
+
+/* Lage schermen (liggende telefoon, kaartbeeld): namen op één regel en compacter, zodat het bruidspaar in beeld blijft. */
+@media (max-height: 640px) {
+  .ed-hero { min-height: 480px; }
+  .ed-kroon { width: min(28vw, 120px); }
+  .ed-names { font-size: clamp(2.2rem, 9vw, 2.8rem); }
+  .ed-names__one, .ed-names__two, .ed-names__amp { display: inline; }
+  .ed-names__amp { margin: 0 .15em; }
+  .ed-hero__date { margin-top: .4rem; }
+  .ed-hero__venue { display: none; }
+  .ed-paar { min-height: 170px; margin-bottom: 2rem; }
+}
+
+/* ================================================================ computer */
+@media (min-width: 600px) {
+  body { background: var(--ed-page); }
+  .inv-eerste-dans .inv-main { width: var(--ed-w); margin: 0 auto; background: var(--ed-bg); box-shadow: 0 0 0 1px color-mix(in srgb, var(--ed-gold) 40%, transparent), 0 40px 90px -40px rgba(40, 30, 20, .45); }
+  .ed-hero { height: min(100vh, 920px); }
+}
+
+/* ================================================================ geen beweging */
+@media (prefers-reduced-motion: reduce) {
+  .ed-dans, .ed-rok, .ed-sluier, .ed-kroon, .ed-kristal, .ed-zegel__was { animation: none !important; }
+  .ed-deur { transition: none; }
+}
+@media print {
+  .ed-hero__fx, .ed-deuren { display: none; }
+}

@@ -21,6 +21,7 @@ DEFAULT_DEMO_OCCASION = {
     "gloria": "kerst",
     "aan-tafel": "kerst",
     "voor-altijd": "bruiloft",
+    "eerste-dans": "bruiloft",
 }
 
 DESIGN_IMAGES = {
@@ -66,6 +67,7 @@ DESIGN_IMAGES = {
     "gloria": ["kerst-lichtjes", "sterrenhemel", "kaarslicht", "kerst-boom", "wolken"],
     "aan-tafel": ["kerst-kaarsen", "kaarslicht", "kerst-lichtjes", "kerst-boom", "goud-lichtjes"],
     "voor-altijd": ["rozen", "waterverf-bloesem", "bloemblaadjes", "eucalyptus", "duinen-staand"],
+    "eerste-dans": ["waterverf-bloesem", "rozen", "kaarslicht", "bloemblaadjes", "zijde-goud"],
 }
 IMAGE_SIZES = {
     "waterverf-bloesem": (1200, 1500),

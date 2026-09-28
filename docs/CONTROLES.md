@@ -445,3 +445,23 @@ ik niet heb; daar zijn alleen `/healthz`, de statische bestanden en de webhook (
   - echte e-mailbezorging (SMTP);
   - de AI met een echte sleutel;
   - een upload naar een echte tweede back-uplocatie (nog geen aanbieder gekozen).
+
+## Bruiloftsontwerp Eerste dans (29 september 2026)
+
+Een eigen ontwerp, geïnspireerd op een voorbeeldvideo van de eigenaar (geen kopie). Paleisdeuren met een lakzegel
+(standaard- of persoonlijk zegel volgens het pakket), een balzaal met kroonluchter en bloemenslinger, en een getekend
+bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in een zwart pak.
+
+- `manage.py test tests`: 266 tests, alle geslaagd (nieuw: `tests/test_eerste_dans.py`).
+- Contrast van de tekst in alle vier kleuren minstens 4,5:1, en de initialen op het zegel minstens 3:1.
+- `e2e/effecten.cjs` voor Eerste dans: 8/8 geslaagd.
+  - Gevonden en opgelost: de knal kwam te laat (na 700 ms, gemeten na 650 ms). Hij start nu bij 450 ms, als het zegel breekt.
+- `e2e/toegankelijkheid.cjs` voor alle vier kleuren, dicht en open: geen bevindingen.
+  - Gevonden en opgelost: de initialen op het zegel hadden te weinig contrast; de lak is dieper gemaakt.
+- In Chromium (Playwright):
+  - openen en de hele pagina op 390 pixels in alle vier kleuren;
+  - op 360, 768 en 1366 pixels geen horizontaal scrollen en geen fouten in de console.
+  - Gevonden en opgelost: het paar viel onder de voorbeeldbalk weg; het past zich nu aan de beschikbare ruimte aan.
+  - Gevonden en opgelost: cijfers in Cormorant lazen als letters ("1" als "I"); getallen staan nu in DM Sans.
+- Kaartbeeld gemaakt met `e2e/make_design_images.cjs`.
+  - Het script zet nu `--inv-banner-h: 0px`, omdat het de voorbeeldbalk verbergt.

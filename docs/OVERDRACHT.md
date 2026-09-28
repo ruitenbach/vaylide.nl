@@ -46,6 +46,14 @@ Gedane rondes:
    - Domein: `vaylide.nl` voorbereid (`docs/DOMEIN.md`); de DNS is niet gewijzigd.
    - AI-model standaard `claude-opus-5-5`.
 
+10. Bruiloftsontwerp **Eerste dans** (29 september 2026):
+    - paleisdeuren met een lakzegel;
+    - een balzaal met kroonluchter en een slinger van hortensia's en rozen;
+    - een getekend bruidspaar dat zacht danst (blonde bruid in wit, bruidegom in een zwart pak);
+    - vier kleuren (hemelsblauw, champagne, saliegroen, poederroze).
+
+    Tekeningen: `tools/eerste_dans/maak_tekeningen.py`.
+
 Wat getest is en hoe: `docs/CONTROLES.md`. Kort, na ronde 7: 160 tests (op SQLite), een browsercontrole op 840 pagina's (vier schermformaten, alle 34 ontwerpen, 272 gedragscontroles; Winterlicht daarna opnieuw op de definitieve stand), 272 controles van de effecten en een meting van de belasting (alle 34 ontwerpen), toegankelijkheid en contrast van alle 34 ontwerpen in alle 106 kleurvarianten, het contrast van de tekst op de tekening van het kerstraam, en axe op de gewijzigde websitepagina's. Na ronde 6: 139 tests (op SQLite; op PostgreSQL 16 in ronde 5), een browsercontrole op 816 pagina's (vier schermformaten, alle 33 ontwerpen, 264 gedragscontroles), toegankelijkheid van de website en een lokale nabootsing van de Render-instellingen met PostgreSQL. Uit ronde 5 (in ronde 6 veranderden aan de uitnodigingen alleen de naam onderaan en het tabblad-icoon): 264 controles van de effecten (ook stilzetten en 'minder beweging'), een meting van de belasting op een vertraagde processor, en toegankelijkheid en contrast van alle ontwerpen in alle kleuren.
 
 Voorvertoning (statisch, alleen om te kijken): https://claude.ai/artifact/DYkTUBCKzn63jE8Mk9x28M

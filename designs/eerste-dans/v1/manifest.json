@@ -1,0 +1,192 @@
+{
+  "slug": "eerste-dans",
+  "version": 1,
+  "name": "Eerste dans",
+  "tagline": "Paleisdeuren met een lakzegel, en een bruidspaar dat danst",
+  "description": "Twee hoge paleisdeuren, verzegeld met een lakzegel. Na een tik breekt het zegel en zwaaien de deuren open. Daarachter een balzaal met een kristallen kroonluchter, een slinger van hortensia's en witte rozen, en een getekend bruidspaar dat zacht danst: de bruid met blond haar in een witte baljurk met sluier, de bruidegom in een zwart pak. Daarna jullie namen in sierlijk schrift, de datum onder een boog, het programma als gouden tijdlijn en fonkelend goudstof. In het voorbeeld klinkt de Canon in D van Pachelbel.",
+  "style_notes": "Balzaal, paleisdeuren, lakzegel, kroonluchter, hortensia's, getekend bruidspaar, romantisch en feestelijk",
+  "occasions": [
+    "bruiloft",
+    "verloving"
+  ],
+  "sort_order": 6,
+  "opening": "paleisdeuren",
+  "opening_label": "Paleisdeuren met lakzegel",
+  "demo_melody": "canon",
+  "kaartbeeld": "open",
+  "palettes": [
+    {
+      "key": "hemelsblauw",
+      "name": "Hemelsblauw",
+      "swatch": [
+        "#8DA4C8",
+        "#FBFAF7",
+        "#C9A45C"
+      ],
+      "vars": {
+        "--ed-page": "#E6ECF3",
+        "--ed-sky": "#D5E2EF",
+        "--ed-bg": "#FBFAF7",
+        "--ed-bg-2": "#EFF3F8",
+        "--ed-ink": "#1F2A3D",
+        "--ed-muted": "#4A566B",
+        "--ed-accent": "#2E4870",
+        "--ed-accent-ink": "#FFFFFF",
+        "--ed-gold": "#C9A45C",
+        "--ed-gold-2": "#76571F",
+        "--ed-line": "#DCE3EC",
+        "--ed-door": "#F1F4F9",
+        "--ed-door-2": "#D6DFEA",
+        "--ed-bloem": "#A9C0DE",
+        "--ed-bloem-2": "#7F9CC6",
+        "--ed-blad": "#8FA588",
+        "--ed-blad-2": "#6F8868",
+        "--ed-seal": "#56709A",
+        "--ed-seal-2": "#7189B2",
+        "--ed-seal-ink": "#FBF6E8",
+        "--ed-cover-ink": "#1F2A3D",
+        "--fx-1": "#FFFFFF",
+        "--fx-2": "#C9A45C",
+        "--fx-3": "#B3C5DF",
+        "--fx-4": "#F3E3B8",
+        "--fx-bg": "#FBFAF7"
+      }
+    },
+    {
+      "key": "champagne",
+      "name": "Champagne",
+      "swatch": [
+        "#D9B77C",
+        "#FFFCF8",
+        "#E7BFC0"
+      ],
+      "vars": {
+        "--ed-page": "#F2EBE1",
+        "--ed-sky": "#F7EFE5",
+        "--ed-bg": "#FFFCF8",
+        "--ed-bg-2": "#F7F0E7",
+        "--ed-ink": "#2E2620",
+        "--ed-muted": "#5B4F45",
+        "--ed-accent": "#7A4B36",
+        "--ed-accent-ink": "#FFFFFF",
+        "--ed-gold": "#C9A45C",
+        "--ed-gold-2": "#74551C",
+        "--ed-line": "#E8DED2",
+        "--ed-door": "#F8F2EA",
+        "--ed-door-2": "#E7DACA",
+        "--ed-bloem": "#EDC9C9",
+        "--ed-bloem-2": "#DCA3A7",
+        "--ed-blad": "#9AAA88",
+        "--ed-blad-2": "#7D8F6C",
+        "--ed-seal": "#8C6A2C",
+        "--ed-seal-2": "#AA8544",
+        "--ed-seal-ink": "#FFF8E6",
+        "--ed-cover-ink": "#2E2620",
+        "--fx-1": "#FFFFFF",
+        "--fx-2": "#E7BFC0",
+        "--fx-3": "#E0C488",
+        "--fx-4": "#F6DADA",
+        "--fx-bg": "#FFFCF8"
+      }
+    },
+    {
+      "key": "salie",
+      "name": "Saliegroen",
+      "swatch": [
+        "#6F8868",
+        "#FBFBF7",
+        "#C9A45C"
+      ],
+      "vars": {
+        "--ed-page": "#E7ECE3",
+        "--ed-sky": "#EDF2E9",
+        "--ed-bg": "#FBFBF7",
+        "--ed-bg-2": "#EFF3EB",
+        "--ed-ink": "#25301F",
+        "--ed-muted": "#4F5B47",
+        "--ed-accent": "#4A6042",
+        "--ed-accent-ink": "#FFFFFF",
+        "--ed-gold": "#C9A45C",
+        "--ed-gold-2": "#715619",
+        "--ed-line": "#DCE3D5",
+        "--ed-door": "#F2F5EF",
+        "--ed-door-2": "#D8E0D0",
+        "--ed-bloem": "#E4EDDA",
+        "--ed-bloem-2": "#BFD2AF",
+        "--ed-blad": "#7C8F6A",
+        "--ed-blad-2": "#5F7352",
+        "--ed-seal": "#4E6448",
+        "--ed-seal-2": "#6A8060",
+        "--ed-seal-ink": "#F4EEDC",
+        "--ed-cover-ink": "#25301F",
+        "--fx-1": "#FFFFFF",
+        "--fx-2": "#C9A45C",
+        "--fx-3": "#DCE8D2",
+        "--fx-4": "#F3E3B8",
+        "--fx-bg": "#FBFBF7"
+      }
+    },
+    {
+      "key": "poederroze",
+      "name": "Poederroze",
+      "swatch": [
+        "#D99FAD",
+        "#FFFBFA",
+        "#C9A45C"
+      ],
+      "vars": {
+        "--ed-page": "#F4E7E7",
+        "--ed-sky": "#F8EFEE",
+        "--ed-bg": "#FFFBFA",
+        "--ed-bg-2": "#F8EEEC",
+        "--ed-ink": "#3A2428",
+        "--ed-muted": "#634649",
+        "--ed-accent": "#86384C",
+        "--ed-accent-ink": "#FFFFFF",
+        "--ed-gold": "#C9A45C",
+        "--ed-gold-2": "#765619",
+        "--ed-line": "#EDDADA",
+        "--ed-door": "#F9F1F1",
+        "--ed-door-2": "#EBD7D7",
+        "--ed-bloem": "#F1C8CF",
+        "--ed-bloem-2": "#DFA1AE",
+        "--ed-blad": "#98A98A",
+        "--ed-blad-2": "#7A8E6D",
+        "--ed-seal": "#8E4458",
+        "--ed-seal-2": "#B0647A",
+        "--ed-seal-ink": "#FFF1F2",
+        "--ed-cover-ink": "#3A2428",
+        "--fx-1": "#FFFFFF",
+        "--fx-2": "#F1C8CF",
+        "--fx-3": "#E0C488",
+        "--fx-4": "#F7DDE2",
+        "--fx-bg": "#FFFBFA"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "goudstof",
+    "knal": "blaadjes",
+    "viering": "harten",
+    "namen": "schrijf",
+    "onthul": "zacht",
+    "extra": [
+      "kenburns",
+      "tik"
+    ]
+  },
+  "changelog": "Eerste versie."
+}
