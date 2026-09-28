@@ -1,6 +1,8 @@
 {% if v.is_demo %}<div class="inv-banner inv-banner--demo" role="note">
-  <p><strong>Voorbeelduitnodiging</strong><span class="inv-banner__sep" aria-hidden="true"> · </span><span>fictief evenement</span></p>
-  {% if not v.embed %}<a class="inv-banner__cta" href="{% url 'studio:start' %}?ontwerp={{ v.design_slug }}&amp;gelegenheid={{ v.occasion }}">Maak jouw uitnodiging</a>{% endif %}
+  {% if v.card_kind == "wenskaart" %}<p><strong>Voorbeeldwenskaart</strong><span class="inv-banner__sep" aria-hidden="true"> · </span><span>fictieve afzender</span></p>
+  {% if not v.embed %}<a class="inv-banner__cta" href="{% url 'studio:start' %}?ontwerp={{ v.design_slug }}&amp;gelegenheid={{ v.occasion }}&amp;soort=wenskaart">Maak jouw wenskaart</a>{% endif %}
+  {% else %}<p><strong>Voorbeelduitnodiging</strong><span class="inv-banner__sep" aria-hidden="true"> · </span><span>fictief evenement</span></p>
+  {% if not v.embed %}<a class="inv-banner__cta" href="{% url 'studio:start' %}?ontwerp={{ v.design_slug }}&amp;gelegenheid={{ v.occasion }}">Maak jouw uitnodiging</a>{% endif %}{% endif %}
 </div>{% elif v.is_preview %}<div class="inv-banner inv-banner--preview" role="note">
   <p><strong>Voorbeeld</strong><span class="inv-banner__sep" aria-hidden="true"> · </span><span>nog niet gepubliceerd, aanmelden staat uit</span></p>
 </div>{% endif %}

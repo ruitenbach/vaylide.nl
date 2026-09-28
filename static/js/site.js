@@ -89,6 +89,43 @@
     select.addEventListener("change", function () { if (select.form) select.form.submit(); });
   });
 
+  // Kleurvarianten en soort kaart op de ontwerppagina: het voorbeeld wisselt mee zonder de pagina te herladen.
+  var kleurFrame = document.querySelector("[data-kleur-frame]");
+  function zetParam(href, naam, waarde) { var u = new URL(href, window.location.href); u.searchParams.set(naam, waarde); return u.pathname + u.search + u.hash; }
+  var soortTekst = { uitnodiging: "Met datum, locatie en aanmelden, bijvoorbeeld voor het kerstdiner.", wenskaart: "Alleen een kerstgroet, zonder datum, locatie of aanmelden." };
+  document.querySelectorAll("[data-soort-link]").forEach(function (link) {
+    link.addEventListener("click", function (event) {
+      if (!kleurFrame || event.metaKey || event.ctrlKey || event.shiftKey) return;
+      event.preventDefault();
+      var soort = link.getAttribute("data-soort");
+      kleurFrame.src = zetParam(kleurFrame.getAttribute("src"), "soort", soort);
+      document.querySelectorAll("[data-kleur-link], [data-palette-link]").forEach(function (a) { a.setAttribute("href", zetParam(a.getAttribute("href"), "soort", soort)); });
+      document.querySelectorAll("[data-soort-input]").forEach(function (input) { input.value = soort; });
+      document.querySelectorAll("[data-soort-link]").forEach(function (other) {
+        if (other === link) other.setAttribute("aria-current", "true"); else other.removeAttribute("aria-current");
+      });
+      var hint = document.querySelector(".segmented__hint");
+      if (hint) hint.textContent = soortTekst[soort] || "";
+      if (window.history && history.replaceState) history.replaceState(null, "", zetParam(window.location.href, "soort", soort));
+    });
+  });
+  document.querySelectorAll("[data-palette-link]").forEach(function (link) {
+    link.addEventListener("click", function (event) {
+      if (!kleurFrame || event.metaKey || event.ctrlKey || event.shiftKey) return;
+      event.preventDefault();
+      var kleur = link.getAttribute("data-kleur");
+      function metKleur(href) { var u = new URL(href, window.location.href); u.searchParams.set("kleur", kleur); return u.pathname + u.search + u.hash; }
+      kleurFrame.src = metKleur(kleurFrame.getAttribute("src"));
+      document.querySelectorAll("[data-kleur-link]").forEach(function (a) { a.setAttribute("href", metKleur(a.getAttribute("href"))); });
+      document.querySelectorAll("[data-kleur-input]").forEach(function (input) { input.value = kleur; });
+      document.querySelectorAll("[data-kleur-naam]").forEach(function (el) { el.textContent = link.getAttribute("data-naam") || ""; });
+      document.querySelectorAll("[data-palette-link]").forEach(function (other) {
+        if (other === link) other.setAttribute("aria-current", "true"); else other.removeAttribute("aria-current");
+      });
+      if (window.history && history.replaceState) history.replaceState(null, "", metKleur(window.location.href));
+    });
+  });
+
   // Tekstveld met link: alles selecteren bij focus.
   document.querySelectorAll("[data-select-all]").forEach(function (input) {
     input.addEventListener("focus", function () { input.select(); });

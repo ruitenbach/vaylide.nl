@@ -1,0 +1,39 @@
+/* Sneeuwpret v1 — ijsblauw, sneeuwpop, sterren, winters.
+   Opbouw, opening en versiering: designs/_atelier/v1. Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Fraunces"; src: url("../../../fonts/fraunces-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Fraunces"; src: url("../../../fonts/fraunces-latin-wght-italic.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
+@font-face { font-family: "Quicksand"; src: url("../../../fonts/quicksand-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+
+body {
+  --a-display: "Fraunces", Georgia, serif;
+  --a-body: "Quicksand", system-ui, sans-serif;
+  --a-script: "Fraunces", Georgia, serif;
+  --a-ui: "Quicksand", system-ui, sans-serif;
+  --a-text-font: "Quicksand", system-ui, sans-serif;
+  --a-radius: 22px;
+  --a-names-weight: 600;
+  --a-h2-weight: 600;
+}
+
+.a-orn--top { width: min(14rem, 62vw); margin-bottom: .6rem; }
+.a-orn--bottom { display: none; }
+.a-orn--closing { width: min(10rem, 46vw); }
+.fx-motion .sp-lamp { animation: sp-twinkel 1.6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .sp-lamp--1 { animation-delay: -.55s; }
+.fx-motion .sp-lamp--2 { animation-delay: -1.1s; }
+@keyframes sp-twinkel { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+.sp-arm { transform-box: view-box; transform-origin: 70px 116px; }
+.sp-hoed { transform-box: view-box; transform-origin: 100px 46px; }
+.sp-sjaal { transform-box: view-box; transform-origin: 110px 96px; }
+.sp-figuur { transform-box: view-box; transform-origin: 100px 222px; }
+.fx-motion .sp-arm { animation: sp-zwaai 2s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .sp-hoed { animation: sp-hoed 4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .sp-sjaal { animation: sp-sjaal 1.4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .sp-figuur { animation: sp-wieg 4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes sp-zwaai { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(18deg); } 50% { transform: rotate(-4deg); } 75% { transform: rotate(16deg); } }
+@keyframes sp-hoed { 0%, 70%, 100% { transform: rotate(0deg); } 80% { transform: rotate(-9deg) translateY(-3px); } 90% { transform: rotate(4deg); } }
+@keyframes sp-sjaal { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-8deg); } }
+@keyframes sp-wieg { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg); } }
+.a-tagline { font-family: var(--a-body); font-style: normal; }
+.a-lead { font-family: var(--a-body); }

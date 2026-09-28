@@ -17,7 +17,7 @@ from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, oc
 from core.ai import AIUnavailable, suggest_text
 from core.utils import ip_fingerprint, rate_limit, wants_json
 from invitations.access import get_accessible_invitation, remember_draft, session_drafts
-from invitations.content import SECTION_LABELS, normalize_content, publish_issues, referenced_assets
+from invitations.content import SECTION_LABELS, card_kind, normalize_content, publish_issues, referenced_assets
 from invitations.images import UploadError, process_photo, sniff_audio
 from invitations.models import Invitation, MediaAsset, Source
 from invitations.render import PathResolver, RenderOptions, build_view
@@ -34,7 +34,7 @@ from orders.pricing import PricingError, compare_packages, optional_addons, reco
 from orders.services import CheckoutError, invitation_is_paid, start_checkout
 
 from .forms import FORM_CLASSES, CheckoutForm, DesignForm
-from .steps import STEP_LABELS, next_step, previous_step, progress
+from .steps import STEP_LABELS, WENSKAART_LABELS, WENSKAART_SKIP, next_step, previous_step, progress
 
 MAX_PHOTOS_PER_INVITATION = 30
 
@@ -58,14 +58,24 @@ def _locked(request, inv: Invitation) -> list[str]:
     return list((inv.draft_overrides or {}).get("locked_fields") or [])
 
 
+def _wenskaart(inv: Invitation, content: dict | None = None) -> bool:
+    return card_kind(content if content is not None else _content(inv), inv.occasion) == "wenskaart"
+
+
+def _skip(inv: Invitation, content: dict | None = None):
+    return WENSKAART_SKIP if _wenskaart(inv, content) else frozenset()
+
+
 def _context(request, inv: Invitation, step: str, **extra) -> dict:
     paid = invitation_is_paid(inv)
-    items = progress(step, paid=paid)
+    wens = _wenskaart(inv)
+    items = progress(step, paid=paid, skip=WENSKAART_SKIP if wens else frozenset(), labels=WENSKAART_LABELS if wens else None)
     current = next((i for i in items if i["state"] == "current"), items[0])
     ctx = {
         "inv": inv,
         "step": step,
-        "step_label": STEP_LABELS.get(step, ""),
+        "step_label": (WENSKAART_LABELS if wens else {}).get(step, STEP_LABELS.get(step, "")),
+        "wenskaart": wens,
         "progress": items,
         "progress_current": current,
         "progress_pct": round(100 * current["number"] / len(items)),
@@ -95,7 +105,8 @@ def start(request):
                 messages.error(request, "Je hebt veel ontwerpen gestart. Probeer het later opnieuw.")
                 return redirect("studio:start")
             owner = request.user if request.user.is_authenticated and not request.user.is_staff else None
-            inv = create_draft(occasion=form.cleaned_data["occasion"], template=form.cleaned_data["template_obj"], owner=owner)
+            inv = create_draft(occasion=form.cleaned_data["occasion"], template=form.cleaned_data["template_obj"], owner=owner,
+                               palette=request.POST.get("kleur", "")[:40], soort=request.POST.get("soort", "")[:20])
             remember_draft(request, inv)
             return redirect("studio:step", uid=inv.uid, step="gegevens")
     else:
@@ -118,6 +129,8 @@ def start(request):
             "occasion_label": OCCASION_LABELS.get(occasion, ""),
             "templates": shown,
             "chosen": chosen,
+            "kleur": (request.GET.get("kleur") or request.POST.get("kleur") or "")[:40],
+            "soort": s if (s := request.GET.get("soort") or request.POST.get("soort") or "") in ("uitnodiging", "wenskaart") else "",
             "existing": existing,
             "progress": progress("gelegenheid" if not occasion else "ontwerp"),
             "progress_current": {"number": 1 if not occasion else 2, "label": "Gelegenheid" if not occasion else "Ontwerp"},
@@ -161,6 +174,9 @@ def step(request, uid, step):
         return render(request, "studio/locked.html", _context(request, inv, step))
 
     content = _content(inv)
+    # Een stap die bij deze kaart niet hoort (Aanmelden bij een wenskaart): door naar de volgende.
+    if step in _skip(inv, content):
+        return redirect("studio:step", uid=inv.uid, step=next_step(step, paid=invitation_is_paid(inv), skip=_skip(inv, content)))
     extra_kwargs = {}
     photos = audio = []
     if step == "fotos":
@@ -182,7 +198,7 @@ def step(request, uid, step):
             new_content = form.apply(copy.deepcopy(content))
             missing = form.missing() if action == "volgende" else {}
             paid = invitation_is_paid(inv)
-            target = next_step(step, paid=paid) if action == "volgende" and not missing else step
+            target = next_step(step, paid=paid, skip=_skip(inv, new_content)) if action == "volgende" and not missing else step
             try:
                 inv = save_draft(inv, expected_rev=posted_rev, content=new_content, user=request.user, source=_source(request),
                                  step=target if action == "volgende" and not missing else None)
@@ -201,7 +217,7 @@ def step(request, uid, step):
                     messages.success(request, "Opgeslagen. Je vindt je ontwerp terug in Mijn Vaylide.")
                     return redirect("studio:step", uid=inv.uid, step=step)
                 elif action == "vorige":
-                    return redirect("studio:step", uid=inv.uid, step=previous_step(step))
+                    return redirect("studio:step", uid=inv.uid, step=previous_step(step, skip=_skip(inv, new_content)))
                 else:
                     return redirect("studio:step", uid=inv.uid, step=target)
         else:

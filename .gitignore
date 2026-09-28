@@ -9,3 +9,5 @@ __pycache__/
 e2e/output/
 e2e/node_modules/
 .DS_Store
+# Lokale instellingen van ontwerphulpmiddelen
+.impeccable/

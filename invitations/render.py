@@ -17,7 +17,7 @@ from django.utils import timezone
 from catalog.effects import effect_view
 from catalog.occasions import display_title, doc_kind, monogram, occasion_config
 
-from .content import HEX_COLOR, TIMEZONE_LABELS, event_expected, event_times, normalize_content, parse_date
+from .content import HEX_COLOR, TIMEZONE_LABELS, card_kind, event_expected, event_times, normalize_content, parse_date, without_event
 
 WEEKDAYS = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"]
 MONTHS = [
@@ -211,6 +211,8 @@ def build_view(
     overrides = overrides or {}
     palette_key = (content.get("style") or {}).get("palette") or template_version.default_palette_key
     content = normalize_content(content, occasion, palette_key)
+    if not event_expected(content, occasion):
+        content = without_event(content)
     cfg = occasion_config(occasion)
     now = options.now or timezone.now()
     features = set(options.features)
@@ -378,6 +380,11 @@ def build_view(
         "closing": enabled("closing") and bool((content.get("closing_text") or "").strip()),
         "music": enabled("music") and "music" in features and (bool(music_url) or options.music_synth),
     }
+    # Een wenskaart is alleen een groet: geen dresscode, 'Goed om te weten' of 'Vragen' (programma, locatie en
+    # aanmelden vallen al weg omdat er geen evenement is).
+    if not with_event and cfg.get("event_optional"):
+        for key in ("dresscode", "practical", "contact"):
+            show[key] = False
 
     # Aanmelden: deadline, verstreken datum en maximale capaciteit.
     rsvp_deadline = times.rsvp_deadline
@@ -452,6 +459,7 @@ def build_view(
         # Kleine regel onder de namen (bij een kerstkaart: de namen van het gezin).
         "subnames": (names_raw.get("members") or "").strip() if occasion == "kerst" else "",
         "has_event": with_event,
+        "card_kind": card_kind(content, occasion),
         "is_couple": len(names) == 2,
         "names_size": names_size,
         "number": number,

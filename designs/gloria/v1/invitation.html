@@ -1,0 +1,174 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Gloria v1 — kerstontwerp met engelen: vleugels die zich openvouwen, engelen met bazuinen en hemels licht.
+   Tekeningen: tools/gloria/maak_tekeningen.py. Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/great-vibes-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/marcellus-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>{% endblock %}
+
+{% block cover %}
+<section class="cover gl-cover" data-cover data-duration="2800" data-fx-delay="1050" data-fx-intro="2200" aria-label="Openingsscherm">
+  <div class="gl-cover__licht" aria-hidden="true"></div>
+  <div class="gl-vleugel gl-vleugel--links" aria-hidden="true">{% include "gloria/v1/_vleugel.html" %}</div>
+  <div class="gl-vleugel gl-vleugel--rechts" aria-hidden="true">{% include "gloria/v1/_vleugel.html" %}</div>
+  <div class="fx-slot" data-fx-slot="cover" aria-hidden="true"></div>
+  <a href="#uitnodiging" class="gl-ster fx-pulse" data-open data-fx-origin aria-label="Open de {{ v.doc_kind }}">
+    <span class="gl-ster__aureool" aria-hidden="true"></span>
+    <svg class="gl-ster__svg" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path class="gl-ster__stralen" d="M50 0L53 40L50 50L47 40ZM50 100L47 60L50 50L53 60ZM0 50L40 47L50 50L40 53ZM100 50L60 53L50 50L60 47Z"/><path class="gl-ster__kern" d="M50 18L56 42L80 50L56 58L50 82L44 58L20 50L44 42Z"/><path class="gl-ster__schuin" d="M29 29L47 45L50 50L45 47ZM71 71L53 55L50 50L55 53ZM71 29L55 47L50 50L53 45ZM29 71L45 53L50 50L47 55Z"/></svg>
+  </a>
+  <div class="gl-cover__kaart">
+    <p class="gl-cover__kicker">Gloria</p>
+    <p class="gl-cover__to">{% if v.has_event %}Een uitnodiging voor {% else %}Een kerstgroet voor {% endif %}{% if v.formal %}u{% else %}jou{% endif %}</p>
+    <p class="gl-cover__hint">Tik op de ster</p>
+    {% if v.show.music %}<button type="button" class="gl-cover__music" data-open data-open-music><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor"/></svg>Openen met muziek</button>{% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<header class="gl-hero fx-rays">
+  <div class="fx-slot gl-hero__fx" data-fx-slot="hero" aria-hidden="true"></div>
+  <div class="gl-engelen" aria-hidden="true">
+    <span class="gl-engel gl-engel--links">{% include "gloria/v1/_engel.html" %}</span>
+    <svg class="gl-engelen__ster" viewBox="0 0 100 100" focusable="false"><path d="M50 0L53 40L50 50L47 40ZM50 100L47 60L50 50L53 60ZM0 50L40 47L50 50L40 53ZM100 50L60 53L50 50L60 47Z"/><path d="M50 22L55 44L78 50L55 56L50 78L45 56L22 50L45 44Z"/></svg>
+    <span class="gl-engel gl-engel--rechts">{% include "gloria/v1/_engel.html" %}</span>
+  </div>
+  <div class="gl-hero__text">
+    <p class="gl-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
+    <h1 class="gl-names gl-names--{{ v.names_size }} fx-names">{% if v.is_couple %}<span class="gl-names__one">{{ v.names.0 }}</span> <span class="gl-names__amp" aria-label="en">&amp;</span> <span class="gl-names__two">{{ v.names.1 }}</span>{% else %}<span>{{ v.names.0 }}</span>{% endif %}</h1>
+    {% if v.subnames %}<p class="gl-hero__members fx-intro" style="--fx-d:5">{{ v.subnames }}</p>{% endif %}
+    <div class="gl-hero__deler fx-intro" style="--fx-d:6">{% include "gloria/v1/_ster.html" %}</div>
+    <p class="gl-hero__tagline fx-intro" style="--fx-d:7">{{ v.tagline }}</p>
+    {% if v.has_event and v.date %}<p class="gl-hero__date fx-intro" style="--fx-d:8">{{ v.weekday }} {{ v.day }} {{ v.month_name }} {{ v.year }}{% if v.time_display %} · {{ v.time_display }}{% endif %}</p>{% endif %}
+  </div>
+  <div class="gl-wolken" aria-hidden="true"><span></span><span></span><span></span></div>
+  <a class="gl-scroll fx-intro" href="#gl-verder" style="--fx-d:9">Scroll verder<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+</header>
+
+<div class="gl-body" id="gl-verder">
+{% if v.has_event and v.date %}
+<section class="gl-sec gl-date" data-reveal aria-labelledby="gl-date-title">
+  <h2 id="gl-date-title" class="gl-h2">De datum</h2>
+  {% include "gloria/v1/_ster.html" %}
+  <div class="gl-datester">
+    <svg class="gl-datester__vorm" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><path d="M100.0 3.0L123.7 42.7L168.6 31.4L157.3 76.3L197.0 100.0L157.3 123.7L168.6 168.6L123.7 157.3L100.0 197.0L76.3 157.3L31.4 168.6L42.7 123.7L3.0 100.0L42.7 76.3L31.4 31.4L76.3 42.7Z"/><path class="gl-datester__binnen" d="M100.0 16.0L119.9 52.0L159.4 40.6L148.0 80.1L184.0 100.0L148.0 119.9L159.4 159.4L119.9 148.0L100.0 184.0L80.1 148.0L40.6 159.4L52.0 119.9L16.0 100.0L52.0 80.1L40.6 40.6L80.1 52.0Z"/><circle class="gl-datester__binnen" cx="100" cy="100" r="44"/></svg>
+    <p class="gl-datester__tekst"><span class="gl-datester__dag fx-shimmer">{{ v.day }}</span><span class="gl-datester__maand">{{ v.month_name }}</span></p>
+  </div>
+  <p class="gl-date__full">{{ v.weekday|capfirst }} {{ v.day }} {{ v.month_name }} {{ v.year }}{% if v.time_display %}<br>{{ v.time_display }}{% include "invitations/partials/time_note.html" %}{% endif %}</p>
+</section>
+{% endif %}
+
+{% if v.welcome or v.hero %}
+<section class="gl-sec gl-letter" data-reveal aria-label="{% if v.occasion == 'kerst' %}Kerstgroet{% else %}Welkom{% endif %}">
+  {% if v.hero %}<figure class="gl-boog gl-letter__photo"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 380px, 76vw" %}</div></figure>{% endif %}
+  {% if v.welcome %}<div class="gl-letter__text">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="gl-sec gl-program" data-reveal aria-labelledby="gl-program-title">
+  <h2 id="gl-program-title" class="gl-h2">Het programma</h2>
+  {% include "gloria/v1/_ster.html" %}
+  <ol class="gl-timeline" data-fx-stagger>
+    {% for item in v.program %}
+    <li class="gl-tl">
+      <span class="gl-tl__ster" aria-hidden="true"></span>
+      {% if item.time %}<p class="gl-tl__time">{{ item.time }}</p>{% endif %}
+      <h3 class="gl-tl__title">{{ item.title }}</h3>
+      {% if item.description %}<p class="gl-tl__desc">{{ item.description }}</p>{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="gl-sec gl-count" data-reveal aria-labelledby="gl-count-title">
+  <h2 id="gl-count-title" class="gl-h2">{% if v.countdown_label == "kerst" %}Aftellen naar kerst{% elif v.is_past %}Dank je wel{% else %}Nog even en het is zover{% endif %}</h2>
+  {% include "gloria/v1/_ster.html" %}
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="gl-sec gl-place" data-reveal aria-labelledby="gl-place-title">
+  <h2 id="gl-place-title" class="gl-h2">Locatie</h2>
+  {% include "gloria/v1/_ster.html" %}
+  {% if v.venue %}<p class="gl-place__venue">{{ v.venue }}</p>{% endif %}
+  {% if v.address_lines %}<address class="gl-place__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+  {% if v.date_display %}<p class="gl-place__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="gl-sec gl-dress" data-reveal aria-labelledby="gl-dress-title">
+  <h2 id="gl-dress-title" class="gl-h2">Dresscode</h2>
+  {% include "gloria/v1/_ster.html" %}
+  {% if v.dresscode_colors %}<ul class="gl-kleuren" aria-label="Kleuren voor de dresscode">
+    {% for c in v.dresscode_colors %}<li class="gl-kleur" style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+  {% for p in v.dresscode_text %}<p class="gl-dress__text">{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="gl-sec gl-story" data-reveal aria-labelledby="gl-story-title">
+  <h2 id="gl-story-title" class="gl-h2">{{ v.story_title }}</h2>
+  {% include "gloria/v1/_ster.html" %}
+  <div class="gl-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="gl-sec gl-gallery" data-reveal aria-labelledby="gl-gallery-title">
+  <h2 id="gl-gallery-title" class="gl-h2">Momenten</h2>
+  {% include "gloria/v1/_ster.html" %}
+  <ul class="gl-photos">
+    {% for photo in v.gallery %}<li class="gl-photo"><figure><div class="gl-boog"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 600px) 250px, 44vw" %}</div></div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="gl-sec gl-practical" data-reveal aria-labelledby="gl-practical-title">
+  <h2 id="gl-practical-title" class="gl-h2">Goed om te weten</h2>
+  {% include "gloria/v1/_ster.html" %}
+  <dl class="gl-practical__list" data-fx-stagger>
+    {% for item in v.practical %}<div class="gl-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="gl-sec gl-rsvp" id="aanmelden" data-reveal aria-labelledby="gl-rsvp-title">
+  <h2 id="gl-rsvp-title" class="gl-h2">{% if v.occasion == "kerst" %}{% if v.formal %}Schuift u aan?{% else %}Schuif je aan?{% endif %}{% elif v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+  {% include "gloria/v1/_ster.html" %}
+  <div class="gl-card">
+    {% include "invitations/partials/rsvp.html" %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="gl-sec gl-contact" data-reveal aria-labelledby="gl-contact-title">
+  <h2 id="gl-contact-title" class="gl-h2">Vragen?</h2>
+  {% include "gloria/v1/_ster.html" %}
+  {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+  <p class="gl-contact__name">{{ v.contact.name }}</p>
+  <p class="gl-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="gl-sec gl-closing" data-reveal aria-label="Afsluiting">
+  <div class="gl-closing__engel" aria-hidden="true">{% include "gloria/v1/_engel.html" %}</div>
+  <p class="gl-closing__wish">{% if v.occasion == "kerst" %}Fijne feestdagen{% else %}Tot dan{% endif %}</p>
+  {% if v.show.closing %}{% for p in v.closing %}<p class="gl-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  {% include "invitations/partials/share_buttons.html" %}
+</section>
+</div>
+{% endblock %}

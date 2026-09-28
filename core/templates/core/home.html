@@ -3,8 +3,9 @@
 {% block body_class %}page-home{% endblock %}
 {% block preload %}<link rel="preload" href="{% static 'fonts/playfair-display-latin-wght-italic.woff2' %}" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="{% static 'img/site/hero.webp' %}" imagesrcset="{% static 'img/site/hero-900.webp' %} 900w, {% static 'img/site/hero.webp' %} 1800w" imagesizes="(max-width: 860px) 100vw, 60vw" fetchpriority="high">{% endblock %}
+{% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
 {% block content %}
-<section class="hero" aria-labelledby="hero-titel">
+<section class="hero" aria-labelledby="hero-titel" data-hero3d>
   <div class="container hero__inner">
     <div class="hero__text">
       <p class="eyebrow">Digitale uitnodigingen</p>
@@ -19,11 +20,18 @@
   </div>
   <div class="hero__media">
     <img src="{% static 'img/site/hero.webp' %}" srcset="{% static 'img/site/hero-900.webp' %} 900w, {% static 'img/site/hero.webp' %} 1800w" sizes="(max-width: 860px) 100vw, 60vw" alt="" width="1800" height="1100" fetchpriority="high" decoding="async">
-    <a class="float-card" href="{% url 'invitations:demo' 'liefde-op-papier' %}?gelegenheid=bruiloft&amp;kleur=salie">
-      <img src="{% static 'img/site/kaart-voorbeeld.webp' %}" alt="" width="500" height="800" decoding="async">
-      <span class="float-card__play">{% icon "afspelen" %}</span>
-      <span class="visually-hidden">Bekijk een werkend voorbeeld: de bruiloft van Sanne en Daan (fictief)</span>
-    </a>
+    {# Sterretjes rond de kaart (hero3d.js tekent ze op dit canvas; zonder script of bij 'minder beweging' blijft het leeg). #}
+    <canvas class="hero__sparkles" aria-hidden="true"></canvas>
+    <div class="card-stage">
+      <span class="card-stage__back" aria-hidden="true"></span>
+      <a class="float-card" href="{% url 'invitations:demo' 'liefde-op-papier' %}?gelegenheid=bruiloft&amp;kleur=salie">
+        <img src="{% static 'img/site/kaart-voorbeeld.webp' %}" alt="" width="500" height="800" decoding="async">
+        <span class="float-card__glans" aria-hidden="true"></span>
+        <span class="float-card__play">{% icon "afspelen" %}</span>
+        <span class="visually-hidden">Bekijk een werkend voorbeeld: de bruiloft van Sanne en Daan (fictief)</span>
+      </a>
+      <span class="card-stage__shadow" aria-hidden="true"></span>
+    </div>
   </div>
 </section>
 

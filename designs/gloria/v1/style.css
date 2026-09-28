@@ -1,0 +1,269 @@
+/* Gloria v1 — kerstontwerp met engelen. Opening: twee engelenvleugels die gevouwen over het scherm liggen en zich
+   na een tik op de ster spreiden. Daarbinnen engelen met bazuinen, wolken, hemels licht en sierlijk schrift.
+   Tekeningen: tools/gloria/maak_tekeningen.py. Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Great Vibes"; src: url("../../../fonts/great-vibes-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "Marcellus"; src: url("../../../fonts/marcellus-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../../../fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 300 800; font-display: swap; }
+
+body {
+  --gl-script: "Great Vibes", "Pinyon Script", cursive;
+  --gl-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --gl-caps: "Marcellus", "Cinzel", Georgia, serif;
+  --gl-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --gl-w: min(100vw, 560px);
+  /* Gedeelde onderdelen (formulier, knoppen, muziek) in de kleuren van dit ontwerp. */
+  --inv-bg: var(--gl-bg);
+  --inv-text: var(--gl-ink);
+  --inv-muted: var(--gl-muted);
+  --inv-accent: var(--gl-accent);
+  --inv-accent-contrast: var(--gl-accent-ink);
+  --inv-font-body: var(--gl-serif);
+  --inv-font-ui: var(--gl-ui);
+  --inv-focus: var(--gl-gold-2);
+  --inv-radius: 14px;
+  --inv-surface-2: color-mix(in srgb, var(--gl-bg-2) 70%, var(--gl-line));
+  --inv-btn-border: color-mix(in srgb, var(--gl-gold-2) 70%, transparent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--gl-gold) 16%, transparent);
+  --inv-field-bg: var(--gl-bg);
+  --inv-field-text: var(--gl-ink);
+  --inv-field-border: color-mix(in srgb, var(--gl-ink) 30%, transparent);
+  --inv-music-bg: linear-gradient(180deg, #FFF6E2, #E9CE93);
+  --inv-music-text: #2B2010;
+  --inv-music-border: rgba(120, 90, 30, .35);
+  --inv-photo-bg: var(--gl-bg-2);
+  --fx-pulse: var(--gl-gold);
+  --fx-rays-y: 16%;
+  --fx-rays-strength: 16%;
+  background: var(--gl-bg);
+  color: var(--gl-ink);
+  font-family: var(--gl-serif);
+  font-size: 1.16rem;
+  font-weight: 500;
+}
+body[data-palette="nachtgoud"] { --inv-error: #FFB4A8; color-scheme: dark; }
+
+/* De veren en de engelen nemen de kleuren van de kleurvariant. */
+.gl-f1, .gl-f2, .gl-f3, .gl-f4 { stroke: var(--gl-veerlijn); stroke-width: .8; stroke-linejoin: round; }
+.gl-f1 { fill: var(--gl-f1); } .gl-f2 { fill: var(--gl-f2); } .gl-f3 { fill: var(--gl-f3); } .gl-f4 { fill: var(--gl-f4); }
+.gl-schacht { fill: none; stroke: var(--gl-veerlijn); stroke-width: .7; opacity: .7; }
+.gl-kleed { fill: var(--gl-f1); stroke: var(--gl-veerlijn); stroke-width: 1.2; stroke-linejoin: round; }
+.gl-plooi { fill: none; stroke: var(--gl-veerlijn); stroke-width: .8; opacity: .8; }
+.gl-huid { fill: #F6E3D2; stroke: var(--gl-veerlijn); stroke-width: 1; }
+.gl-haar { fill: var(--gl-gold); stroke: var(--gl-veerlijn); stroke-width: .8; }
+.gl-aureool { fill: none; stroke: var(--gl-gold); stroke-width: 2.4; filter: drop-shadow(0 0 3px var(--gl-gold)); }
+.gl-goud { fill: var(--gl-gold); stroke: var(--gl-veerlijn); stroke-width: .8; }
+.gl-vaandel { fill: var(--gl-vaandel); stroke: var(--gl-veerlijn); stroke-width: .8; }
+
+/* ================================================================ openingsscherm: gevouwen vleugels */
+.gl-cover {
+  overflow: hidden;
+  background:
+    radial-gradient(40% 60% at 50% 42%, color-mix(in srgb, var(--gl-glow) 55%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--gl-page), var(--gl-sky));
+  --fx-bg: var(--gl-f2);
+}
+.gl-cover__licht {
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 10%; translate: -50% 0; pointer-events: none;
+  background: radial-gradient(50% 50% at 50% 40%, #FFFDF6, color-mix(in srgb, var(--gl-glow) 80%, transparent) 40%, transparent 75%);
+  filter: blur(6px);
+}
+.gl-vleugel { position: absolute; top: 0; bottom: 0; width: 52%; z-index: 2; filter: drop-shadow(0 10px 30px rgba(0, 0, 0, .28)); }
+.gl-vleugel--links { left: 0; transform-origin: 96% 10%; }
+.gl-vleugel--rechts { right: 0; transform-origin: 4% 10%; }
+.gl-vleugel__svg { display: block; width: 100%; height: 100%; }
+.gl-vleugel--rechts .gl-vleugel__svg { scale: -1 1; }
+.fx-motion .gl-vleugel--links { animation: gl-adem-l 5s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .gl-vleugel--rechts { animation: gl-adem-r 5s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes gl-adem-l { 0%, 100% { rotate: 0deg; } 50% { rotate: 1.4deg; } }
+@keyframes gl-adem-r { 0%, 100% { rotate: 0deg; } 50% { rotate: -1.4deg; } }
+.gl-cover .fx-slot { z-index: 4; }
+
+.gl-ster { position: absolute; left: 50%; top: max(7vh, 3.6rem); z-index: 5; width: clamp(84px, 24vw, 110px); aspect-ratio: 1; translate: -50% 0; display: grid; place-items: center; border-radius: 50%; -webkit-tap-highlight-color: transparent; }
+.gl-ster__svg { position: relative; width: 100%; height: 100%; filter: drop-shadow(0 0 10px #FFF3C8) drop-shadow(0 0 22px color-mix(in srgb, var(--gl-gold) 80%, transparent)); }
+.gl-ster__stralen { fill: #FFF8E2; }
+.gl-ster__kern { fill: var(--gl-gold); stroke: #FFF6DC; stroke-width: 1.2; }
+.gl-ster__schuin { fill: color-mix(in srgb, var(--gl-gold) 70%, #fff); }
+.gl-ster__aureool { position: absolute; inset: -14%; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--gl-gold) 80%, #fff); box-shadow: 0 0 18px color-mix(in srgb, var(--gl-gold) 70%, transparent), inset 0 0 18px color-mix(in srgb, var(--gl-gold) 50%, transparent); }
+.fx-motion .gl-ster__svg { animation: gl-fonkel 3.4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes gl-fonkel { 0%, 100% { scale: 1; rotate: 0deg; } 50% { scale: 1.08; rotate: 8deg; } }
+.gl-ster:focus-visible { outline: 2px solid #FFF6DC; outline-offset: 10px; }
+.gl-ster.fx-pulse::after { border-radius: 50%; inset: -18%; }
+
+/* Het medaillon met de tekst ligt op de vleugels, met een eigen achtergrond voor goed contrast. */
+.gl-cover__kaart {
+  position: absolute; left: 50%; bottom: max(6vh, env(safe-area-inset-bottom)); z-index: 5; translate: -50% 0; width: min(86vw, 340px);
+  padding: 2.2rem 1.4rem 1.4rem; text-align: center; color: var(--gl-ink);
+  background: radial-gradient(90% 60% at 50% 0, var(--gl-glow), transparent 70%), var(--gl-bg);
+  border: 1px solid color-mix(in srgb, var(--gl-gold) 80%, transparent); outline: 1px solid color-mix(in srgb, var(--gl-gold) 40%, transparent); outline-offset: 4px;
+  border-radius: 999px 999px 18px 18px / 150px 150px 18px 18px;
+  box-shadow: 0 24px 50px -20px rgba(0, 0, 0, .45);
+}
+.gl-cover__kicker { margin: 0; font: 400 clamp(2.4rem, 11vw, 3rem)/1 var(--gl-script); color: var(--gl-gold-2); }
+.gl-cover__to { margin: .5rem 0 0; font: italic 500 1.3rem/1.25 var(--gl-serif); }
+.gl-cover__hint { margin: .3rem 0 .9rem; font: 400 .74rem var(--gl-caps); letter-spacing: .24em; text-transform: uppercase; color: var(--gl-muted); }
+.gl-cover__music {
+  display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: .55rem 1.2rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--gl-gold-2) 70%, transparent); background: transparent; color: var(--gl-ink); font: 600 .86rem var(--gl-ui);
+}
+.gl-cover__music:hover { background: color-mix(in srgb, var(--gl-gold) 16%, transparent); }
+.gl-cover__music:focus-visible { outline: 2px solid var(--gl-gold-2); outline-offset: 3px; }
+
+/* ---------------------------------------------------------------- openen: de vleugels spreiden zich */
+.is-opening .gl-cover__kaart { opacity: 0; translate: -50% 20px; transition: opacity .4s ease, translate .6s ease; }
+.fx-motion.is-opening .gl-ster { animation: gl-ster-open 1.3s cubic-bezier(.3, .7, .3, 1) both; }
+@keyframes gl-ster-open { 0% { scale: 1; } 35% { scale: 1.35; filter: brightness(1.4); } 100% { scale: .4; opacity: 0; translate: -50% -60px; } }
+.fx-motion.is-opening .gl-vleugel { animation: none; transition: transform 1.7s cubic-bezier(.5, 0, .25, 1) .45s, opacity .8s ease 1.5s; opacity: 0; }
+.fx-motion.is-opening .gl-vleugel--links { transform: translate(-30%, -4%) rotate(38deg) scale(1.1); }
+.fx-motion.is-opening .gl-vleugel--rechts { transform: translate(30%, -4%) rotate(-38deg) scale(1.1); }
+.fx-motion.is-opening .gl-cover__licht { scale: 18 1; transition: scale 1.6s cubic-bezier(.4, 0, .2, 1) .5s; }
+.is-opening .gl-cover { opacity: 0; transition: opacity .7s ease 2s; }
+.is-opening-reduced .gl-cover { transition: opacity .25s ease; }
+
+/* ================================================================ de uitnodiging */
+.inv-gloria .inv-main { position: relative; z-index: 1; }
+.gl-hero {
+  position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 100vh; min-height: 100svh; padding: 4.8rem clamp(1rem, 5vw, 1.8rem) 6rem; text-align: center;
+  background:
+    radial-gradient(80% 40% at 50% 18%, var(--gl-glow), transparent 72%),
+    linear-gradient(180deg, color-mix(in srgb, var(--gl-sky) 30%, var(--gl-bg)) 0%, var(--gl-bg) 60%);
+}
+.gl-hero__fx { z-index: 0; }
+.gl-engelen { position: relative; z-index: 1; display: flex; align-items: flex-end; justify-content: center; width: min(108%, 500px); margin-bottom: .4rem; }
+.gl-engel { display: block; width: 44%; }
+.gl-engel svg { display: block; width: 100%; height: auto; overflow: visible; }
+.gl-engel--rechts svg { scale: -1 1; }
+.gl-engelen__ster { width: 13%; margin: 0 -2% 22%; fill: var(--gl-gold); filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gl-gold) 80%, transparent)); flex: none; }
+.gl-engel__vleugel { transform-box: view-box; transform-origin: 84px 100px; }
+.fx-motion .gl-engel { animation: gl-zweef 5.5s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .gl-engel--rechts { animation-delay: -2.7s; }
+.fx-motion .gl-engel__vleugel { animation: gl-klap 2.6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .gl-engelen__ster { animation: gl-fonkel 3.4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes gl-zweef { 0%, 100% { translate: 0 0; } 50% { translate: 0 -7px; } }
+@keyframes gl-klap { 0%, 100% { rotate: 0deg; } 50% { rotate: 7deg; } }
+.gl-hero__text { position: relative; z-index: 2; width: min(100%, 460px); }
+.gl-kicker { margin: 0 0 .4rem; font: 400 .78rem var(--gl-caps); letter-spacing: .32em; text-transform: uppercase; color: var(--gl-gold-2); }
+.gl-names { margin: 0; font: 400 clamp(3.2rem, 16vw, 4.6rem)/1.08 var(--gl-script); color: var(--gl-gold-2); word-spacing: .18em; text-wrap: balance; overflow-wrap: anywhere; }
+.gl-names__one, .gl-names__two { display: block; }
+.gl-names__amp { display: block; font: italic 400 .4em/1.1 var(--gl-serif); color: var(--gl-muted); }
+.gl-names--long { font-size: clamp(2.6rem, 12vw, 3.7rem); }
+.gl-names--xlong { font-size: clamp(2.2rem, 9.5vw, 3rem); }
+.gl-hero__members { margin: .5rem 0 0; font: italic 500 1.15rem/1.4 var(--gl-serif); }
+.gl-hero__deler { width: min(70%, 220px); margin: 1rem auto .7rem; color: var(--gl-gold-2); }
+.gl-deler { display: block; width: 100%; height: auto; }
+.gl-hero__tagline { margin: 0 auto; max-width: 22rem; font: italic 500 clamp(1.2rem, 5vw, 1.4rem)/1.4 var(--gl-serif); text-wrap: balance; }
+.gl-hero__date { margin: 1.2rem 0 0; font: 400 .78rem/1.7 var(--gl-caps); letter-spacing: .2em; text-transform: uppercase; color: var(--gl-muted); }
+/* Wolken onderaan: stapelwolken van overlappende bollen, zacht vervaagd, die heel langzaam drijven. */
+.gl-wolken { position: absolute; left: -8%; right: -8%; bottom: -2%; height: 24%; z-index: 1; pointer-events: none; filter: blur(3px); opacity: var(--gl-wolk-sterkte, .95); }
+body[data-palette="nachtgoud"] .gl-wolken { --gl-wolk-sterkte: .65; }
+.gl-wolken span {
+  position: absolute; bottom: 0; height: 100%; --w: color-mix(in srgb, var(--gl-f1) 94%, transparent); --r: color-mix(in srgb, var(--gl-f3) 70%, transparent);
+  background:
+    radial-gradient(circle at 18% 72%, var(--w) 0 20%, transparent 20.5%),
+    radial-gradient(circle at 38% 52%, var(--w) 0 26%, transparent 26.5%),
+    radial-gradient(circle at 60% 60%, var(--w) 0 23%, transparent 23.5%),
+    radial-gradient(circle at 80% 76%, var(--w) 0 18%, transparent 18.5%),
+    linear-gradient(transparent 70%, var(--w) 70%),
+    radial-gradient(circle at 40% 60%, var(--r) 0 30%, transparent 31%);
+  background-size: 100% 100%; background-repeat: no-repeat;
+}
+.gl-wolken span:nth-child(1) { left: 0; width: 52%; }
+.gl-wolken span:nth-child(2) { left: 30%; width: 48%; height: 82%; }
+.gl-wolken span:nth-child(3) { right: 0; width: 50%; height: 92%; }
+.fx-motion .gl-wolken span { animation: gl-drijf 18s ease-in-out infinite alternate; animation-play-state: var(--fx-play, running); }
+.fx-motion .gl-wolken span:nth-child(2) { animation-duration: 24s; animation-direction: alternate-reverse; }
+@keyframes gl-drijf { from { translate: -14px 0; } to { translate: 14px 0; } }
+.gl-scroll { position: absolute; bottom: 1rem; left: 50%; translate: -50% 0; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: .2rem; font: 400 .68rem var(--gl-caps); letter-spacing: .26em; text-transform: uppercase; color: var(--gl-muted); text-decoration: none; }
+
+/* ---------------------------------------------------------------- secties */
+.gl-body { position: relative; }
+.gl-sec { position: relative; padding: clamp(3.2rem, 13vw, 4.6rem) clamp(1.25rem, 6.5vw, 2.6rem); text-align: center; }
+.gl-sec:nth-child(even) { background: var(--gl-bg-2); }
+.gl-h2 { margin: 0; font: 400 clamp(2.6rem, 11.5vw, 3.3rem)/1.15 var(--gl-script); color: var(--gl-gold-2); text-wrap: balance; }
+.gl-sec > .gl-deler { width: min(60%, 200px); margin: .5rem auto 1.7rem; color: var(--gl-gold-2); }
+
+/* De datum in een ster */
+.gl-datester { position: relative; width: min(64vw, 230px); aspect-ratio: 1; margin: 0 auto; display: grid; place-items: center; }
+.gl-datester__vorm { position: absolute; inset: 0; width: 100%; height: 100%; fill: color-mix(in srgb, var(--gl-glow) 60%, var(--gl-bg)); stroke: var(--gl-gold); stroke-width: 1.6; stroke-linejoin: round; filter: drop-shadow(0 0 16px color-mix(in srgb, var(--gl-gold) 45%, transparent)); }
+.gl-datester__binnen { fill: none; stroke-width: .8; stroke-dasharray: 2 4; }
+.fx-motion .is-visible .gl-datester__vorm { animation: gl-draai 60s linear infinite; animation-play-state: var(--fx-play, running); }
+@keyframes gl-draai { to { rotate: 360deg; } }
+.gl-datester__tekst { position: relative; margin: 0; display: flex; flex-direction: column; align-items: center; }
+.gl-datester__dag { font: 600 clamp(3.2rem, 15vw, 4.2rem)/1 var(--gl-serif); color: var(--gl-gold-2); }
+.gl-datester__maand { font: 400 .78rem var(--gl-caps); letter-spacing: .24em; text-transform: uppercase; color: var(--gl-ink); }
+.gl-date__full { margin: 1.4rem 0 0; font: italic 500 1.25rem/1.5 var(--gl-serif); }
+
+/* Welkom en foto's in boogramen */
+.gl-boog { overflow: hidden; border-radius: 999px 999px 8px 8px / 50% 50% 8px 8px; padding: 6px; background: var(--gl-bg); border: 1px solid color-mix(in srgb, var(--gl-gold) 75%, transparent); box-shadow: 0 18px 36px -24px rgba(40, 30, 10, .5); }
+.gl-boog .ph { border-radius: 999px 999px 4px 4px / 50% 50% 4px 4px; overflow: hidden; }
+.gl-letter__photo { max-width: 300px; margin: 0 auto 1.8rem; }
+.gl-letter__photo .ph { aspect-ratio: 3 / 4; }
+.gl-letter__text { max-width: 26rem; margin: 0 auto; font-size: 1.24rem; line-height: 1.6; }
+.gl-letter__text p { margin: 0 0 .9rem; }
+.gl-letter__text p:first-child { font: 400 2.1rem/1.2 var(--gl-script); color: var(--gl-gold-2); }
+
+/* Programma: een verticale lijn met sterretjes */
+.gl-timeline { list-style: none; margin: 0 auto; padding: 0; max-width: 24rem; display: grid; gap: 1.7rem; }
+.gl-tl { position: relative; padding-top: 1.6rem; }
+.gl-tl__ster { position: absolute; top: 0; left: 50%; width: 18px; height: 18px; translate: -50% 0; background: var(--gl-gold); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
+.gl-tl + .gl-tl::before { content: ""; position: absolute; left: 50%; top: -1.5rem; height: 1.2rem; border-left: 1px dotted color-mix(in srgb, var(--gl-gold-2) 70%, transparent); }
+.gl-tl__time { margin: 0; font: 400 .8rem var(--gl-caps); letter-spacing: .2em; color: var(--gl-gold-2); }
+.gl-tl__title { margin: .15rem 0 0; font: italic 600 1.4rem/1.25 var(--gl-serif); }
+.gl-tl__desc { margin: .25rem 0 0; color: var(--gl-muted); line-height: 1.45; }
+
+/* Aftellen */
+.gl-count .cd__num { font: 600 clamp(2.3rem, 11vw, 3.1rem)/1.05 var(--gl-serif); color: var(--gl-gold-2); }
+.gl-count .cd__label { margin-top: .3rem; font: 400 .66rem var(--gl-caps); letter-spacing: .22em; text-transform: uppercase; }
+.gl-count .inv-actions { margin-top: 1.6rem; }
+
+/* Locatie, dresscode, verhaal, praktisch */
+.gl-place__venue { margin: 0; font: italic 600 clamp(1.6rem, 7vw, 2rem)/1.2 var(--gl-serif); color: var(--gl-gold-2); }
+.gl-place__address { margin: .5rem 0 0; font-style: normal; line-height: 1.55; }
+.gl-place__when { margin: 1rem 0 1.5rem; color: var(--gl-muted); }
+.gl-kleuren { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 1.1rem; margin: 0 0 1.3rem; padding: 0; }
+.gl-kleur { position: relative; width: 42px; height: 42px; margin-top: 10px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c) 55%, #fff), var(--c) 55%); box-shadow: 0 0 0 1px color-mix(in srgb, var(--gl-gold) 80%, transparent), 0 8px 16px -8px rgba(0, 0, 0, .5); }
+.gl-kleur::before { content: ""; position: absolute; left: 50%; top: -12px; width: 30px; height: 8px; translate: -50% 0; border-radius: 50%; border: 1.6px solid var(--gl-gold); }
+.gl-dress__text { max-width: 24rem; margin: 0 auto .6rem; font-size: 1.2rem; }
+.gl-story__text { max-width: 27rem; margin: 0 auto; line-height: 1.6; }
+.gl-photos { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(.7rem, 3vw, 1rem); max-width: 480px; margin: 0 auto; padding: 0; }
+.gl-photo figure { margin: 0; }
+.gl-photo .ph { aspect-ratio: 3 / 4; }
+.gl-photo figcaption { padding: .5rem .2rem 0; font: italic 500 1rem var(--gl-serif); color: var(--gl-muted); }
+.gl-practical__list { display: grid; gap: 1.2rem; max-width: 26rem; margin: 0 auto; }
+.gl-practical__item dt { font: 400 .78rem var(--gl-caps); letter-spacing: .2em; text-transform: uppercase; color: var(--gl-gold-2); }
+.gl-practical__item dd { margin: .3rem 0 0; }
+
+/* Aanmelden, contact en afsluiting */
+.gl-card { max-width: 440px; margin: 0 auto; padding: 2.2rem clamp(1.1rem, 5vw, 1.7rem) 1.6rem; text-align: left; background: var(--gl-bg); border: 1px solid color-mix(in srgb, var(--gl-gold) 70%, transparent); border-radius: 180px 180px 18px 18px / 70px 70px 18px 18px; box-shadow: 0 24px 44px -32px rgba(40, 30, 10, .55); }
+.gl-card .rsvp { font-size: 1.02rem; }
+.gl-card .rsvp__deadline { font-family: var(--gl-serif); font-style: italic; font-size: 1.12rem; }
+.gl-contact__name { margin: .4rem 0 .2rem; font: 400 2rem var(--gl-script); color: var(--gl-gold-2); }
+.gl-closing__engel { width: min(46vw, 180px); margin: 0 auto .6rem; }
+.gl-closing__engel svg { display: block; width: 100%; height: auto; }
+.fx-motion .gl-closing .gl-engel__vleugel { animation: gl-klap 2.6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.gl-closing__wish { margin: 0; font: 400 clamp(2.8rem, 12vw, 3.5rem)/1.1 var(--gl-script); color: var(--gl-gold-2); }
+.gl-closing__text { max-width: 24rem; margin: .8rem auto 0; }
+.gl-closing .inv-share { margin-top: 1.8rem; }
+
+.inv-gloria .music__toggle, .inv-gloria .fx-toggle { box-shadow: 0 8px 22px -6px rgba(40, 30, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .6); }
+.inv-gloria .music__toggle { background: linear-gradient(180deg, #FFF6E2, #E9CE93); }
+
+/* ================================================================ computer: de kaart zweeft in de hemel */
+@media (min-width: 600px) {
+  body { background: radial-gradient(46rem 36rem at 50% 30%, color-mix(in srgb, var(--gl-glow) 40%, transparent), transparent 70%) fixed, linear-gradient(180deg, var(--gl-page), var(--gl-sky)) fixed; }
+  .inv-gloria .inv-main { width: var(--gl-w); margin: 0 auto; background: var(--gl-bg); box-shadow: 0 0 0 1px color-mix(in srgb, var(--gl-gold) 50%, transparent), 0 40px 90px -30px rgba(0, 0, 0, .55); }
+  .gl-hero { min-height: min(100vh, 940px); }
+  .inv-gloria .inv-colophon { color: #F4EEE2; }
+  .gl-vleugel { width: 50.5%; }
+}
+
+/* ================================================================ geen beweging */
+@media (prefers-reduced-motion: reduce) {
+  .gl-vleugel, .gl-ster__svg, .gl-engel, .gl-engel__vleugel, .gl-engelen__ster, .gl-wolken span, .gl-datester__vorm { animation: none !important; }
+}
+@media print {
+  .gl-hero__fx, .gl-wolken { display: none; }
+}

@@ -110,7 +110,7 @@ De gedeelde opbouw staat in `designs/_atelier/v1/`: `base.html` (volgorde van de
 | `date` | `blok`, `lijn`, `cirkel`, `cijfers`, `kalender` |
 | `photo` | `boog`, `cirkel`, `rond`, `recht`, `polaroid` |
 | `texture` | `geen`, `papier`, `stippen`, `linnen`, `ruit`, `sterren`, `confetti` |
-| `ornament` | `geen`, `eucalyptus`, `botanisch`, `bloemen`, `pampas`, `palm`, `lauwerkrans`, `deco`, `geometrisch`, `sterren`, `confetti`, `ballonnen`, `harten`, `zon`, `golven`, `wolken`, `regenboog`, `ringen`, `lijnen`, `fonkel`, `stippen` |
+| `ornament` | `geen`, `eucalyptus`, `botanisch`, `bloemen`, `pampas`, `palm`, `lauwerkrans`, `deco`, `geometrisch`, `sterren`, `confetti`, `ballonnen`, `harten`, `zon`, `golven`, `wolken`, `regenboog`, `ringen`, `lijnen`, `fonkel`, `stippen`, `kerstman` (de kerstman met hulst, in vaste kerstkleuren; het groen van de hulst is `c3`), `sneeuwpop` (warm aangeklede sneeuwpop tussen twee verlichte kerstbomen, in vaste kleuren; zonder verlopen, zodat hij ook werkt als hij meer dan eens op de pagina staat) |
 
 Een onbekende keuze geeft bij het inlezen een duidelijke melding. De kop `getal` toont bij een verjaardag de leeftijd en bij een jubileum of zakelijk evenement het aantal jaren (als de klant dat invult); anders de initialen.
 
@@ -152,7 +152,7 @@ static/img/designs/mijn-ontwerp.webp   ← voorbeeldafbeelding (800×1000), opti
    - `opening_label`: naam van de opening, bijvoorbeeld "Envelop met lakzegel";
    - `sort_order`: volgorde op de website;
    - `changelog`: wat deze versie is;
-   - optioneel `demo_melody`: welke melodie het speeldoosje in het voorbeeld speelt (nu alleen `stille-nacht`; leeg is de standaardmelodie). Klanten kiezen hun eigen muziek;
+   - optioneel `demo_melody`: welke melodie het speeldoosje in het voorbeeld speelt (`stille-nacht`: speeldoosje; `carol-of-the-bells`: een klein ensemble met celesta, strijkers, pizzicato-bas en kerkklok; `gloria`: 'Angels We Have Heard on High' met harp, engelenkoor en celesta; `we-wish-you`: 'We Wish You a Merry Christmas' als wals met piano, contrabas en arrensleebellen; `canon`: de Canon in D van Pachelbel met harp, strijkers en twee violen; leeg is de standaardmelodie). Melodieën staan in `MELODIES` in `invitations/static/invitations/invite.js`; een melodie met `voices` speelt elke stem met een eigen instrument (`createArrangement`). Gebruik alleen muziek die publiek domein is. Klanten kiezen hun eigen muziek;
    - optioneel `kaartbeeld`: `"open"` maakt het kaartbeeld van de geopende uitnodiging in plaats van het openingsscherm (`e2e/make_design_images.cjs`).
 3. **Pas `invitation.html` en `style.css` aan.** Houd deze afspraken aan:
    - begin met `{% extends "invitations/base_invitation.html" %}` en vul `{% block cover %}` (de opening) en `{% block content %}` (de inhoud);
@@ -206,7 +206,7 @@ Een onbekende keuze geeft bij het inlezen een duidelijke melding. Op de ontwerpp
 
 ## Kerstkaarten en Winterlicht
 
-**De gelegenheid Kerst** werkt op twee manieren:
+**De gelegenheid Kerst** werkt op twee manieren. De klant kiest dat zelf, bovenaan de stap Gegevens ('Wat voor kaart wordt het?'), en kan het later wijzigen. Op de ontwerppagina wisselt de schakelaar 'Uitnodiging | Wenskaart' het voorbeeld; die keuze gaat mee naar het samenstellen (`?soort=`). De keuze staat in de inhoud als `soort` (`uitnodiging` of `wenskaart`); bij een wenskaart blijven eerder ingevulde datum en locatie bewaard maar worden ze niet getoond (`card_kind` en `without_event` in `invitations/content.py`). Oudere concepten zonder keuze volgen de oude regel hieronder:
 
 - **Alleen een kerstgroet.** De klant laat "Wanneer" en "Waar" leeg. De kaart toont dan geen datum, locatie, agenda of aanmelden, en de afteller telt af naar eerste kerstdag (van juli tot en met kerstavond; daarna verdwijnt hij). Publiceren vraagt niet om een datum, locatie of aanmelddeadline.
 - **Met een uitnodiging**, bijvoorbeeld voor een kerstdiner of brunch. Zodra de klant iets bij "Wanneer" of "Waar" invult, gelden de gewone regels: datum, begintijd, locatie en, als aanmelden aan staat, een deadline.

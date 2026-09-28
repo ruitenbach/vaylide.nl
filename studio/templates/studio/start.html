@@ -13,6 +13,8 @@
 {% endif %}
 <form method="post" class="form" data-once>
   {% csrf_token %}
+  {% if kleur %}<input type="hidden" name="kleur" value="{{ kleur }}">{% endif %}
+  {% if soort %}<input type="hidden" name="soort" value="{{ soort }}">{% endif %}
   <fieldset class="studio-block">
     <legend class="studio-block__title"><span class="studio-block__num">1</span> Gelegenheid</legend>
     <div class="occasion-grid">

@@ -15,7 +15,7 @@ ATELIER_OPTIONS = {
     "texture": ["geen", "papier", "stippen", "linnen", "ruit", "sterren", "confetti"],
     "ornament": ["geen", "eucalyptus", "botanisch", "bloemen", "pampas", "palm", "lauwerkrans", "deco", "geometrisch",
                  "sterren", "confetti", "ballonnen", "harten", "zon", "golven", "wolken", "regenboog", "ringen", "lijnen",
-                 "fonkel", "stippen"],
+                 "fonkel", "stippen", "kerstman", "sneeuwpop"],
 }
 
 OPENING_LABELS = {

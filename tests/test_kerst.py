@@ -1,4 +1,5 @@
 """Kerst: de gelegenheid, een kerstgroet zonder evenement, het ontwerp Winterlicht, sneeuw en de website."""
+import os
 import json
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -155,7 +156,8 @@ class KerstStudioTests(VaylideTestCase):
         inv = Invitation.objects.get(uid=uid)
         page = c.get(f"/maken/{uid}/gegevens/")
         self.assertContains(page, "Van wie komt de kerstkaart?")
-        self.assertContains(page, "Alleen een kerstgroet sturen?")
+        self.assertContains(page, "Wat voor kaart wordt het?")
+        self.assertContains(page, 'name="soort" value="wenskaart" checked')  # nog niets ingevuld: een wenskaart
         response = c.post(f"/maken/{uid}/gegevens/", {
             "rev": inv.draft_rev, "actie": "volgende", "name_family": "Familie Jansen", "name_members": "Eva, Tom en Noor",
             "timezone": "Europe/Amsterdam", "welcome_text": "Fijne feestdagen!",
@@ -164,10 +166,8 @@ class KerstStudioTests(VaylideTestCase):
         inv.refresh_from_db()
         self.assertEqual(inv.title, "Familie Jansen")
         # Aanmelden staat standaard aan, maar zonder evenement is er geen deadline nodig.
-        page = c.get(f"/maken/{uid}/aanmelden/")
-        self.assertContains(page, "Je kerstkaart heeft nog geen datum en locatie.")
-        response = c.post(f"/maken/{uid}/aanmelden/", {"rev": inv.draft_rev, "actie": "volgende", "enabled": "on", "max_party_size": "2"})
-        self.assertRedirects(response, f"/maken/{uid}/fotos/", fetch_redirect_response=False)
+        # Zonder datum en locatie wordt het een wenskaart: de stap Aanmelden valt weg.
+        self.assertRedirects(c.get(f"/maken/{uid}/aanmelden/"), f"/maken/{uid}/fotos/", fetch_redirect_response=False)
 
     def test_partial_event_still_asks_for_time_and_venue(self):
         c = Client()
@@ -234,9 +234,9 @@ class WinterlichtDesignTests(VaylideTestCase):
             for fg, bg in pairs:
                 self.assertGreaterEqual(contrast(c[fg], c[bg]), 4.5, f"{palette['key']}: {fg} op {bg}")
             for name in (f"scene-{palette['key']}.webp", f"scene-{palette['key']}-720.webp", f"huis-{palette['key']}.webp"):
-                self.assertTrue(finders.find(f"designs/winterlicht/v1/img/{name}"), name)
+                self.assertTrue(finders.find(f"designs{os.sep}winterlicht/v1/img/{name}"), name)
         for name in ("relief-boven", "relief-krans", "relief-zijkant", "relief-patroon", "goud-boven", "goud-krans", "goud-zijkant"):
-            self.assertTrue(finders.find(f"designs/winterlicht/v1/img/{name}.webp"), name)
+            self.assertTrue(finders.find(f"designs{os.sep}winterlicht/v1/img/{name}.webp"), name)
         self.assertTrue(finders.find("img/designs/winterlicht.webp"))
         self.assertTrue(finders.find("img/site/gelegenheid-kerst.webp"))
         self.assertEqual(len(DESIGN_IMAGES["winterlicht"]), 5)
@@ -353,7 +353,7 @@ class KerstSiteTests(VaylideTestCase):
 
     def test_collection_filter_and_search(self):
         response = Client().get("/ontwerpen/", {"gelegenheid": "kerst"})
-        self.assertEqual([c["template"].slug for c in response.context["cards"]], ["winterlicht"])
+        self.assertEqual([c["template"].slug for c in response.context["cards"]], ["aan-tafel", "middernacht", "gloria", "winterlicht", "kerstman", "sneeuwpop"])
         self.assertContains(response, "Ontwerpen voor kerst")
         self.assertContains(Client().get("/zoeken/", {"q": "kerst"}), "/ontwerpen/?gelegenheid=kerst")
         detail = Client().get("/ontwerpen/winterlicht/")

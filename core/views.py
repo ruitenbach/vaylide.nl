@@ -11,7 +11,7 @@ from django.views.decorators.http import require_http_methods
 
 from catalog.assets import design_image_url
 from catalog.models import AddOn, Package, Template
-from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion
+from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, occasion_config
 from catalog.effects import effect_card_label, effect_summary
 from invitations.demo import DEFAULT_DEMO_OCCASION
 
@@ -92,6 +92,27 @@ def design_detail(request, slug):
     occasion = request.GET.get("gelegenheid", "")
     if occasion not in template.occasions:
         occasion = DEFAULT_DEMO_OCCASION.get(slug, template.occasions[0])
+    # Gekozen kleurvariant: werkt als gewone link (ook zonder JavaScript); site.js wisselt het voorbeeld zonder herladen.
+    palette_keys = [p.get("key") for p in version.palettes]
+    kleur = request.GET.get("kleur", "")
+    if kleur not in palette_keys:
+        kleur = version.default_palette_key
+    # Uitnodiging of wenskaart: alleen bij gelegenheden waar het evenement optioneel is (Kerst).
+    soorten = []
+    soort = ""
+    if occasion_config(occasion).get("event_optional"):
+        soort = request.GET.get("soort", "")
+        if soort not in ("uitnodiging", "wenskaart"):
+            soort = "uitnodiging"
+        soorten = [
+            {"key": key, "label": label, "url": f"?gelegenheid={occasion}&kleur={kleur}&soort={key}", "current": key == soort}
+            for key, label in (("uitnodiging", "Uitnodiging"), ("wenskaart", "Wenskaart"))
+        ]
+    extra = f"&soort={soort}" if soort else ""
+    palettes = [
+        {**p, "url": f"?gelegenheid={occasion}&kleur={p.get('key')}{extra}", "current": p.get("key") == kleur}
+        for p in version.palettes
+    ]
     return render(
         request,
         "core/design_detail.html",
@@ -99,9 +120,13 @@ def design_detail(request, slug):
             "template": template,
             "version": version,
             "occasion": occasion,
+            "kleur": kleur,
+            "palettes": palettes,
+            "soort": soort,
+            "soorten": soorten,
             "occasion_choices": [(k, OCCASION_LABELS[k]) for k in template.occasions if k in OCCASION_LABELS],
-            "demo_url": f"{reverse('invitations:demo', args=[slug])}?gelegenheid={occasion}",
-            "start_url": f"{reverse('studio:start')}?ontwerp={slug}&gelegenheid={occasion}",
+            "demo_url": f"{reverse('invitations:demo', args=[slug])}?gelegenheid={occasion}&kleur={kleur}{extra}",
+            "start_url": f"{reverse('studio:start')}?ontwerp={slug}&gelegenheid={occasion}&kleur={kleur}{extra}",
             "others": _design_cards([t for t in by_occasion(_designs(), occasion) if t.pk != template.pk and t.supports(occasion)][:3], occasion),
             "occasion_label": OCCASION_LABELS.get(occasion, ""),
             "effects_text": effect_summary(version.manifest.get("effects")),
@@ -253,4 +278,9 @@ def cron_jobs(request):
         raise Http404()
     done = process_due()
     report = apply_retention() if request.GET.get("retentie") == "1" else {}
-    return HttpResponse(f"taken: {done}; retentie: {report}", content_type="text/plain")
+    backup = ""
+    if request.GET.get("backup") == "1":
+        from .backup import make_backup
+
+        backup = make_backup().name
+    return HttpResponse(f"taken: {done}; retentie: {report}; backup: {backup}", content_type="text/plain")

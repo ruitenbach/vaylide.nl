@@ -4,7 +4,8 @@
 <div class="studio-intro">
   <h1>Aanmelden door gasten</h1>
   <p class="lead">Gasten hebben geen account nodig. Standaard vragen we naam, aanwezigheid en aantal personen.</p>
-  {% if cfg.event_optional and not content.date and not content.venue_name %}<p class="notice">Je kerstkaart heeft nog geen datum en locatie. Aanmelden verschijnt alleen als je mensen uitnodigt, bijvoorbeeld voor een kerstdiner. Vul dat in bij <a href="{% url 'studio:step' inv.uid 'gegevens' %}">Gegevens</a>, of ga gewoon verder.</p>{% endif %}
+  {% if cfg.event_optional and content.soort == "wenskaart" %}<p class="notice">Je maakt een wenskaart: aanmelden wordt niet getoond. Wil je toch mensen uitnodigen, bijvoorbeeld voor het kerstdiner? Kies dan 'Uitnodiging' bij <a href="{% url 'studio:step' inv.uid 'gegevens' %}">Gegevens</a>. Anders ga je gewoon verder.</p>
+  {% elif cfg.event_optional and not content.date and not content.venue_name %}<p class="notice">Je kerstkaart heeft nog geen datum en locatie. Aanmelden verschijnt alleen als je mensen uitnodigt, bijvoorbeeld voor een kerstdiner. Vul dat in bij <a href="{% url 'studio:step' inv.uid 'gegevens' %}">Gegevens</a>, of ga gewoon verder.</p>{% endif %}
 </div>
 {% include "studio/_conflict.html" %}
 <form method="post" class="form studio-form" data-once data-dirty-check novalidate>

@@ -1,0 +1,27 @@
+{
+  "slug": "aan-tafel",
+  "version": 1,
+  "name": "Aan tafel",
+  "tagline": "Een warme uitnodiging voor het kerstdiner, bij kaarslicht",
+  "description": "Een plaatskaartje met een strik van touw en een takje hulst staat op een houten tafel, tussen twee brandende kaarsen en warme lichtjes. Na een tik klapt het kaartje open en word je aan tafel uitgenodigd. Daarbinnen een gedekte tafel met kaarsen en een dennenslinger, jullie namen in warm schrift, de datum op een plaatskaartje, het menu op een kaart met een strik en de tafelschikking. In het voorbeeld klinkt 'We Wish You a Merry Christmas' als gezellige wals, met piano, contrabas en arrensleebellen.",
+  "style_notes": "Kaarslicht, hout, kerstrood, dennengroen, Schotse ruit, gezellig en warm",
+  "occasions": ["kerst"],
+  "sort_order": 37,
+  "opening": "plaatskaartje",
+  "opening_label": "Plaatskaartje op tafel",
+  "demo_melody": "we-wish-you",
+  "kaartbeeld": "open",
+  "palettes": [
+    {"key": "haardvuur", "name": "Haardvuur", "swatch": ["#9E1B24", "#FBF4E8", "#5A3622"],
+     "vars": {"--at-page": "#1A0F0A", "--at-wood": "#6A4029", "--at-wood-2": "#46291A", "--at-bg": "#FBF4E8", "--at-bg-2": "#F4E9D8", "--at-ink": "#2E1D17", "--at-muted": "#664F45", "--at-accent": "#9E1B24", "--at-accent-ink": "#FFFFFF", "--at-gold": "#D7A955", "--at-gold-2": "#8A5E1C", "--at-line": "#E8D8C0", "--at-green": "#2F5A3A", "--at-berry": "#C21F2B", "--at-card": "#FFF9EE", "--at-card-ink": "#3A231C", "--at-ribbon": "#9E1B24", "--at-ribbon-2": "#2F5A3A", "--at-glow": "#FFB85C", "--at-cover-ink": "#FBEBD2", "--fx-1": "#F2C46B", "--fx-2": "#FFF3DA", "--fx-3": "#C21F2B", "--fx-4": "#FFD9A0", "--fx-bg": "#FBF4E8"}},
+    {"key": "dennengroen", "name": "Dennengroen", "swatch": ["#1F5A3A", "#F7F3E8", "#B31B26"],
+     "vars": {"--at-page": "#0E1511", "--at-wood": "#5C3B26", "--at-wood-2": "#3C2518", "--at-bg": "#F7F3E8", "--at-bg-2": "#EDEBDD", "--at-ink": "#1D261F", "--at-muted": "#515C53", "--at-accent": "#1F5A3A", "--at-accent-ink": "#FFFFFF", "--at-gold": "#D2A855", "--at-gold-2": "#7C5718", "--at-line": "#DDDDC9", "--at-green": "#1F5A3A", "--at-berry": "#B31B26", "--at-card": "#FFFBF2", "--at-card-ink": "#23301F", "--at-ribbon": "#1F5A3A", "--at-ribbon-2": "#B31B26", "--at-glow": "#FFC06A", "--at-cover-ink": "#F6EEDC", "--fx-1": "#F2C46B", "--fx-2": "#FFF3DA", "--fx-3": "#B31B26", "--fx-4": "#CFE3C8", "--fx-bg": "#F7F3E8"}},
+    {"key": "kaarslicht", "name": "Kaarslicht", "swatch": ["#FFFBF3", "#C9A27A", "#8A5A1E"],
+     "vars": {"--at-page": "#2B1E15", "--at-wood": "#C9A27A", "--at-wood-2": "#9E7852", "--at-bg": "#FFFBF3", "--at-bg-2": "#F7EEDF", "--at-ink": "#33261C", "--at-muted": "#6A584A", "--at-accent": "#8A5A1E", "--at-accent-ink": "#FFFFFF", "--at-gold": "#D9B064", "--at-gold-2": "#7E531A", "--at-line": "#EDE0CC", "--at-green": "#48684A", "--at-berry": "#B8323A", "--at-card": "#FFFDF8", "--at-card-ink": "#3A2A1E", "--at-ribbon": "#C9A45C", "--at-ribbon-2": "#FFFFFF", "--at-glow": "#FFC877", "--at-cover-ink": "#FFF1DC", "--fx-1": "#F2C46B", "--fx-2": "#FFFFFF", "--fx-3": "#E7C58F", "--fx-4": "#FFE2B8", "--fx-bg": "#FFFBF3"}},
+    {"key": "tartan", "name": "Schotse ruit", "swatch": ["#1B2B22", "#B31B26", "#E0B25E"],
+     "vars": {"--at-page": "#0C140F", "--at-wood": "#5A3622", "--at-wood-2": "#3A2216", "--at-bg": "#1B2B22", "--at-bg-2": "#22362A", "--at-ink": "#F6EEDF", "--at-muted": "#D2C8B4", "--at-accent": "#E0B25E", "--at-accent-ink": "#1B2B22", "--at-gold": "#E0B25E", "--at-gold-2": "#E3B762", "--at-line": "#35503F", "--at-green": "#2F6A45", "--at-berry": "#D22B36", "--at-card": "#FFF9EE", "--at-card-ink": "#3A231C", "--at-ribbon": "#B31B26", "--at-ribbon-2": "#1F5A3A", "--at-glow": "#FFB85C", "--at-cover-ink": "#F6EEDF", "--fx-1": "#F2C46B", "--fx-2": "#FFF3DA", "--fx-3": "#D22B36", "--fx-4": "#FFD9A0", "--fx-bg": "#1B2B22"}}
+  ],
+  "sections": ["countdown", "story", "gallery", "program", "location", "dresscode", "practical", "rsvp", "contact", "closing", "music"],
+  "effects": {"sfeer": "bokeh", "knal": "vonken", "viering": "sterren", "namen": "zacht", "onthul": "omhoog", "extra": ["kenburns", "tik"]},
+  "changelog": "Eerste versie."
+}

@@ -19,7 +19,9 @@ from invitations.content import (
     MAX_PROGRAM_ITEMS,
     MAX_QUESTIONS,
     QUESTION_TYPES,
+    SOORTEN,
     TIMEZONES,
+    card_kind,
     event_expected,
     parse_date,
 )
@@ -99,6 +101,11 @@ class DetailsForm(StepForm):
         self.event_optional = bool(cfg.get("event_optional"))
         if self.event_optional:
             self.fields["venue_name"].help_text = "Bijvoorbeeld 'Bij ons thuis' of de naam van het restaurant."
+            # Uitnodiging (met datum, locatie en aanmelden) of wenskaart (alleen een groet).
+            self.fields["soort"] = forms.ChoiceField(
+                label="Wat voor kaart wordt het?", choices=[(s, s) for s in SOORTEN], required=False, widget=forms.RadioSelect)
+            if not self.is_bound:
+                self.initial["soort"] = card_kind(self.content, self.occasion)
         self.name_keys = []
         new_fields = {}
         for key, label, required, max_len, help_text in cfg["name_fields"]:
@@ -158,6 +165,8 @@ class DetailsForm(StepForm):
         content["start_time"] = d["start_time"].strftime("%H:%M") if d.get("start_time") else ""
         content["end_time"] = d["end_time"].strftime("%H:%M") if d.get("end_time") else ""
         content["timezone"] = d.get("timezone") or "Europe/Amsterdam"
+        if self.event_optional:
+            content["soort"] = d.get("soort") if d.get("soort") in SOORTEN else card_kind(content, self.occasion)
         return content
 
     def missing(self) -> dict[str, str]:
@@ -166,9 +175,14 @@ class DetailsForm(StepForm):
         for name, key, label, required in self.name_keys:
             if required and not _s(d.get(name)):
                 errors[name] = f"Vul '{label.lower()}' in."
-        # Bij een kerstkaart is het evenement optioneel: leeg laten is een kerstgroet zonder uitnodiging.
-        if self.event_optional and not any(_s(d.get(k)) for k in ("date", "start_time", "end_time", "venue_name", "address")):
-            return errors
+        # Bij een kerstkaart is het evenement optioneel: een wenskaart heeft geen datum of locatie nodig.
+        # Zonder keuze (oudere formulieren) geldt: leeg laten is een wenskaart.
+        if self.event_optional:
+            soort = d.get("soort")
+            if soort == "wenskaart":
+                return errors
+            if soort != "uitnodiging" and not any(_s(d.get(k)) for k in ("date", "start_time", "end_time", "venue_name", "address")):
+                return errors
         if not d.get("date"):
             errors["date"] = "Vul de datum in."
         if not d.get("start_time"):
@@ -197,6 +211,11 @@ class ProgramForm(StepForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         c = self.content
+        # Wenskaart: alleen de afsluitende tekst; programma, dresscode, praktisch en contact blijven ongewijzigd bewaard.
+        self.only_closing = card_kind(c, self.occasion) == "wenskaart"
+        if self.only_closing:
+            self.fields["closing_text"].label = "Afsluitende wens (optioneel)"
+            self.fields["closing_text"].help_text = "Bijvoorbeeld: 'Fijne feestdagen en alvast een gelukkig nieuwjaar!'"
         program = list(c.get("program") or [])
         practical = list(c.get("practical") or [])
         self.program_rows = min(MAX_PROGRAM_ITEMS, max(len(program) + 2, 4))
@@ -278,6 +297,9 @@ class ProgramForm(StepForm):
 
     def apply(self, content: dict) -> dict:
         d = self.cleaned_data
+        if self.only_closing:
+            content["closing_text"] = _s(d.get("closing_text"))
+            return content
         program = []
         for i in range(self.program_rows):
             title = _s(d.get(f"p{i}_title"))
@@ -500,9 +522,13 @@ class StyleForm(StepForm):
         ("music", "Muziek"),
     ]
 
+    # Onderdelen die bij een wenskaart niet getoond worden: hun schakelaar verdwijnt en de stand blijft bewaard.
+    WENSKAART_HIDDEN = frozenset({"program", "dresscode", "practical", "contact"})
+
     def __init__(self, *args, template_version, **kwargs):
         super().__init__(*args, **kwargs)
         self.template_version = template_version
+        self.hidden_sections = self.WENSKAART_HIDDEN if card_kind(self.content, self.occasion) == "wenskaart" else frozenset()
         self.fields["palette"].choices = [(p["key"], p["name"]) for p in template_version.palettes]
         for key, label in self.SECTION_FIELDS:
             self.fields[f"s_{key}"] = forms.BooleanField(label=label, required=False)
@@ -517,14 +543,15 @@ class StyleForm(StepForm):
         return [(p, self["palette"]) for p in self.template_version.palettes]
 
     def section_fields(self):
-        return [(key, self[f"s_{key}"]) for key, _ in self.SECTION_FIELDS]
+        return [(key, self[f"s_{key}"]) for key, _ in self.SECTION_FIELDS if key not in self.hidden_sections]
 
     def apply(self, content: dict) -> dict:
         d = self.cleaned_data
         content["style"] = {"palette": d["palette"], "opening": bool(d.get("opening"))}
         sections = content.setdefault("sections", {})
         for key, _ in self.SECTION_FIELDS:
-            sections[key] = bool(d.get(f"s_{key}"))
+            if key not in self.hidden_sections:
+                sections[key] = bool(d.get(f"s_{key}"))
         return content
 
 

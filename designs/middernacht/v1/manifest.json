@@ -1,0 +1,27 @@
+{
+  "slug": "middernacht",
+  "version": 1,
+  "name": "Middernacht",
+  "tagline": "Een kerstgala voor volwassenen, met een kerstbal van glas",
+  "description": "Een glazen kerstbal met jullie monogram in goud hangt aan een fluwelen lint en schommelt zacht in het licht. Na een tik zwaait hij, gloeit hij op en duik je erin. Daarbinnen een art-decokader met hangende kerstballen, jullie namen in goudfolie, een toegangskaart voor de datum, het programma als menukaart en champagnebubbels. In het voorbeeld klinkt 'Carol of the Bells' met celesta, strijkers en een kerkklok.",
+  "style_notes": "Zwart, smaragd, bordeaux of ivoor met goud, glas, art deco, avond",
+  "occasions": ["kerst"],
+  "sort_order": 38,
+  "opening": "kerstbal",
+  "opening_label": "Glazen kerstbal",
+  "demo_melody": "carol-of-the-bells",
+  "kaartbeeld": "open",
+  "palettes": [
+    {"key": "champagne", "name": "Zwart & champagne", "swatch": ["#0E0C0A", "#E7CD94", "#1B1712"],
+     "vars": {"--mn-page": "#060504", "--mn-bg": "#0E0C0A", "--mn-bg-2": "#15120E", "--mn-ink": "#F3ECDF", "--mn-muted": "#C9BFAE", "--mn-gold": "#E7CD94", "--mn-gold-2": "#D9B874", "--mn-gold-3": "#8C6A2E", "--mn-accent": "#D9B874", "--mn-accent-ink": "#120F0B", "--mn-line": "#3A3226", "--mn-glass": "#2A241C", "--mn-glass-2": "#050403", "--mn-ribbon": "#1C1814", "--mn-cover-ink": "#F3ECDF", "--fx-1": "#E7CD94", "--fx-2": "#FFFFFF", "--fx-3": "#B8924B", "--fx-4": "#FFF1CF", "--fx-bg": "#0E0C0A", "--fx-shine": "#FFF4D6"}},
+    {"key": "smaragd", "name": "Smaragd & goud", "swatch": ["#06201A", "#E6CB8C", "#0E5A45"],
+     "vars": {"--mn-page": "#020D09", "--mn-bg": "#06201A", "--mn-bg-2": "#0A2A21", "--mn-ink": "#F1EEE4", "--mn-muted": "#C3CDC4", "--mn-gold": "#E6CB8C", "--mn-gold-2": "#D8B96F", "--mn-gold-3": "#8A6A2A", "--mn-accent": "#D8B96F", "--mn-accent-ink": "#06201A", "--mn-line": "#1D4538", "--mn-glass": "#12745A", "--mn-glass-2": "#021A13", "--mn-ribbon": "#0B3A2D", "--mn-cover-ink": "#F1EEE4", "--fx-1": "#E6CB8C", "--fx-2": "#FFFFFF", "--fx-3": "#4FB08E", "--fx-4": "#FFF1CF", "--fx-bg": "#06201A", "--fx-shine": "#FFF4D6"}},
+    {"key": "bordeaux", "name": "Bordeaux & roségoud", "swatch": ["#22070F", "#F0C9A8", "#7A1026"],
+     "vars": {"--mn-page": "#0E0306", "--mn-bg": "#22070F", "--mn-bg-2": "#2C0B15", "--mn-ink": "#F7ECEA", "--mn-muted": "#D8C1C1", "--mn-gold": "#F0C9A8", "--mn-gold-2": "#E3B592", "--mn-gold-3": "#8E5A3C", "--mn-accent": "#E3B592", "--mn-accent-ink": "#22070F", "--mn-line": "#4A1C28", "--mn-glass": "#9A1731", "--mn-glass-2": "#1E0309", "--mn-ribbon": "#4A0A18", "--mn-cover-ink": "#F7ECEA", "--fx-1": "#F0C9A8", "--fx-2": "#FFFFFF", "--fx-3": "#D05A6E", "--fx-4": "#FFE6D6", "--fx-bg": "#22070F", "--fx-shine": "#FFF0E4"}},
+    {"key": "ivoor", "name": "Ivoor & goud", "swatch": ["#FAF6EE", "#8A6424", "#1C1916"],
+     "vars": {"--mn-page": "#E8DFCF", "--mn-bg": "#FAF6EE", "--mn-bg-2": "#F2EBDF", "--mn-ink": "#1C1916", "--mn-muted": "#58514A", "--mn-gold": "#C9A45C", "--mn-gold-2": "#7E5A1E", "--mn-gold-3": "#6B4C17", "--mn-accent": "#1C1916", "--mn-accent-ink": "#F6E7C4", "--mn-line": "#E2D6C2", "--mn-glass": "#D9B45E", "--mn-glass-2": "#5C4214", "--mn-ribbon": "#1C1916", "--mn-cover-ink": "#1C1916", "--fx-1": "#C9A45C", "--fx-2": "#FFFFFF", "--fx-3": "#1C1916", "--fx-4": "#E9CE93", "--fx-bg": "#FAF6EE", "--fx-shine": "#C9A45C"}}
+  ],
+  "sections": ["countdown", "story", "gallery", "program", "location", "dresscode", "practical", "rsvp", "contact", "closing", "music"],
+  "effects": {"sfeer": "goudstof", "knal": "champagne", "viering": "champagne", "namen": "folie", "onthul": "zacht", "extra": ["stralen", "kenburns", "kantel", "tik"]},
+  "changelog": "Eerste versie."
+}

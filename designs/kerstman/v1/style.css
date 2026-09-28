@@ -1,0 +1,31 @@
+/* Ho ho ho v1 — kerstrood, kerstman, hulst, sneeuw.
+   Opbouw, opening en versiering: designs/_atelier/v1. Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Fredoka"; src: url("../../../fonts/fredoka-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Nunito"; src: url("../../../fonts/nunito-latin-wght-normal.woff2") format("woff2"); font-weight: 200 1000; font-display: swap; }
+@font-face { font-family: "Caveat"; src: url("../../../fonts/caveat-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+
+body {
+  --a-display: "Fredoka", system-ui, sans-serif;
+  --a-body: "Nunito", system-ui, sans-serif;
+  --a-script: "Caveat", cursive;
+  --a-ui: "Nunito", system-ui, sans-serif;
+  --a-text-font: "Nunito", system-ui, sans-serif;
+  --a-radius: 18px;
+  --a-names-weight: 600;
+  --a-h2-weight: 600;
+}
+
+.a-orn--top { width: min(11rem, 48vw); margin-bottom: .6rem; }
+.a-orn--bottom { display: none; }
+.a-orn--closing { width: min(8rem, 36vw); }
+.ks-arm { transform-box: view-box; transform-origin: 66px 112px; }
+.ks-figuur, .ks-hoofd { transform-box: view-box; transform-origin: 100px 220px; }
+.fx-motion .ks-arm { animation: ks-zwaai 1.8s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .ks-figuur, .fx-motion .ks-hoofd { animation: ks-wieg 3.6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .ks-hoofd { animation-name: ks-knik; }
+@keyframes ks-zwaai { 0%, 100% { transform: rotate(0deg); } 20% { transform: rotate(-16deg); } 40% { transform: rotate(4deg); } 60% { transform: rotate(-14deg); } 80% { transform: rotate(2deg); } }
+@keyframes ks-wieg { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(1.5deg); } }
+@keyframes ks-knik { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(3deg); } }
+.a-tagline { font-family: var(--a-body); font-style: normal; }
+.a-lead { font-family: var(--a-body); }

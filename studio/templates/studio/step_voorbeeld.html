@@ -25,8 +25,9 @@
     {% else %}<p class="notice notice--success"><strong>Alles is compleet.</strong>Controleer de teksten nog één keer rustig.</p>{% endif %}
     <ul class="edit-links">
       <li><a href="{% url 'studio:step' inv.uid 'gegevens' %}">Gegevens aanpassen</a></li>
+      {% if wenskaart %}<li><a href="{% url 'studio:step' inv.uid 'programma' %}">Afsluiting</a></li>{% else %}
       <li><a href="{% url 'studio:step' inv.uid 'programma' %}">Programma en info</a></li>
-      <li><a href="{% url 'studio:step' inv.uid 'aanmelden' %}">Aanmelden</a></li>
+      <li><a href="{% url 'studio:step' inv.uid 'aanmelden' %}">Aanmelden</a></li>{% endif %}
       <li><a href="{% url 'studio:step' inv.uid 'fotos' %}">Foto's en verhaal</a></li>
       <li><a href="{% url 'studio:step' inv.uid 'stijl' %}">Stijl en onderdelen</a></li>
     </ul>

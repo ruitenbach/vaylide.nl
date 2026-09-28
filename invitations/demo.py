@@ -17,6 +17,10 @@ DEFAULT_DEMO_OCCASION = {
     "avondgoud": "verjaardag",
     "puur-moment": "verloving",
     "winterlicht": "kerst",
+    "middernacht": "kerst",
+    "gloria": "kerst",
+    "aan-tafel": "kerst",
+    "voor-altijd": "bruiloft",
 }
 
 DESIGN_IMAGES = {
@@ -56,6 +60,12 @@ DESIGN_IMAGES = {
     "mijlpaal": ["zijde-goud", "stadslicht", "architectuur", "goud-lichtjes", "zee-horizon"],
     # Kerst: eigen getekende beelden uit tools/winterlicht/ (kerstboom, lichtjes, kaarsen, winterbos).
     "winterlicht": ["kerst-boom", "kerst-lichtjes", "kerst-kaarsen", "kerst-winterbos", "goud-lichtjes"],
+    "kerstman": ["kerst-lichtjes", "kerst-boom", "kerst-kaarsen", "kerst-winterbos", "goud-lichtjes"],
+    "sneeuwpop": ["kerst-winterbos", "kerst-lichtjes", "kerst-boom", "kerst-kaarsen", "goud-lichtjes"],
+    "middernacht": ["goud-lichtjes", "zijde-goud", "kaarslicht", "kerst-lichtjes", "stadslicht"],
+    "gloria": ["kerst-lichtjes", "sterrenhemel", "kaarslicht", "kerst-boom", "wolken"],
+    "aan-tafel": ["kerst-kaarsen", "kaarslicht", "kerst-lichtjes", "kerst-boom", "goud-lichtjes"],
+    "voor-altijd": ["rozen", "waterverf-bloesem", "bloemblaadjes", "eucalyptus", "duinen-staand"],
 }
 IMAGE_SIZES = {
     "waterverf-bloesem": (1200, 1500),
@@ -108,7 +118,7 @@ def _img(name: str, x=50, y=50, caption="") -> dict:
             "alt": "Voorbeeldbeeld (abstracte illustratie)", "caption": caption}
 
 
-def demo_content(design_slug: str, occasion: str, palette_key: str = "") -> dict:
+def demo_content(design_slug: str, occasion: str, palette_key: str = "", soort: str = "") -> dict:
     content = default_content(occasion, palette_key)
     day = _demo_date()
     deadline = day - timedelta(weeks=6)
@@ -225,6 +235,16 @@ def demo_content(design_slug: str, occasion: str, palette_key: str = "") -> dict
             "en jullie waren er steeds bij. Daarom vieren we kerst dit jaar graag samen: met lichtjes, lekker eten "
             "en de mensen die ons het dierbaarst zijn.\n\nSchuif je aan bij ons kerstdiner?"
         )
+        if soort == "wenskaart":
+            # Dezelfde familie, maar alleen een kerstgroet: geen datum, locatie of aanmelden.
+            content["soort"] = "wenskaart"
+            content["welcome_text"] = (
+                "Lieve familie en vrienden,\n\nwat een jaar was het! Er werd gelachen, gegroeid en een beetje gehuild, "
+                "en jullie waren er steeds bij. Dank je wel daarvoor.\n\nWe wensen jullie warme, lichtjesvolle feestdagen "
+                "en een prachtig nieuw jaar."
+            )
+        elif soort == "uitnodiging":
+            content["soort"] = "uitnodiging"
         content["story"] = {"title": "Ons jaar", "text": (
             "Lotte leerde fietsen (zonder zijwieltjes!), Siem zette zijn eerste stapjes en Daan bakte eindelijk "
             "een kerststol die niet inzakte.\n\nWe zijn dankbaar voor alle lieve mensen om ons heen, en we kijken "

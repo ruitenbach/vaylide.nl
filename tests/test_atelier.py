@@ -24,6 +24,7 @@ LONG_NAMES = {
     "jubileum": {"honorees": "Maximiliaan-Alexander & Ernestina van den Boogaard", "years": "25"},
     "babyshower": {"parents": "Maximiliaan-Alexander & Ernestina", "baby_name": ""},
     "zakelijk": {"event_title": "Internationale relatiedag voor partners", "organization": "Voorbeeld BV", "years": ""},
+    "kerst": {"family": "Familie Maximiliaan-Alexander van den Boogaard", "members": ""},
 }
 
 
@@ -37,10 +38,10 @@ def atelier_manifests():
 class AtelierCollectionTests(VaylideTestCase):
     def test_thirty_designs_five_per_occasion(self):
         manifests = [data for _, data in atelier_manifests()]
-        self.assertEqual(len(manifests), 30)
+        self.assertEqual(len(manifests), 32)
         primary = Counter(data["occasions"][0] for data in manifests)
-        # Kerst heeft een eigen, volledig ontworpen kaart (Winterlicht) en geen Atelier-ontwerpen.
-        self.assertEqual(primary, Counter({occasion: 5 for occasion in OCCASIONS if occasion != "kerst"}))
+        # Kerst heeft een eigen, volledig ontworpen kaart (Winterlicht) en twee Atelier-ontwerpen (Ho ho ho, Sneeuwpret).
+        self.assertEqual(primary, Counter({occasion: (2 if occasion == "kerst" else 5) for occasion in OCCASIONS}))
         # Allemaal ingelezen, zichtbaar en met de Atelier-opbouw als huidige versie.
         for data in manifests:
             template = Template.objects.get(slug=data["slug"])

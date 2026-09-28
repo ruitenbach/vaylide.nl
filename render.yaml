@@ -56,6 +56,31 @@ services:
         value: voorbeeld
       - key: VIERLIEF_PREVIEW_PASSWORD
         sync: false
+      - fromGroup: vaylide-taken
+
+  # Elke 15 minuten: mislukte taken opnieuw; rond 02:00 UTC ook bewaartermijnen en een back-up
+  # (op de schijf van de webdienst). Zie tools/cron_taken.py en docs/BACKUP.md.
+  - type: cron
+    name: vaylide-taken
+    runtime: python
+    region: frankfurt
+    plan: starter
+    schedule: "*/15 * * * *"
+    buildCommand: "true"
+    startCommand: python tools/cron_taken.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      # Het publieke adres van de webdienst; vóór het koppelen van het domein het …onrender.com-adres.
+      - key: VIERLIEF_CRON_URL
+        value: https://www.vaylide.com/intern/taken/
+      - fromGroup: vaylide-taken
+
+envVarGroups:
+  - name: vaylide-taken
+    envVars:
+      - key: VIERLIEF_CRON_TOKEN
+        generateValue: true
 
 databases:
   - name: vaylide-db

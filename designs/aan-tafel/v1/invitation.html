@@ -1,0 +1,179 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Aan tafel v1 — warme uitnodiging voor het kerstdiner: een plaatskaartje op tafel bij kaarslicht.
+   Tekeningen: tools/aan_tafel/maak_tekeningen.py (slinger en takje); kaarsen en tafel met CSS. Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/parisienne-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/lora-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>{% endblock %}
+
+{% block cover %}
+<section class="cover at-cover" data-cover data-duration="2600" data-fx-delay="850" data-fx-intro="2000" aria-label="Openingsscherm">
+  <div class="at-kamer" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="at-cover__boven">
+    <p class="at-cover__kicker">{% if v.occasion == "kerst" %}{% if v.has_event %}Kerstdiner{% else %}Kerstgroet{% endif %}{% else %}{{ v.kicker }}{% endif %}</p>
+    <p class="at-cover__to">{% if v.has_event %}Er is een plaats voor {% else %}Een kerstgroet voor {% endif %}{% if v.formal %}u{% else %}jou{% endif %}</p>
+  </div>
+  <div class="at-tafel" aria-hidden="true"><span class="at-tafel__licht"></span></div>
+  <div class="at-kaarsen at-kaarsen--links">{% include "aan-tafel/v1/_kaars.html" with hoogte="30vh" variant="creme" %}{% include "aan-tafel/v1/_kaars.html" with hoogte="21vh" variant="rood" %}</div>
+  <div class="at-kaarsen at-kaarsen--rechts">{% include "aan-tafel/v1/_kaars.html" with hoogte="19vh" variant="rood" %}{% include "aan-tafel/v1/_kaars.html" with hoogte="27vh" variant="creme" %}</div>
+  <div class="fx-slot" data-fx-slot="cover" aria-hidden="true"></div>
+  <a href="#uitnodiging" class="at-kaartje" data-open data-fx-origin data-fx-tilt aria-label="Open de {{ v.doc_kind }}">
+    <span class="at-kaartje__binnen" aria-hidden="true"><span class="at-kaartje__welkom">{% if v.has_event %}Welkom aan tafel{% else %}Warme kerstgroeten{% endif %}</span></span>
+    <span class="at-kaartje__voor fx-pulse">
+      <span class="at-kaartje__takje">{% include "aan-tafel/v1/_takje.html" %}</span>
+      <span class="at-kaartje__strik" aria-hidden="true"></span>
+      <span class="at-kaartje__tekst" aria-hidden="true">{% if v.has_event %}Een plaats aan tafel{% else %}Fijne feestdagen{% endif %}</span>
+      <span class="at-kaartje__mono" aria-hidden="true">{{ v.monogram }}</span>
+    </span>
+    <span class="at-kaartje__schaduw" aria-hidden="true"></span>
+  </a>
+  <div class="at-cover__onder">
+    <p class="at-cover__hint">Tik op het kaartje</p>
+    {% if v.show.music %}<button type="button" class="at-cover__music" data-open data-open-music><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor"/></svg>Openen met muziek</button>{% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<header class="at-hero">
+  <div class="at-kamer" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="fx-slot at-hero__fx" data-fx-slot="hero" aria-hidden="true"></div>
+  <div class="at-slinger" aria-hidden="true">{% include "aan-tafel/v1/_slinger.html" %}</div>
+  <div class="at-hero__text">
+    <p class="at-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
+    <h1 class="at-names at-names--{{ v.names_size }} fx-names">{% if v.is_couple %}<span class="at-names__one">{{ v.names.0 }}</span> <span class="at-names__amp" aria-label="en">&amp;</span> <span class="at-names__two">{{ v.names.1 }}</span>{% else %}<span>{{ v.names.0 }}</span>{% endif %}</h1>
+    {% if v.subnames %}<p class="at-hero__members fx-intro" style="--fx-d:5">{{ v.subnames }}</p>{% endif %}
+    <p class="at-hero__tagline fx-intro" style="--fx-d:6">{{ v.tagline }}</p>
+    {% if v.has_event and v.date %}<p class="at-hero__date fx-intro" style="--fx-d:7">{{ v.weekday }} {{ v.day }} {{ v.month_name }}{% if v.time_display %} · {{ v.time_display }}{% endif %}</p>{% endif %}
+  </div>
+  <div class="at-hero__tafel" aria-hidden="true">
+    <div class="at-kaarsen at-kaarsen--hero">{% include "aan-tafel/v1/_kaars.html" with hoogte="92px" variant="rood" %}{% include "aan-tafel/v1/_kaars.html" with hoogte="136px" variant="creme" %}{% include "aan-tafel/v1/_kaars.html" with hoogte="110px" variant="rood" %}</div>
+    <span class="at-hero__takje at-hero__takje--l">{% include "aan-tafel/v1/_takje.html" %}</span>
+    <span class="at-hero__takje at-hero__takje--r">{% include "aan-tafel/v1/_takje.html" %}</span>
+  </div>
+  <a class="at-scroll fx-intro" href="#at-verder" style="--fx-d:8">Scroll verder<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+</header>
+
+<div class="at-body" id="at-verder">
+{% if v.has_event and v.date %}
+<section class="at-sec at-date" data-reveal aria-labelledby="at-date-title">
+  <h2 id="at-date-title" class="at-h2">Wanneer schuif {% if v.formal %}u{% else %}je{% endif %} aan?</h2>
+  <div class="at-plaats">
+    <span class="at-plaats__takje">{% include "aan-tafel/v1/_takje.html" %}</span>
+    <p class="at-plaats__dag">{{ v.weekday }}</p>
+    <p class="at-plaats__datum">{{ v.day }} {{ v.month_name }}</p>
+    <p class="at-plaats__jaar">{{ v.year }}</p>
+    {% if v.time_display %}<p class="at-plaats__tijd">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.welcome or v.hero %}
+<section class="at-sec at-letter" data-reveal aria-label="{% if v.occasion == 'kerst' %}Kerstgroet{% else %}Welkom{% endif %}">
+  {% if v.hero %}<figure class="at-foto at-letter__photo"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 380px, 76vw" %}</div></figure>{% endif %}
+  {% if v.welcome %}<div class="at-letter__text">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="at-sec at-program" data-reveal aria-labelledby="at-program-title">
+  <div class="at-menu">
+    <span class="at-menu__lint" aria-hidden="true"></span>
+    <h2 id="at-program-title" class="at-h2 at-menu__titel">Menu</h2>
+    <p class="at-menu__sub">&amp; verloop van de avond</p>
+    <ol class="at-menu__lijst" data-fx-stagger>
+      {% for item in v.program %}
+      <li class="at-gang">
+        {% if item.time %}<p class="at-gang__tijd">{{ item.time }}</p>{% endif %}
+        <h3 class="at-gang__titel">{{ item.title }}</h3>
+        {% if item.description %}<p class="at-gang__desc">{{ item.description }}</p>{% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+    <span class="at-menu__takje" aria-hidden="true">{% include "aan-tafel/v1/_takje.html" %}</span>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="at-sec at-count" data-reveal aria-labelledby="at-count-title">
+  <h2 id="at-count-title" class="at-h2">{% if v.countdown_label == "kerst" %}Aftellen naar kerst{% elif v.is_past %}Dank je wel{% else %}Nog even en we gaan aan tafel{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="at-sec at-place" data-reveal aria-labelledby="at-place-title">
+  <h2 id="at-place-title" class="at-h2">Waar</h2>
+  {% if v.venue %}<p class="at-place__venue">{{ v.venue }}</p>{% endif %}
+  {% if v.address_lines %}<address class="at-place__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+  {% if v.date_display %}<p class="at-place__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="at-sec at-dress" data-reveal aria-labelledby="at-dress-title">
+  <h2 id="at-dress-title" class="at-h2">Dresscode</h2>
+  {% if v.dresscode_colors %}<ul class="at-ballen" aria-label="Kleuren voor de dresscode">
+    {% for c in v.dresscode_colors %}<li class="at-kbal" style="--c:{{ c }};--i:{{ forloop.counter0 }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+  {% for p in v.dresscode_text %}<p class="at-dress__text">{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="at-sec at-story" data-reveal aria-labelledby="at-story-title">
+  <h2 id="at-story-title" class="at-h2">{{ v.story_title }}</h2>
+  <div class="at-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="at-sec at-gallery" data-reveal aria-labelledby="at-gallery-title">
+  <h2 id="at-gallery-title" class="at-h2">Momenten</h2>
+  <ul class="at-photos">
+    {% for photo in v.gallery %}<li class="at-foto" style="--r:{% cycle '-2.5deg' '2deg' '-1.5deg' '2.5deg' %}"><figure><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 600px) 250px, 44vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="at-sec at-practical" data-reveal aria-labelledby="at-practical-title">
+  <h2 id="at-practical-title" class="at-h2">Goed om te weten</h2>
+  <dl class="at-practical__list" data-fx-stagger>
+    {% for item in v.practical %}<div class="at-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="at-sec at-rsvp" id="aanmelden" data-reveal aria-labelledby="at-rsvp-title">
+  <h2 id="at-rsvp-title" class="at-h2">{% if v.occasion == "kerst" %}{% if v.formal %}Schuift u aan?{% else %}Schuif je aan?{% endif %}{% elif v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+  <div class="at-card">
+    <span class="at-card__lint" aria-hidden="true"></span>
+    {% include "invitations/partials/rsvp.html" %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="at-sec at-contact" data-reveal aria-labelledby="at-contact-title">
+  <h2 id="at-contact-title" class="at-h2">Vragen?</h2>
+  {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+  <p class="at-contact__name">{{ v.contact.name }}</p>
+  <p class="at-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="at-sec at-closing" data-reveal aria-label="Afsluiting">
+  <div class="at-closing__slinger" aria-hidden="true">{% include "aan-tafel/v1/_slinger.html" %}</div>
+  <p class="at-closing__wish">{% if v.occasion == "kerst" %}Fijne feestdagen{% else %}Tot aan tafel{% endif %}</p>
+  {% if v.show.closing %}{% for p in v.closing %}<p class="at-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  {% include "invitations/partials/share_buttons.html" %}
+</section>
+</div>
+{% endblock %}

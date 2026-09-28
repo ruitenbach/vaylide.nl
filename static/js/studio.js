@@ -5,6 +5,18 @@
   var html = document.documentElement;
   html.classList.add("js-enabled");
 
+  // Uitnodiging of wenskaart: bij een wenskaart verdwijnen 'Wanneer' en 'Waar' (de ingevulde waarden blijven bewaard).
+  document.querySelectorAll("[data-soort-keuze]").forEach(function (group) {
+    var form = group.closest("form");
+    function update() {
+      var checked = group.querySelector("input[name=soort]:checked");
+      var wens = checked && checked.value === "wenskaart";
+      form.querySelectorAll("[data-alleen-uitnodiging]").forEach(function (el) { el.hidden = wens; });
+    }
+    group.addEventListener("change", update);
+    update();
+  });
+
   function csrfToken() {
     var input = document.querySelector("input[name=csrfmiddlewaretoken]");
     return input ? input.value : "";

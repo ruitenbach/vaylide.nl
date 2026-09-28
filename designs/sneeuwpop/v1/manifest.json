@@ -1,0 +1,147 @@
+{
+  "slug": "sneeuwpop",
+  "version": 1,
+  "name": "Sneeuwpret",
+  "tagline": "Ijzig en vrolijk, met een zwaaiende sneeuwpop",
+  "description": "Een vouwkaart opent zich in een sneeuwbui. Een warm aangeklede sneeuwpop met hoge hoed, rode sjaal en wanten zwaait je toe tussen verlichte kerstbomen, in een kader van ijs.",
+  "style_notes": "IJsblauw, sneeuwpop, sterren, winters",
+  "occasions": [
+    "kerst"
+  ],
+  "sort_order": 46,
+  "opening": "vouwkaart",
+  "opening_label": "Vouwkaart",
+  "atelier": {
+    "opening": "vouwkaart",
+    "hero": "kader",
+    "sections": "midden",
+    "heading": "ornament",
+    "names": "display",
+    "date": "cirkel",
+    "photo": "boog",
+    "texture": "sterren",
+    "ornament": "sneeuwpop"
+  },
+  "palettes": [
+    {
+      "key": "ijsblauw",
+      "name": "IJsblauw",
+      "swatch": [
+        "#F1F7FC",
+        "#BFD9EE",
+        "#1F5E99"
+      ],
+      "vars": {
+        "--a-bg": "#F1F7FC",
+        "--a-surface": "#FFFFFF",
+        "--a-ink": "#12243A",
+        "--a-muted": "#4B5E74",
+        "--a-accent": "#1F5E99",
+        "--a-accent-ink": "#FFFFFF",
+        "--a-line": "#D6E5F2",
+        "--a-c2": "#BFD9EE",
+        "--a-c3": "#E3EFF8",
+        "--a-cover-bg": "#DCEBF7",
+        "--a-cover-ink": "#12243A",
+        "--a-scheme": "light",
+        "--a-page": "#F1F7FC"
+      }
+    },
+    {
+      "key": "zilverwit",
+      "name": "Zilverwit",
+      "swatch": [
+        "#F7F7F9",
+        "#D5D8E0",
+        "#8E1B2C"
+      ],
+      "vars": {
+        "--a-bg": "#F7F7F9",
+        "--a-surface": "#FFFFFF",
+        "--a-ink": "#1E2027",
+        "--a-muted": "#555866",
+        "--a-accent": "#8E1B2C",
+        "--a-accent-ink": "#FFFFFF",
+        "--a-line": "#E2E3E8",
+        "--a-c2": "#D5D8E0",
+        "--a-c3": "#EDEEF2",
+        "--a-cover-bg": "#E9EAEF",
+        "--a-cover-ink": "#1E2027",
+        "--a-scheme": "light",
+        "--a-page": "#F7F7F9"
+      }
+    },
+    {
+      "key": "mint",
+      "name": "Mint",
+      "swatch": [
+        "#F0F8F5",
+        "#BFE0D3",
+        "#1C6B55"
+      ],
+      "vars": {
+        "--a-bg": "#F0F8F5",
+        "--a-surface": "#FFFFFF",
+        "--a-ink": "#11271F",
+        "--a-muted": "#48605A",
+        "--a-accent": "#1C6B55",
+        "--a-accent-ink": "#FFFFFF",
+        "--a-line": "#D3E8E0",
+        "--a-c2": "#BFE0D3",
+        "--a-c3": "#E2F2EC",
+        "--a-cover-bg": "#D8EEE6",
+        "--a-cover-ink": "#11271F",
+        "--a-scheme": "light",
+        "--a-page": "#F0F8F5"
+      }
+    },
+    {
+      "key": "poolnacht",
+      "name": "Poolnacht",
+      "swatch": [
+        "#141A36",
+        "#8FD3F0",
+        "#8FD3F0"
+      ],
+      "vars": {
+        "--a-bg": "#141A36",
+        "--a-surface": "#1D2447",
+        "--a-ink": "#EEF2FA",
+        "--a-muted": "#C1C7D8",
+        "--a-accent": "#8FD3F0",
+        "--a-accent-ink": "#141A36",
+        "--a-line": "#2D3664",
+        "--a-c2": "#8FD3F0",
+        "--a-c3": "#3B4680",
+        "--a-cover-bg": "#0E1329",
+        "--a-cover-ink": "#EEF2FA",
+        "--a-scheme": "dark",
+        "--a-page": "#141A36"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "changelog": "Eerste versie.",
+  "effects": {
+    "sfeer": "sneeuw",
+    "knal": "sneeuw",
+    "viering": "sterren",
+    "namen": "gloed",
+    "onthul": "zacht",
+    "extra": [
+      "tik"
+    ]
+  }
+}

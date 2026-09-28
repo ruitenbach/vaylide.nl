@@ -1,0 +1,193 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Middernacht v1 — kerstgala voor volwassenen: een glazen kerstbal als opening, art deco en goudfolie. Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/bodoni-moda-latin-wght-italic.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cinzel-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>{% endblock %}
+
+{% block cover %}
+<section class="cover mn-cover" data-cover data-duration="2700" data-fx-delay="900" data-fx-intro="2100" aria-label="Openingsscherm">
+  <div class="mn-cover__stage">
+    <div class="mn-cover__rays" aria-hidden="true"></div>
+    <div class="mn-cover__flare" aria-hidden="true"></div>
+    <div class="fx-slot" data-fx-slot="cover" aria-hidden="true"></div>
+    <a href="#uitnodiging" class="mn-bal" data-open data-fx-origin data-fx-tilt aria-label="Open de {{ v.doc_kind }}">
+      <span class="mn-bal__swing">
+        <span class="mn-bal__lint" aria-hidden="true"></span>
+        <span class="mn-bal__strik" aria-hidden="true"></span>
+        <span class="mn-bal__cap" aria-hidden="true"></span>
+        <span class="mn-bal__glass fx-pulse">
+          <span class="mn-bal__shine" aria-hidden="true"></span>
+          <svg class="mn-bal__fili" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+            <ellipse cx="100" cy="100" rx="99" ry="26" fill="none" stroke="currentColor" stroke-width=".8" opacity=".55"/>
+            <ellipse cx="100" cy="100" rx="99" ry="34" fill="none" stroke="currentColor" stroke-width=".5" opacity=".4"/>
+            <path d="M3 100q24 12 48 0t49 0 49 0 48 0" fill="none" stroke="currentColor" stroke-width="1" opacity=".75"/>
+            <path d="M100 1C78 30 78 170 100 199M100 1C122 30 122 170 100 199" fill="none" stroke="currentColor" stroke-width=".45" opacity=".35"/>
+            <g fill="currentColor" opacity=".85"><circle cx="27" cy="106" r="1.6"/><circle cx="51" cy="100" r="1.6"/><circle cx="173" cy="106" r="1.6"/><circle cx="149" cy="100" r="1.6"/></g>
+            <circle cx="100" cy="100" r="31" fill="none" stroke="currentColor" stroke-width="1.1"/>
+            <circle cx="100" cy="100" r="35" fill="none" stroke="currentColor" stroke-width=".5" stroke-dasharray="1.5 3"/>
+          </svg>
+          <span class="mn-bal__mono mn-bal__mono--{{ v.monogram|length }}" aria-hidden="true">{{ v.monogram }}</span>
+        </span>
+      </span>
+    </a>
+    <div class="mn-cover__text">
+      <p class="mn-cover__kicker">{% if v.occasion == "kerst" %}{% if v.has_event %}Kerstgala{% else %}Kerstgroet{% endif %}{% else %}{{ v.kicker }}{% endif %}</p>
+      <p class="mn-cover__to">{% if v.has_event %}Een uitnodiging voor {% else %}Een kerstgroet voor {% endif %}{% if v.formal %}u{% else %}jou{% endif %}</p>
+      <p class="mn-cover__hint">Tik op de kerstbal</p>
+      {% if v.show.music %}<button type="button" class="mn-cover__music" data-open data-open-music><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor"/></svg>Openen met muziek</button>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<header class="mn-hero fx-rays">
+  <div class="fx-slot mn-hero__fx" data-fx-slot="hero" aria-hidden="true"></div>
+  {% include "middernacht/v1/_hangers.html" %}
+  <div class="mn-frame">
+    {% include "middernacht/v1/_hoek.html" with hoek="lb" %}{% include "middernacht/v1/_hoek.html" with hoek="rb" %}{% include "middernacht/v1/_hoek.html" with hoek="lo" %}{% include "middernacht/v1/_hoek.html" with hoek="ro" %}
+    <p class="mn-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
+    <h1 class="mn-names mn-names--{{ v.names_size }} fx-names">{% if v.is_couple %}<span class="mn-names__one">{{ v.names.0 }}</span> <span class="mn-names__amp" aria-label="en">&amp;</span> <span class="mn-names__two">{{ v.names.1 }}</span>{% else %}<span>{{ v.names.0 }}</span>{% endif %}</h1>
+    {% if v.subnames %}<p class="mn-hero__members fx-intro" style="--fx-d:5">{{ v.subnames }}</p>{% endif %}
+    <div class="mn-hero__rule fx-intro" style="--fx-d:6">{% include "middernacht/v1/_deco.html" %}</div>
+    <p class="mn-hero__tagline fx-intro" style="--fx-d:7">{{ v.tagline }}</p>
+    {% if v.has_event and v.date %}<p class="mn-hero__date fx-intro" style="--fx-d:8"><span>{{ v.weekday }}</span><span class="mn-hero__day">{{ v.day }} {{ v.month_name }}</span><span>{{ v.year }}</span></p>{% endif %}
+  </div>
+  <a class="mn-scroll fx-intro" href="#mn-verder" style="--fx-d:9">Scroll verder<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+</header>
+
+<div class="mn-body" id="mn-verder">
+{% if v.has_event and v.date %}
+<section class="mn-sec mn-date" data-reveal aria-labelledby="mn-date-title">
+  <p class="mn-label">Noteer de datum</p>
+  <h2 id="mn-date-title" class="mn-h2">{% if v.formal %}Uw{% else %}Jouw{% endif %} toegangskaart</h2>
+  <div class="mn-ticket">
+    <span class="mn-ticket__notch mn-ticket__notch--l" aria-hidden="true"></span><span class="mn-ticket__notch mn-ticket__notch--r" aria-hidden="true"></span>
+    <p class="mn-ticket__weekday">{{ v.weekday }}</p>
+    <p class="mn-ticket__day fx-shimmer">{{ v.day }}</p>
+    <p class="mn-ticket__month">{{ v.month_name }} {{ v.year }}</p>
+    {% if v.time_display %}<p class="mn-ticket__time">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+    {% if v.venue %}<p class="mn-ticket__venue">{{ v.venue }}</p>{% endif %}
+    <p class="mn-ticket__admit">Op uitnodiging van {% if v.names.1 %}{{ v.names.0 }} &amp; {{ v.names.1 }}{% else %}{{ v.names.0 }}{% endif %}</p>
+  </div>
+</section>
+{% endif %}
+
+{% if v.welcome or v.hero %}
+<section class="mn-sec mn-letter" data-reveal aria-label="{% if v.occasion == 'kerst' %}Kerstgroet{% else %}Welkom{% endif %}">
+  {% include "middernacht/v1/_deco.html" %}
+  {% if v.hero %}<figure class="mn-letter__photo"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 420px, 80vw" %}</div></figure>{% endif %}
+  {% if v.welcome %}<div class="mn-letter__text">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="mn-sec mn-program" data-reveal aria-labelledby="mn-program-title">
+  <p class="mn-label">De avond</p>
+  <h2 id="mn-program-title" class="mn-h2">Het programma</h2>
+  <div class="mn-menu">
+    {% include "middernacht/v1/_hoek.html" with hoek="lb" %}{% include "middernacht/v1/_hoek.html" with hoek="ro" %}
+    <ol class="mn-menu__list" data-fx-stagger>
+      {% for item in v.program %}
+      <li class="mn-menu__item">
+        <p class="mn-menu__row"><span class="mn-menu__title">{{ item.title }}</span><span class="mn-menu__dots" aria-hidden="true"></span>{% if item.time %}<span class="mn-menu__time">{{ item.time }}</span>{% endif %}</p>
+        {% if item.description %}<p class="mn-menu__desc">{{ item.description }}</p>{% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="mn-sec mn-count" data-reveal aria-labelledby="mn-count-title">
+  <p class="mn-label">{% if v.countdown_label == "kerst" %}Tot kerst{% else %}Tot het gala{% endif %}</p>
+  <h2 id="mn-count-title" class="mn-h2">{% if v.countdown_label == "kerst" %}Aftellen naar kerst{% elif v.is_past %}Dank je wel{% else %}Nog even en het is zover{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="mn-sec mn-place" data-reveal aria-labelledby="mn-place-title">
+  <p class="mn-label">Waar</p>
+  <h2 id="mn-place-title" class="mn-h2">Locatie</h2>
+  {% if v.venue %}<p class="mn-place__venue">{{ v.venue }}</p>{% endif %}
+  {% if v.address_lines %}<address class="mn-place__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+  {% if v.date_display %}<p class="mn-place__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="mn-sec mn-dress" data-reveal aria-labelledby="mn-dress-title">
+  <p class="mn-label">Gekleed voor de avond</p>
+  <h2 id="mn-dress-title" class="mn-h2">Dresscode</h2>
+  {% if v.dresscode_colors %}<ul class="mn-gems" aria-label="Kleuren voor de dresscode">
+    {% for c in v.dresscode_colors %}<li class="mn-gem" style="--c:{{ c }};--i:{{ forloop.counter0 }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+  {% for p in v.dresscode_text %}<p class="mn-dress__text">{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="mn-sec mn-story" data-reveal aria-labelledby="mn-story-title">
+  {% include "middernacht/v1/_deco.html" %}
+  <h2 id="mn-story-title" class="mn-h2">{{ v.story_title }}</h2>
+  <div class="mn-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="mn-sec mn-gallery" data-reveal aria-labelledby="mn-gallery-title">
+  <p class="mn-label">Herinneringen</p>
+  <h2 id="mn-gallery-title" class="mn-h2">Momenten</h2>
+  <ul class="mn-photos">
+    {% for photo in v.gallery %}<li class="mn-photo"><figure><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 600px) 250px, 44vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="mn-sec mn-practical" data-reveal aria-labelledby="mn-practical-title">
+  <p class="mn-label">Praktisch</p>
+  <h2 id="mn-practical-title" class="mn-h2">Goed om te weten</h2>
+  <dl class="mn-practical__list" data-fx-stagger>
+    {% for item in v.practical %}<div class="mn-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="mn-sec mn-rsvp" id="aanmelden" data-reveal aria-labelledby="mn-rsvp-title">
+  <p class="mn-label">R.S.V.P.</p>
+  <h2 id="mn-rsvp-title" class="mn-h2">{% if v.occasion == "kerst" %}{% if v.formal %}Schuift u aan?{% else %}Schuif je aan?{% endif %}{% elif v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+  <div class="mn-card">
+    {% include "invitations/partials/rsvp.html" %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="mn-sec mn-contact" data-reveal aria-labelledby="mn-contact-title">
+  <p class="mn-label">Contact</p>
+  <h2 id="mn-contact-title" class="mn-h2">Vragen?</h2>
+  {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+  <p class="mn-contact__name">{{ v.contact.name }}</p>
+  <p class="mn-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="mn-sec mn-closing" data-reveal aria-label="Afsluiting">
+  <svg class="mn-coupes" viewBox="0 0 160 110" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><g class="mn-coupe mn-coupe--l"><path d="M28 30h44c0 16-10 26-22 26S28 46 28 30Z"/><path d="M50 56v34M36 92h28"/><path class="mn-coupe__wine" d="M31 36h38c-2 10-9 16-19 16s-17-6-19-16Z" fill="currentColor" fill-opacity=".22" stroke="none"/></g><g class="mn-coupe mn-coupe--r"><path d="M88 30h44c0 16-10 26-22 26S88 46 88 30Z"/><path d="M110 56v34M96 92h28"/><path class="mn-coupe__wine" d="M91 36h38c-2 10-9 16-19 16s-17-6-19-16Z" fill="currentColor" fill-opacity=".22" stroke="none"/></g><path class="mn-coupes__spark" d="M80 6v10M71 10l4 6M89 10l-4 6"/></g></svg>
+  <p class="mn-closing__wish">{% if v.occasion == "kerst" %}Fijne feestdagen{% else %}Proost{% endif %}</p>
+  {% if v.show.closing %}{% for p in v.closing %}<p class="mn-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  <p class="mn-closing__mono" aria-hidden="true">{{ v.monogram }}</p>
+  {% include "invitations/partials/share_buttons.html" %}
+</section>
+</div>
+{% endblock %}

@@ -1,0 +1,360 @@
+/* Middernacht v1 — een kerstgala voor volwassenen. Opening: een glazen kerstbal met monogram die schommelt, oplicht
+   en waar je in duikt. Daarbinnen art deco, goudfolie, een toegangskaart en een menukaart.
+   Alles is met CSS en SVG getekend (geen beelden). Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Bodoni Moda"; src: url("../../../fonts/bodoni-moda-latin-wght-italic.woff2") format("woff2"); font-weight: 400 900; font-style: italic; font-display: swap; }
+@font-face { font-family: "Bodoni Moda"; src: url("../../../fonts/bodoni-moda-latin-wght-normal.woff2") format("woff2"); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: "Cinzel"; src: url("../../../fonts/cinzel-latin-wght-normal.woff2") format("woff2"); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../../../fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 300 800; font-display: swap; }
+
+body {
+  --mn-display: "Bodoni Moda", "Playfair Display", Didot, Georgia, serif;
+  --mn-caps: "Cinzel", "Trajan Pro", Georgia, serif;
+  --mn-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --mn-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mn-w: min(100vw, 560px);
+  --mn-foil: linear-gradient(100deg, var(--mn-gold-2) 0%, var(--mn-gold) 28%, color-mix(in srgb, var(--mn-gold) 45%, #fff) 44%, var(--mn-gold) 58%, var(--mn-gold-2) 100%);
+  /* Gedeelde onderdelen (formulier, knoppen, muziek) in de kleuren van dit ontwerp. */
+  --inv-bg: var(--mn-bg);
+  --inv-text: var(--mn-ink);
+  --inv-muted: var(--mn-muted);
+  --inv-accent: var(--mn-accent);
+  --inv-accent-contrast: var(--mn-accent-ink);
+  --inv-font-body: var(--mn-serif);
+  --inv-font-ui: var(--mn-ui);
+  --inv-focus: var(--mn-gold);
+  --inv-radius: 2px;
+  --inv-surface-2: color-mix(in srgb, var(--mn-bg-2) 70%, var(--mn-line));
+  --inv-btn-border: color-mix(in srgb, var(--mn-gold-2) 75%, transparent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--mn-gold) 14%, transparent);
+  --inv-field-bg: var(--mn-bg);
+  --inv-field-text: var(--mn-ink);
+  --inv-field-border: color-mix(in srgb, var(--mn-ink) 32%, transparent);
+  --inv-music-bg: linear-gradient(180deg, #F3DDA6, #CFA75C);
+  --inv-music-text: #1A140C;
+  --inv-music-border: rgba(90, 60, 20, .35);
+  --inv-photo-bg: var(--mn-bg-2);
+  --fx-pulse: var(--mn-gold);
+  --fx-rays-y: 46%;
+  --fx-rays-strength: 9%;
+  background: var(--mn-bg);
+  color: var(--mn-ink);
+  font-family: var(--mn-serif);
+  font-size: 1.16rem;
+  font-weight: 500;
+}
+body:not([data-palette="ivoor"]) { --inv-error: #FFB4A8; color-scheme: dark; }
+/* Ivoor: licht papier, dus donkerder goudfolie en een donker monogram op de gouden kerstbal. */
+body[data-palette="ivoor"] { --mn-foil: linear-gradient(100deg, #4E380F 0%, #7E5A1E 30%, #9C7430 46%, #7E5A1E 62%, #4E380F 100%); --fx-shine: #B08840; }
+body[data-palette="ivoor"] :is(.mn-bal__glass, .mn-hang__mono) { color: #2A1E0B; }
+body[data-palette="ivoor"] .mn-bal__mono { background: none; -webkit-text-fill-color: #2A1E0B; filter: drop-shadow(0 1px 0 rgba(255, 240, 200, .6)); }
+
+/* ================================================================ openingsscherm: de glazen kerstbal */
+.mn-cover {
+  --mn-bal: min(64vw, 36vh, 330px);
+  color: var(--mn-cover-ink);
+  background:
+    radial-gradient(60% 46% at 50% 44%, color-mix(in srgb, var(--mn-gold) 16%, transparent), transparent 70%),
+    radial-gradient(120% 90% at 50% 30%, color-mix(in srgb, var(--mn-page) 70%, var(--mn-bg-2)), var(--mn-page) 75%);
+  --fx-bg: var(--mn-page);
+}
+.mn-cover__stage { position: relative; width: 100%; height: 100%; overflow: hidden; }
+/* Art-decostralen achter de bal. */
+.mn-cover__rays {
+  position: absolute; left: 50%; top: calc(24vh + var(--mn-bal) * .62); width: 190vmax; height: 190vmax; margin: -95vmax 0 0 -95vmax; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--mn-gold) 12%, transparent) 0deg 1.2deg, transparent 1.2deg 9deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 7%, #000 12%, rgba(0, 0, 0, .5) 22%, transparent 40%);
+  mask-image: radial-gradient(circle, transparent 7%, #000 12%, rgba(0, 0, 0, .5) 22%, transparent 40%);
+}
+.fx-motion .mn-cover__rays { animation: fx-spin 160s linear infinite; animation-play-state: var(--fx-play, running); }
+.mn-cover__flare {
+  position: absolute; left: 50%; top: calc(24vh + var(--mn-bal) * .62); width: 30vmax; height: 30vmax; margin: -15vmax 0 0 -15vmax; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, #FFF8E8 0, color-mix(in srgb, var(--mn-gold) 80%, #fff) 18%, color-mix(in srgb, var(--mn-gold) 40%, transparent) 42%, transparent 70%);
+  opacity: 0; scale: .2;
+}
+.mn-cover .fx-slot { z-index: 4; }
+
+/* De bal hangt aan een fluwelen lint vanaf de bovenrand en schommelt om dat punt. */
+.mn-bal { position: absolute; left: 50%; top: 0; z-index: 3; width: var(--mn-bal); margin-left: calc(var(--mn-bal) / -2); color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.mn-bal__swing { display: flex; flex-direction: column; align-items: center; transform-origin: 50% 0; }
+.fx-motion .mn-bal__swing { animation: mn-swing 5.2s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes mn-swing { 0%, 100% { rotate: -2.6deg; } 50% { rotate: 2.6deg; } }
+.mn-bal__lint {
+  width: 7px; height: 24vh;
+  background: linear-gradient(90deg, var(--mn-gold-3), var(--mn-gold) 18%, var(--mn-ribbon) 26%, color-mix(in srgb, var(--mn-ribbon) 70%, #fff) 50%, var(--mn-ribbon) 74%, var(--mn-gold) 82%, var(--mn-gold-3));
+}
+.mn-bal__strik { position: relative; width: 44%; height: calc(var(--mn-bal) * .1); margin-top: calc(var(--mn-bal) * -.05); z-index: 1; }
+.mn-bal__strik::before, .mn-bal__strik::after {
+  content: ""; position: absolute; top: 0; width: 46%; height: 100%; border-radius: 50%;
+  background: radial-gradient(60% 70% at 50% 40%, color-mix(in srgb, var(--mn-ribbon) 70%, #fff), var(--mn-ribbon) 70%);
+  box-shadow: inset 0 0 0 1.5px var(--mn-gold), 0 4px 10px rgba(0, 0, 0, .35);
+}
+.mn-bal__strik::before { left: 2%; rotate: 16deg; }
+.mn-bal__strik::after { right: 2%; rotate: -16deg; }
+.mn-bal__cap {
+  position: relative; z-index: 2; width: 22%; height: calc(var(--mn-bal) * .1); margin-top: calc(var(--mn-bal) * -.02); margin-bottom: calc(var(--mn-bal) * -.035); border-radius: 5px 5px 3px 3px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, .18) 0 2px, transparent 2px 6px),
+    linear-gradient(90deg, var(--mn-gold-3), var(--mn-gold) 30%, #FFF3D0 48%, var(--mn-gold) 64%, var(--mn-gold-3));
+  box-shadow: 0 3px 6px rgba(0, 0, 0, .4);
+}
+.mn-bal__glass {
+  position: relative; display: grid; place-items: center; width: var(--mn-bal); aspect-ratio: 1; border-radius: 50%; color: var(--mn-gold);
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255, 255, 255, .7) 0 1.5%, rgba(255, 255, 255, .22) 6%, transparent 20%),
+    radial-gradient(circle at 72% 80%, color-mix(in srgb, var(--mn-gold) 38%, transparent), transparent 34%),
+    radial-gradient(circle at 38% 34%, color-mix(in srgb, var(--mn-glass) 82%, #fff) 0%, var(--mn-glass) 30%, var(--mn-glass-2) 82%);
+  box-shadow:
+    inset -16px -26px 46px rgba(0, 0, 0, .55), inset 12px 14px 30px rgba(255, 255, 255, .1),
+    0 34px 60px -24px rgba(0, 0, 0, .85), 0 0 90px -6px color-mix(in srgb, var(--mn-gold) 32%, transparent);
+}
+/* Weerspiegeling van een raam in het glas. */
+.mn-bal__glass::before {
+  content: ""; position: absolute; left: 17%; top: 15%; width: 20%; height: 12%; border-radius: 40% 60% 30% 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0)); rotate: -32deg; filter: blur(.5px);
+}
+.mn-bal__glass::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12); pointer-events: none; }
+.mn-bal__shine { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; pointer-events: none; }
+.mn-bal__shine::after {
+  content: ""; position: absolute; top: -20%; left: -60%; width: 40%; height: 140%; rotate: 22deg;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .22), transparent); translate: 0 0;
+}
+.fx-motion .mn-bal__shine::after { animation: mn-glint 6.5s ease-in-out 1.2s infinite; animation-play-state: var(--fx-play, running); }
+@keyframes mn-glint { 0%, 62% { translate: 0 0; } 100% { translate: 520% 0; } }
+.mn-bal__fili { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 0 3px color-mix(in srgb, var(--mn-gold) 45%, transparent)); }
+.mn-bal__mono {
+  position: relative; font: italic 500 calc(var(--mn-bal) * .2)/1 var(--mn-display); letter-spacing: -.02em;
+  background: var(--mn-foil); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .5));
+}
+.mn-bal__mono--3, .mn-bal__mono--4 { font-size: calc(var(--mn-bal) * .14); }
+.mn-bal .fx-pulse::after { border-radius: 50%; inset: -9px; }
+.mn-bal:focus-visible { outline: none; }
+.mn-bal:focus-visible .mn-bal__glass { outline: 2px solid var(--mn-gold); outline-offset: 8px; }
+@media (hover: hover) { .mn-bal:hover .mn-bal__glass { filter: brightness(1.12); } }
+
+.mn-cover__text {
+  position: absolute; left: 0; right: 0; bottom: max(5vh, env(safe-area-inset-bottom)); z-index: 3; padding: 0 1.5rem; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: .35rem;
+}
+.mn-cover__kicker { margin: 0; font: 600 .74rem var(--mn-caps); letter-spacing: .42em; text-transform: uppercase; color: var(--mn-gold-2); }
+.mn-cover__to { margin: .1rem 0 0; font: italic 400 clamp(1.7rem, 7.4vw, 2.3rem)/1.15 var(--mn-display); }
+.mn-cover__hint { margin: .2rem 0 .6rem; font: 500 .82rem var(--mn-ui); letter-spacing: .06em; opacity: .82; }
+.mn-cover__music {
+  display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: .55rem 1.3rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--mn-gold) 70%, transparent); background: color-mix(in srgb, var(--mn-page) 55%, transparent);
+  color: var(--mn-cover-ink); font: 600 .86rem var(--mn-ui); letter-spacing: .03em;
+}
+.mn-cover__music:hover { background: color-mix(in srgb, var(--mn-gold) 16%, transparent); }
+.mn-cover__music:focus-visible { outline: 2px solid var(--mn-gold); outline-offset: 3px; }
+
+/* ---------------------------------------------------------------- openen: zwaaien, oplichten, erin duiken */
+.fx-motion.is-opening .mn-bal__swing { animation: mn-open-swing 1.2s cubic-bezier(.3, .6, .3, 1) both; }
+@keyframes mn-open-swing { 0% { rotate: 0deg; } 25% { rotate: -9deg; } 55% { rotate: 6deg; } 80% { rotate: -2deg; } 100% { rotate: 0deg; } }
+.fx-motion.is-opening .mn-bal__glass { animation: mn-dive 1.7s cubic-bezier(.55, 0, .3, 1) .95s both; }
+@keyframes mn-dive {
+  0% { scale: 1; filter: brightness(1); }
+  35% { scale: 1.12; filter: brightness(1.5) drop-shadow(0 0 40px var(--mn-gold)); }
+  100% { scale: 9; opacity: 0; filter: brightness(2.2); }
+}
+.fx-motion.is-opening :is(.mn-bal__lint, .mn-bal__strik, .mn-bal__cap) { opacity: 0; transition: opacity .5s ease 1.05s; }
+.fx-motion.is-opening .mn-cover__flare { animation: mn-flare 1.6s ease-out 1.05s both; }
+@keyframes mn-flare { 0% { opacity: 0; scale: .2; } 45% { opacity: 1; scale: 2.2; } 100% { opacity: 0; scale: 6; } }
+.fx-motion.is-opening .mn-cover__rays { opacity: 1; filter: brightness(1.8); transition: filter .8s ease .9s; }
+.is-opening .mn-cover__text { opacity: 0; transition: opacity .4s ease; }
+.is-opening .mn-cover { opacity: 0; transition: opacity .6s ease 2s; }
+.is-opening-reduced .mn-cover { transition: opacity .25s ease; }
+
+/* ================================================================ de uitnodiging */
+.inv-middernacht .inv-main { position: relative; z-index: 1; }
+.mn-hero {
+  position: relative; overflow: hidden; display: grid; place-items: center;
+  min-height: 100vh; min-height: calc(100svh - var(--mn-bar, 0px)); padding: clamp(7rem, 30vw, 9.5rem) clamp(1rem, 5vw, 1.8rem) 4.2rem;
+  background:
+    radial-gradient(70% 48% at 50% 46%, color-mix(in srgb, var(--mn-gold) 11%, transparent), transparent 72%),
+    radial-gradient(130% 80% at 50% 0, var(--mn-bg-2), var(--mn-bg) 70%);
+  text-align: center;
+}
+.mn-hero__fx { z-index: 0; }
+
+/* Drie hangende kerstballen (CSS-lagen). */
+.mn-hangers { position: absolute; inset: 0 0 auto; height: 58%; z-index: 1; pointer-events: none; }
+.mn-hang { position: absolute; top: 0; display: flex; flex-direction: column; align-items: center; transform-origin: 50% 0; width: calc(var(--mn-w) * .3); margin-left: calc(var(--mn-w) * -.15); }
+.mn-hang::before { content: ""; width: 1.5px; height: calc(var(--mn-w) * var(--len-n, .2)); background: linear-gradient(var(--mn-gold-3), var(--mn-gold)); }
+.mn-hang--1 { left: 20%; --len-n: .2; }
+.mn-hang--2 { left: 50%; --len-n: .1; }
+.mn-hang--3 { left: 80%; --len-n: .28; }
+.mn-hang__cap { width: 12%; height: calc(var(--mn-w) * .018); border-radius: 2px; background: linear-gradient(90deg, var(--mn-gold-3), var(--mn-gold) 45%, var(--mn-gold-3)); margin-bottom: -2px; position: relative; z-index: 1; }
+.mn-hang__ball {
+  display: grid; place-items: center; border-radius: 50%; width: calc(var(--mn-w) * .13); aspect-ratio: 1;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, .6) 0 3%, transparent 20%),
+    radial-gradient(circle at 38% 34%, color-mix(in srgb, var(--mn-glass) 80%, #fff), var(--mn-glass) 32%, var(--mn-glass-2) 85%);
+  box-shadow: inset -5px -8px 14px rgba(0, 0, 0, .5), 0 12px 22px -12px rgba(0, 0, 0, .8), 0 0 30px -8px color-mix(in srgb, var(--mn-gold) 40%, transparent);
+}
+.mn-hang--2 .mn-hang__ball { width: calc(var(--mn-w) * .21); box-shadow: inset -7px -10px 18px rgba(0, 0, 0, .5), inset 0 0 0 1px color-mix(in srgb, var(--mn-gold) 40%, transparent), 0 16px 28px -14px rgba(0, 0, 0, .8), 0 0 40px -8px color-mix(in srgb, var(--mn-gold) 45%, transparent); }
+.mn-hang--3 .mn-hang__ball { width: calc(var(--mn-w) * .1); }
+.mn-hang__mono { font: italic 500 calc(var(--mn-w) * .07)/1 var(--mn-display); color: var(--mn-gold); }
+.fx-motion .mn-hang { animation: mn-swing 6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .mn-hang--1 { animation-duration: 5.2s; animation-delay: -1.3s; }
+.fx-motion .mn-hang--3 { animation-duration: 4.6s; animation-delay: -2.4s; }
+
+/* Het art-decokader om de namen. */
+.mn-frame { position: relative; z-index: 2; width: min(100%, 470px); padding: clamp(2.2rem, 9vw, 3rem) clamp(1.1rem, 6vw, 2.2rem); color: var(--mn-gold); }
+.mn-corner { position: absolute; width: clamp(38px, 12vw, 58px); height: auto; color: var(--mn-gold); }
+.mn-corner--lb { left: 0; top: 0; }
+.mn-corner--rb { right: 0; top: 0; scale: -1 1; }
+.mn-corner--lo { left: 0; bottom: 0; scale: 1 -1; }
+.mn-corner--ro { right: 0; bottom: 0; scale: -1 -1; }
+.mn-kicker { margin: 0 0 1rem; font: 600 .74rem var(--mn-caps); letter-spacing: .4em; text-transform: uppercase; color: var(--mn-gold-2); }
+.mn-names {
+  margin: 0; font: italic 500 clamp(2.9rem, 14vw, 4.3rem)/1.02 var(--mn-display); letter-spacing: -.015em; color: var(--mn-gold-2); text-wrap: balance; overflow-wrap: anywhere;
+}
+/* Goudfolie: een verloop in de letters; het effect 'folie' laat er af en toe een lichtstreep over glijden. */
+.mn-names > span:not(.mn-names__amp) { background: var(--mn-foil); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.fx-motion.fx-namen-folie .mn-names > span:not(.mn-names__amp) {
+  background-image: linear-gradient(105deg, transparent 40%, var(--fx-shine) 50%, transparent 60%), var(--mn-foil);
+  background-size: 300% 100%, 100% 100%; background-position: 100% 0, 0 0;
+  animation-name: mn-foil-shine;
+}
+@keyframes mn-foil-shine { 0%, 68% { background-position: 100% 0, 0 0; } 100% { background-position: 0 0, 0 0; } }
+.mn-names__one, .mn-names__two { display: block; }
+.mn-names__amp { display: block; margin: .06em 0; font: 400 .5em/1 var(--mn-caps); color: var(--mn-gold); letter-spacing: .1em; }
+.mn-names--long { font-size: clamp(2.3rem, 11vw, 3.5rem); }
+.mn-names--xlong { font-size: clamp(1.9rem, 8.6vw, 2.8rem); }
+.mn-hero__members { margin: .8rem 0 0; font: italic 500 1.12rem/1.4 var(--mn-serif); color: var(--mn-ink); }
+.mn-hero__rule { margin: 1.3rem auto .9rem; width: min(78%, 250px); color: var(--mn-gold); }
+.mn-deco { display: block; width: 100%; height: auto; }
+.mn-hero__tagline { margin: 0 auto; max-width: 22rem; font: italic 400 clamp(1.2rem, 5vw, 1.4rem)/1.4 var(--mn-serif); color: var(--mn-ink); text-wrap: balance; }
+.mn-hero__date { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: .35rem .9rem; margin: 1.5rem 0 0; font: 600 .72rem var(--mn-caps); letter-spacing: .28em; text-transform: uppercase; color: var(--mn-muted); }
+.mn-hero__day { font: 600 1rem var(--mn-caps); letter-spacing: .18em; color: var(--mn-gold-2); padding: .25rem .9rem; border-block: 1px solid color-mix(in srgb, var(--mn-gold) 55%, transparent); }
+.mn-scroll { position: absolute; bottom: 1.1rem; left: 50%; translate: -50% 0; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: .2rem; font: 600 .66rem var(--mn-caps); letter-spacing: .3em; text-transform: uppercase; color: var(--mn-muted); text-decoration: none; }
+.fx-motion .mn-scroll svg { animation: mn-nudge 2.4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes mn-nudge { 0%, 100% { translate: 0 0; } 50% { translate: 0 4px; } }
+
+/* ---------------------------------------------------------------- secties */
+.mn-body { position: relative; }
+.mn-sec { position: relative; padding: clamp(3.4rem, 14vw, 5rem) clamp(1.25rem, 6.5vw, 2.6rem); text-align: center; }
+.mn-sec:nth-child(even) { background: var(--mn-bg-2); }
+.mn-sec + .mn-sec::before { content: ""; position: absolute; top: 0; left: 50%; width: min(60%, 260px); height: 1px; translate: -50% 0; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--mn-gold) 55%, transparent), transparent); }
+.mn-label { margin: 0 0 .5rem; font: 600 .7rem var(--mn-caps); letter-spacing: .38em; text-transform: uppercase; color: var(--mn-gold-2); }
+.mn-h2 { margin: 0 0 1.8rem; font: italic 500 clamp(2rem, 9vw, 2.6rem)/1.1 var(--mn-display); color: var(--mn-ink); text-wrap: balance; }
+.mn-sec > .mn-deco { width: min(62%, 220px); margin: 0 auto 1.6rem; color: var(--mn-gold); }
+
+/* Toegangskaart */
+.mn-ticket {
+  position: relative; max-width: 330px; margin: 0 auto; padding: 1.9rem 1.4rem 1.6rem;
+  border: 1px solid color-mix(in srgb, var(--mn-gold) 70%, transparent); outline: 1px solid color-mix(in srgb, var(--mn-gold) 35%, transparent); outline-offset: -8px;
+  background: radial-gradient(90% 60% at 50% 30%, color-mix(in srgb, var(--mn-gold) 9%, transparent), transparent 70%), var(--mn-bg);
+  box-shadow: 0 30px 60px -36px rgba(0, 0, 0, .8);
+}
+.mn-ticket__notch { position: absolute; top: 62%; width: 22px; height: 22px; border-radius: 50%; background: var(--mn-bg-2); border: 1px solid color-mix(in srgb, var(--mn-gold) 70%, transparent); }
+.mn-sec:nth-child(odd) .mn-ticket__notch { background: var(--mn-bg); }
+.mn-ticket__notch--l { left: -12px; clip-path: inset(0 0 0 50%); }
+.mn-ticket__notch--r { right: -12px; clip-path: inset(0 50% 0 0); }
+.mn-ticket__weekday { margin: 0; font: 600 .78rem var(--mn-caps); letter-spacing: .36em; text-transform: uppercase; color: var(--mn-muted); }
+.mn-ticket__day { margin: .1rem 0 0; font: italic 500 clamp(5rem, 26vw, 6.5rem)/1 var(--mn-display); color: var(--mn-gold-2); }
+.mn-ticket__month { margin: .2rem 0 0; font: 600 1rem var(--mn-caps); letter-spacing: .24em; text-transform: uppercase; color: var(--mn-ink); }
+.mn-ticket__time { margin: .8rem 0 0; padding-top: .8rem; border-top: 1px dashed color-mix(in srgb, var(--mn-gold) 50%, transparent); font: 500 1.15rem var(--mn-serif); }
+.mn-ticket__venue { margin: .25rem 0 0; font: italic 500 1.1rem var(--mn-serif); color: var(--mn-muted); }
+.mn-ticket__admit { margin: 1rem 0 0; font: 600 .62rem var(--mn-caps); letter-spacing: .3em; text-transform: uppercase; color: var(--mn-gold-2); }
+
+/* Welkom */
+.mn-letter__photo { margin: 0 auto 1.6rem; max-width: 340px; padding: 8px; border: 1px solid color-mix(in srgb, var(--mn-gold) 60%, transparent); }
+.mn-letter__photo .ph { aspect-ratio: 4 / 5; }
+.mn-letter__text { max-width: 26rem; margin: 0 auto; font-size: 1.24rem; line-height: 1.6; }
+.mn-letter__text p { margin: 0 0 .9rem; }
+.mn-letter__text p:first-child { margin-bottom: 1.1rem; font: italic 500 1.55rem/1.3 var(--mn-display); color: var(--mn-gold-2); }
+
+/* Programma als menukaart */
+.mn-menu { position: relative; max-width: 420px; margin: 0 auto; padding: clamp(1.8rem, 7vw, 2.4rem) clamp(1.2rem, 6vw, 2rem); }
+.mn-menu .mn-corner--lb { left: 0; top: 0; }
+.mn-menu .mn-corner--ro { right: 0; bottom: 0; }
+.mn-menu__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.3rem; text-align: left; }
+.mn-menu__row { display: flex; align-items: baseline; gap: .5rem; margin: 0; }
+.mn-menu__title { font: italic 500 1.35rem/1.2 var(--mn-display); color: var(--mn-ink); }
+.mn-menu__dots { flex: 1; min-width: 1.2rem; border-bottom: 1px dotted color-mix(in srgb, var(--mn-gold) 70%, transparent); translate: 0 -.3em; }
+.mn-menu__time { font: 600 .82rem var(--mn-caps); letter-spacing: .14em; color: var(--mn-gold-2); white-space: nowrap; }
+.mn-menu__desc { margin: .25rem 0 0; color: var(--mn-muted); font-size: 1.08rem; line-height: 1.45; }
+
+/* Aftellen */
+.mn-count .cd { gap: 0; flex-wrap: nowrap; }
+.mn-count .cd__unit { position: relative; min-width: 0; flex: 0 1 5.2rem; }
+.mn-count .cd__unit + .cd__unit::before { content: "·"; position: absolute; left: 0; top: .1em; translate: -50% 0; font: 400 2rem/1 var(--mn-display); color: var(--mn-gold); }
+.mn-count .cd__num { font: italic 500 clamp(2.3rem, 11vw, 3.2rem)/1.05 var(--mn-display); color: var(--mn-gold-2); }
+.mn-count .cd__label { margin-top: .4rem; font: 600 .62rem var(--mn-caps); letter-spacing: .26em; text-transform: uppercase; color: var(--mn-muted); }
+.mn-count .inv-actions { margin-top: 1.8rem; }
+
+/* Locatie */
+.mn-place__venue { margin: 0; font: italic 500 clamp(1.7rem, 7vw, 2.1rem)/1.2 var(--mn-display); color: var(--mn-gold-2); }
+.mn-place__address { margin: .6rem 0 0; font-style: normal; line-height: 1.55; }
+.mn-place__when { margin: 1rem 0 1.5rem; color: var(--mn-muted); }
+
+/* Dresscode: kleuren als edelstenen */
+.mn-gems { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin: 0 0 1.4rem; padding: 0; }
+.mn-gem {
+  width: 44px; height: 44px; rotate: 45deg; border-radius: 4px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--c) 60%, #fff) 0%, var(--c) 45%, color-mix(in srgb, var(--c) 70%, #000) 100%);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mn-gold) 70%, transparent), 0 0 0 5px var(--mn-bg-2), 0 0 0 6px color-mix(in srgb, var(--mn-gold) 40%, transparent), 0 10px 20px -8px rgba(0, 0, 0, .6);
+}
+.mn-dress__text { max-width: 24rem; margin: 0 auto .6rem; font-size: 1.2rem; }
+
+/* Verhaal, foto's, praktisch */
+.mn-story__text { max-width: 27rem; margin: 0 auto; line-height: 1.6; }
+.mn-photos { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(.7rem, 3vw, 1rem); max-width: 480px; margin: 0 auto; padding: 0; }
+.mn-photo figure { margin: 0; padding: 6px; border: 1px solid color-mix(in srgb, var(--mn-gold) 55%, transparent); background: var(--mn-bg); }
+.mn-photo .ph { aspect-ratio: 4 / 5; }
+.mn-photo figcaption { padding: .5rem .2rem .2rem; font: italic 500 1rem var(--mn-serif); color: var(--mn-muted); }
+.mn-practical__list { display: grid; gap: 1.2rem; max-width: 26rem; margin: 0 auto; }
+.mn-practical__item dt { font: 600 .74rem var(--mn-caps); letter-spacing: .26em; text-transform: uppercase; color: var(--mn-gold-2); }
+.mn-practical__item dd { margin: .3rem 0 0; }
+
+/* Aanmelden en contact */
+.mn-card {
+  max-width: 440px; margin: 0 auto; padding: 1.7rem clamp(1.1rem, 5vw, 1.7rem); text-align: left; background: var(--mn-bg);
+  border: 1px solid color-mix(in srgb, var(--mn-gold) 65%, transparent); outline: 1px solid color-mix(in srgb, var(--mn-gold) 25%, transparent); outline-offset: 5px;
+}
+.mn-card .rsvp { font-size: 1.02rem; }
+.mn-card .rsvp__deadline { font-family: var(--mn-serif); font-style: italic; font-size: 1.12rem; }
+.mn-contact__name { margin: .4rem 0 .2rem; font: italic 500 1.4rem var(--mn-display); color: var(--mn-gold-2); }
+
+/* Afsluiting: twee coupes die klinken */
+.mn-coupes { display: block; width: 150px; height: auto; margin: 0 auto 1rem; color: var(--mn-gold); overflow: visible; }
+.mn-coupe { transform-box: fill-box; }
+.mn-coupe--l { transform-origin: 50% 100%; }
+.mn-coupe--r { transform-origin: 50% 100%; }
+.mn-coupes__spark { opacity: 0; }
+.fx-motion .is-visible .mn-coupe--l { animation: mn-clink-l 1.1s cubic-bezier(.3, .8, .3, 1) .3s both; }
+.fx-motion .is-visible .mn-coupe--r { animation: mn-clink-r 1.1s cubic-bezier(.3, .8, .3, 1) .3s both; }
+.fx-motion .is-visible .mn-coupes__spark { animation: mn-spark .6s ease-out .75s both; }
+@keyframes mn-clink-l { from { translate: -14px 0; rotate: -14deg; } 60% { translate: 2px 0; rotate: 12deg; } to { translate: 0 0; rotate: 8deg; } }
+@keyframes mn-clink-r { from { translate: 14px 0; rotate: 14deg; } 60% { translate: -2px 0; rotate: -12deg; } to { translate: 0 0; rotate: -8deg; } }
+@keyframes mn-spark { 0% { opacity: 0; translate: 0 6px; } 50% { opacity: 1; } 100% { opacity: 0; translate: 0 -4px; } }
+.mn-closing__wish { margin: 0; font: italic 500 clamp(2.3rem, 10vw, 3rem)/1.1 var(--mn-display); color: var(--mn-gold-2); }
+.mn-closing__text { max-width: 24rem; margin: .8rem auto 0; }
+.mn-closing__mono { margin: 1.6rem auto 0; width: 3.4rem; height: 3.4rem; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--mn-gold) 60%, transparent); border-radius: 50%; font: italic 500 1.3rem/1 var(--mn-display); color: var(--mn-gold-2); }
+.mn-closing .inv-share { margin-top: 1.8rem; }
+
+/* Knoppen: goud met zwart, strak */
+.inv-middernacht .inv-btn { font-family: var(--mn-ui); letter-spacing: .04em; }
+.inv-middernacht .music__toggle, .inv-middernacht .fx-toggle { box-shadow: 0 8px 22px -6px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .5); }
+.inv-middernacht .music__toggle { background: linear-gradient(180deg, #F3DDA6, #CFA75C); }
+
+/* ================================================================ computer: de uitnodiging op een fluwelen tafel */
+@media (min-width: 600px) {
+  body { background: radial-gradient(50rem 40rem at 50% 40%, color-mix(in srgb, var(--mn-gold) 9%, transparent), transparent 70%) fixed, var(--mn-page); }
+  .inv-middernacht .inv-main { width: var(--mn-w); margin: 0 auto; background: var(--mn-bg); box-shadow: 0 0 0 1px color-mix(in srgb, var(--mn-gold) 45%, transparent), 0 0 0 7px var(--mn-page), 0 0 0 8px color-mix(in srgb, var(--mn-gold) 22%, transparent), 0 40px 90px -30px rgba(0, 0, 0, .8); }
+  .mn-hero { min-height: min(100vh, 960px); }
+  .inv-middernacht .inv-colophon { color: color-mix(in srgb, var(--mn-cover-ink) 75%, transparent); }
+  .mn-cover { --mn-bal: min(36vh, 330px); }
+}
+
+/* ================================================================ geen beweging */
+@media (prefers-reduced-motion: reduce) {
+  .mn-bal__swing, .mn-hang, .mn-bal__shine::after, .mn-cover__rays, .mn-scroll svg, .mn-coupe, .mn-coupes__spark { animation: none !important; }
+}
+@media print {
+  .mn-hangers, .mn-hero__fx { display: none; }
+}

@@ -1,0 +1,155 @@
+{
+  "slug": "kerstman",
+  "version": 1,
+  "name": "Ho ho ho",
+  "tagline": "Vrolijk, met de kerstman en een cadeau",
+  "description": "Een kerstcadeau om uit te pakken: plof, en de cadeautjes vliegen eruit. De kerstman met hulst, sneeuw die zacht valt en een kalenderblaadje voor de datum.",
+  "style_notes": "Kerstrood, kerstman, hulst, sneeuw",
+  "occasions": [
+    "kerst"
+  ],
+  "sort_order": 45,
+  "opening": "cadeau",
+  "opening_label": "Cadeau om uit te pakken",
+  "atelier": {
+    "opening": "cadeau",
+    "hero": "klassiek",
+    "sections": "kaarten",
+    "heading": "script",
+    "names": "script",
+    "date": "kalender",
+    "photo": "cirkel",
+    "texture": "stippen",
+    "ornament": "kerstman"
+  },
+  "palettes": [
+    {
+      "key": "kerstrood",
+      "name": "Kerstrood",
+      "swatch": [
+        "#FFF8F1",
+        "#F4C9C2",
+        "#A3122A"
+      ],
+      "vars": {
+        "--a-bg": "#FFF8F1",
+        "--a-surface": "#FFFFFF",
+        "--a-ink": "#2B1414",
+        "--a-muted": "#6A4E4A",
+        "--a-accent": "#A3122A",
+        "--a-accent-ink": "#FFFFFF",
+        "--a-line": "#F1DED4",
+        "--a-c2": "#F4C9C2",
+        "--a-c3": "#2E6B3F",
+        "--a-cover-bg": "#FBE9E1",
+        "--a-cover-ink": "#2B1414",
+        "--a-wrap": "#B3152F",
+        "--a-ribbon": "#E9C46A",
+        "--a-scheme": "light",
+        "--a-page": "#FFF8F1"
+      }
+    },
+    {
+      "key": "sneeuwwit",
+      "name": "Sneeuwwit",
+      "swatch": [
+        "#F6FAFD",
+        "#CFE0EE",
+        "#A3122A"
+      ],
+      "vars": {
+        "--a-bg": "#F6FAFD",
+        "--a-surface": "#FFFFFF",
+        "--a-ink": "#14233A",
+        "--a-muted": "#4F5D70",
+        "--a-accent": "#A3122A",
+        "--a-accent-ink": "#FFFFFF",
+        "--a-line": "#DDE7F0",
+        "--a-c2": "#CFE0EE",
+        "--a-c3": "#2E6B3F",
+        "--a-cover-bg": "#E8F1F8",
+        "--a-cover-ink": "#14233A",
+        "--a-wrap": "#FFFFFF",
+        "--a-ribbon": "#B3152F",
+        "--a-scheme": "light",
+        "--a-page": "#F6FAFD"
+      }
+    },
+    {
+      "key": "dennengroen",
+      "name": "Dennengroen",
+      "swatch": [
+        "#F2F6F1",
+        "#CFE3D3",
+        "#1F5B3A"
+      ],
+      "vars": {
+        "--a-bg": "#F2F6F1",
+        "--a-surface": "#FFFFFF",
+        "--a-ink": "#13261B",
+        "--a-muted": "#4B5C52",
+        "--a-accent": "#1F5B3A",
+        "--a-accent-ink": "#FFFFFF",
+        "--a-line": "#D7E3DA",
+        "--a-c2": "#CFE3D3",
+        "--a-c3": "#2E6B3F",
+        "--a-cover-bg": "#1F5B3A",
+        "--a-cover-ink": "#FFFFFF",
+        "--a-wrap": "#1F5B3A",
+        "--a-ribbon": "#C8102E",
+        "--a-scheme": "light",
+        "--a-page": "#F2F6F1"
+      }
+    },
+    {
+      "key": "nachtblauw",
+      "name": "Nachtblauw",
+      "swatch": [
+        "#0E1730",
+        "#E7C36A",
+        "#E7C36A"
+      ],
+      "vars": {
+        "--a-bg": "#0E1730",
+        "--a-surface": "#16213F",
+        "--a-ink": "#F4EFE6",
+        "--a-muted": "#C5C6CC",
+        "--a-accent": "#E7C36A",
+        "--a-accent-ink": "#0E1730",
+        "--a-line": "#26335A",
+        "--a-c2": "#E7C36A",
+        "--a-c3": "#5FA37A",
+        "--a-cover-bg": "#0A1126",
+        "--a-cover-ink": "#F4EFE6",
+        "--a-wrap": "#A3122A",
+        "--a-ribbon": "#E7C36A",
+        "--a-scheme": "dark",
+        "--a-page": "#0E1730"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "changelog": "Eerste versie.",
+  "effects": {
+    "sfeer": "sneeuw",
+    "knal": "cadeautjes",
+    "viering": "sneeuw",
+    "namen": "pop",
+    "onthul": "zoom",
+    "extra": [
+      "tik"
+    ]
+  }
+}

@@ -554,4 +554,67 @@ DESIGNS += [
             {"key": "wit-blauw", "name": "Wit & blauw", "colors": {"bg": "#FFFFFF", "surface": "#F4F7FC", "ink": "#0F1B33", "muted": "#4D5A70", "accent": "#2451A6", "accent_ink": "#FFFFFF", "line": "#DDE4F0", "c2": "#C9D8F2", "c3": "#EEF2F9", "cover_bg": "#EEF2F9", "cover_ink": "#0F1B33", "ribbon": "#2451A6"}},
         ],
     },
+    # ---------------------------------------------------------------- Kerst
+    {
+        "slug": "kerstman", "name": "Ho ho ho", "sort_order": 45,
+        "tagline": "Vrolijk, met de kerstman en een cadeau",
+        "description": "Een kerstcadeau om uit te pakken: plof, en de cadeautjes vliegen eruit. De kerstman met hulst, sneeuw die zacht valt en een kalenderblaadje voor de datum.",
+        "style_notes": "Kerstrood, kerstman, hulst, sneeuw",
+        "occasions": ["kerst"],
+        # c3 is het groen van de hulstblaadjes naast de kerstman.
+        "atelier": {"opening": "cadeau", "hero": "klassiek", "sections": "kaarten", "heading": "script", "names": "script", "date": "kalender", "photo": "cirkel", "texture": "stippen", "ornament": "kerstman"},
+        "effects": {"sfeer": "sneeuw", "knal": "cadeautjes", "viering": "sneeuw", "namen": "pop", "onthul": "zoom", "extra": ["tik"]},
+        "fonts": {"display": "fredoka", "body": "nunito", "script": "caveat", "ui": "nunito", "text": "nunito"},
+        "preload": ["display", "body", "script"],
+        "tokens": {"--a-radius": "18px", "--a-names-weight": "600", "--a-h2-weight": "600"},
+        # De kerstman staat bovenaan en onderaan de kaart; hij zwaait en wiegt (alleen met beweging aan).
+        "css": ".a-orn--top { width: min(11rem, 48vw); margin-bottom: .6rem; }\n.a-orn--bottom { display: none; }\n.a-orn--closing { width: min(8rem, 36vw); }\n"
+               ".ks-arm { transform-box: view-box; transform-origin: 66px 112px; }\n.ks-figuur, .ks-hoofd { transform-box: view-box; transform-origin: 100px 220px; }\n"
+               ".fx-motion .ks-arm { animation: ks-zwaai 1.8s ease-in-out infinite; animation-play-state: var(--fx-play, running); }\n"
+               ".fx-motion .ks-figuur, .fx-motion .ks-hoofd { animation: ks-wieg 3.6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }\n"
+               ".fx-motion .ks-hoofd { animation-name: ks-knik; }\n"
+               "@keyframes ks-zwaai { 0%, 100% { transform: rotate(0deg); } 20% { transform: rotate(-16deg); } 40% { transform: rotate(4deg); } 60% { transform: rotate(-14deg); } 80% { transform: rotate(2deg); } }\n"
+               "@keyframes ks-wieg { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(1.5deg); } }\n"
+               "@keyframes ks-knik { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(3deg); } }\n.a-tagline { font-family: var(--a-body); font-style: normal; }\n.a-lead { font-family: var(--a-body); }",
+        "palettes": [
+            {"key": "kerstrood", "name": "Kerstrood", "colors": {"bg": "#FFF8F1", "surface": "#FFFFFF", "ink": "#2B1414", "muted": "#6A4E4A", "accent": "#A3122A", "accent_ink": "#FFFFFF", "line": "#F1DED4", "c2": "#F4C9C2", "c3": "#2E6B3F", "cover_bg": "#FBE9E1", "cover_ink": "#2B1414", "wrap": "#B3152F", "ribbon": "#E9C46A"}},
+            {"key": "sneeuwwit", "name": "Sneeuwwit", "colors": {"bg": "#F6FAFD", "surface": "#FFFFFF", "ink": "#14233A", "muted": "#4F5D70", "accent": "#A3122A", "accent_ink": "#FFFFFF", "line": "#DDE7F0", "c2": "#CFE0EE", "c3": "#2E6B3F", "cover_bg": "#E8F1F8", "cover_ink": "#14233A", "wrap": "#FFFFFF", "ribbon": "#B3152F"}},
+            {"key": "dennengroen", "name": "Dennengroen", "colors": {"bg": "#F2F6F1", "surface": "#FFFFFF", "ink": "#13261B", "muted": "#4B5C52", "accent": "#1F5B3A", "accent_ink": "#FFFFFF", "line": "#D7E3DA", "c2": "#CFE3D3", "c3": "#2E6B3F", "cover_bg": "#1F5B3A", "cover_ink": "#FFFFFF", "wrap": "#1F5B3A", "ribbon": "#C8102E"}},
+            {"key": "nachtblauw", "name": "Nachtblauw", "colors": {"bg": "#0E1730", "surface": "#16213F", "ink": "#F4EFE6", "muted": "#C5C6CC", "accent": "#E7C36A", "accent_ink": "#0E1730", "line": "#26335A", "c2": "#E7C36A", "c3": "#5FA37A", "cover_bg": "#0A1126", "cover_ink": "#F4EFE6", "wrap": "#A3122A", "ribbon": "#E7C36A", "scheme": "dark"}},
+        ],
+    },
+    {
+        "slug": "sneeuwpop", "name": "Sneeuwpret", "sort_order": 46,
+        "tagline": "Ijzig en vrolijk, met een zwaaiende sneeuwpop",
+        "description": "Een vouwkaart opent zich in een sneeuwbui. Een warm aangeklede sneeuwpop met hoge hoed, rode sjaal en wanten zwaait je toe tussen verlichte kerstbomen, in een kader van ijs.",
+        "style_notes": "IJsblauw, sneeuwpop, sterren, winters",
+        "occasions": ["kerst"],
+        # Warm aangekleed (rode sjaal en wanten), met aan weerszijden verlichte kerstbomen.
+        "atelier": {"opening": "vouwkaart", "hero": "kader", "sections": "midden", "heading": "ornament", "names": "display", "date": "cirkel", "photo": "boog", "texture": "sterren", "ornament": "sneeuwpop"},
+        "effects": {"sfeer": "sneeuw", "knal": "sneeuw", "viering": "sterren", "namen": "gloed", "onthul": "zacht", "extra": ["tik"]},
+        "fonts": {"display": "fraunces", "body": "quicksand", "ui": "quicksand", "text": "quicksand"},
+        "preload": ["display", "body"],
+        "tokens": {"--a-radius": "22px", "--a-names-weight": "600", "--a-h2-weight": "600"},
+        "css": ".a-orn--top { width: min(14rem, 62vw); margin-bottom: .6rem; }\n.a-orn--bottom { display: none; }\n.a-orn--closing { width: min(10rem, 46vw); }\n"
+               ".fx-motion .sp-lamp { animation: sp-twinkel 1.6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }\n"
+               ".fx-motion .sp-lamp--1 { animation-delay: -.55s; }\n.fx-motion .sp-lamp--2 { animation-delay: -1.1s; }\n"
+               "@keyframes sp-twinkel { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }\n"
+               ".sp-arm { transform-box: view-box; transform-origin: 70px 116px; }\n.sp-hoed { transform-box: view-box; transform-origin: 100px 46px; }\n"
+               ".sp-sjaal { transform-box: view-box; transform-origin: 110px 96px; }\n.sp-figuur { transform-box: view-box; transform-origin: 100px 222px; }\n"
+               ".fx-motion .sp-arm { animation: sp-zwaai 2s ease-in-out infinite; animation-play-state: var(--fx-play, running); }\n"
+               ".fx-motion .sp-hoed { animation: sp-hoed 4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }\n"
+               ".fx-motion .sp-sjaal { animation: sp-sjaal 1.4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }\n"
+               ".fx-motion .sp-figuur { animation: sp-wieg 4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }\n"
+               "@keyframes sp-zwaai { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(18deg); } 50% { transform: rotate(-4deg); } 75% { transform: rotate(16deg); } }\n"
+               "@keyframes sp-hoed { 0%, 70%, 100% { transform: rotate(0deg); } 80% { transform: rotate(-9deg) translateY(-3px); } 90% { transform: rotate(4deg); } }\n"
+               "@keyframes sp-sjaal { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-8deg); } }\n"
+               "@keyframes sp-wieg { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg); } }\n"
+               ".a-tagline { font-family: var(--a-body); font-style: normal; }\n.a-lead { font-family: var(--a-body); }",
+        "palettes": [
+            {"key": "ijsblauw", "name": "IJsblauw", "colors": {"bg": "#F1F7FC", "surface": "#FFFFFF", "ink": "#12243A", "muted": "#4B5E74", "accent": "#1F5E99", "accent_ink": "#FFFFFF", "line": "#D6E5F2", "c2": "#BFD9EE", "c3": "#E3EFF8", "cover_bg": "#DCEBF7", "cover_ink": "#12243A"}},
+            {"key": "zilverwit", "name": "Zilverwit", "colors": {"bg": "#F7F7F9", "surface": "#FFFFFF", "ink": "#1E2027", "muted": "#555866", "accent": "#8E1B2C", "accent_ink": "#FFFFFF", "line": "#E2E3E8", "c2": "#D5D8E0", "c3": "#EDEEF2", "cover_bg": "#E9EAEF", "cover_ink": "#1E2027"}},
+            {"key": "mint", "name": "Mint", "colors": {"bg": "#F0F8F5", "surface": "#FFFFFF", "ink": "#11271F", "muted": "#48605A", "accent": "#1C6B55", "accent_ink": "#FFFFFF", "line": "#D3E8E0", "c2": "#BFE0D3", "c3": "#E2F2EC", "cover_bg": "#D8EEE6", "cover_ink": "#11271F"}},
+            {"key": "poolnacht", "name": "Poolnacht", "colors": {"bg": "#141A36", "surface": "#1D2447", "ink": "#EEF2FA", "muted": "#C1C7D8", "accent": "#8FD3F0", "accent_ink": "#141A36", "line": "#2D3664", "c2": "#8FD3F0", "c3": "#3B4680", "cover_bg": "#0E1329", "cover_ink": "#EEF2FA", "scheme": "dark"}},
+        ],
+    },
 ]

@@ -201,10 +201,45 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
 .hero__media { position: absolute; top: 0; right: 0; bottom: 0; left: 40%; }
 .hero__media > img { width: 100%; height: 100%; object-fit: cover; object-position: 60% 50%; }
 .hero__media::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, #F9F0E6 0%, rgba(249, 240, 230, .65) 16%, rgba(249, 240, 230, 0) 42%); }
-.float-card { position: absolute; z-index: 2; top: 50%; right: clamp(2rem, 9vw, 9rem); display: block; width: clamp(12.5rem, 17vw, 15.5rem); aspect-ratio: 5 / 8; border-radius: var(--radius-lg); overflow: hidden; background: var(--paper); box-shadow: var(--shadow-float); transform: translateY(-50%) rotate(5deg); transition: transform .35s ease; }
-.float-card:hover { transform: translateY(-52%) rotate(3.5deg); }
+/* De kaart in de kop: zweeft in 3D, kantelt mee met de muis (hero3d.js zet --rx, --ry, --gx en --gy) en glanst. */
+.card-stage {
+  --rx: 0deg; --ry: 0deg; --gx: 30%; --gy: 20%; --px: 0; --py: 0;
+  position: absolute; z-index: 3; top: 50%; right: clamp(2rem, 9vw, 9rem); width: clamp(12.5rem, 17vw, 15.5rem); aspect-ratio: 5 / 8;
+  translate: 0 -50%; perspective: 1100px;
+}
+.float-card {
+  position: absolute; inset: 0; display: block; border-radius: var(--radius-lg); overflow: hidden; background: var(--paper);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset, var(--shadow-float);
+  transform: rotate(5deg) rotateX(var(--rx)) rotateY(var(--ry)); transform-style: preserve-3d; transition: transform .5s cubic-bezier(.2, .8, .2, 1), box-shadow .3s ease;
+}
+.card-stage.is-actief .float-card { transition: transform .12s linear; }
+.float-card:hover { box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset, 0 44px 70px -28px rgba(55, 38, 18, .6); }
+/* Een tweede kaart schuin erachter geeft diepte. */
+.card-stage__back {
+  position: absolute; inset: 4% -6% -4% 6%; border-radius: var(--radius-lg); background: linear-gradient(160deg, var(--gold-soft), #E6D3B3);
+  box-shadow: 0 24px 40px -24px rgba(55, 38, 18, .5); transform: rotate(-4deg) translate(calc(var(--px) * -6px), calc(var(--py) * -6px)); transition: transform .5s ease;
+}
+/* Zachte schaduw op de 'tafel' die meebeweegt met het zweven. */
+.card-stage__shadow { position: absolute; left: 12%; right: 12%; bottom: -9%; height: 7%; border-radius: 50%; background: radial-gradient(closest-side, rgba(55, 38, 18, .35), transparent); filter: blur(4px); z-index: -1; }
+/* Lichtglans die de muis volgt, met een vleugje parelmoer. */
+.float-card__glans {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: soft-light; opacity: .6;
+  background:
+    radial-gradient(circle at var(--gx) var(--gy), rgba(255, 255, 255, .7), rgba(255, 255, 255, 0) 38%),
+    linear-gradient(115deg, rgba(255, 214, 170, 0) 30%, rgba(255, 236, 200, .45) 45%, rgba(214, 226, 255, .35) 52%, rgba(255, 214, 170, 0) 66%);
+  background-size: 100% 100%, 220% 220%; background-position: 0 0, calc(50% + var(--px) * 30%) calc(50% + var(--py) * 30%);
+}
+/* De achtergrondfoto schuift een klein beetje tegengesteld mee (parallax). */
+.hero__media > img { transform: translate(calc(var(--hx, 0) * -10px), calc(var(--hy, 0) * -8px)) scale(1.04); transition: transform .6s ease-out; }
+.hero__sparkles { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .card-stage { animation: card-zweef 6.5s ease-in-out infinite; }
+  .card-stage__shadow { animation: card-schaduw 6.5s ease-in-out infinite; }
+}
+@keyframes card-zweef { 0%, 100% { translate: 0 -50%; } 50% { translate: 0 calc(-50% - 12px); } }
+@keyframes card-schaduw { 0%, 100% { opacity: 1; scale: 1; } 50% { opacity: .7; scale: .9; } }
 .float-card img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
-.float-card__play { position: absolute; left: 50%; bottom: 9%; display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: var(--accent); color: #fff; transform: translateX(-50%); box-shadow: 0 10px 20px -8px rgba(60, 40, 15, .6); }
+.float-card__play { position: absolute; z-index: 2; left: 50%; bottom: 9%; display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: var(--accent); color: #fff; transform: translateX(-50%); box-shadow: 0 10px 20px -8px rgba(60, 40, 15, .6); }
 .float-card__play .icon { width: 1.5rem; height: 1.5rem; margin-left: 2px; }
 @media (max-width: 860px) {
   .hero__br { display: none; }
@@ -213,8 +248,8 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
   .hero__media { position: relative; left: auto; height: 25rem; }
   .hero__media > img { object-position: 70% 50%; }
   .hero__media::before { background: linear-gradient(180deg, var(--ivory) 0%, rgba(251, 248, 242, 0) 30%); }
-  .float-card { top: auto; right: auto; left: 50%; bottom: 2rem; width: 12.5rem; transform: translateX(-50%) rotate(5deg); }
-  .float-card:hover { transform: translateX(-50%) rotate(3.5deg); }
+  .card-stage { top: auto; right: auto; left: 50%; bottom: 2rem; width: 12.5rem; translate: -50% 0; }
+  @keyframes card-zweef { 0%, 100% { translate: -50% 0; } 50% { translate: -50% -10px; } }
   .hero__checks { margin-top: 1.75rem; gap: .55rem 1.25rem; }
 }
 
@@ -407,6 +442,26 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
 .meta-list dd { margin: 0; }
 .palette-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .35rem 1rem; }
 .palette-list li { display: inline-flex; align-items: center; gap: .45rem; }
+/* Soort kaart op de ontwerppagina: een strakke schakelaar met twee delen. */
+.segmented { list-style: none; display: inline-flex; margin: 0; padding: 3px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--paper); }
+.segmented__item { display: inline-flex; align-items: center; min-height: 40px; padding: 0 1.1rem; border-radius: 7px; color: var(--ink-2); font-weight: 500; text-decoration: none; }
+.segmented__item:hover { color: var(--ink); background: var(--ivory-2); }
+.segmented__item[aria-current="true"] { background: var(--ink); color: var(--paper); font-weight: 600; }
+.segmented__item:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.segmented__hint { margin: .5rem 0 0; color: var(--muted); font-size: .92rem; }
+/* Kleurkeuze op de ontwerppagina: ronde stalen met de kleuren van de variant; de gekozen staal krijgt een ring. */
+.swatch-picker__name { margin: 0 0 .5rem; font-weight: 600; color: var(--ink); }
+.swatch-picker__list { list-style: none; display: flex; flex-wrap: wrap; gap: .35rem; margin: 0; padding: 0; }
+.swatch {
+  position: relative; display: block; width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--s1) 0 50%, var(--s2) 50% 76%, var(--s3) 76%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .14), 0 0 0 3px var(--paper), 0 0 0 4px transparent;
+  transition: box-shadow .15s ease, transform .15s ease;
+}
+.swatch:hover { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .14), 0 0 0 3px var(--paper), 0 0 0 4px var(--line-strong); }
+.swatch[aria-current="true"] { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .14), 0 0 0 3px var(--paper), 0 0 0 4.5px var(--ink); }
+.swatch:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+@media (prefers-reduced-motion: reduce) { .swatch { transition: none; } }
 .palette-list__swatches { display: inline-flex; }
 .palette-list__swatches span { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--ivory); margin-left: -5px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .12); }
 .palette-list__swatches span:first-child { margin-left: 0; }

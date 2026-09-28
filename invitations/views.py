@@ -47,8 +47,9 @@ def _demo_setup(request, slug):
 @xframe_options_sameorigin
 def demo(request, slug):
     template, version, occasion, palette = _demo_setup(request, slug)
-    content = demo_content(slug, occasion, palette)
-    query = f"?gelegenheid={occasion}&kleur={palette}"
+    soort = request.GET.get("soort", "")
+    content = demo_content(slug, occasion, palette, soort=soort)
+    query = f"?gelegenheid={occasion}&kleur={palette}" + (f"&soort={content['soort']}" if content.get("soort") else "")
     options = RenderOptions(
         mode="demo",
         music_synth=True,

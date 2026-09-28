@@ -12,7 +12,14 @@
         <div><dt>Opening</dt><dd>{{ version.manifest.opening_label }}</dd></div>
         {% if effects_text %}<div><dt>Effecten</dt><dd>{{ effects_text }} Gasten kunnen de beweging met één tik stilzetten.</dd></div>{% endif %}
         <div><dt>Geschikt voor</dt><dd>{{ template.occasion_labels|join:", "|lower }}</dd></div>
-        <div><dt>Kleuren</dt><dd><ul class="palette-list" aria-label="Kleurvarianten">{% for p in version.palettes %}<li><span class="palette-list__swatches" aria-hidden="true">{% for c in p.swatch %}<span style="background:{{ c }}"></span>{% endfor %}</span>{{ p.name }}</li>{% endfor %}</ul></dd></div>
+        {% if soorten %}<div><dt>Soort kaart</dt><dd>
+          <ul class="segmented" aria-label="Toon het voorbeeld als uitnodiging of als wenskaart">{% for s in soorten %}<li><a class="segmented__item" href="{{ s.url }}" data-soort-link data-soort="{{ s.key }}"{% if s.current %} aria-current="true"{% endif %}>{{ s.label }}</a></li>{% endfor %}</ul>
+          <p class="segmented__hint">{% if soort == "wenskaart" %}Alleen een kerstgroet, zonder datum, locatie of aanmelden.{% else %}Met datum, locatie en aanmelden, bijvoorbeeld voor het kerstdiner.{% endif %}</p>
+        </dd></div>{% endif %}
+        <div><dt>Kleur</dt><dd class="swatch-picker">
+          <p class="swatch-picker__name" aria-live="polite">{% for p in palettes %}{% if p.current %}<span data-kleur-naam>{{ p.name }}</span>{% endif %}{% endfor %}</p>
+          <ul class="swatch-picker__list" aria-label="Kies een kleur voor het voorbeeld">{% for p in palettes %}<li><a class="swatch" href="{{ p.url }}" data-palette-link data-kleur="{{ p.key }}" data-naam="{{ p.name }}" title="{{ p.name }}"{% if p.current %} aria-current="true"{% endif %} style="--s1:{{ p.swatch.0 }};--s2:{{ p.swatch.1|default:p.swatch.0 }};--s3:{{ p.swatch.2|default:p.swatch.1|default:p.swatch.0 }}"><span class="visually-hidden">{{ p.name }}</span></a></li>{% endfor %}</ul>
+        </dd></div>
       </dl>
       <form class="occasion-picker" method="get">
         <label class="field"><span class="label">Voorbeeld voor</span>
@@ -20,16 +27,18 @@
             {% for key, label in occasion_choices %}<option value="{{ key }}"{% if key == occasion %} selected{% endif %}>{{ label }}</option>{% endfor %}
           </select>
         </label>
+        <input type="hidden" name="kleur" value="{{ kleur }}" data-kleur-input>
+        {% if soort %}<input type="hidden" name="soort" value="{{ soort }}" data-soort-input>{% endif %}
         <noscript><button class="btn btn--ghost btn--sm" type="submit">Toon</button></noscript>
       </form>
       <div class="btn-row">
-        <a class="btn btn--primary" href="{{ start_url }}">Kies dit ontwerp {% icon "pijl" %}</a>
-        <a class="link-arrow" href="{{ demo_url }}">Open het voorbeeld</a>
+        <a class="btn btn--primary" href="{{ start_url }}" data-kleur-link>Kies dit ontwerp {% icon "pijl" %}</a>
+        <a class="link-arrow" href="{{ demo_url }}" data-kleur-link>Open het voorbeeld</a>
       </div>
     </div>
     <div class="phone-demo">
       <div class="phone">
-        <div class="phone__screen"><iframe src="{{ demo_url }}&amp;embed=1" title="Werkend voorbeeld van {{ template.name }} (fictief evenement)" loading="lazy"></iframe></div>
+        <div class="phone__screen"><iframe src="{{ demo_url }}&amp;embed=1" data-kleur-frame title="Werkend voorbeeld van {{ template.name }} (fictief evenement)" loading="lazy"></iframe></div>
       </div>
       <p class="demo-caption">Voorbeeld met een fictief evenement</p>
     </div>

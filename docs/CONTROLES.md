@@ -327,3 +327,63 @@ CHECKS=0 PERF=1 node e2e/effecten.cjs http://127.0.0.1:8000 /tmp/effecten-belast
 ```
 
 Het rapport en de schermafbeeldingen komen in de uitvoermap (`rapport.json` of `rapport-<schermformaat>.json`, en per schermformaat een map met afbeeldingen). Gebruik bij de controles een server met `DEBUG` uit (zoals gunicorn); de ontwikkelserver toont bij een 404 een eigen foutpagina.
+
+## Kerstontwerpen Ho ho ho, Sneeuwpret en Middernacht (28 september 2026)
+
+Uitgevoerd op Windows met Python 3.12 en Chromium (Playwright):
+
+- `manage.py test tests`: 176 tests, alle geslaagd.
+- Contrast van alle tekstkleuren in alle kleurvarianten (minstens 4,5:1; Middernacht minstens 5:1).
+- In de browser bekeken op telefoonformaat: de opening en de geopende kaart van alle drie, alle vier kleuren van Middernacht (openingsscherm en hele pagina) en Middernacht op 360 pixels breed (geen horizontaal scrollen).
+- Beweging gemeten: de arm van de kerstman en de arm, sjaal en het lijf van de sneeuwpop draaien alleen met beweging aan.
+- Muziek van Middernacht: na "Openen met muziek" staat de knop op spelen, zonder fouten in de console; het gemeten geluidsniveau stijgt van ongeveer 0,1 (celesta) naar 0,3 (volledig ensemble) en blijft ruim onder vervorming.
+
+Niet gedaan: echte iPhone/Android, Safari en Firefox, schermlezers en de volledige `e2e/`-controles op alle ontwerpen.
+
+## Kerstontwerp Gloria (28 september 2026)
+
+- `manage.py test tests`: 182 tests, alle geslaagd.
+- Contrast van de tekstkleuren in alle vier kleuren minstens 4,5:1 (tekst staat nooit op de veren: op het openingsscherm ligt hij op een eigen medaillon).
+- In Chromium (Playwright) bekeken op 390 pixels breed: openingsscherm in alle vier kleuren, de kop in alle vier kleuren, de hele pagina in Kerstrood, en het openen op drie momenten (vleugels spreiden zich naar buiten en omhoog, daarna licht en de kop).
+- Muziek: na "Openen met muziek" staat de knop op spelen, zonder fouten; het gemeten niveau is 0,1 tot 0,25 in het couplet en loopt in het refrein met koor op tot ongeveer 0,38, zonder vervorming.
+
+Niet gedaan: echte telefoons, Safari en Firefox, schermlezers en de volledige `e2e/`-controles.
+
+## Kleuren kiezen op de ontwerppagina (28 september 2026)
+
+Probleem: op de ontwerppagina stonden de kleuren alleen als lijstje; het voorbeeld toonde altijd de eerste kleur en "Kies dit ontwerp" nam geen kleur mee. Nu is elke kleur een link (`?kleur=`), wisselt het voorbeeld in de telefoon mee zonder herladen (`static/js/site.js`) en start het samenstellen in de gekozen kleur (`create_draft(palette=…)`).
+
+- `manage.py test tests`: 188 tests, alle geslaagd (nieuw: `tests/test_kleuren.py`, onder meer alle kleuren van alle ontwerpen op de ontwerppagina en de stap Stijl voor de vijf kerstontwerpen).
+- In Chromium (Playwright) op 1280 pixels: op de ontwerppagina's van de vijf kerstontwerpen en Liefde op papier elke kleur aangeklikt; het voorbeeld in de telefoon toonde telkens die kleur en de startknop nam hem mee, zonder fouten in de console.
+
+## Kerstdiner-ontwerp Aan tafel en nieuwe kleurkeuze (28 september 2026)
+
+- De kleurkeuze op de ontwerppagina is nu een rij ronde kleurstalen met de naam van de gekozen kleur erboven (in plaats van pilvormige knoppen). Bekeken in Chromium op 1280 en 390 pixels; na een klik op een staal wisselt de naam en het voorbeeld.
+- `manage.py test tests`: 194 tests, alle geslaagd (nieuw: `tests/test_aan_tafel.py`).
+- Contrast van de tekst in alle vier kleuren van Aan tafel minstens 4,5:1, ook op het plaatskaartje en de menukaart; de tekst onderaan het openingsscherm staat op een eigen donker vlak, omdat het hout bij Kaarslicht licht is.
+- In Chromium (Playwright) op 390 pixels: openingsscherm en kop in alle vier kleuren, de secties in Haardvuur en Schotse ruit, en het openen op drie momenten.
+- Muziek: knop op spelen, geen fouten, niveau 0,1 tot ongeveer 0,4 zonder vervorming.
+
+## Uitnodiging of wenskaart (28 september 2026)
+
+- `manage.py test tests`: 202 tests, alle geslaagd (nieuw: `tests/test_wenskaart.py`: de keuze, publiceren zonder evenement, verplichte velden bij een uitnodiging, de schakelaar op de ontwerppagina en het voorbeeld als wenskaart voor alle zes kerstontwerpen).
+- In Chromium (Playwright): op de ontwerppagina van Aan tafel 'Wenskaart' aangeklikt; het voorbeeld in de telefoon toonde 'Een kerstgroet voor jou' en 'Fijne feestdagen' en de startknop nam `soort=wenskaart` mee. Het voorbeeld als wenskaart op 390 pixels bekeken (geen datum, menu of aanmelden). In het samenstellen verdwijnen 'Wanneer' en 'Waar' bij het kiezen van Wenskaart. Geen fouten in de console.
+
+## Homepage: kaart in 3D met sterretjes (28 september 2026)
+
+- De kaart in de kop zweeft, kantelt mee met de muis (op de telefoon draait hij vanzelf), krijgt een lichtglans en een tweede kaart erachter; de achtergrondfoto schuift licht mee; gouden sterretjes rond de kaart en een glitterspoor achter de muis (`static/js/hero3d.js`, stijl in `static/css/vierlief.css`).
+- `manage.py test tests`: 204 tests, alle geslaagd (nieuw: `tests/test_home3d.py`).
+- In Chromium (Playwright): muisbeweging over de kop op 1366 pixels (de kaart kantelt, sterretjes zichtbaar), telefoonformaat 390 met aanraken (kaart draait vanzelf), 'minder beweging' (geen animatie en geen kanteling), en op 360, 390, 768 en 1366 pixels geen horizontaal scrollen en geen fouten in de console.
+
+## Wenskaart zonder dresscode, praktische info en contact (28 september 2026)
+
+- `manage.py test tests`: 208 tests, alle geslaagd (nieuw in `tests/test_wenskaart.py`: wat een wenskaart en een uitnodiging tonen, het voorbeeld van alle zes kerstontwerpen als wenskaart zonder 'Vragen?' of 'Goed om te weten', de stap Afsluiting, het overslaan van Aanmelden en het bewaren van de verborgen gegevens).
+- In Chromium (Playwright) op 390 pixels: een wenskaart samengesteld (Wenskaart gekozen, afzender ingevuld); de voortgang toont 8 stappen met 'Afsluiting' en zonder 'Aanmelden', de stap Afsluiting toont alleen de afsluitende wens en 'Volgende' gaat naar Foto's. Geen fouten in de console.
+- De deelbare voorvertoning is opnieuw gemaakt met de nieuwe wenskaarten.
+
+## Bruiloftsontwerp Voor altijd (28 september 2026)
+
+- `manage.py test tests`: 215 tests, alle geslaagd (nieuw: `tests/test_voor_altijd.py`).
+- Contrast van de tekst in alle vier kleuren minstens 4,5:1.
+- In Chromium (Playwright) op 390 pixels: openingsscherm en kop in alle vier kleuren, de hele pagina in Bordeaux, het openen op drie momenten (deksel open, ringen omhoog en glinstering, inzoomen); op 360 pixels voor bruiloft, verloving en jubileum geen horizontaal scrollen en geen fouten. Een tik op het midden van het doosje komt bij de openingslink aan.
+- Muziek: knop op spelen, geen fouten; niveau 0,14 tot 0,21 over de eerste 32 seconden (violen vanaf ongeveer 10 seconden), zonder vervorming.

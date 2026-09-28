@@ -74,6 +74,9 @@ def default_content(occasion: str, palette_key: str = "") -> dict:
         "schema": SCHEMA_VERSION,
         "names": {key: "" for key, *_ in cfg["name_fields"]},
         "headline": "",
+        # Soort kaart bij gelegenheden met een optioneel evenement (Kerst): "uitnodiging" of "wenskaart".
+        # Leeg = zoals vroeger: een uitnodiging zodra er een datum of locatie is ingevuld.
+        "soort": "",
         "date": "",
         "start_time": "",
         "end_time": "",
@@ -196,9 +199,29 @@ def has_event_details(content: dict) -> bool:
     return any(str(content.get(key) or "").strip() for key in ("date", "start_time", "end_time", "venue_name", "address"))
 
 
+SOORTEN = ("uitnodiging", "wenskaart")
+
+
+def card_kind(content: dict, occasion: str) -> str:
+    """'uitnodiging' of 'wenskaart'. Alleen gelegenheden met een optioneel evenement (Kerst) kennen een wenskaart;
+    zonder expliciete keuze geldt wat er is ingevuld (oudere concepten)."""
+    if not occasion_config(occasion).get("event_optional"):
+        return "uitnodiging"
+    soort = content.get("soort")
+    if soort in SOORTEN:
+        return soort
+    return "uitnodiging" if has_event_details(content) else "wenskaart"
+
+
 def event_expected(content: dict, occasion: str) -> bool:
-    """Hoort er een evenement bij? Bij een kerstkaart alleen als de klant er een invult."""
-    return not occasion_config(occasion).get("event_optional") or has_event_details(content)
+    """Hoort er een evenement bij? Bij een wenskaart niet; dan tellen datum, locatie en aanmelden niet mee."""
+    return card_kind(content, occasion) == "uitnodiging"
+
+
+def without_event(content: dict) -> dict:
+    """De inhoud zoals een wenskaart hem toont: zonder datum, tijd, locatie en programma. De ingevulde gegevens blijven
+    in het concept bewaard, zodat de klant kan terugwisselen naar een uitnodiging."""
+    return {**content, "date": "", "start_time": "", "end_time": "", "venue_name": "", "address": "", "route_url": "", "program": []}
 
 
 @dataclass
@@ -232,7 +255,7 @@ def publish_issues(content: dict, occasion: str, *, first_publication: bool, now
             issues.append(Issue("gegevens", "venue_name", "Vul de naam van de locatie in."))
         if not str(content.get("address") or "").strip():
             issues.append(Issue("gegevens", "address", "Vul het adres van de locatie in, zodat de routeknop werkt.", blocking=False))
-    times = event_times(content)
+    times = event_times(content if with_event else without_event(content))
     if first_publication and times.start and times.start < now:
         issues.append(Issue("gegevens", "date", "De datum en begintijd liggen in het verleden."))
     sections = content.get("sections") or {}

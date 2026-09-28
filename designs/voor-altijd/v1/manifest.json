@@ -1,0 +1,177 @@
+{
+  "slug": "voor-altijd",
+  "version": 1,
+  "name": "Voor altijd",
+  "tagline": "Een fluwelen ringdoosje dat opengaat, met twee gouden ringen",
+  "description": "Een fluwelen ringdoosje ligt op zacht linnen tussen rozenblaadjes. Na een tik klapt het deksel open en fonkelen daarbinnen twee in elkaar gehaakte gouden ringen op satijn. Daarna een olijfkrans om jullie monogram, jullie namen in sierlijk schrift, de datum in drie in elkaar grijpende ringen, het programma als gouden tijdlijn en dwarrelende blaadjes. In het voorbeeld klinkt de Canon in D van Pachelbel, met harp, strijkers en twee violen.",
+  "style_notes": "Fluweel, satijn, goud, olijftakken, ringen, romantisch en tijdloos",
+  "occasions": [
+    "bruiloft",
+    "verloving",
+    "jubileum"
+  ],
+  "sort_order": 5,
+  "opening": "ringdoosje",
+  "opening_label": "Ringdoosje",
+  "demo_melody": "canon",
+  "kaartbeeld": "open",
+  "palettes": [
+    {
+      "key": "salie",
+      "name": "Saliegroen",
+      "swatch": [
+        "#5E7457",
+        "#FBF8F2",
+        "#C9A45C"
+      ],
+      "vars": {
+        "--va-page": "#EDE7DC",
+        "--va-velvet": "#5E7457",
+        "--va-velvet-2": "#3D4F39",
+        "--va-satin": "#F4EEE3",
+        "--va-bg": "#FBF8F2",
+        "--va-bg-2": "#F1EEE4",
+        "--va-ink": "#2C2A24",
+        "--va-muted": "#625D52",
+        "--va-accent": "#4F6447",
+        "--va-accent-ink": "#FFFFFF",
+        "--va-gold": "#C9A45C",
+        "--va-gold-2": "#85632A",
+        "--va-line": "#E3DDCF",
+        "--va-leaf": "#7C8F6A",
+        "--va-leaf-2": "#5F7352",
+        "--va-olive": "#4A5A3E",
+        "--va-cover-ink": "#2C2A24",
+        "--fx-1": "#EDB8B3",
+        "--fx-2": "#FFFFFF",
+        "--fx-3": "#F6D2CC",
+        "--fx-4": "#E3C27E",
+        "--fx-bg": "#FBF8F2"
+      }
+    },
+    {
+      "key": "bordeaux",
+      "name": "Bordeaux",
+      "swatch": [
+        "#7A1F31",
+        "#FCF7F5",
+        "#D1A77E"
+      ],
+      "vars": {
+        "--va-page": "#EFE3DF",
+        "--va-velvet": "#7A1F31",
+        "--va-velvet-2": "#4E1120",
+        "--va-satin": "#F8EDEA",
+        "--va-bg": "#FCF7F5",
+        "--va-bg-2": "#F6ECE8",
+        "--va-ink": "#2F2023",
+        "--va-muted": "#6A5256",
+        "--va-accent": "#8A2A3C",
+        "--va-accent-ink": "#FFFFFF",
+        "--va-gold": "#D1A77E",
+        "--va-gold-2": "#8C5A3A",
+        "--va-line": "#EBDDD8",
+        "--va-leaf": "#8A9A7A",
+        "--va-leaf-2": "#6B7B5C",
+        "--va-olive": "#4F5E44",
+        "--va-cover-ink": "#2F2023",
+        "--fx-1": "#EDB8B3",
+        "--fx-2": "#FFFFFF",
+        "--fx-3": "#F6D2CC",
+        "--fx-4": "#E3C27E",
+        "--fx-bg": "#FCF7F5"
+      }
+    },
+    {
+      "key": "nachtblauw",
+      "name": "Nachtblauw",
+      "swatch": [
+        "#1F2B4A",
+        "#FAF9F6",
+        "#C9A45C"
+      ],
+      "vars": {
+        "--va-page": "#E6E6EA",
+        "--va-velvet": "#1F2B4A",
+        "--va-velvet-2": "#121A30",
+        "--va-satin": "#F2F1EE",
+        "--va-bg": "#FAF9F6",
+        "--va-bg-2": "#EFF0F3",
+        "--va-ink": "#1D2233",
+        "--va-muted": "#565B6B",
+        "--va-accent": "#25325A",
+        "--va-accent-ink": "#FFFFFF",
+        "--va-gold": "#C9A45C",
+        "--va-gold-2": "#7C5C22",
+        "--va-line": "#E0E1E6",
+        "--va-leaf": "#7E8E82",
+        "--va-leaf-2": "#5C6C62",
+        "--va-olive": "#4A564F",
+        "--va-cover-ink": "#1D2233",
+        "--fx-1": "#EDB8B3",
+        "--fx-2": "#FFFFFF",
+        "--fx-3": "#F6D2CC",
+        "--fx-4": "#E3C27E",
+        "--fx-bg": "#FAF9F6"
+      }
+    },
+    {
+      "key": "poederroze",
+      "name": "Poederroze",
+      "swatch": [
+        "#C48C8E",
+        "#FFFBF9",
+        "#D6B17E"
+      ],
+      "vars": {
+        "--va-page": "#F3E6E3",
+        "--va-velvet": "#C48C8E",
+        "--va-velvet-2": "#9A6466",
+        "--va-satin": "#FFF8F5",
+        "--va-bg": "#FFFBF9",
+        "--va-bg-2": "#F9EFEC",
+        "--va-ink": "#33262A",
+        "--va-muted": "#6E5A5E",
+        "--va-accent": "#9A4F5A",
+        "--va-accent-ink": "#FFFFFF",
+        "--va-gold": "#D6B17E",
+        "--va-gold-2": "#8A6128",
+        "--va-line": "#F0E1DD",
+        "--va-leaf": "#93A083",
+        "--va-leaf-2": "#748265",
+        "--va-olive": "#56624A",
+        "--va-cover-ink": "#33262A",
+        "--fx-1": "#EDB8B3",
+        "--fx-2": "#FFFFFF",
+        "--fx-3": "#F6D2CC",
+        "--fx-4": "#E3C27E",
+        "--fx-bg": "#FFFBF9"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "blaadjes",
+    "knal": "blaadjes",
+    "viering": "harten",
+    "namen": "schrijf",
+    "onthul": "zacht",
+    "extra": [
+      "kenburns",
+      "tik"
+    ]
+  },
+  "changelog": "Eerste versie."
+}

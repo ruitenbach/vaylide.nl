@@ -298,6 +298,15 @@ LOGGING = {
     "loggers": {"django.security": {"level": "WARNING"}},
 }
 
+# Onverwachte serverfouten (500) per e-mail aan de eigenaar, alleen als er echt gemaild wordt.
+# Leeg VIERLIEF_ERROR_EMAIL = het adres van VIERLIEF_OWNER_EMAIL; "uit" = geen foutmails.
+ERROR_EMAIL = env("VIERLIEF_ERROR_EMAIL", OWNER_NOTIFY_EMAIL)
+if EMAIL_MODE == "smtp" and not DEBUG and ERROR_EMAIL and ERROR_EMAIL.lower() != "uit":
+    ADMINS = [("Vaylide", ERROR_EMAIL)]
+    EMAIL_SUBJECT_PREFIX = "[Vaylide] "
+    LOGGING["handlers"]["mail_admins"] = {"class": "django.utils.log.AdminEmailHandler", "level": "ERROR"}
+    LOGGING["loggers"]["django.request"] = {"handlers": ["console", "mail_admins"], "level": "ERROR", "propagate": False}
+
 # In live-modus mogen testvoorzieningen niet actief zijn.
 if not TEST_MODE:
     if PAYMENT_PROVIDER == "test":

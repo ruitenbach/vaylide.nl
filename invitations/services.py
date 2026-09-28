@@ -14,9 +14,9 @@ from django.db.models import Max
 from django.utils import timezone
 from django.utils.text import slugify
 
-from catalog.occasions import display_title
+from catalog.occasions import display_title, occasion_config
 
-from .content import default_content, event_times, normalize_content, publish_issues, referenced_assets
+from .content import SOORTEN, default_content, event_times, normalize_content, publish_issues, referenced_assets
 from .models import Invitation, InvitationVersion, MediaAsset, Source
 
 SLUG_ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789"
@@ -36,9 +36,14 @@ class PublishBlocked(Exception):
         self.issues = issues
 
 
-def create_draft(*, occasion: str, template, owner=None) -> Invitation:
+def create_draft(*, occasion: str, template, owner=None, palette: str = "", soort: str = "") -> Invitation:
     version = template.current_version
-    content = default_content(occasion, version.default_palette_key)
+    # Een onbekende kleur valt terug op de standaardkleur van het ontwerp.
+    keys = [p.get("key") for p in version.palettes]
+    content = default_content(occasion, palette if palette in keys else version.default_palette_key)
+    # Uitnodiging of wenskaart (alleen waar de gelegenheid dat kent, zoals Kerst).
+    if soort in SOORTEN and occasion_config(occasion).get("event_optional"):
+        content["soort"] = soort
     return Invitation.objects.create(
         owner=owner,
         occasion=occasion,
@@ -141,7 +146,8 @@ def assign_slug(invitation: Invitation) -> str:
         return invitation.slug
     base = slugify(invitation.title.replace("&", "en"))[:40].strip("-") or "uitnodiging"
     for _ in range(20):
-        suffix = "".join(secrets.choice(SLUG_ALPHABET) for _ in range(5))
+        # 8 tekens (31^8 ≈ 8,5·10^11): de titel is vaak te raden, het achtervoegsel niet.
+        suffix = "".join(secrets.choice(SLUG_ALPHABET) for _ in range(8))
         candidate = f"{base}-{suffix}"
         if not Invitation.objects.filter(slug=candidate).exists():
             invitation.slug = candidate

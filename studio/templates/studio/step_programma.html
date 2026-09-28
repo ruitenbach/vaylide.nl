@@ -1,13 +1,17 @@
 {% extends "studio/base_studio.html" %}
-{% block title %}Programma en info{% endblock %}
+{% block title %}{% if wenskaart %}Afsluiting{% else %}Programma en info{% endif %}{% endblock %}
 {% block studio %}
 <div class="studio-intro">
-  <h1>Programma en praktische informatie</h1>
-  <p class="lead">Alles is optioneel; lege onderdelen worden niet getoond.</p>
+  {% if wenskaart %}<h1>Je afsluitende wens</h1>
+  <p class="lead">Sluit je kerstkaart af met een persoonlijke wens. Dit is optioneel.</p>
+  {% else %}<h1>Programma en praktische informatie</h1>
+  <p class="lead">Alles is optioneel; lege onderdelen worden niet getoond.</p>{% endif %}
 </div>
+{% if wenskaart %}<p class="notice">Je maakt een wenskaart: een warme kerstwens, zonder programma, dresscode, praktische informatie of contact. Hier schrijf je alleen je afsluitende wens.</p>{% endif %}
 {% include "studio/_conflict.html" %}
 <form method="post" class="form studio-form" data-once data-dirty-check novalidate>
   {% csrf_token %}
+  {% if not wenskaart %}
   <section class="studio-block" aria-labelledby="blok-programma">
     <h2 class="studio-block__title" id="blok-programma">Programma</h2>
     <p class="hint">{{ cfg.program_hint }}. Wordt automatisch op tijd gesorteerd.</p>
@@ -56,6 +60,7 @@
     </div>
     {% include "studio/_field.html" with field=form.contact_note %}
   </section>
+  {% endif %}
   <section class="studio-block" aria-labelledby="blok-afsluiting">
     <h2 class="studio-block__title" id="blok-afsluiting">Afsluiting</h2>
     {% include "studio/_field.html" with field=form.closing_text %}

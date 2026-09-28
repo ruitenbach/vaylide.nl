@@ -24,7 +24,146 @@
       // Per maat (6 achtsten) twee begeleidingstonen: grondtoon en kwint, op tel 1 en tel 2.
       bass: [[48, 55], [48, 55], [43, 50], [48, 55], [41, 48], [48, 55], [41, 48], [48, 55], [43, 50], [48, 55], [48, 43], [48, 55]],
       rest: 3
-    }
+    },
+    /* 'Carol of the Bells' (Sjtsjedryk, Mykola Leontovytsj, 1914) is publiek domein; deze zetting (celesta, strijkers,
+       pizzicato en een kerkklok) en de klank zijn eigen werk. 3/4-maat, lengtes in achtsten; 0 = rust; een lijst = akkoord. */
+    "carol-of-the-bells": (function () {
+      var motif = [[70, 2], [69, 1], [70, 1], [67, 2]];
+      function bars(n, notes, shift) {
+        var out = [];
+        for (var i = 0; i < n; i++) notes.forEach(function (x) { out.push([x[0] ? x[0] + (shift || 0) : 0, x[1]]); });
+        return out;
+      }
+      var down = [43, 41, 39, 38]; // de dalende bas: G, F, Es, D
+      var chords = [[55, 58, 62], [53, 58, 62], [51, 55, 58], [50, 54, 57]];
+      function bass(times) {
+        var out = [];
+        for (var i = 0; i < times; i++) down.forEach(function (r) { out.push([r, 2], [0, 2], [r + 7, 2]); });
+        return out;
+      }
+      function pad(times, up) {
+        var out = [];
+        for (var i = 0; i < times; i++) chords.forEach(function (c) { out.push([c.map(function (m) { return m + (up || 0); }), 6]); });
+        return out;
+      }
+      return {
+        eighth: 0.19,
+        rest: 6,
+        voices: [
+          { inst: "celesta", gain: 0.15, notes: [].concat(bars(16, motif), bars(8, motif, 12), bars(7, motif), [[67, 6]]) },
+          { inst: "pizz", gain: 0.2, notes: [].concat([[0, 24]], bass(7)) },
+          { inst: "strijkers", gain: 0.02, notes: [].concat([[0, 48]], pad(5)) },
+          { inst: "celesta", gain: 0.075, notes: [].concat([[0, 48]], bars(2, [[74, 6], [72, 6], [70, 6], [69, 6]]), bars(2, [[86, 6], [84, 6], [82, 6], [81, 6]])) },
+          { inst: "klok", gain: 0.08, notes: [].concat([[0, 96]], [[55, 12], [55, 12], [55, 12], [55, 12]]) }
+        ]
+      };
+    })(),
+    /* 'Angels We Have Heard on High' / 'Les anges dans nos campagnes' (Frans kerstlied, 18e eeuw) is publiek domein;
+       deze zetting (harp, engelenkoor en celesta) en de klank zijn eigen werk. 4/4-maat in F, lengtes in achtsten. */
+    "gloria": (function () {
+      var couplet = [[69, 2], [69, 2], [69, 2], [72, 2], [72, 3], [70, 1], [69, 4], [69, 2], [67, 2], [69, 2], [72, 2], [69, 3], [67, 1], [65, 4]];
+      var refrein = [
+        [72, 3], [74, 1], [72, 1], [70, 1], [69, 2], [70, 3], [72, 1], [70, 1], [69, 1], [67, 2],
+        [69, 3], [70, 1], [69, 1], [67, 1], [65, 2], [67, 4], [60, 4],
+        [65, 2], [67, 2], [69, 2], [70, 2], [69, 4], [67, 4], [65, 8]
+      ];
+      var F = [53, 57, 60], C = [52, 55, 60], Dm = [53, 57, 62], Bb = [53, 58, 62];
+      var akkCouplet = [[F, 8], [F, 4], [C, 4], [Dm, 4], [C, 4], [C, 4], [F, 4]];
+      var akkRefrein = [[F, 8], [C, 8], [Dm, 4], [Bb, 4], [C, 8], [F, 4], [Bb, 4], [F, 4], [C, 4], [F, 8]];
+      var akkoorden = [].concat(akkCouplet, akkCouplet, akkRefrein, akkRefrein);
+      // Harp: gebroken akkoorden in achtsten, met de grondtoon laag op elke eerste tel.
+      var harp = [], bas = [], koor = [];
+      akkoorden.forEach(function (a) {
+        var c = a[0], patroon = [c[0] + 12, c[1] + 12, c[2] + 12, c[0] + 24, c[2] + 12, c[1] + 12, c[2] + 12, c[0] + 24];
+        for (var i = 0; i < a[1]; i++) harp.push([patroon[i % 8], 1]);
+        bas.push([c[0] - 12, a[1]]);
+        koor.push([c, a[1]]);
+      });
+      var stil = function (n) { return [[0, n]]; };
+      return {
+        eighth: 0.26,
+        rest: 4,
+        voices: [
+          { inst: "celesta", gain: 0.13, notes: [].concat(couplet, couplet, refrein, refrein) },
+          { inst: "koor", gain: 0.11, notes: [].concat(stil(64), refrein, refrein) },
+          { inst: "koor", gain: 0.05, notes: [].concat(stil(32), koor.slice(7)) },
+          { inst: "harp", gain: 0.075, notes: harp },
+          { inst: "harp", gain: 0.11, notes: bas },
+          { inst: "klok", gain: 0.05, notes: [].concat(stil(64), [[65, 56]], [[65, 56]]) }
+        ]
+      };
+    })(),
+    /* 'We Wish You a Merry Christmas' (Engels, traditioneel) is publiek domein; deze zetting als gezellige wals
+       (warme piano, contrabas en arrensleebellen) en de klank zijn eigen werk. 3/4-maat in G, lengtes in achtsten. */
+    "we-wish-you": (function () {
+      var melodie = [
+        [0, 4], [62, 2],
+        [67, 2], [67, 1], [69, 1], [67, 1], [66, 1], [64, 2], [60, 2], [64, 2],
+        [69, 2], [69, 1], [71, 1], [69, 1], [67, 1], [66, 2], [62, 2], [62, 2],
+        [71, 2], [71, 1], [72, 1], [71, 1], [69, 1], [67, 2], [64, 2], [62, 1], [62, 1],
+        [64, 2], [69, 2], [66, 2], [67, 4], [62, 2],
+        [67, 2], [67, 2], [67, 2], [66, 4], [66, 2], [67, 2], [66, 2], [64, 2], [62, 4], [69, 2],
+        [71, 2], [69, 2], [67, 2], [74, 2], [62, 2], [62, 1], [62, 1], [64, 2], [69, 2], [66, 2], [67, 6]
+      ];
+      var A = { G: [55, 59, 62], C: [55, 60, 64], A7: [55, 61, 64], D: [54, 57, 62], B7: [54, 59, 63], Em: [55, 59, 64] };
+      var grond = { G: 43, C: 48, A7: 45, D: 50, B7: 47, Em: 40 };
+      // Per maat drie tellen: op tel 1 de bas, op tel 2 en 3 het akkoord (hoempapa).
+      var maten = [null, ["G", "G", "G"], ["C", "C", "C"], ["A7", "A7", "A7"], ["D", "D", "D"], ["B7", "B7", "B7"], ["Em", "Em", "Em"],
+        ["C", "D", "D"], ["G", "G", "G"], ["G", "G", "G"], ["D", "D", "D"], ["Em", "A7", "A7"], ["D", "D", "D"], ["G", "G", "G"],
+        ["Em", "Em", "Em"], ["C", "D", "D"], ["G", "G", "G"]];
+      var bas = [], akkoord = [], bellen = [];
+      maten.forEach(function (m, i) {
+        if (!m) { bas.push([0, 6]); akkoord.push([0, 6]); bellen.push([0, 6]); return; }
+        bas.push([grond[m[0]], 2], [0, 4]);
+        akkoord.push([0, 2], [A[m[1]], 2], [A[m[2]], 2]);
+        // Arrensleebellen in het refrein (vanaf maat 9), op tel 2 en 3.
+        if (i >= 9) bellen.push([0, 2], [96, 2], [96, 2]); else bellen.push([0, 6]);
+      });
+      return {
+        eighth: 0.2,
+        rest: 0,
+        voices: [
+          { inst: "piano", gain: 0.16, notes: melodie },
+          { inst: "piano", gain: 0.05, notes: akkoord },
+          { inst: "pizz", gain: 0.24, notes: bas },
+          { inst: "bellen", gain: 0.05, notes: bellen },
+          { inst: "strijkers", gain: 0.012, notes: [].concat([[0, 54]], maten.slice(9).map(function (m) { return [A[m[0]], 6]; })) }
+        ]
+      };
+    })(),
+    /* Canon in D (Johann Pachelbel, rond 1700) is publiek domein; deze zetting (harp, cello, strijkers en twee violen
+       die elkaar naspelen) en de klank zijn eigen werk. 4/4 in D, per akkoord twee tellen (vier achtsten). */
+    "canon": (function () {
+      var akk = [[62, 66, 69], [61, 64, 69], [62, 66, 71], [61, 66, 69], [62, 67, 71], [62, 66, 69], [62, 67, 71], [61, 64, 69]];
+      var grond = [50, 45, 47, 42, 43, 38, 43, 45]; // D A B Fis G D G A
+      var stem1 = [78, 76, 74, 73, 71, 69, 71, 73]; // Fis E D Cis B A B Cis
+      var stem2 = [74, 73, 71, 69, 67, 66, 67, 64]; // D Cis B A G Fis G E
+      var variatie = [74, 78, 81, 79, 78, 74, 78, 76, 74, 71, 74, 69, 67, 71, 69, 67];
+      function lang(noten) { return noten.map(function (m) { return [m, 4]; }); }
+      function stil(n) { return [[0, n]]; }
+      var CYCLI = 5, harp = [], bas = [], pad = [];
+      for (var c = 0; c < CYCLI; c++) {
+        akk.forEach(function (a, i) {
+          [a[0], a[1], a[2], a[0] + 12].forEach(function (m) { harp.push([m, 1]); });
+          bas.push([grond[i], 4]);
+          pad.push([a.map(function (m) { return m - 12; }), 4]);
+        });
+      }
+      return {
+        eighth: 0.3,
+        rest: 4,
+        voices: [
+          { inst: "harp", gain: 0.07, notes: harp },
+          { inst: "harp", gain: 0.1, notes: lang(grond.concat(grond, grond, grond, grond).map(function (m) { return m - 12; })) },
+          { inst: "strijkers", gain: 0.016, notes: bas },
+          { inst: "strijkers", gain: 0.008, notes: [].concat(stil(32), pad.slice(8)) },
+          // Viool 1: de bekende lijn, daarna de dalende lijn en de variatie in kwartnoten.
+          { inst: "viool", gain: 0.05, notes: [].concat(stil(32), lang(stem1), lang(stem2), variatie.map(function (m) { return [m, 2]; }), lang(stem1)) },
+          // Viool 2 speelt dezelfde lijn een ronde later na (de canon).
+          { inst: "viool", gain: 0.035, notes: [].concat(stil(64), lang(stem1), lang(stem2), lang(stem1.map(function (m) { return m - 12; }))) }
+        ]
+      };
+    })()
   };
 
   /* ---------- Muziek ---------- */
@@ -35,7 +174,8 @@
     var label = root.querySelector("[data-music-label]");
     var audio = root.querySelector("[data-music-audio]");
     var melody = root.getAttribute("data-music-synth");
-    var synth = root.hasAttribute("data-music-synth") ? (MELODIES[melody] ? createMusicBox(MELODIES[melody]) : createSynth()) : null;
+    var tune = MELODIES[melody];
+    var synth = root.hasAttribute("data-music-synth") ? (tune ? (tune.voices ? createArrangement(tune) : createMusicBox(tune)) : createSynth()) : null;
     var playing = false;
     if (!audio && !synth) return { play: function () {}, available: false };
     toggle.hidden = false;
@@ -154,6 +294,255 @@
       },
       stop: function () {
         // Wat al klinkt, sterft vanzelf uit in de galm.
+        playing = false;
+        clearInterval(timer);
+        timer = null;
+      }
+    };
+  }
+
+  /* Klein ensemble voor de voorbeelden: meerdere stemmen, elk met een eigen instrument (eigen synthese, geen bestand).
+     celesta: heldere klokjes; pizz: getokkelde bas; strijkers: zacht aanzwellende akkoorden; klok: een diepe kerkklok. */
+  function createArrangement(tune) {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    var ctx = null, out = null, timer = null, nextTime = 0, index = 0, playing = false;
+    var events = [];
+    var loopLength = 0;
+    tune.voices.forEach(function (voice) {
+      var t = 0;
+      voice.notes.forEach(function (n) {
+        if (n[0]) events.push({ at: t, midi: n[0], len: n[1], inst: voice.inst, gain: voice.gain });
+        t += n[1];
+      });
+      loopLength = Math.max(loopLength, t);
+    });
+    events.sort(function (a, b) { return a.at - b.at; });
+    loopLength += tune.rest || 0;
+
+    function hz(midi) { return 440 * Math.pow(2, (midi - 69) / 12); }
+
+    function setup() {
+      ctx = new AC();
+      var master = ctx.createGain();
+      master.gain.value = 0.85;
+      var comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -18;
+      comp.ratio.value = 3;
+      var verb = ctx.createConvolver();
+      var len = Math.round(ctx.sampleRate * 3.2);
+      var ir = ctx.createBuffer(2, len, ctx.sampleRate);
+      for (var c = 0; c < 2; c++) {
+        var data = ir.getChannelData(c);
+        for (var i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.8);
+      }
+      verb.buffer = ir;
+      var wet = ctx.createGain();
+      wet.gain.value = 0.36;
+      out = ctx.createGain();
+      out.connect(comp);
+      out.connect(verb);
+      verb.connect(wet);
+      wet.connect(comp);
+      comp.connect(master);
+      master.connect(ctx.destination);
+    }
+
+    function partials(f, when, gain, list, type) {
+      list.forEach(function (p) {
+        var osc = ctx.createOscillator();
+        var g = ctx.createGain();
+        osc.type = type || "sine";
+        osc.frequency.value = f * p[0];
+        g.gain.setValueAtTime(0.0001, when);
+        g.gain.exponentialRampToValueAtTime(gain * p[1], when + 0.004);
+        g.gain.exponentialRampToValueAtTime(0.0001, when + p[2]);
+        osc.connect(g);
+        g.connect(out);
+        osc.start(when);
+        osc.stop(when + p[2] + 0.05);
+      });
+    }
+
+    var play = {
+      celesta: function (midi, when, gain) {
+        partials(hz(midi + 12), when, gain, [[1, 1, 1.5], [2, 0.3, 0.7], [4, 0.1, 0.3], [7.1, 0.04, 0.08]]);
+      },
+      pizz: function (midi, when, gain) {
+        var osc = ctx.createOscillator();
+        var filter = ctx.createBiquadFilter();
+        var g = ctx.createGain();
+        osc.type = "triangle";
+        osc.frequency.value = hz(midi);
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(1600, when);
+        filter.frequency.exponentialRampToValueAtTime(300, when + 0.4);
+        g.gain.setValueAtTime(0.0001, when);
+        g.gain.exponentialRampToValueAtTime(gain, when + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, when + 0.7);
+        osc.connect(filter);
+        filter.connect(g);
+        g.connect(out);
+        osc.start(when);
+        osc.stop(when + 0.75);
+      },
+      strijkers: function (midi, when, gain, dur) {
+        (Array.isArray(midi) ? midi : [midi]).forEach(function (m) {
+          var filter = ctx.createBiquadFilter();
+          var g = ctx.createGain();
+          filter.type = "lowpass";
+          filter.frequency.value = 1500;
+          g.gain.setValueAtTime(0.0001, when);
+          g.gain.linearRampToValueAtTime(gain, when + Math.min(0.6, dur * 0.4));
+          g.gain.setValueAtTime(gain, when + dur * 0.8);
+          g.gain.exponentialRampToValueAtTime(0.0001, when + dur + 0.9);
+          filter.connect(g);
+          g.connect(out);
+          [-7, 7].forEach(function (cents) {
+            var osc = ctx.createOscillator();
+            osc.type = "sawtooth";
+            osc.frequency.value = hz(m);
+            osc.detune.value = cents;
+            osc.connect(filter);
+            osc.start(when);
+            osc.stop(when + dur + 1);
+          });
+        });
+      },
+      klok: function (midi, when, gain) {
+        partials(hz(midi), when, gain, [[0.5, 0.6, 5], [1, 1, 4], [1.19, 0.45, 3], [1.5, 0.3, 2.4], [2, 0.35, 2], [2.74, 0.2, 1.4], [3.76, 0.1, 0.9]]);
+      },
+      // Warme piano: grondtoon met zachte boventonen, twee licht verstemde snaren (koor) en een lange uitklank.
+      piano: function (midi, when, gain) {
+        (Array.isArray(midi) ? midi : [midi]).forEach(function (m) {
+          partials(hz(m) * 1.0006, when, gain * 0.6, [[1, 1, 2.6], [2, 0.32, 1.4], [3, 0.12, 0.8], [4, 0.05, 0.5]]);
+          partials(hz(m) * 0.9994, when, gain * 0.6, [[1, 1, 2.4], [2, 0.28, 1.2]]);
+        });
+      },
+      // Arrensleebellen: een paar korte, hoge rinkels van gefilterde ruis vlak na elkaar.
+      bellen: function (midi, when, gain) {
+        var len = Math.round(ctx.sampleRate * 0.25);
+        var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+        var data = buf.getChannelData(0);
+        for (var i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+        [0, 0.035, 0.07].forEach(function (d, k) {
+          var src = ctx.createBufferSource();
+          var hp = ctx.createBiquadFilter();
+          var g = ctx.createGain();
+          src.buffer = buf;
+          hp.type = "bandpass";
+          hp.frequency.value = 7000 + k * 900;
+          hp.Q.value = 3;
+          g.gain.setValueAtTime(0.0001, when + d);
+          g.gain.exponentialRampToValueAtTime(gain * (1 - k * 0.2) * 4, when + d + 0.004);
+          g.gain.exponentialRampToValueAtTime(0.0001, when + d + 0.16);
+          src.connect(hp);
+          hp.connect(g);
+          g.connect(out);
+          src.start(when + d);
+          src.stop(when + d + 0.2);
+        });
+      },
+      // Viool: twee zaagtanden door een zacht filter, met een trillende toon die pas na de inzet begint.
+      viool: function (midi, when, gain, dur) {
+        var filter = ctx.createBiquadFilter();
+        var g = ctx.createGain();
+        filter.type = "lowpass";
+        filter.frequency.value = 2600;
+        filter.Q.value = 0.8;
+        g.gain.setValueAtTime(0.0001, when);
+        g.gain.linearRampToValueAtTime(gain, when + Math.min(0.18, dur * 0.3));
+        g.gain.setValueAtTime(gain, when + dur * 0.85);
+        g.gain.exponentialRampToValueAtTime(0.0001, when + dur + 0.5);
+        filter.connect(g);
+        g.connect(out);
+        [-4, 4].forEach(function (cents) {
+          var osc = ctx.createOscillator();
+          var lfo = ctx.createOscillator();
+          var depth = ctx.createGain();
+          osc.type = "sawtooth";
+          osc.frequency.value = hz(midi);
+          osc.detune.value = cents;
+          lfo.frequency.value = 5.6;
+          depth.gain.setValueAtTime(0, when);
+          depth.gain.linearRampToValueAtTime(14, when + 0.35);
+          lfo.connect(depth);
+          depth.connect(osc.detune);
+          osc.connect(filter);
+          osc.start(when);
+          lfo.start(when);
+          osc.stop(when + dur + 0.6);
+          lfo.stop(when + dur + 0.6);
+        });
+      },
+      // Harp: een zachte tokkel met boventonen die snel wegsterven.
+      harp: function (midi, when, gain) {
+        partials(hz(midi), when, gain, [[1, 1, 2.2], [2, 0.4, 1.1], [3, 0.16, 0.6], [4, 0.06, 0.3]], "triangle");
+      },
+      // Koor: zaagtanden door twee klinkerfilters ('aah'), met trillende stem en een zachte inzet.
+      koor: function (midi, when, gain, dur) {
+        (Array.isArray(midi) ? midi : [midi]).forEach(function (m) {
+          var g = ctx.createGain();
+          g.gain.setValueAtTime(0.0001, when);
+          g.gain.linearRampToValueAtTime(gain, when + Math.min(0.28, dur * 0.4));
+          g.gain.setValueAtTime(gain, when + dur * 0.85);
+          g.gain.exponentialRampToValueAtTime(0.0001, when + dur + 0.7);
+          [[760, 7, 1], [1180, 9, 0.6], [2600, 10, 0.25]].forEach(function (f) {
+            var bp = ctx.createBiquadFilter();
+            var fg = ctx.createGain();
+            bp.type = "bandpass";
+            bp.frequency.value = f[0];
+            bp.Q.value = f[1];
+            fg.gain.value = f[2] * 3.2;
+            bp.connect(fg);
+            fg.connect(g);
+            [-6, 6].forEach(function (cents) {
+              var osc = ctx.createOscillator();
+              var lfo = ctx.createOscillator();
+              var depth = ctx.createGain();
+              osc.type = "sawtooth";
+              osc.frequency.value = hz(m);
+              osc.detune.value = cents;
+              lfo.frequency.value = 5.2 + cents / 20;
+              depth.gain.value = 9;
+              lfo.connect(depth);
+              depth.connect(osc.detune);
+              osc.connect(bp);
+              osc.start(when);
+              lfo.start(when);
+              osc.stop(when + dur + 0.8);
+              lfo.stop(when + dur + 0.8);
+            });
+          });
+          g.connect(out);
+        });
+      }
+    };
+
+    function schedule() {
+      var ahead = ctx.currentTime + 0.35;
+      while (nextTime < ahead) {
+        var e = events[index];
+        play[e.inst](e.midi, nextTime, e.gain, e.len * tune.eighth);
+        index++;
+        var nextAt = index < events.length ? events[index].at : loopLength;
+        if (index >= events.length) index = 0;
+        nextTime += (nextAt - e.at) * tune.eighth;
+      }
+    }
+
+    return {
+      start: function () {
+        if (!ctx) setup();
+        if (ctx.state === "suspended") ctx.resume();
+        if (playing) return;
+        playing = true;
+        index = 0;
+        nextTime = ctx.currentTime + 0.08;
+        schedule();
+        timer = setInterval(schedule, 100);
+      },
+      stop: function () {
         playing = false;
         clearInterval(timer);
         timer = null;

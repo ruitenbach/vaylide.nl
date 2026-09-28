@@ -46,10 +46,11 @@ De geheime sleutel van de site maakt Render zelf aan. Er komt geen eigen serverb
    https-certificaat maakt Render zelf aan zodra de DNS klopt.
 7. **Controle**: volg stap 4 hieronder op `https://www.vaylide.com`.
 
-Nog niet in de blueprint, want pas nodig voor live: een klok die elke paar minuten `POST /intern/taken/`
-aanroept met de header `Authorization: Bearer <VIERLIEF_CRON_TOKEN>` (mislukte taken opnieuw proberen), en
-één keer per nacht met `?retentie=1` (bewaartermijnen). Voor de testversie is dat niet nodig: taken lopen
-direct na een testbetaling.
+De blueprint maakt ook een geplande taak (`vaylide-taken`, een cron-dienst): elke 15 minuten `POST /intern/taken/`
+met de header `Authorization: Bearer <VIERLIEF_CRON_TOKEN>` (mislukte taken opnieuw proberen), en rond 02:00 UTC ook
+de bewaartermijnen en een back-up (zie `docs/BACKUP.md`). Het token maakt Render zelf aan en deelt het tussen de
+twee diensten. Zolang het domein nog niet gekoppeld is, zet je `VIERLIEF_CRON_URL` bij de cron-dienst op het
+…onrender.com-adres van de site. Bij een fout meldt de taak zich in het logboek van de cron-dienst.
 
 Wat vooraf is gecontroleerd: `render.yaml` is geldig. De bouwstap (statische bestanden) en de start van de
 database op een lege PostgreSQL-database zijn lokaal nagebootst met dezelfde instellingen. Daarna zijn de

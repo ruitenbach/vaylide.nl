@@ -1,0 +1,27 @@
+{
+  "slug": "gloria",
+  "version": 1,
+  "name": "Gloria",
+  "tagline": "Hemels, met engelenvleugels die zich openvouwen",
+  "description": "Twee grote engelenvleugels van gelaagde veren liggen gevouwen over het scherm, met een gouden aureool en een ster. Na een tik op de ster spreiden de vleugels zich, stroomt er hemels licht binnen en dwarrelen er veertjes. Daarbinnen twee engelen die op hun bazuin blazen naar de ster, wolken in stralend licht, jullie namen in sierlijk schrift, de datum in een ster en boogramen voor de foto's. In het voorbeeld klinkt 'Angels We Have Heard on High' met harp, engelenkoor en celesta.",
+  "style_notes": "Ivoor en goud, engelen, veren, hemels licht, wolken, sierlijk schrift",
+  "occasions": ["kerst"],
+  "sort_order": 39,
+  "opening": "vleugels",
+  "opening_label": "Engelenvleugels",
+  "demo_melody": "gloria",
+  "kaartbeeld": "open",
+  "palettes": [
+    {"key": "hemelsblauw", "name": "Hemelsblauw", "swatch": ["#16264D", "#F7F4EC", "#D4B06A"],
+     "vars": {"--gl-page": "#16264D", "--gl-sky": "#3C5A94", "--gl-bg": "#F7F4EC", "--gl-bg-2": "#EEF1F6", "--gl-ink": "#1C2440", "--gl-muted": "#545C73", "--gl-gold": "#D4B06A", "--gl-gold-2": "#86621F", "--gl-accent": "#22386E", "--gl-accent-ink": "#FFFFFF", "--gl-line": "#E2DCCD", "--gl-glow": "#FFF3D6", "--gl-f1": "#FCFAF4", "--gl-f2": "#F2EADB", "--gl-f3": "#E6DAC2", "--gl-f4": "#D8C8A8", "--gl-veerlijn": "#C4A259", "--gl-vaandel": "#22386E", "--fx-1": "#E8CB88", "--fx-2": "#FFFFFF", "--fx-3": "#F2EADB", "--fx-4": "#C9D6EE", "--fx-bg": "#F7F4EC"}},
+    {"key": "parelmoer", "name": "Parelmoer", "swatch": ["#E9E0E6", "#FCFAF6", "#7A4E6E"],
+     "vars": {"--gl-page": "#CFC3CF", "--gl-sky": "#E8D6DE", "--gl-bg": "#FCFAF6", "--gl-bg-2": "#F4EEEC", "--gl-ink": "#2A2226", "--gl-muted": "#5F5459", "--gl-gold": "#CDAE78", "--gl-gold-2": "#7F5E2A", "--gl-accent": "#7A4E6E", "--gl-accent-ink": "#FFFFFF", "--gl-line": "#E8DDDD", "--gl-glow": "#FFF6EC", "--gl-f1": "#FFFEFB", "--gl-f2": "#F6F0EE", "--gl-f3": "#ECE1E3", "--gl-f4": "#DCCCD2", "--gl-veerlijn": "#C4A56E", "--gl-vaandel": "#7A4E6E", "--fx-1": "#E6CFA0", "--fx-2": "#FFFFFF", "--fx-3": "#F1E2EA", "--fx-4": "#E3D0DC", "--fx-bg": "#FCFAF6"}},
+    {"key": "kerstrood", "name": "Kerstrood", "swatch": ["#3A0A12", "#FBF6F0", "#8E1B2C"],
+     "vars": {"--gl-page": "#3A0A12", "--gl-sky": "#7E2436", "--gl-bg": "#FBF6F0", "--gl-bg-2": "#F5ECE4", "--gl-ink": "#2E1A1A", "--gl-muted": "#624C4A", "--gl-gold": "#D2AE68", "--gl-gold-2": "#82601F", "--gl-accent": "#8E1B2C", "--gl-accent-ink": "#FFFFFF", "--gl-line": "#EADCCF", "--gl-glow": "#FFE9CF", "--gl-f1": "#FDF9F2", "--gl-f2": "#F4EADB", "--gl-f3": "#E9D9C1", "--gl-f4": "#DBC5A3", "--gl-veerlijn": "#C29C52", "--gl-vaandel": "#8E1B2C", "--fx-1": "#E6C582", "--fx-2": "#FFFFFF", "--fx-3": "#F4EADB", "--fx-4": "#E7A6AE", "--fx-bg": "#FBF6F0"}},
+    {"key": "nachtgoud", "name": "Nachtgoud", "swatch": ["#0B0F1F", "#E8CB88", "#F4EEE2"],
+     "vars": {"--gl-page": "#070A16", "--gl-sky": "#22306A", "--gl-bg": "#10162B", "--gl-bg-2": "#161E38", "--gl-ink": "#F2EEE4", "--gl-muted": "#C6C8D2", "--gl-gold": "#E8CB88", "--gl-gold-2": "#E2C27E", "--gl-accent": "#E2C27E", "--gl-accent-ink": "#10162B", "--gl-line": "#2A3456", "--gl-glow": "#3A3A5E", "--gl-f1": "#F7F2E8", "--gl-f2": "#EAE0CC", "--gl-f3": "#D9CAAC", "--gl-f4": "#C4B08A", "--gl-veerlijn": "#B8924B", "--gl-vaandel": "#A3212F", "--fx-1": "#E8CB88", "--fx-2": "#FFFFFF", "--fx-3": "#F4EEE2", "--fx-4": "#9FB2E8", "--fx-bg": "#10162B"}}
+  ],
+  "sections": ["countdown", "story", "gallery", "program", "location", "dresscode", "practical", "rsvp", "contact", "closing", "music"],
+  "effects": {"sfeer": "goudstof", "knal": "pluisjes", "viering": "sterren", "namen": "schrijf", "onthul": "zacht", "extra": ["stralen", "kenburns", "tik"]},
+  "changelog": "Eerste versie."
+}
