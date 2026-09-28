@@ -33,14 +33,16 @@ services:
         fromDatabase:
           name: vaylide-db
           property: connectionString
+      # Het eigen domein vaylide.nl (met www) staat al toegestaan; het …onrender.com-adres voegt Render zelf toe
+      # (RENDER_EXTERNAL_HOSTNAME). Zo werkt de site meteen zodra de DNS van vaylide.nl naar Render wijst.
       - key: DJANGO_ALLOWED_HOSTS
-        value: vaylide.com,www.vaylide.com
+        value: vaylide.nl,www.vaylide.nl
       - key: DJANGO_CSRF_TRUSTED_ORIGINS
-        value: https://vaylide.com,https://www.vaylide.com
-      # Het adres in links in e-mails en QR-codes. Zolang het domein nog niet is gekoppeld,
-      # kun je hier het …onrender.com-adres van de dienst invullen.
+        value: https://vaylide.nl,https://www.vaylide.nl,https://vaylide.onrender.com
+      # Het adres in links in e-mails, QR-codes en de terugkeer na betalen. Bij de livegang (nadat de DNS
+      # werkt en het certificaat er is) wordt dit https://vaylide.nl. Zie docs/DOMEIN.md.
       - key: VIERLIEF_BASE_URL
-        value: https://www.vaylide.com
+        value: https://vaylide.onrender.com
       - key: VIERLIEF_DATA_DIR
         value: /var/data
       - key: VIERLIEF_UPLOAD_DIR
@@ -71,9 +73,9 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
-      # Het publieke adres van de webdienst; vóór het koppelen van het domein het …onrender.com-adres.
+      # Het publieke adres van de webdienst; na de livegang https://vaylide.nl/intern/taken/.
       - key: VIERLIEF_CRON_URL
-        value: https://www.vaylide.com/intern/taken/
+        value: https://vaylide.onrender.com/intern/taken/
       - fromGroup: vaylide-taken
 
 envVarGroups:

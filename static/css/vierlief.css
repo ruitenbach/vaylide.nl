@@ -1007,3 +1007,11 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .betaalmiddel--logo img { display: block; width: auto; height: 2.3rem; }
 .betaalmiddelen--inline .betaalmiddel--logo { padding: .2rem .4rem; }
 .betaalmiddelen--inline .betaalmiddel--logo img { height: 1.7rem; }
+
+/* Ontwerppagina op de telefoon: de waarde mag de kolom nooit breder maken dan het scherm (de schakelaar
+   Uitnodiging/Wenskaart paste niet naast het label); onder 480 pixels staat het label erboven. */
+.detail-grid > * { min-width: 0; }
+.meta-list > div { grid-template-columns: 8.5rem minmax(0, 1fr); }
+@media (max-width: 480px) {
+  .meta-list > div { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
+}

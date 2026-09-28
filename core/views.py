@@ -291,6 +291,8 @@ def cron_jobs(request):
     backup = ""
     if request.GET.get("backup") == "1":
         from .backup import make_backup
+        from .offsite import copy_offsite
 
-        backup = make_backup().name
+        made = make_backup()
+        backup = f"{made.name} (tweede locatie: {copy_offsite(made)})"
     return HttpResponse(f"taken: {done}; retentie: {report}; backup: {backup}", content_type="text/plain")

@@ -1,7 +1,7 @@
 """Roept de takenroute van de site aan; bedoeld voor een geplande taak (cron) bij de hosting.
 
 Elke aanroep: mislukte taken opnieuw proberen. Tussen 02:00 en 02:14 UTC ook bewaartermijnen
-toepassen en een back-up maken. Nodig: VIERLIEF_CRON_URL (bijv. https://www.vaylide.com/intern/taken/)
+toepassen en een back-up maken. Nodig: VIERLIEF_CRON_URL (bijv. https://www.vaylide.nl/intern/taken/)
 en VIERLIEF_CRON_TOKEN (dezelfde waarde als op de webdienst). Alleen standaardbibliotheek.
 """
 import datetime

@@ -1,0 +1,7 @@
+De nachtelijke back-up is wel gemaakt, maar niet naar de tweede back-uplocatie gekopieerd.
+
+Reden:
+{{ reason }}
+
+De back-up staat nog op de server (in de map backups van VIERLIEF_DATA_DIR). Controleer de instellingen
+(VIERLIEF_BACKUP_S3_*) en probeer het opnieuw met: python manage.py backup --offsite

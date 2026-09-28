@@ -41,6 +41,14 @@ class BackupTests(VaylideTestCase):
                 call_command("restore_backup", str(path), "--ja")
             User.objects.all().delete()
             shutil.rmtree(self.uploads)
+            # Zoals na migrate in een verse database: de catalogus staat er al, met andere nummers.
+            from catalog.models import Package, Template
+            from catalog.seed import ensure_catalog
+
+            Template.objects.update(current_version=None)
+            Template.objects.all().delete()
+            Package.objects.all().delete()
+            ensure_catalog()
             info = restore_backup(path)
             self.assertIn("gemaakt", info)
             self.assertTrue(User.objects.filter(email="klant@vierlief.test").exists())

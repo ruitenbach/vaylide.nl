@@ -107,3 +107,12 @@ class ErrorPageTests(VaylideTestCase):
         self.assertEqual(response.status_code, 404)
         self.assertContains(response, "Pagina niet gevonden", status_code=404)
         self.assertContains(response, "Vaylide", status_code=404)
+
+
+class LayoutRegressionTests(VaylideTestCase):
+    def test_design_detail_value_column_cannot_widen_the_page(self):
+        from django.conf import settings
+
+        css = (settings.BASE_DIR / "static/css/vierlief.css").read_text(encoding="utf-8")
+        self.assertIn(".meta-list > div { grid-template-columns: 8.5rem minmax(0, 1fr); }", css)
+        self.assertIn(".detail-grid > * { min-width: 0; }", css)

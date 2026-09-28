@@ -6,7 +6,7 @@ worden gezet. Daarvoor zijn twee dingen nodig die alleen de eigenaar heeft of ki
 - een **hostingaccount**: de computer op internet waarop de site draait (een betaalde dienst);
 - toegang tot de **DNS-instellingen** van het domein, bij het bedrijf waar het domein is geregistreerd.
 
-Dit stappenplan gaat uit van het domein van de eigenaar: `vaylide.com`.
+Dit stappenplan gaat uit van het domein van de eigenaar: `vaylide.nl`.
 
 ## In twee stappen
 
@@ -41,10 +41,11 @@ De geheime sleutel van de site maakt Render zelf aan. Er komt geen eigen serverb
    inlogvenster van de browser, daarna de site met de testbalk.
 5. **Beheeraccount**: open in Render de **Shell** van de dienst en voer `python manage.py createsuperuser`
    uit, met een sterk wachtwoord van minstens 12 tekens. Log daarna in op `/beheer/`.
-6. **Domein**: voeg bij de dienst onder **Settings → Custom Domains** `vaylide.com` en `www.vaylide.com`
-   toe. Render laat zien welke DNS-records je bij je domeinbedrijf instelt (zie stap 2 hieronder). Het
-   https-certificaat maakt Render zelf aan zodra de DNS klopt.
-7. **Controle**: volg stap 4 hieronder op `https://www.vaylide.com`.
+6. **Domein**: voeg bij de dienst onder **Settings → Custom Domains** `vaylide.nl` toe (Render voegt
+   `www.vaylide.nl` er zelf bij en stuurt dat door). Render laat zien welke DNS-records je bij je
+   domeinbedrijf instelt; de stappen en de records staan in `docs/DOMEIN.md`. Het https-certificaat maakt
+   Render zelf aan zodra de DNS klopt.
+7. **Controle**: volg stap 4 hieronder op `https://vaylide.nl`.
 
 De blueprint maakt ook een geplande taak (`vaylide-taken`, een cron-dienst): elke 15 minuten `POST /intern/taken/`
 met de header `Authorization: Bearer <VIERLIEF_CRON_TOKEN>` (mislukte taken opnieuw proberen), en rond 02:00 UTC ook
@@ -81,11 +82,11 @@ De hostingaanbieder geeft aan welke records nodig zijn. Meestal:
 
 | Record | Naam | Waarde |
 |---|---|---|
-| A (en eventueel AAAA) | `vaylide.com` | het IP-adres van de hosting |
+| A (en eventueel AAAA) | `vaylide.nl` | het IP-adres van de hosting |
 | CNAME | `www` | het adres dat de hosting opgeeft |
 
-Kies één hoofdadres, bijvoorbeeld `https://www.vaylide.com`, en laat het andere daarheen doorsturen
-(dat regel je bij de hosting). Het https-certificaat maakt de hosting meestal zelf aan zodra de DNS klopt.
+Hoofdadres: `https://vaylide.nl`; `www.vaylide.nl` stuurt daarheen door (dat regelt Render). De exacte
+records voor Render en wat er nu staat: `docs/DOMEIN.md`. Het https-certificaat maakt de hosting meestal zelf aan zodra de DNS klopt.
 
 ## 3. Instellingen op de hosting
 
@@ -96,9 +97,9 @@ afgeschermde testversie:
 VIERLIEF_MODE=test
 DJANGO_DEBUG=false
 DJANGO_SECRET_KEY=            # lange willekeurige waarde, zie .env.example
-DJANGO_ALLOWED_HOSTS=vaylide.com,www.vaylide.com
-DJANGO_CSRF_TRUSTED_ORIGINS=https://vaylide.com,https://www.vaylide.com
-VIERLIEF_BASE_URL=https://www.vaylide.com
+DJANGO_ALLOWED_HOSTS=vaylide.nl,www.vaylide.nl
+DJANGO_CSRF_TRUSTED_ORIGINS=https://vaylide.nl,https://www.vaylide.nl
+VIERLIEF_BASE_URL=https://vaylide.nl        # tot de DNS is omgezet: https://vaylide.onrender.com
 VIERLIEF_CONTACT_EMAIL=       # het adres waarop je bereikbaar wilt zijn
 VIERLIEF_OWNER_EMAIL=         # waar meldingen voor de eigenaar heen gaan
 DATABASE_URL=                 # van de hosting (PostgreSQL)
@@ -119,10 +120,10 @@ Voor live komen daar de waarden voor Mollie en e-mail bij en wordt `VIERLIEF_MOD
    bij `release`). De ontwerpen worden daarbij ingelezen.
 2. Een beheeraccount maken: `python manage.py createsuperuser`, met een sterk wachtwoord.
 3. `python manage.py check --deploy`. Er horen alleen de bewust open gelaten meldingen W005 en W021 te staan.
-4. Open `https://www.vaylide.com`: je krijgt eerst het inlogvenster van de browser, daarna de site met
+4. Open `https://vaylide.nl`: je krijgt eerst het inlogvenster van de browser, daarna de site met
    de testbalk. Controleer het logo, een voorbeelduitnodiging, samenstellen tot de testbetaling, en het
    beheer op het geheime pad.
-5. Bekijk `https://www.vaylide.com/healthz`: dat moet zonder wachtwoord "ok" geven (voor de controle door
+5. Bekijk `https://vaylide.nl/healthz`: dat moet zonder wachtwoord "ok" geven (voor de controle door
    de hosting).
 
 Gebruik een lege database: niet de ontwikkeldatabase met testgegevens, zoals het account

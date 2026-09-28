@@ -32,6 +32,20 @@ Gedane rondes:
 
 8. Nieuwe vormgeving van de website (29 september 2026): een 3D-wereld over de hele kop met een envelop met het logo die opengaat (tik, klik of Enter) en een gouden kaart met reliëf; boogvormige themakaarten met Kerst voorop; een warm kerstpodium met zwevende kerstkaarten; stappen als kaartjes; een licht paneel in plaats van het donkere; vragen vlak voor de voettekst; een voettekst met een stilstaand beeld van de bloem; dezelfde stijl op Zo werkt het, Prijzen, Inspiratie en Over ons (tekst van de eigenaar). Lakzegel: Essentieel krijgt een standaardzegel met een motief (rood, of groen bij een groene kleurvariant), Compleet het persoonlijk zegel met initialen (functie `zegel`, migratie `catalog/0002`). Een bedrijfslogo op het zegel is er nog niet: op aanvraag via Op maat. Prijzen zijn niet veranderd.
 
+9. Voorbereiding livegang (29 september 2026):
+   - Verwerking:
+     - na publicatie volgt de levering aan de koper als aparte taak (`deliver_order`);
+     - een herhaling levert precies één keer;
+     - Beheer → Verwerking toont vastgelopen bestellingen met "Verwerking opnieuw starten".
+   - Klantreis: in de browser gecontroleerd met `e2e/klantreis.cjs`.
+   - Back-up:
+     - herstel in een verse database gerepareerd en getest;
+     - een versleutelde tweede back-uplocatie (S3-compatibel) is voorbereid (`docs/BACKUP.md`).
+   - Juridische teksten: feitelijk aangevuld (levering, afbreken, bewaartermijn, AI bij extra wensen).
+   - `docs/INVULLIJST.md`: ontbrekende feiten en teksten die juridisch beoordeeld moeten worden.
+   - Domein: `vaylide.nl` voorbereid (`docs/DOMEIN.md`); de DNS is niet gewijzigd.
+   - AI-model standaard `claude-opus-5-5`.
+
 Wat getest is en hoe: `docs/CONTROLES.md`. Kort, na ronde 7: 160 tests (op SQLite), een browsercontrole op 840 pagina's (vier schermformaten, alle 34 ontwerpen, 272 gedragscontroles; Winterlicht daarna opnieuw op de definitieve stand), 272 controles van de effecten en een meting van de belasting (alle 34 ontwerpen), toegankelijkheid en contrast van alle 34 ontwerpen in alle 106 kleurvarianten, het contrast van de tekst op de tekening van het kerstraam, en axe op de gewijzigde websitepagina's. Na ronde 6: 139 tests (op SQLite; op PostgreSQL 16 in ronde 5), een browsercontrole op 816 pagina's (vier schermformaten, alle 33 ontwerpen, 264 gedragscontroles), toegankelijkheid van de website en een lokale nabootsing van de Render-instellingen met PostgreSQL. Uit ronde 5 (in ronde 6 veranderden aan de uitnodigingen alleen de naam onderaan en het tabblad-icoon): 264 controles van de effecten (ook stilzetten en 'minder beweging'), een meting van de belasting op een vertraagde processor, en toegankelijkheid en contrast van alle ontwerpen in alle kleuren.
 
 Voorvertoning (statisch, alleen om te kijken): https://claude.ai/artifact/DYkTUBCKzn63jE8Mk9x28M

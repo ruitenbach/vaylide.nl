@@ -2,9 +2,11 @@
 
 Vaylide staat nu in testmodus. Er zijn geen betaalde diensten afgesloten en er is niets naar productie gepubliceerd. Hoe je de site op je eigen domein zet, eerst als testversie met een wachtwoord: `docs/ONLINE.md`. Hieronder staat wat nog nodig is: eerst jouw keuzes, dan de aansluitingen en de technische stappen.
 
+Korte lijst met wat de eigenaar nog moet aanleveren: `docs/INVULLIJST.md`.
+
 ## 1. Keuzes en zakelijke zaken
 
-- [ ] **Naam en domein**: controleer of "Vaylide" beschikbaar is als merk (bijvoorbeeld bij BOIP) en bij de KVK. Het domein is `vaylide.com`; de voorbeelden in `.env.example` gebruiken dat domein. Hoe je de site op je domein zet: `docs/ONLINE.md`.
+- [ ] **Naam en domein**: controleer of "Vaylide" beschikbaar is als merk (bijvoorbeeld bij BOIP) en bij de KVK. Het domein is `vaylide.nl`; de voorbeelden in `.env.example` gebruiken dat domein. Hoe je de site op je domein zet: `docs/ONLINE.md`.
 - [ ] **Logo**: zorg dat je de rechten op het logo hebt (bijvoorbeeld van wie het heeft gemaakt) voordat je het als merk vastlegt.
 - [ ] **Definitieve prijzen en pakketten**: bedragen, inbegrepen functies, beschikbaarheidsduur en btw. Stel ze in via **Beheer → Prijzen** en zet in **Beheer → Instellingen** "Voorlopige prijzen" uit.
 - [ ] **Facturen**: de app maakt geen btw-facturen. De bevestigingsmail is geen factuur. Kies hoe je factureert (boekhoudpakket of een koppeling) en of klanten om een factuur kunnen vragen.
@@ -24,7 +26,7 @@ Vaylide staat nu in testmodus. Er zijn geen betaalde diensten afgesloten en er i
 
 - [ ] **Hosting in de EU** met: https, een blijvende map voor uploads (niet openbaar), een worker of een cron-aanroep elke minuut, een dagelijkse taak `apply_retention`, en back-ups. Zie de README voor Docker en Procfile.
 - [ ] **Database**: PostgreSQL met dagelijkse back-ups (`DATABASE_URL`).
-- [ ] **Back-ups van uploads** (`VIERLIEF_UPLOAD_DIR`) en een **hersteltest** van database en uploads samen.
+- [ ] **Back-ups van uploads** (`VIERLIEF_UPLOAD_DIR`) en een **hersteltest** van database en uploads samen. Lokaal uitgevoerd op 29 september 2026 (zie `docs/CONTROLES.md`); herhaal op de testversie. Tweede back-uplocatie: voorbereid, aanbieder kiezen (`docs/BACKUP.md`).
 - [ ] **Mollie**:
   1. Maak een account aan en laat het verifiëren. Zet de gewenste betaalmethoden aan, zoals iDEAL.
   2. Test eerst met een testsleutel: `VIERLIEF_MODE=test`, `VIERLIEF_PAYMENT_PROVIDER=mollie` en `MOLLIE_API_KEY=test_...`. Dit gebruikt de echte Mollie-omgeving zonder echt geld; in testmodus weigert de site een `live_`-sleutel. Stappen en omgevingsvariabelen voor de testversie op Render: `docs/MOLLIE_TEST.md`.

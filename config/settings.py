@@ -259,9 +259,19 @@ MOLLIE_API_BASE = env("MOLLIE_API_BASE", "https://api.mollie.com/v2")
 # Betaalmethoden op de site als Mollie ze niet kan melden (of zonder Mollie). Met Mollie tonen we wat daar aanstaat.
 PAYMENT_METHODS = env_list("VIERLIEF_PAYMENT_METHODS", "ideal,paypal")
 
+# --- Tweede back-uplocatie (optioneel, zie docs/BACKUP.md) -----------------------
+# Een versleutelde kopie van elke nachtelijke back-up naar S3-compatibele opslag. Uit tot alles is ingevuld.
+BACKUP_S3_BUCKET = env("VIERLIEF_BACKUP_S3_BUCKET")
+BACKUP_S3_ENDPOINT = env("VIERLIEF_BACKUP_S3_ENDPOINT")  # leeg bij AWS; anders het adres van de aanbieder
+BACKUP_S3_REGION = env("VIERLIEF_BACKUP_S3_REGION")
+BACKUP_S3_ACCESS_KEY = env("VIERLIEF_BACKUP_S3_ACCESS_KEY")
+BACKUP_S3_SECRET_KEY = env("VIERLIEF_BACKUP_S3_SECRET_KEY")
+BACKUP_S3_PREFIX = env("VIERLIEF_BACKUP_S3_PREFIX", "vaylide")
+BACKUP_ENCRYPTION_KEY = env("VIERLIEF_BACKUP_ENCRYPTION_KEY")
+
 # --- AI (optioneel) -----------------------------------------------------------
 ANTHROPIC_API_KEY = env("ANTHROPIC_API_KEY")
-AI_MODEL = env("VIERLIEF_AI_MODEL", "claude-opus-5")
+AI_MODEL = env("VIERLIEF_AI_MODEL", "claude-opus-5-5")
 AI_ENABLED = env_bool("VIERLIEF_AI_ENABLED", True)
 
 # --- Verwerking --------------------------------------------------------------

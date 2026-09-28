@@ -402,3 +402,46 @@ Probleem: op de ontwerppagina stonden de kleuren alleen als lijstje; het voorbee
 - `manage.py test tests`: 235 tests, alle geslaagd (nieuw: `tests/test_mollie_testmodus.py`, met een nagebootste Mollie-API): betaling aanmaken met https-webhook, pas betaald na bevestiging door Mollie, vier meldingen geven één verwerking, afgebroken betaling publiceert niet en kan opnieuw, webhook bereikbaar achter het wachtwoord van de testversie (pagina's niet), een status in de melding wordt genegeerd, en een `live_`-sleutel wordt in testmodus geweigerd (de site start niet en bestellen roept Mollie niet aan).
 - Niet gecontroleerd: een echte Mollie-testbetaling. Daarvoor is de testsleutel nodig (die zet de eigenaar zelf in Render) en inloggen op de afgeschermde testversie. De stappen staan in `docs/MOLLIE_TEST.md`.
 - Voettekst (29 september 2026): `manage.py test tests` 241 tests, alle geslaagd (nieuw: `tests/test_voettekst.py`). In Chromium op 1366 en 390 pixels: betaalmethoden iDEAL en PayPal en het Instagram-icoon in de voettekst, geen fouten en geen horizontaal scrollen. Op Render: de webhook `/webhooks/betaling/mollie/` komt langs het wachtwoord (404 zolang `VIERLIEF_PAYMENT_PROVIDER` nog `test` is, geen 401).
+
+## Voorbereiding livegang (29 september 2026)
+
+Lokaal in testmodus (gesimuleerde betaling en e-mail). De testversie op Render is afgeschermd met een wachtwoord dat
+ik niet heb; daar zijn alleen `/healthz`, de statische bestanden en de webhook (langs het wachtwoord) gecontroleerd.
+
+- `manage.py test tests`: 258 tests, alle geslaagd. Nieuw: `test_verwerking_levering.py` (levering als aparte taak,
+  herhaling na een onderbreking levert precies één keer, e-mailstoring zonder dubbele mail, vastgelopen bestellingen
+  in het beheer, eigen 404-pagina), `test_offsite.py` (versleutelde tweede back-uplocatie) en `test_ai_koppeling.py`
+  (AI-aanroep nagebootst). Bijgewerkt: de hersteltest in `test_productie.py` gebruikt nu een verse catalogus.
+- **Klantreis in de browser** (`e2e/klantreis.cjs`, Chromium, op 390 en 1366 pixels, elk 37/37 geslaagd):
+  - inloggen met code;
+  - alle stappen van het samenstellen, en gegevens opslaan;
+  - een foto uploaden, en een nepbestand dat met een melding wordt geweigerd;
+  - bestellen en betalen, publicatie, en de link op de statuspagina;
+  - een gast opent de uitnodiging en meldt zich aan; het antwoord staat in Mijn Vaylide en in de CSV-export;
+  - een afgebroken betaling publiceert niet, het ontwerp blijft bewaard, en opnieuw betalen lukt;
+  - een andere klant krijgt 404 op vijf adressen van klant A, zonder login volgt doorsturen naar inloggen, en een
+    klant komt niet in het beheer;
+  - de beheerder logt in en opent vier beheerpagina's;
+  - geen JavaScript-fouten.
+
+  Met `DEBUG` aan toont de ontwikkelserver bij een 404 Django's eigen pagina; de Vaylide-404 is met een test gecontroleerd.
+- **Hersteltest**: een back-up van de lokale testdatabase is teruggezet in een lege, nieuwe database met een eigen
+  uploadmap.
+  - Daarbij gevonden en opgelost: herstellen mislukte, omdat `migrate` de catalogus al met eigen nummers vult. De
+    catalogus wordt nu eerst leeggemaakt; de test bootst dit na.
+  - Na herstel waren de aantallen gelijk: 16 gebruikers, 18 uitnodigingen (7 online), 2 aanmeldingen, 8 bestellingen,
+    11 betalingen, 5 bestanden (geen ontbrekend) en 22 e-mails.
+  - De openbare uitnodiging (200), de gastenlijst van de eigenaar met het antwoord van de gast en het fotobestand
+    werkten.
+- **Breedtes**: 18 pagina's op 360, 390, 768 en 1366 pixels (72 weergaven).
+  - Gevonden en opgelost: de ontwerppagina van de kerstontwerpen scrolde op 360 en 390 pixels zijwaarts (426 pixels
+    breed; de schakelaar Uitnodiging/Wenskaart paste niet naast het label).
+  - Daarna geen horizontaal scrollen, geen foutstatus en geen fouten in de console.
+- `manage.py check --deploy` (met `DEBUG` uit en een lange geheime sleutel): alleen de bewuste meldingen W005 en W021.
+- DNS van `vaylide.nl` opgevraagd (alleen gelezen, niets gewijzigd): zie `docs/DOMEIN.md`.
+- Niet gecontroleerd:
+  - de pagina's en de bestelroute op de Render-testversie zelf (wachtwoord);
+  - een echte Mollie-testbetaling (sleutel);
+  - echte e-mailbezorging (SMTP);
+  - de AI met een echte sleutel;
+  - een upload naar een echte tweede back-uplocatie (nog geen aanbieder gekozen).

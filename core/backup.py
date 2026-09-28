@@ -58,8 +58,24 @@ def make_backup(keep: int = 14) -> Path:
     return target
 
 
+def _clear_seeded_catalog() -> None:
+    """`migrate` vult een lege database al met ontwerpen, pakketten, opties en instellingen (met eigen nummers).
+    Die botsen met de back-up (zelfde codes, andere nummers); de back-up bevat ze zelf, dus eerst weg."""
+    from catalog.models import AddOn, Package, Template, TemplateVersion
+
+    from .models import SiteConfig
+
+    Template.objects.update(current_version=None)
+    for model in (TemplateVersion, Template, Package, AddOn, SiteConfig):
+        model.objects.all().delete()
+
+
 def restore_backup(path: Path) -> dict:
     """Zet een back-up terug in een LEGE, gemigreerde database. Uploads worden vervangen."""
+    from accounts.models import User
+
+    if User.objects.exists():
+        raise ValueError("De database is niet leeg. Herstel alleen in een lege database, direct na migrate.")
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp = Path(tmpdir)
         with tarfile.open(path, "r:gz") as tar:
@@ -68,6 +84,7 @@ def restore_backup(path: Path) -> dict:
         if not dump.is_file():
             raise ValueError("Dit is geen Vaylide-back-up (database.json ontbreekt).")
         with transaction.atomic():
+            _clear_seeded_catalog()
             management.call_command("loaddata", str(dump), verbosity=0)
         uploads = Path(settings.MEDIA_ROOT)
         if (tmp / "uploads").is_dir():
