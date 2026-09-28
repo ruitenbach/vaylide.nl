@@ -14,7 +14,7 @@ cp .env.example .env                      # zet een eigen DJANGO_SECRET_KEY; gee
 .venv/bin/python manage.py migrate        # leest ook de ontwerpen in (sync_designs)
 .venv/bin/python manage.py createsuperuser
 .venv/bin/python manage.py runserver      # http://127.0.0.1:8000, testmodus
-.venv/bin/python manage.py test tests     # 235 tests, moeten altijd slagen
+.venv/bin/python manage.py test tests     # 241 tests, moeten altijd slagen
 ```
 
 Visuele controles (Node met Playwright en Chromium): zie "Zelf herhalen" in `docs/CONTROLES.md` (`e2e/fixtures.py`, `e2e/controle2.cjs`, `e2e/toegankelijkheid.cjs` en `e2e/effecten.cjs`). Beelden opnieuw maken: `tools/logo/README.md` (logo en iconen), `tools/merkbeelden/README.md` (website), `tools/generate_demo_images.py` (voorbeeldbeelden), `tools/winterlicht/README.md` (de kerstkaart Winterlicht), `tools/gloria/maak_tekeningen.py` (vleugels en engelen van Gloria), `tools/aan_tafel/maak_tekeningen.py` (slinger en hulst van Aan tafel), `tools/voor_altijd/maak_tekeningen.py` (krans, takje en ringen van Voor altijd) en `e2e/make_design_images.cjs` (kaartbeelden van de ontwerpen). Een losse voorvertoning zonder server (om te delen): `python tools/voorvertoning.py <map> [ontwerp ...]`. De 3D-wereld op de homepage (envelop, gouden kaart, sterretjes, kerstpodium) en de sterretjes in de paginakoppen: `static/js/hero3d.js` (de envelop werkt altijd; beweging stilgezet bij 'minder beweging'). Themabeelden: `tools/merkbeelden/voorbeelden.cjs`.

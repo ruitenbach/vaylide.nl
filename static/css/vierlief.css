@@ -982,3 +982,23 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 @media (max-width: 900px) { .voorbeelden > .voorbeeld { flex-basis: calc((100% - clamp(1rem, 2.5vw, 1.6rem)) / 2); } }
 @media (max-width: 600px) { .voorbeelden > .voorbeeld { flex-basis: 100%; } }
 .site-footer__bloem { opacity: .7; }
+
+/* ---------- Voettekst: betaalmethoden en sociale media ---------- */
+.site-footer__extra { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1.25rem 2.5rem; }
+@media (min-width: 900px) { .site-footer__extra { grid-column: 1 / -1; } }
+.site-footer__kop { margin: 0 0 .5rem; font-size: .74rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--accent-text); }
+.betaalmiddelen { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; margin: 0; padding: 0; }
+.betaalmiddel {
+  display: inline-flex; align-items: center; min-height: 2.1rem; padding: .25rem .8rem; border-radius: 8px; background: #fff;
+  font-weight: 700; font-size: .92rem; letter-spacing: .01em; color: var(--ink); box-shadow: 0 0 0 1px var(--line-strong), 0 4px 10px -8px rgba(70, 50, 25, .45);
+}
+/* Alleen de naam in de merkkleur (geen nagemaakte logo's). */
+.betaalmiddel--ideal { color: #B30059; }
+.betaalmiddel--paypal { color: #003087; font-style: italic; }
+.betaalmiddelen--inline { display: inline-flex; vertical-align: middle; gap: .35rem; margin-left: .25rem; }
+.betaalmiddelen--inline .betaalmiddel { min-height: 1.8rem; padding: .1rem .6rem; font-size: .86rem; }
+.betaal-uitleg { color: var(--ink-2); font-size: .95rem; line-height: 2; }
+.sociale-links { display: flex; gap: .6rem; list-style: none; margin: 0; padding: 0; }
+.sociale-links a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--paper); color: var(--ink); box-shadow: 0 0 0 1px var(--line-strong); transition: color .2s, box-shadow .2s, transform .2s; }
+.sociale-links a:hover { color: var(--accent-text); box-shadow: 0 0 0 1px var(--accent); transform: translateY(-2px); }
+.sociale-links .icon { width: 1.35rem; height: 1.35rem; }

@@ -9,6 +9,9 @@ ICONS = {
     "pijl": '<path d="M5 12h14"/><path d="m13.5 6.5 5.5 5.5-5.5 5.5"/>',
     "afspelen": '<path d="M9.5 7.8v8.4l6.8-4.2-6.8-4.2Z" fill="currentColor" stroke="none"/>',
     "vink": '<circle cx="12" cy="12" r="8.5"/><path d="m8.6 12.3 2.3 2.3 4.6-4.8"/>',
+    # Merktekens van Instagram en TikTok, eenvoudig nagetekend in dezelfde lijnstijl (alleen als link naar het eigen profiel).
+    "instagram": '<rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.6" cy="7.4" r=".9" fill="currentColor" stroke="none"/>',
+    "tiktok": '<path d="M13.5 4v10.2a3.3 3.3 0 1 1-3.3-3.3"/><path d="M13.5 4c.4 2.4 2 3.9 4.5 4.1"/>',
     "menu": '<path d="M4 7h16M4 12h16M4 17h16"/>',
     "kaarten": '<rect x="4" y="6.5" width="9.5" height="13" rx="1.5"/><path d="M8.5 6.5V5.5A1.5 1.5 0 0 1 10 4h8.5A1.5 1.5 0 0 1 20 5.5v10a1.5 1.5 0 0 1-1.5 1.5h-5"/>',
     "potlood": '<path d="M15.5 4.5 19.5 8.5 9 19H5v-4L15.5 4.5Z"/><path d="m13.5 6.5 4 4"/>',

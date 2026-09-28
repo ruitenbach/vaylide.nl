@@ -49,3 +49,12 @@ niets afgeschreven", en in Beheer → Instellingen staat bij Betalingen "Mollie 
    concept en is niet openbaar.
 4. Kijk in het Mollie-dashboard (testmodus) of beide betalingen er staan, en onder de betaling bij
    "Webhook" of de aanroep status 200 kreeg.
+
+## Betaalmethoden en sociale media in de voettekst
+
+- De voettekst en de bestelstap tonen de betaalmethoden die in je Mollie-account **aanstaan** (opgevraagd
+  bij Mollie, een uur bewaard). Zet PayPal dus aan in Mollie (Instellingen → Betaalmethoden, ook voor
+  testmodus); anders toont de site alleen iDEAL. Zonder Mollie of als Mollie even niet antwoordt:
+  `VIERLIEF_PAYMENT_METHODS` (standaard `ideal,paypal`).
+- Instagram en TikTok: Beheer → Instellingen. Een icoon verschijnt alleen als er een link is ingevuld.
+  Instagram staat standaard op https://www.instagram.com/vaylidenl/.

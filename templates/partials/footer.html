@@ -1,4 +1,4 @@
-{% load static %}<footer class="site-footer">
+{% load static vl %}<footer class="site-footer">
   {# Stilstaand beeld van de bloem uit de homepage (geen animatie), zacht weggeblend. #}
   <div class="site-footer__bloem" aria-hidden="true"><img src="{% static 'img/site/hero-900.webp' %}" alt="" width="900" height="550" loading="lazy" decoding="async"></div>
   <div class="container site-footer__inner">
@@ -19,6 +19,16 @@
         <li><a href="{% url 'core:terms' %}">Voorwaarden</a></li>
       </ul>
     </nav>
+    <div class="site-footer__extra">
+      {% with methods=PAYMENT_METHODS %}{% if methods %}<div class="site-footer__betalen">
+        <p class="site-footer__kop">Veilig betalen met</p>
+        <ul class="betaalmiddelen">{% for m in methods %}<li class="betaalmiddel betaalmiddel--{{ m.id }}">{{ m.label }}</li>{% endfor %}</ul>
+      </div>{% endif %}{% endwith %}
+      {% with links=SOCIAL_LINKS %}{% if links %}<div class="site-footer__social">
+        <p class="site-footer__kop">Volg ons</p>
+        <ul class="sociale-links">{% for l in links %}<li><a href="{{ l.url }}" target="_blank" rel="noopener me" aria-label="Vaylide op {{ l.label }}">{% icon l.icon 22 %}</a></li>{% endfor %}</ul>
+      </div>{% endif %}{% endwith %}
+    </div>
     <p class="site-footer__copy">&copy; {{ CURRENT_YEAR }} Vaylide</p>
   </div>
 </footer>

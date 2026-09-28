@@ -27,6 +27,8 @@ class SiteConfig(models.Model):
         blank=True,
         help_text="Alleen invullen als je deze belofte echt kunt waarmaken, bijv. 'We reageren binnen 2 werkdagen.'",
     )
+    instagram_url = models.URLField("Instagram-pagina", blank=True, default="https://www.instagram.com/vaylidenl/", help_text="Volledige link, bijv. https://www.instagram.com/vaylide/. Leeg = geen icoon in de voettekst.")
+    tiktok_url = models.URLField("TikTok-pagina", blank=True, help_text="Volledige link, bijv. https://www.tiktok.com/@vaylide. Leeg = geen icoon in de voettekst.")
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

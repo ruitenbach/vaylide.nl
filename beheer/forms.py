@@ -133,7 +133,7 @@ class SiteConfigForm(forms.ModelForm):
     class Meta:
         model = SiteConfig
         fields = ["prices_provisional", "support_response_text", "default_max_party_size", "guest_data_retention_days",
-                  "anonymous_draft_retention_days", "unpaid_draft_retention_days"]
+                  "anonymous_draft_retention_days", "unpaid_draft_retention_days", "instagram_url", "tiktok_url"]
 
 
 class ExtendForm(forms.Form):

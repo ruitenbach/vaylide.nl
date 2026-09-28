@@ -256,6 +256,8 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 PAYMENT_PROVIDER = env("VIERLIEF_PAYMENT_PROVIDER", "test" if TEST_MODE else "mollie").lower()
 MOLLIE_API_KEY = env("MOLLIE_API_KEY")
 MOLLIE_API_BASE = env("MOLLIE_API_BASE", "https://api.mollie.com/v2")
+# Betaalmethoden op de site als Mollie ze niet kan melden (of zonder Mollie). Met Mollie tonen we wat daar aanstaat.
+PAYMENT_METHODS = env_list("VIERLIEF_PAYMENT_METHODS", "ideal,paypal")
 
 # --- AI (optioneel) -----------------------------------------------------------
 ANTHROPIC_API_KEY = env("ANTHROPIC_API_KEY")

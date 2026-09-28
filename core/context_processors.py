@@ -1,6 +1,17 @@
 from django.conf import settings
 from django.utils import timezone
 
+from orders.methods import available_methods
+
+
+def social_links() -> list[dict]:
+    """Instagram en TikTok uit de instellingen (Beheer → Instellingen); alleen wat is ingevuld."""
+    from .models import SiteConfig
+
+    config = SiteConfig.get()
+    links = [("instagram", "Instagram", config.instagram_url), ("tiktok", "TikTok", config.tiktok_url)]
+    return [{"icon": icon, "label": label, "url": url} for icon, label, url in links if url]
+
 
 def test_banner() -> str:
     """Wat de testbalk zegt: met Mollie zijn het echte testbetalingen (geen geld), anders gesimuleerd."""
@@ -13,6 +24,9 @@ def vierlief(request):
     return {
         "TEST_MODE": settings.TEST_MODE,
         "TEST_BANNER": test_banner(),
+        # Pas uitgerekend als een template ze gebruikt (voettekst, bestelstap).
+        "PAYMENT_METHODS": available_methods,
+        "SOCIAL_LINKS": social_links,
         "CONTACT_EMAIL": settings.CONTACT_EMAIL,
         "BASE_URL": settings.BASE_URL,
         "CURRENT_YEAR": timezone.localdate().year,
