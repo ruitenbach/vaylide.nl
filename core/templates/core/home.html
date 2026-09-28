@@ -5,7 +5,12 @@
 <link rel="preload" as="image" href="{% static 'img/site/hero.webp' %}" imagesrcset="{% static 'img/site/hero-900.webp' %} 900w, {% static 'img/site/hero.webp' %} 1800w" imagesizes="(max-width: 860px) 100vw, 60vw" fetchpriority="high">{% endblock %}
 {% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
 {% block content %}
-<section class="hero" aria-labelledby="hero-titel" data-hero3d>
+{# De 3D-wereld vult de hele kop, ook achter de tekst: zachte lichten, de foto met vervloeiende randen en sterretjes. #}
+<section class="hero hero--wereld" aria-labelledby="hero-titel" data-hero3d>
+  <div class="hero__wereld" aria-hidden="true">
+    <span class="hero__licht hero__licht--1"></span><span class="hero__licht hero__licht--2"></span><span class="hero__licht hero__licht--3"></span>
+    <canvas class="hero__sparkles"></canvas>
+  </div>
   <div class="container hero__inner">
     <div class="hero__text">
       <p class="eyebrow">Digitale uitnodigingen</p>
@@ -19,50 +24,85 @@
     </div>
   </div>
   <div class="hero__media">
-    <img src="{% static 'img/site/hero.webp' %}" srcset="{% static 'img/site/hero-900.webp' %} 900w, {% static 'img/site/hero.webp' %} 1800w" sizes="(max-width: 860px) 100vw, 60vw" alt="" width="1800" height="1100" fetchpriority="high" decoding="async">
-    {# Sterretjes rond de kaart (hero3d.js tekent ze op dit canvas; zonder script of bij 'minder beweging' blijft het leeg). #}
-    <canvas class="hero__sparkles" aria-hidden="true"></canvas>
+    <img class="hero__foto" src="{% static 'img/site/hero.webp' %}" srcset="{% static 'img/site/hero-900.webp' %} 900w, {% static 'img/site/hero.webp' %} 1800w" sizes="(max-width: 860px) 100vw, 60vw" alt="" width="1800" height="1100" fetchpriority="high" decoding="async">
     <div class="card-stage">
-      <span class="card-stage__back" aria-hidden="true"></span>
-      <a class="float-card" href="{% url 'invitations:demo' 'liefde-op-papier' %}?gelegenheid=bruiloft&amp;kleur=salie">
-        <img src="{% static 'img/site/kaart-voorbeeld.webp' %}" alt="" width="500" height="800" decoding="async">
-        <span class="float-card__glans" aria-hidden="true"></span>
-        <span class="float-card__play">{% icon "afspelen" %}</span>
-        <span class="visually-hidden">Bekijk een werkend voorbeeld: de bruiloft van Sanne en Daan (fictief)</span>
-      </a>
+      {# Een gouden kaart met reliëf, schuin achter de envelop. #}
+      <div class="goudkaart" aria-hidden="true">
+        <span class="goudkaart__rand"></span>
+        <span class="goudkaart__kop">Save the date</span>
+        <span class="goudkaart__namen">Emma <i>&amp;</i> Lucas</span>
+        <span class="goudkaart__lijn"></span>
+        <span class="goudkaart__datum">12 · 06 · 2027</span>
+        <span class="goudkaart__glans"></span>
+      </div>
+      {# Gesloten envelop met het Vaylide-logo; bij een tik (of hover op de computer) opent hij en komt de uitnodiging eruit. #}
+      <div class="envelop" data-envelop>
+        <span class="envelop__achter" aria-hidden="true"></span>
+        <div class="envelop__kaart" id="envelop-kaart">
+          <img src="{% static 'img/site/kaart-voorbeeld.webp' %}" alt="Voorbeelduitnodiging: de bruiloft van Sanne en Daan (fictief)" width="500" height="800" decoding="async">
+          <a class="envelop__link" href="{% url 'invitations:demo' 'liefde-op-papier' %}?gelegenheid=bruiloft&amp;kleur=salie">{% icon "afspelen" %}<span>Bekijk het voorbeeld</span></a>
+        </div>
+        <span class="envelop__voor" aria-hidden="true"><img class="envelop__logo" src="{% static 'img/merk/vaylide-logo.webp' %}" alt="" width="350" height="240" decoding="async"></span>
+        <span class="envelop__klep" aria-hidden="true"><span class="envelop__klep-voor"></span><span class="envelop__klep-achter"></span></span>
+        <button type="button" class="envelop__knop" aria-expanded="false" aria-controls="envelop-kaart"><span class="envelop__hint">Tik om te openen</span><span class="visually-hidden">Open de envelop met een voorbeelduitnodiging</span></button>
+      </div>
       <span class="card-stage__shadow" aria-hidden="true"></span>
     </div>
   </div>
 </section>
 
-<section class="occasions" aria-label="Gelegenheden">
+<section class="themas" aria-labelledby="themas-titel">
   <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Voor elk moment</p>
+      <h2 id="themas-titel">Kies je gelegenheid</h2>
+    </div>
     {% include "partials/occasion_tiles.html" %}
   </div>
 </section>
 
-<section class="section section--tight" aria-labelledby="stappen-titel">
-  <div class="container">
-    <div class="panel-soft how-panel">
-      <h2 id="stappen-titel">Zo werkt het</h2>
-      <ol class="how-steps">
-        {% for icon_name, title, text in steps %}
-        <li class="how-step">
-          <div class="how-step__top"><span class="how-step__num" aria-hidden="true">{{ forloop.counter }}</span>{% icon icon_name 40 %}</div>
-          <h3><span class="visually-hidden">Stap {{ forloop.counter }}: </span>{{ title }}</h3>
-          <p>{{ text }}</p>
-        </li>
-        {% endfor %}
-      </ol>
-      {% if from_price %}<p class="how-panel__foot"><span><strong>Vanaf {{ from_price }}</strong> eenmalig, geen kosten per gast.{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</span><a class="link-arrow" href="{% url 'core:pricing' %}">Bekijk de prijzen</a></p>{% endif %}
+{# Kerstpodium: warme, feestelijke achtergrond met sprankelend licht en zwevende kerstkaarten. #}
+<section class="kerstpodium" aria-labelledby="kerst-titel" data-sparkles>
+  <div class="kerstpodium__licht" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <canvas class="kerstpodium__sparkles" aria-hidden="true"></canvas>
+  <div class="container kerstpodium__inner">
+    <div class="kerstpodium__tekst">
+      <span class="kerstpodium__badge">Nieuw</span>
+      <h2 id="kerst-titel">Kerst</h2>
+      <p>{{ kerst_note }}</p>
+      <div class="btn-row">
+        <a class="btn btn--goud" href="{% url 'core:designs' %}?gelegenheid=kerst">Bekijk de kerstkaarten {% icon "pijl" %}</a>
+      </div>
     </div>
+    <ul class="kaartenwaaier" data-tilt3d>
+      {% for card in kerst_cards %}<li class="zweefkaart" style="--i:{{ forloop.counter0 }}"><a href="{{ card.detail_url }}"><img src="{{ card.image }}" alt="" width="800" height="1000" loading="lazy" decoding="async"><span class="zweefkaart__naam">{{ card.template.name }}</span></a></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="stappen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">In vier stappen</p>
+      <h2 id="stappen-titel">Zo werkt het</h2>
+    </div>
+    <ol class="stappenrij">
+      {% for icon_name, title, text in steps %}
+      <li class="stapkaart" style="--i:{{ forloop.counter0 }}">
+        <span class="stapkaart__num" aria-hidden="true">{{ forloop.counter }}</span>
+        <span class="stapkaart__icoon">{% icon icon_name 30 %}</span>
+        <h3><span class="visually-hidden">Stap {{ forloop.counter }}: </span>{{ title }}</h3>
+        <p>{{ text }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+    {% if from_price %}<p class="stappenrij__voet"><span><strong>Vanaf {{ from_price }}</strong> eenmalig, geen kosten per gast.{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</span><a class="link-arrow" href="{% url 'core:pricing' %}">Bekijk de prijzen</a></p>{% endif %}
   </div>
 </section>
 
 <section class="section section--flush" aria-labelledby="meer-titel">
   <div class="container">
-    <div class="feature-panel">
-      <div class="feature-panel__bg"><img src="{% static 'img/site/groen.webp' %}" srcset="{% static 'img/site/groen-800.webp' %} 800w, {% static 'img/site/groen.webp' %} 1600w" sizes="(max-width: 860px) 100vw, 76rem" alt="" width="1600" height="900" loading="lazy" decoding="async"></div>
+    <div class="feature-panel feature-panel--licht">
       <div class="feature-panel__inner">
         <div class="phone-demo">
           <div class="phone">
@@ -73,9 +113,10 @@
           </div>
         </div>
         <div class="feature-panel__text">
+          <p class="eyebrow">Alles in één link</p>
           <h2 id="meer-titel">Meer dan een uitnodiging</h2>
           <p>Je gasten openen je uitnodiging met één tik. Afteller, route, programma, foto's en aanmelden: alles staat in één link.</p>
-          <ul class="feature-icons">{% for icon_name, label in features %}<li>{% icon icon_name 32 %}{{ label }}</li>{% endfor %}</ul>
+          <ul class="feature-icons">{% for icon_name, label in features %}<li>{% icon icon_name 30 %}{{ label }}</li>{% endfor %}</ul>
           <a class="btn btn--primary btn--lg" href="{% url 'core:how' %}">Bekijk alle mogelijkheden {% icon "pijl" %}</a>
         </div>
       </div>
@@ -83,14 +124,15 @@
   </div>
 </section>
 
-<section class="section section--flush" aria-labelledby="ontwerpen-titel">
+<section class="section" aria-labelledby="ontwerpen-titel">
   <div class="container designs-row">
     <div class="designs-row__text">
+      <p class="eyebrow">De collectie</p>
       <h2 id="ontwerpen-titel">Onze ontwerpen</h2>
       <p>Kies uit {{ design_count }} ontwerpen, elk met een eigen opening en kleurvarianten. Probeer ze op je eigen telefoon.</p>
       <a class="link-arrow" href="{% url 'core:designs' %}">Bekijk alle {{ design_count }}</a>
     </div>
-    <div class="grid grid--trio">
+    <div class="grid grid--trio designs-row__kaarten">
       {% for card in cards %}{% include "partials/design_card.html" %}{% endfor %}
     </div>
   </div>
@@ -106,6 +148,19 @@
       </div>
       <div class="unique-card__media"><img src="{% static 'img/site/maatwerk.webp' %}" srcset="{% static 'img/site/maatwerk-700.webp' %} 700w, {% static 'img/site/maatwerk.webp' %} 1200w" sizes="(max-width: 720px) 100vw, 38rem" alt="" width="1200" height="760" loading="lazy" decoding="async"></div>
     </div>
+  </div>
+</section>
+
+<section class="section home-faq" aria-labelledby="faq-titel">
+  <div class="container container--mid">
+    <div class="sectie-kop">
+      <p class="eyebrow">Goed om te weten</p>
+      <h2 id="faq-titel">Veelgestelde vragen</h2>
+    </div>
+    <div class="faq-lijst">
+      {% for question, answer in home_faq %}<details class="faq-item"><summary>{{ question }}</summary><p>{{ answer }}</p></details>{% endfor %}
+    </div>
+    <p class="home-faq__meer"><a class="link-arrow" href="{% url 'core:faq' %}">Alle veelgestelde vragen</a></p>
   </div>
 </section>
 {% endblock %}

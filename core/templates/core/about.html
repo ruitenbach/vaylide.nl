@@ -1,26 +1,58 @@
-{% extends "base.html" %}{% load vl %}
+{% extends "base.html" %}{% load static vl %}
 {% block title %}Over ons{% endblock %}
-{% block description %}Vaylide maakt persoonlijke digitale uitnodigingen met aanmelden, afteller en route.{% endblock %}
+{% block description %}Waarom Vaylide bestaat: persoonlijke digitale uitnodigingen, snel te maken en eenvoudig te delen, voor particulieren en bedrijven.{% endblock %}
+{% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
 {% block content %}
-<section class="page-head">
+<section class="paginakop" data-sparkles>
+  {% include "partials/paginakop_wereld.html" %}
   <div class="container container--mid">
     <p class="eyebrow">Over ons</p>
-    <h1>Uitnodigen met een verhaal</h1>
-    <p class="lead">Vaylide maakt digitale uitnodigingen voor de momenten die je niet wilt vergeten: persoonlijk, eenvoudig te delen en met aanmelden erbij.</p>
+    <h1>Over <em>Vaylide</em></h1>
+    <p class="lead">Een bijzondere gebeurtenis begint met een uitnodiging. Het eerste moment waarop je gasten voelen wat er komen gaat. Vaylide maakt van dat moment iets persoonlijks.</p>
   </div>
 </section>
+
+<section class="section section--flush" aria-labelledby="waarom-titel">
+  <div class="container">
+    <div class="verhaal">
+      <h2 id="waarom-titel">Waarom Vaylide?</h2>
+      <p>Een uitnodiging verdient meer aandacht dan een standaard berichtje. Tegelijk wil je niet weken wachten op drukwerk of steeds opnieuw dezelfde informatie naar gasten sturen. Daarom brengen we mooi ontwerp en digitaal gemak samen.</p>
+      <p>Bij Vaylide kies je een ontwerp dat bij jouw moment past en maak je het eigen met jouw tekst, kleuren en details. Daarna deel je de uitnodiging eenvoudig met je gasten. Bij ontwerpen met een aanmeldfunctie kun je hun reacties op één plek bekijken.</p>
+
+      <h2>Onze visie</h2>
+      <p>Wij willen dat een digitale uitnodiging net zo bijzonder voelt als het moment waarvoor je iemand uitnodigt. Van een bruiloft of verjaardag tot een kerstviering of zakelijk evenement: iedere gelegenheid vraagt om een eigen sfeer.</p>
+      <p>Digitaal geeft je de vrijheid om sneller te delen en gasten gemakkelijk op de hoogte te houden. Het maakt gedrukt papier en fysieke bezorging minder nodig, zonder dat de uitnodiging haar persoonlijke karakter verliest.</p>
+      <p>Vaylide is er voor mensen die iets moois willen delen, op een manier die past bij hoe we vandaag communiceren.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="punten-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Wat je van ons mag verwachten</p>
+      <h2 id="punten-titel">Zo maken we het je makkelijk</h2>
+    </div>
+    <ul class="puntenrij">{% for icon_name, title, text in points %}<li>{% icon icon_name %}<div><h3>{{ title }}</h3><p>{{ text }}</p></div></li>{% endfor %}</ul>
+  </div>
+</section>
+
 <section class="section section--flush" aria-labelledby="waarden-titel">
-  <div class="container container--mid">
-    <h2 id="waarden-titel" class="visually-hidden">Waar we op letten</h2>
-    <ul class="value-grid">{% for icon_name, title, text in values %}<li>{% icon icon_name 32 %}<h3>{{ title }}</h3><p>{{ text }}</p></li>{% endfor %}</ul>
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Waar we op letten</p>
+      <h2 id="waarden-titel">Onze uitgangspunten</h2>
+    </div>
+    <ul class="value-grid value-grid--kaarten">{% for icon_name, title, text in values %}<li>{% icon icon_name 32 %}<h3>{{ title }}</h3><p>{{ text }}</p></li>{% endfor %}</ul>
   </div>
 </section>
-<section class="section" aria-labelledby="vraag-titel">
+
+<section class="section" aria-labelledby="slot-titel">
   <div class="container container--mid">
-    <div class="panel-soft">
-      <h2 id="vraag-titel">Vragen of een bijzondere wens?</h2>
-      <p class="measure">We bekijken je vraag persoonlijk. Kost een wens iets extra, dan krijg je eerst een voorstel; we beginnen pas na jouw akkoord.</p>
-      <div class="btn-row"><a class="btn btn--primary" href="{% url 'core:contact' %}">Neem contact op {% icon "pijl" %}</a><a class="link-arrow" href="{% url 'core:faq' %}">Veelgestelde vragen</a></div>
+    <div class="verhaal__slot">
+      <h2 id="slot-titel">Maak van jouw moment een uitnodiging om naar uit te kijken.</h2>
+      <p class="verhaal__slot-tekst">Vragen of een bijzondere wens? We bekijken je vraag persoonlijk. Kost een wens iets extra, dan krijg je eerst een voorstel; we beginnen pas na jouw akkoord.</p>
+      <div class="btn-row btn-row--center"><a class="btn btn--primary" href="{% url 'studio:start' %}">Maak jouw uitnodiging {% icon "pijl" %}</a><a class="btn btn--secondary" href="{% url 'core:contact' %}">Neem contact op</a></div>
     </div>
   </div>
 </section>

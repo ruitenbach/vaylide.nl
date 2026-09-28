@@ -344,11 +344,17 @@ class SnowEffectTests(VaylideTestCase):
 
 class KerstSiteTests(VaylideTestCase):
     def test_home_and_inspiration_show_the_christmas_tile(self):
-        for url in ("/", "/inspiratie/"):
-            response = Client().get(url)
-            self.assertContains(response, 'class="tile tile--wide" href="/ontwerpen/?gelegenheid=kerst"')
-            self.assertContains(response, "Een warme digitale kerstkaart")
-            self.assertContains(response, "img/site/gelegenheid-kerst.webp")
+        home = Client().get("/")
+        # Kerst staat voorop bij de gelegenheden en heeft een eigen podium met de kerstkaarten.
+        html = home.content.decode()
+        self.assertContains(home, 'class="tile tile--kerst" href="/ontwerpen/?gelegenheid=kerst"')
+        self.assertLess(html.index("tile--kerst"), html.index("tile--bruiloft"))
+        self.assertContains(home, "Een warme digitale kerstkaart")
+        self.assertContains(home, "img/site/tegel-kerst.webp")
+        self.assertContains(home, 'class="kerstpodium"')
+        inspiration = Client().get("/inspiratie/")
+        self.assertContains(inspiration, 'id="tekst-kerst"')
+        self.assertContains(inspiration, "img/site/gelegenheid-kerst.webp")
         self.assertContains(Client().get("/inspiratie/"), "Schuif je aan bij ons kerstdiner?")
 
     def test_collection_filter_and_search(self):

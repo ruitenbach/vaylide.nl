@@ -314,7 +314,7 @@ def _preview_options(inv: Invitation, content: dict) -> RenderOptions:
     paid = invitation_is_paid(inv)
     return RenderOptions(
         mode="preview",
-        features=list(inv.features) if paid else ["story", "gallery", "music", "extra_questions"],
+        features=list(inv.features) if paid else ["story", "gallery", "music", "extra_questions", "zegel"],
         max_gallery_photos=inv.max_gallery_photos if paid else 12,
         resolver=PathResolver(f"/maken/{inv.uid}/media", assets),
         share_url=inv.public_url,

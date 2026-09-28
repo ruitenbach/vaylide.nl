@@ -24,7 +24,7 @@ MONTHS = [
     "januari", "februari", "maart", "april", "mei", "juni",
     "juli", "augustus", "september", "oktober", "november", "december",
 ]
-ALL_FEATURES = ["story", "gallery", "music", "extra_questions"]
+ALL_FEATURES = ["story", "gallery", "music", "extra_questions", "zegel"]
 
 
 def nl_date(d) -> str:
@@ -179,6 +179,20 @@ class RenderOptions:
     existing_response: object | None = None
     music_synth: bool = False
     embed: bool = False
+
+
+# Standaard lakzegel (zonder de functie 'zegel'): een motief in plaats van initialen, in rood of in groen.
+SEAL_COLORS = {
+    "rood": {"base": "#8E1B26", "light": "#BD4650", "ink": "#F4D99E"},
+    "groen": {"base": "#2C5A3C", "light": "#4F8158", "ink": "#F4E3B0"},
+}
+GREEN_PALETTE_WORDS = ("salie", "groen", "smaragd", "eucalyptus", "mint", "olijf", "dennen", "hulst", "jungle")
+
+
+def seal_color(palette_key: str) -> str:
+    """Rood, of groen bij een groene kleurvariant."""
+    key = (palette_key or "").lower()
+    return "groen" if any(w in key for w in GREEN_PALETTE_WORDS) else "rood"
 
 
 def _paragraphs(text: str) -> list[str]:
@@ -467,6 +481,10 @@ def build_view(
         "headline_custom": bool(headline),
         "tagline": tagline,
         "monogram": monogram(occasion, content),
+        # Lakzegel: initialen alleen met de functie 'zegel' (Compleet); anders een standaardmotief in rood of groen.
+        "seal_personal": "zegel" in features,
+        "seal_color": seal_color(palette_key),
+        "seal_std": SEAL_COLORS[seal_color(palette_key)],
         "welcome": _paragraphs(content.get("welcome_text")),
         "date": day,
         "date_display": nl_date(day) if day else "",

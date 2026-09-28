@@ -15,8 +15,8 @@ from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, oc
 from catalog.effects import effect_card_label, effect_summary
 from invitations.demo import DEFAULT_DEMO_OCCASION
 
-from .content import (FAQ, FEATURES, HERO_CHECKS, HOME_DESIGNS, HOME_FEATURES, OCCASION_TILE_NOTES, OCCASION_TILES, STEPS, STEPS_SHORT,
-                      TEXT_SAMPLES, TIPS, VALUES)
+from .content import (ABOUT_POINTS, FAQ, FEATURE_GROUPS, FEATURES, HERO_CHECKS, HOME_DESIGNS, HOME_FAQ_EXTRA, HOME_FAQ_QUESTIONS,
+                      HOME_FEATURES, HOME_KERST, OCCASION_TILE_NOTES, OCCASION_TILES, STEPS, STEPS_SHORT, TEXT_SAMPLES, TIPS, VALUES)
 from .forms import ContactForm
 from .models import ContactMessage, SiteConfig
 from .utils import form_age_seconds, ip_fingerprint, rate_limit, signed_timestamp
@@ -49,15 +49,21 @@ def home(request):
     featured = [by_slug[s] for s in HOME_DESIGNS if s in by_slug]
     featured += [d for d in designs if d not in featured][: max(0, 3 - len(featured))]
     cheapest = Package.objects.filter(is_active=True).order_by("price_cents").first()
+    # Kerstpodium: lichte kerstontwerpen met hun kaartbeeld.
+    kerst = [by_slug[s] for s in HOME_KERST if s in by_slug]
+    faq_by_question = dict(FAQ)
+    home_faq = [(q, faq_by_question[q]) for q in HOME_FAQ_QUESTIONS if q in faq_by_question] + list(HOME_FAQ_EXTRA)
     return render(
         request,
         "core/home.html",
         {
+            "kerst_cards": _design_cards(kerst),
+            "kerst_note": OCCASION_TILE_NOTES.get("kerst", ""),
+            "home_faq": home_faq,
             "cards": _design_cards(featured[:3]),
             "design_count": len(designs),
             "checks": HERO_CHECKS,
             "tiles": OCCASION_TILES,
-            "tile_notes": OCCASION_TILE_NOTES,
             "steps": STEPS_SHORT,
             "features": HOME_FEATURES,
             "from_price": cheapest.price_display if cheapest else "",
@@ -135,7 +141,9 @@ def design_detail(request, slug):
 
 
 def how(request):
-    return render(request, "core/how.html", {"steps": STEPS, "features": FEATURES})
+    by_icon = {icon: (icon, title, text) for icon, title, text in FEATURES}
+    groups = [(title, intro, [by_icon[i] for i in icons if i in by_icon]) for title, intro, icons in FEATURE_GROUPS]
+    return render(request, "core/how.html", {"steps": STEPS, "feature_groups": groups})
 
 
 def pricing(request):
@@ -155,11 +163,13 @@ def faq(request):
 
 
 def inspiration(request):
-    return render(request, "core/inspiration.html", {"tiles": OCCASION_TILES, "tile_notes": OCCASION_TILE_NOTES, "samples": TEXT_SAMPLES, "tips": TIPS})
+    labels = dict(OCCASION_TILES)
+    samples = sorted(TEXT_SAMPLES, key=lambda s: list(labels).index(s[0]) if s[0] in labels else 99)
+    return render(request, "core/inspiration.html", {"samples": samples, "tips": TIPS})
 
 
 def about(request):
-    return render(request, "core/about.html", {"values": VALUES})
+    return render(request, "core/about.html", {"values": VALUES, "points": ABOUT_POINTS})
 
 
 def search(request):

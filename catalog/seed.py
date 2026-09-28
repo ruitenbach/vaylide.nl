@@ -27,7 +27,7 @@ DEFAULT_PACKAGES = [
         "max_gallery_photos": 0,
         "highlights": [
             "Alle ontwerpen en kleurvarianten",
-            "Openingsanimatie met persoonlijk zegel",
+            "Openingsanimatie met standaard lakzegel (rood of groen)",
             "Afteller, programma, locatie en routeknop",
             "Aanmeldformulier met gastenlijst en export",
             "Eigen link, QR-code en agenda-knop",
@@ -43,10 +43,11 @@ DEFAULT_PACKAGES = [
         "description": "Met jullie verhaal, fotogalerij, muziek en extra vragen.",
         "price_cents": 6900,
         "availability_months": 12,
-        "features": ["story", "gallery", "music", "extra_questions"],
+        "features": ["story", "gallery", "music", "extra_questions", "zegel"],
         "max_gallery_photos": 12,
         "highlights": [
             "Alles uit Essentieel",
+            "Persoonlijk zegel met jullie initialen",
             "Persoonlijk verhaal",
             "Fotogalerij tot 12 foto's",
             "Eigen muziek (start pas na een tik)",

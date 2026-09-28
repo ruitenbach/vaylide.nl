@@ -1,31 +1,57 @@
-{% extends "base.html" %}{% load vl %}
+{% extends "base.html" %}{% load static vl %}
 {% block title %}Zo werkt het{% endblock %}
 {% block description %}Van ontwerp kiezen tot aanmeldingen beheren: zo werkt een digitale uitnodiging van Vaylide.{% endblock %}
+{% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
 {% block content %}
-<section class="page-head">
+<section class="paginakop" data-sparkles>
+  {% include "partials/paginakop_wereld.html" %}
   <div class="container container--mid">
     <p class="eyebrow">Stap voor stap</p>
-    <h1>Zo werkt het</h1>
+    <h1>Zo <em>werkt</em> het</h1>
     <p class="lead">Je maakt je uitnodiging zelf, in je eigen tempo. Na je betaling staat hij automatisch online.</p>
   </div>
 </section>
-<section class="section section--flush">
-  <div class="container container--mid">
-    <ol class="steps steps--list">{% for title, text in steps %}<li><h2>{{ title }}</h2><p>{{ text }}</p></li>{% endfor %}</ol>
+
+<section class="section section--flush" aria-label="De stappen">
+  <div class="container">
+    <ol class="stappenrij stappenrij--zes">
+      {% for icon_name, title, text in steps %}
+      <li class="stapkaart" style="--i:{{ forloop.counter0 }}">
+        <span class="stapkaart__num" aria-hidden="true">{{ forloop.counter }}</span>
+        <span class="stapkaart__icoon">{% icon icon_name 30 %}</span>
+        <h2 class="h-small"><span class="visually-hidden">Stap {{ forloop.counter }}: </span>{{ title }}</h2>
+        <p>{{ text }}</p>
+      </li>
+      {% endfor %}
+    </ol>
   </div>
 </section>
-<section class="section section--line" aria-labelledby="gasten-titel">
-  <div class="container container--mid">
-    <div class="section-head"><h2 id="gasten-titel">Wat je gasten krijgen</h2></div>
-    <dl class="feature-list">{% for icon_name, title, text in features %}<div>{% icon icon_name %}<dt>{{ title }}</dt><dd>{{ text }}</dd></div>{% endfor %}</dl>
+
+<section class="section" aria-labelledby="gasten-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Voor je gasten</p>
+      <h2 id="gasten-titel">Wat je gasten krijgen</h2>
+      <p>Eén link met alles erin. Geen app en geen account nodig.</p>
+    </div>
+    <div class="gastgroepen">
+      {% for title, intro, items in feature_groups %}
+      <section class="gastgroep" aria-labelledby="groep-{{ forloop.counter }}">
+        <h3 id="groep-{{ forloop.counter }}">{{ title }}</h3>
+        <p>{{ intro }}</p>
+        <ul>{% for icon_name, item_title, text in items %}<li>{% icon icon_name %}<p><strong>{{ item_title }}</strong><span>{{ text }}</span></p></li>{% endfor %}</ul>
+      </section>
+      {% endfor %}
+    </div>
   </div>
 </section>
-<section class="section" aria-labelledby="wensen-titel">
+
+<section class="section section--flush" aria-labelledby="wensen-titel">
   <div class="container container--mid">
-    <div class="panel-soft">
-    <h2 id="wensen-titel">Bijzondere wensen</h2>
-    <p class="measure">Iets wat niet in de standaardopties zit? Gebruik <strong>Extra wensen of hulp nodig?</strong> tijdens het samenstellen of in Mijn Vaylide. Kost het iets extra, dan krijg je eerst een voorstel; we beginnen pas na jouw akkoord.</p>
-    <div class="btn-row"><a class="btn btn--primary" href="{% url 'studio:start' %}">Maak jouw uitnodiging {% icon "pijl" %}</a></div>
+    <div class="verhaal__slot">
+      <h2 id="wensen-titel">Bijzondere wensen</h2>
+      <p class="verhaal__slot-tekst">Iets wat niet in de standaardopties zit? Gebruik <strong>Extra wensen of hulp nodig?</strong> tijdens het samenstellen of in Mijn Vaylide. Kost het iets extra, dan krijg je eerst een voorstel; we beginnen pas na jouw akkoord.</p>
+      <div class="btn-row btn-row--center"><a class="btn btn--primary" href="{% url 'studio:start' %}">Maak jouw uitnodiging {% icon "pijl" %}</a></div>
     </div>
   </div>
 </section>

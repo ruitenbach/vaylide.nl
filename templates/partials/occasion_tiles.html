@@ -1,12 +1,7 @@
-{% load static vl %}<ul class="tile-grid">
-  {% for key, label in tiles %}{% with note=tile_notes|get_item:key %}
-  {% if note %}<li class="tile-grid__wide"><a class="tile tile--wide" href="{% url 'core:designs' %}?gelegenheid={{ key }}">
-    <span class="tile__img"><img src="{% static 'img/site/gelegenheid-'|add:key|add:'.webp' %}" alt="" width="1200" height="520" loading="lazy" decoding="async"></span>
-    <span class="tile__body"><span class="tile__badge">Nieuw</span><span class="tile__label">{{ label }} {% icon "pijl" %}</span><span class="tile__note">{{ note }}</span></span>
-  </a></li>
-  {% else %}<li><a class="tile" href="{% url 'core:designs' %}?gelegenheid={{ key }}">
-    <span class="tile__img"><img src="{% static 'img/site/gelegenheid-'|add:key|add:'.webp' %}" alt="" width="560" height="350" loading="lazy" decoding="async"></span>
+{% load static vl %}{# Themakaarten per gelegenheid: boogvormige kaarten met diepte die zacht zweven (Kerst voorop). Staande beelden uit tools/merkbeelden/voorbeelden.cjs. #}
+<ul class="tile-grid">
+  {% for key, label in tiles %}<li style="--i:{{ forloop.counter0 }}"><a class="tile tile--{{ key }}" href="{% url 'core:designs' %}?gelegenheid={{ key }}">
+    <span class="tile__img"><img src="{% static 'img/site/tegel-'|add:key|add:'.webp' %}" alt="" width="400" height="500" loading="lazy" decoding="async"></span>
     <span class="tile__label">{{ label }} {% icon "pijl" %}</span>
-  </a></li>{% endif %}
-  {% endwith %}{% endfor %}
+  </a></li>{% endfor %}
 </ul>

@@ -1,47 +1,78 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load static vl %}
 {% block title %}Prijzen{% endblock %}
 {% block description %}Pakketten en extra opties voor digitale uitnodigingen van Vaylide. Eenmalig betalen, geen kosten per gast.{% endblock %}
+{% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
 {% block content %}
-<section class="page-head">
+<section class="paginakop" data-sparkles>
+  {% include "partials/paginakop_wereld.html" %}
   <div class="container container--mid">
     <p class="eyebrow">Prijzen</p>
-    <h1>Eén keer betalen</h1>
+    <h1>Eén keer <em>betalen</em></h1>
     <p class="lead">Eén keer betalen, geen kosten per gast. Ontwerpen en bekijken is gratis; je betaalt pas bij het publiceren.</p>
     {% if config.prices_provisional %}<p><span class="provisional">Voorlopige prijzen</span></p>{% endif %}
   </div>
 </section>
-<section class="section section--flush">
+
+<section class="section section--flush" aria-label="Pakketten">
   <div class="container">
-    <div class="price-grid">
+    <div class="prijskolommen">
       {% for p in packages %}
-      <article class="price-card{% if p.is_featured %} price-card--featured{% endif %}">
-        <h2>{{ p.name }}</h2>
+      <article class="prijskaart{% if p.is_featured %} prijskaart--uitgelicht{% endif %}">
+        {% if p.is_featured %}<span class="prijskaart__lint">Meest compleet</span>{% endif %}
+        <div class="prijskaart__kop"><h2>{{ p.name }}</h2><span class="prijskaart__soort prijskaart__soort--vast">Vaste prijs</span></div>
         <p class="price">{{ p.price_display }} <small>eenmalig</small></p>
         <p class="muted">{{ p.description }}</p>
+        {% if p.code == "essentieel" %}
+        <div class="prijskaart__zegel">
+          <span class="lakzegels" aria-hidden="true"><span class="lakzegel"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" focusable="false"><path d="M12 1.5Q13.2 10.8 22.5 12Q13.2 13.2 12 22.5Q10.8 13.2 1.5 12Q10.8 10.8 12 1.5Z" fill="currentColor"/></svg></span><span class="lakzegel lakzegel--groen"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" focusable="false"><path d="M12 1.5Q13.2 10.8 22.5 12Q13.2 13.2 12 22.5Q10.8 13.2 1.5 12Q10.8 10.8 12 1.5Z" fill="currentColor"/></svg></span></span>
+          <p><strong>Standaard lakzegel</strong>In rood of groen, afgestemd op je kleurvariant. Zonder initialen.</p>
+        </div>
+        {% elif "zegel" in p.features %}
+        <div class="prijskaart__zegel">
+          <span class="lakzegel" aria-hidden="true">E&amp;L</span>
+          <p><strong>Persoonlijk zegel</strong>Met jullie eigen initialen op het lakzegel.</p>
+        </div>
+        {% endif %}
         <ul class="checklist">{% for h in p.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
         <a class="btn {% if p.is_featured %}btn--primary{% else %}btn--secondary{% endif %}" href="{% url 'studio:start' %}">Begin met je ontwerp</a>
       </article>
       {% endfor %}
-      <article class="price-card">
-        <h2>Op maat</h2>
-        <p class="price price--text">Op aanvraag</p>
-        <p class="muted">Een eigen ontwerp, een andere taal of iets heel bijzonders. Je krijgt eerst een voorstel.</p>
-        <a class="btn btn--secondary" href="{% url 'core:contact' %}?onderwerp=maatwerk">Vraag een voorstel aan</a>
+      <article class="prijskaart prijskaart--maat">
+        <div class="prijskaart__kop"><h2>Op maat</h2><span class="prijskaart__soort prijskaart__soort--aanvraag">Op aanvraag</span></div>
+        <p class="price price--text">Prijs op aanvraag</p>
+        <p class="muted">Voor wie iets wil dat nergens anders te vinden is.</p>
+        <div class="prijskaart__zegel">
+          <span class="lakzegel" aria-hidden="true">{% icon "potlood" %}</span>
+          <p><strong>Je bedrijfslogo op het zegel?</strong>Dat kan op aanvraag. We bekijken het persoonlijk en je krijgt eerst een voorstel.</p>
+        </div>
+        <ul class="checklist">
+          <li>Een ontwerp in jullie eigen stijl of huisstijl</li>
+          <li>Je eigen logo of beeldmerk, ook op het zegel</li>
+          <li>Een andere taal of een bijzondere opbouw</li>
+          <li>Persoonlijk contact over je wensen</li>
+          <li>Eerst een voorstel met prijs; we beginnen pas na jouw akkoord</li>
+        </ul>
+        <a class="btn btn--primary" href="{% url 'core:contact' %}?onderwerp=maatwerk">Vraag een voorstel aan {% icon "pijl" %}</a>
       </article>
     </div>
+    <p class="small muted center aside-line">De pakketten hebben een vaste prijs. Op maat is altijd op aanvraag: je ziet eerst een voorstel met prijs.</p>
   </div>
 </section>
-<section class="section section--line" aria-labelledby="opties-titel">
+
+<section class="section" aria-labelledby="opties-titel">
   <div class="container container--mid">
-    <div class="section-head"><h2 id="opties-titel">Extra opties</h2></div>
-    <p class="muted measure">Gebruik je een onderdeel dat niet in je pakket zit, dan telt je bestelling de optie automatisch mee. Bij het afrekenen zie je welk pakket het voordeligst is.</p>
-    <div class="table-wrap">
+    <div class="sectie-kop">
+      <p class="eyebrow">Los erbij</p>
+      <h2 id="opties-titel">Extra opties</h2>
+      <p>Gebruik je een onderdeel dat niet in je pakket zit, dan telt je bestelling de optie automatisch mee. Bij het afrekenen zie je welk pakket het voordeligst is.</p>
+    </div>
+    <div class="table-wrap prijstabel">
       <table class="table-simple">
         <thead><tr><th scope="col">Optie</th><th scope="col">Omschrijving</th><th scope="col" class="num">Prijs</th></tr></thead>
         <tbody>{% for a in addons %}<tr><td>{{ a.name }}</td><td>{{ a.description }}</td><td class="num">{{ a.price_display }}</td></tr>{% endfor %}</tbody>
       </table>
     </div>
-    <p class="small muted table-note">Alle prijzen zijn inclusief btw.</p>
+    <p class="small muted table-note">Alle prijzen zijn inclusief btw. Vaste prijzen; alleen maatwerk is op aanvraag.</p>
   </div>
 </section>
 {% endblock %}

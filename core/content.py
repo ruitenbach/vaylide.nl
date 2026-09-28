@@ -13,8 +13,12 @@ STEPS_SHORT = [
 
 HERO_CHECKS = ["Snel en eenvoudig", "Stijlvolle ontwerpen", "Automatisch online", "RSVP & gastenlijst"]
 
-# Homepage: drie uitgelichte ontwerpen (codes). Ontbreekt er een, dan vullen de eerste uit de collectie aan.
-HOME_DESIGNS = ["liefde-op-papier", "sterrennacht", "confetti"]
+# Homepage: drie uitgelichte ontwerpen (codes), de kerstkaart eerst. Alleen lichte ontwerpen: geen donkere of zwarte
+# voorbeeldkaarten op de homepage. Ontbreekt er een, dan vullen de eerste uit de collectie aan.
+HOME_DESIGNS = ["winterlicht", "liefde-op-papier", "confetti"]
+
+# Homepage, kerstpodium: lichte kerstontwerpen die in 3D zweven (kaartbeelden uit static/img/designs/).
+HOME_KERST = ["winterlicht", "gloria", "kerstman", "sneeuwpop"]
 
 # Donker paneel op de homepage: onderdelen die elke uitnodiging kan hebben.
 HOME_FEATURES = [
@@ -26,28 +30,29 @@ HOME_FEATURES = [
     ("kleuren", "Kleurkeuze"),
 ]
 
-# Tegels per gelegenheid; het beeld is een weergave van een echt voorbeeld.
+# Tegels per gelegenheid; het beeld is een weergave van een echt (licht) voorbeeld. Kerst staat voorop.
 OCCASION_TILES = [
+    ("kerst", "Kerst"),
     ("bruiloft", "Bruiloft"),
     ("verloving", "Verloving"),
     ("verjaardag", "Verjaardag"),
     ("jubileum", "Jubileum"),
     ("babyshower", "Babyshower"),
     ("zakelijk", "Zakelijk"),
-    ("kerst", "Kerst"),
 ]
-# De kersttegel staat breed onder de zes gewone tegels, met een korte uitleg.
+# Korte uitleg bij een tegel (nu alleen Kerst; op de homepage staat die in het kerstpodium).
 OCCASION_TILE_NOTES = {
-    "kerst": "Een warme digitale kerstkaart, met of zonder uitnodiging voor het kerstdiner.",
+    "kerst": "Een warme digitale kerstkaart, als uitnodiging voor het kerstdiner of als wenskaart.",
 }
 
+# Zo werkt het: zes stappen (icoonnamen uit core/icons.py).
 STEPS = [
-    ("Kies een ontwerp", "Probeer het werkende voorbeeld op je eigen telefoon."),
-    ("Vul je gegevens in", "Alleen de vragen die bij jouw gelegenheid horen."),
-    ("Voeg foto's toe", "Je kiest zelf welk deel in beeld komt."),
-    ("Bekijk je voorbeeld", "Op telefoon en computer; pas aan wat je wilt."),
-    ("Betaal online", "Na een bevestigde betaling wordt je uitnodiging automatisch gepubliceerd."),
-    ("Deel en volg aanmeldingen", "Via link of QR-code. Antwoorden zie je in Mijn Vaylide."),
+    ("kaarten", "Kies een ontwerp", "Probeer het werkende voorbeeld op je eigen telefoon."),
+    ("potlood", "Vul je gegevens in", "Alleen de vragen die bij jouw gelegenheid horen."),
+    ("fotos", "Voeg foto's toe", "Je kiest zelf welk deel in beeld komt."),
+    ("oog", "Bekijk je voorbeeld", "Op telefoon en computer; pas aan wat je wilt."),
+    ("tas", "Betaal online", "Na een bevestigde betaling wordt je uitnodiging automatisch gepubliceerd."),
+    ("delen", "Deel en volg aanmeldingen", "Via link of QR-code. Antwoorden zie je in Mijn Vaylide."),
 ]
 
 FEATURES = [
@@ -60,6 +65,13 @@ FEATURES = [
     ("delen", "Delen", "Via WhatsApp, een link of een QR-code."),
     ("muziek", "Muziek", "Start pas als de gast erop tikt."),
     ("slot", "Privé", "Niet vindbaar in zoekmachines. Alleen jij ziet de gastenlijst."),
+]
+
+# 'Wat je gasten krijgen' (Zo werkt het) in drie rustige groepen; de onderdelen komen uit FEATURES (op icoon).
+FEATURE_GROUPS = [
+    ("Openen en beleven", "Wat je gasten zien als ze de link openen.", ["envelop", "muziek", "wekker"]),
+    ("Alles bij de hand", "De praktische informatie op één plek.", ["programma", "locatie", "agenda"]),
+    ("Reageren en delen", "Eenvoudig voor je gasten, overzichtelijk voor jou.", ["gasten", "delen", "slot"]),
 ]
 
 FAQ = [
@@ -98,6 +110,21 @@ FAQ = [
      "Je kunt je uitnodiging, de aanmeldingen en je account ook zelf eerder verwijderen."),
 ]
 
+# Homepage: een korte selectie veelgestelde vragen (vragen uit FAQ, plus één over delen). Alleen functies die er zijn.
+HOME_FAQ_QUESTIONS = [
+    "Hoe werkt een digitale uitnodiging van Vaylide?",
+    "Kan ik na het publiceren nog iets aanpassen?",
+    "Hoe betaal ik?",
+    "Wanneer staat mijn uitnodiging online?",
+    "Moeten mijn gasten een account aanmaken?",
+    "Wie kan de aanmeldingen zien?",
+]
+HOME_FAQ_EXTRA = [
+    ("Hoe deel ik mijn uitnodiging met gasten?",
+     "Na de betaling krijg je een eigen link en een QR-code. Die deel je via WhatsApp of e-mail, of je zet de QR-code "
+     "op een kaartje. Gasten openen de uitnodiging in hun browser, zonder app."),
+]
+
 # Inspiratie: voorbeeldteksten om over te nemen (geen echte klanten of reviews).
 TEXT_SAMPLES = [
     ("bruiloft", "Bruiloft", "Wij gaan trouwen! We zouden het heel bijzonder vinden om deze dag met jou te vieren."),
@@ -116,6 +143,18 @@ TIPS = [
     ("kleuren", "Geef een dresscode mee", "Met een paar kleuren erbij weten gasten precies wat je bedoelt."),
     ("fotos", "Kies rustige foto's", "Je bepaalt zelf welk deel in beeld komt, zodat tekst goed leesbaar blijft."),
     ("delen", "Deel op jouw manier", "Stuur de link via WhatsApp of e-mail, of zet de QR-code op een kaart."),
+]
+
+# Over ons: aanvulling op de tekst van de eigenaar. Alleen wat Vaylide echt doet; geen duurzaamheidsclaims.
+ABOUT_POINTS = [
+    ("wekker", "Snel beschikbaar",
+     "Geen wachttijd voor drukwerk of bezorging. Zodra je betaling is bevestigd, staat je uitnodiging online en kun je hem direct delen."),
+    ("potlood", "Eenvoudig te maken",
+     "Je stelt je uitnodiging zelf samen, in je eigen tempo en met een voorbeeld dat meteen meekijkt. Je gasten hebben geen account of app nodig."),
+    ("kaarten", "Voor particulieren en bedrijven",
+     "Van bruiloft, verjaardag of kerstdiner tot relatiedag, jubileum of personeelsfeest. Bij zakelijke evenementen spreekt de uitnodiging je gasten aan met 'u'."),
+    ("envelop", "Digitaal in plaats van extra drukwerk",
+     "Een wijziging publiceer je op dezelfde link, en programma, route en aanmelden staan bij elkaar. Wil je toch iets op papier, dan print je de QR-code op een kaartje."),
 ]
 
 # Over ons: waar Vaylide op let.

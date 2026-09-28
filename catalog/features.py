@@ -10,6 +10,8 @@ FEATURES = {
     "gallery": "Fotogalerij",
     "music": "Muziek",
     "extra_questions": "Extra vragen bij aanmelden",
+    # Lakzegel met de eigen initialen. Zonder deze functie toont het zegel een standaardmotief in rood of groen.
+    "zegel": "Persoonlijk zegel",
 }
 
 # Welke sectie of instelling hoort bij welke functie.

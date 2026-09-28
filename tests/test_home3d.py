@@ -9,7 +9,8 @@ class Home3DTests(VaylideTestCase):
     def test_hero_has_3d_card_and_sparkles(self):
         html = Client().get("/").content.decode()
         self.assertIn('data-hero3d', html)
-        self.assertIn('class="hero__sparkles" aria-hidden="true"', html)
+        self.assertIn('<div class="hero__wereld" aria-hidden="true">', html)
+        self.assertIn('<canvas class="hero__sparkles"></canvas>', html)
         self.assertIn('class="card-stage"', html)
         self.assertIn("js/hero3d.js", html)
         # De vaste teksten van de eigenaar blijven staan, en de kaart linkt nog naar het werkende voorbeeld.

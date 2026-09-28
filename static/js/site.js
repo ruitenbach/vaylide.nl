@@ -68,10 +68,27 @@
           var card = entry.target;
           seen.unobserve(card);
           card.classList.add("is-seen");
-          window.setTimeout(function () { card.classList.remove("is-seen"); }, 1800);
+          window.setTimeout(function () { card.classList.remove("is-seen"); }, 2900); // lang genoeg voor de confetti
         });
       }, { threshold: 0.6 });
       cards.forEach(function (card) { seen.observe(card); });
+    }
+  }
+
+  // Stapkaartjes schuiven een voor een in beeld. Zonder IntersectionObserver of bij 'minder beweging' staan ze er meteen.
+  var reveal = document.querySelectorAll(".stapkaart");
+  if (reveal.length) {
+    if (!calm && "IntersectionObserver" in window) {
+      var revealer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-zichtbaar");
+          revealer.unobserve(entry.target);
+        });
+      }, { threshold: 0.2 });
+      reveal.forEach(function (el) { revealer.observe(el); });
+    } else {
+      reveal.forEach(function (el) { el.classList.add("is-zichtbaar"); });
     }
   }
 

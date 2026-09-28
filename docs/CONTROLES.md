@@ -387,3 +387,12 @@ Probleem: op de ontwerppagina stonden de kleuren alleen als lijstje; het voorbee
 - Contrast van de tekst in alle vier kleuren minstens 4,5:1.
 - In Chromium (Playwright) op 390 pixels: openingsscherm en kop in alle vier kleuren, de hele pagina in Bordeaux, het openen op drie momenten (deksel open, ringen omhoog en glinstering, inzoomen); op 360 pixels voor bruiloft, verloving en jubileum geen horizontaal scrollen en geen fouten. Een tik op het midden van het doosje komt bij de openingslink aan.
 - Muziek: knop op spelen, geen fouten; niveau 0,14 tot 0,21 over de eerste 32 seconden (violen vanaf ongeveer 10 seconden), zonder vervorming.
+
+## Nieuwe vormgeving van de website en het lakzegel (29 september 2026)
+
+- `manage.py test tests`: 227 tests, alle geslaagd (nieuw: `tests/test_vormgeving2026.py`; bijgewerkt: `test_atelier`, `test_home3d`, `test_kerst`, `test_site`).
+- In Chromium (Playwright): home, Zo werkt het, Prijzen, Inspiratie en Over ons op 1366 en 390 pixels volledig gefotografeerd, zonder fouten in de console; op 360, 390, 768 en 1366 pixels geen horizontaal scrollen op deze vijf pagina's.
+- Envelop in de kop: op 390 pixels met aanraken geopend (`aria-expanded` wordt `true`, de link naar het werkende voorbeeld is bovenaan en aanklikbaar); op 1366 pixels met de muis; met 'minder beweging' geopend met Enter; zonder JavaScript opent hij bij aanwijzen.
+- Lakzegel: Liefde op papier, Lauwerkrans (Atelier-envelop) en Winterlicht gerenderd zonder en met de functie `zegel`: zonder een motief in rood of groen (groen bij een groene kleurvariant), met de initialen.
+- Gevonden en opgelost: een commentaar over meerdere regels in `designs/winterlicht/v1/_zegel.html` verscheen als tekst op de envelop (Django-commentaar `{# #}` mag maar één regel zijn). Nu één regel, met een test.
+- Niet gecontroleerd: de pagina's op `vaylide.onrender.com` zelf (afgeschermd met een wachtwoord dat ik niet heb); alleen de nieuwe statische bestanden en `/healthz` zijn daar gecontroleerd.

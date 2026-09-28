@@ -180,7 +180,8 @@ class AtelierSiteTests(VaylideTestCase):
         count = Template.objects.filter(is_active=True, current_version__isnull=False).count()
         self.assertEqual(response.content.decode().count('class="design-card"'), 3)
         self.assertContains(response, f"Kies uit {count} ontwerpen")
-        for slug in ("liefde-op-papier", "sterrennacht", "confetti"):
+        # Alleen lichte ontwerpen op de homepage (geen donkere voorbeeldkaarten), de kerstkaart eerst.
+        for slug in ("winterlicht", "liefde-op-papier", "confetti"):
             self.assertContains(response, f"/ontwerpen/{slug}/")
 
     def test_collection_lists_designs_made_for_the_occasion_first(self):

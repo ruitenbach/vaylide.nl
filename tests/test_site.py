@@ -11,7 +11,13 @@ class NewPagesTests(VaylideTestCase):
         self.assertContains(inspiration, 'id="tekst-bruiloft"')
         self.assertContains(inspiration, "/ontwerpen/?gelegenheid=babyshower")
         about = Client().get("/over-ons/")
-        self.assertContains(about, "Uitnodigen met een verhaal")
+        self.assertContains(about, "Waarom Vaylide?")
+        self.assertContains(about, "Onze visie")
+        self.assertContains(about, "Maak van jouw moment een uitnodiging om naar uit te kijken.")
+        self.assertContains(about, "Voor particulieren en bedrijven")
+        # Geen onbewezen duurzaamheidsclaims.
+        for word in ("duurzaam", "co2", "milieuvriendelijk", "groener"):
+            self.assertNotIn(word, about.content.decode().lower())
         # Geen verzonnen reviews, sterren of klantenaantallen.
         for page in (inspiration, about, Client().get("/")):
             html = page.content.decode()

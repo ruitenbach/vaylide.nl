@@ -1,7 +1,10 @@
-<footer class="site-footer">
+{% load static %}<footer class="site-footer">
+  {# Stilstaand beeld van de bloem uit de homepage (geen animatie), zacht weggeblend. #}
+  <div class="site-footer__bloem" aria-hidden="true"><img src="{% static 'img/site/hero-900.webp' %}" alt="" width="900" height="550" loading="lazy" decoding="async"></div>
   <div class="container site-footer__inner">
     <div class="site-footer__brand">
       <a class="logo" href="{% url 'core:home' %}" aria-label="Vaylide, naar de homepage">{% include "partials/logo.html" %}</a>
+      <p class="site-footer__slogan">Elk bijzonder moment begint met een uitnodiging.</p>
     </div>
     <nav aria-label="Voettekst">
       <ul class="site-footer__links">
