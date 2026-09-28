@@ -7,6 +7,7 @@
   <div class="stat-row">
     <a class="stat{% if attention.wishes_new %} stat--alert{% endif %}" href="{% url 'beheer:wishes' %}"><span class="stat__num">{{ attention.wishes_new }}</span><span class="stat__label">nieuwe of ongelezen aanvragen</span></a>
     <a class="stat{% if attention.orders_attention %} stat--alert{% endif %}" href="{% url 'beheer:orders' %}?verwerking=attention"><span class="stat__num">{{ attention.orders_attention }}</span><span class="stat__label">bestellingen met aandacht</span></a>
+    <a class="stat{% if attention.orders_stuck %} stat--alert{% endif %}" href="{% url 'beheer:processing' %}#vast-titel"><span class="stat__num">{{ attention.orders_stuck }}</span><span class="stat__label">vastgelopen bestellingen</span></a>
     <a class="stat{% if attention.jobs_failed %} stat--alert{% endif %}" href="{% url 'beheer:processing' %}"><span class="stat__num">{{ attention.jobs_failed }}</span><span class="stat__label">mislukte verwerkingen ({{ attention.jobs_dead }} handmatig)</span></a>
     <a class="stat{% if attention.emails_failed %} stat--alert{% endif %}" href="{% url 'beheer:processing' %}"><span class="stat__num">{{ attention.emails_failed }}</span><span class="stat__label">e-mails niet verzonden</span></a>
     <a class="stat{% if attention.contact_open %} stat--alert{% endif %}" href="{% url 'beheer:contact_messages' %}"><span class="stat__num">{{ attention.contact_open }}</span><span class="stat__label">open contactberichten</span></a>

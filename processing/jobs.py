@@ -25,6 +25,7 @@ log = logging.getLogger(__name__)
 HANDLERS = {
     "send_email": "processing.emails.handle_send_email",
     "fulfil_order": "orders.fulfilment.handle_fulfil_order",
+    "deliver_order": "orders.fulfilment.handle_deliver_order",
     "fulfil_custom_order": "orders.fulfilment.handle_fulfil_custom_order",
     "assess_request": "wishes.services.handle_assess_request",
 }

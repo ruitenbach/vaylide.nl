@@ -15,6 +15,7 @@ from django.utils import timezone
 
 from catalog.models import AddOn, Package, Template, TemplateVersion
 from core.ai import ai_configured
+from orders.stuck import stuck_orders
 from core.models import ContactMessage, SiteConfig
 from core.privacy import anonymize_user, delete_invitation
 from core.utils import ip_fingerprint, rate_limit
@@ -71,6 +72,7 @@ def _attention():
     return {
         "wishes_new": CustomRequest.objects.filter(unread_by_staff=True).exclude(status=CustomRequest.Status.CLOSED).count(),
         "orders_attention": Order.objects.filter(fulfilment_status=Order.Fulfilment.ATTENTION).count(),
+        "orders_stuck": len(stuck_orders()),
         "orders_processing": Order.objects.filter(status=Order.Status.PAID, fulfilment_status=Order.Fulfilment.PROCESSING).count(),
         "jobs_failed": Job.objects.filter(status__in=[Job.Status.FAILED, Job.Status.DEAD]).count(),
         "jobs_dead": Job.objects.filter(status=Job.Status.DEAD).count(),
@@ -484,6 +486,11 @@ def processing(request):
                 retry(job)
                 count += 1
             messages.success(request, f"{count} taak/taken opnieuw geprobeerd.")
+        elif action == "bestelling-opnieuw":
+            from orders.stuck import restart
+
+            order = get_object_or_404(Order, uid=request.POST.get("bestelling"))
+            messages.success(request, f"{order.number}: {restart(order)}")
         elif action == "storing" and settings.TEST_MODE:
             set_fault("publish", int(request.POST.get("publish") or 0))
             set_fault("email", int(request.POST.get("email") or 0))
@@ -499,6 +506,7 @@ def processing(request):
         request,
         "beheer/processing.html",
         {
+            "stuck": stuck_orders(),
             "jobs": jobs[:100],
             "status": status,
             "emails": OutboundEmail.objects.order_by("-created_at")[:40],

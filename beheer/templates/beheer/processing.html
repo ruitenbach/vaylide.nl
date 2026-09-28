@@ -10,6 +10,18 @@
   <li><a class="chip" href="?status=done"{% if status == "done" %} aria-current="true"{% endif %}>Klaar</a></li>
   <li><a class="chip" href="?status="{% if not status %} aria-current="true"{% endif %}>Alle</a></li>
 </ul></nav>
+<section class="panel" aria-labelledby="vast-titel">
+  <h2 id="vast-titel">Vastgelopen bestellingen</h2>
+  {% if stuck %}
+  <ul class="item-list">{% for order, reason in stuck %}
+    <li class="item">
+      <div class="item__top"><strong><a href="{% url 'beheer:order' order.uid %}">{{ order.number }}</a> · {{ order.invitation_title|default:"bestelling" }}</strong><span class="badge badge--attention">{{ order.get_fulfilment_status_display }}</span></div>
+      <p class="item__meta">{{ order.customer.email }} · betaald {{ order.paid_at|date:"j-n H:i" }} · {{ reason }}</p>
+      <form method="post" data-once>{% csrf_token %}<input type="hidden" name="actie" value="bestelling-opnieuw"><input type="hidden" name="bestelling" value="{{ order.uid }}"><button class="btn btn--secondary btn--sm" type="submit">Verwerking opnieuw starten</button></form>
+    </li>{% endfor %}</ul>
+  <p class="small muted">Opnieuw starten is veilig: er ontstaat nooit een tweede publicatie of e-mail. Bij een dubbele betaling of een afwijkend bedrag: controleer eerst in Mollie en betaal zo nodig terug.</p>
+  {% else %}<p class="empty-state">Geen vastgelopen bestellingen.</p>{% endif %}
+</section>
 <section class="panel">
   <h2>Taken</h2>
   {% if jobs %}

@@ -1,9 +1,11 @@
 """Automatische levering na een bevestigde betaling.
 
 Volgorde: bestelling bevestigen → uitnodiging publiceren (met rechten en
-beschikbaarheidsduur) → klant informeren per e-mail. Publiceren en het
-toekennen van rechten gebeuren in één transactie, zodat een herhaalde of
-opnieuw gestarte taak de beschikbaarheid nooit dubbel verlengt.
+beschikbaarheidsduur) → levering aan de koper als aparte taak (e-mail met link en
+QR-code). Publiceren en het toekennen van rechten gebeuren in één transactie,
+zodat een herhaalde of opnieuw gestarte taak de beschikbaarheid nooit dubbel
+verlengt. Alle stappen zijn idempotent (unieke taak- en e-mailsleutels): een
+herhaling maakt nooit een tweede publicatie, levering of e-mail.
 """
 from __future__ import annotations
 
@@ -13,13 +15,23 @@ from django.utils import timezone
 from invitations.models import Invitation, Source
 from invitations.services import availability_end, publish_version, snapshot
 from processing.emails import SimulatedFailure, consume_fault, notify_owner_order_attention, send_invitation_live, send_order_confirmation, send_wish_update
+from processing.jobs import enqueue
 
 from .models import Order
 
 
+def enqueue_delivery(order: Order):
+    """Levering aan de koper als eigen taak; dezelfde sleutel voorkomt een tweede levering."""
+    return enqueue("deliver_order", {"order_id": order.pk}, unique_key=f"deliver_order:{order.pk}", order=order, invitation=order.invitation)
+
+
 def handle_fulfil_order(job) -> None:
     order = Order.objects.select_related("invitation", "customer").get(pk=job.payload["order_id"])
-    if order.status != Order.Status.PAID or order.fulfilment_status == Order.Fulfilment.DONE:
+    if order.status != Order.Status.PAID:
+        return
+    if order.fulfilment_status == Order.Fulfilment.DONE:
+        # Al gepubliceerd (bijv. herhaling na een onderbreking): zorg alleen dat de levering er is.
+        enqueue_delivery(order)
         return
     invitation = order.invitation
     if invitation is None:
@@ -60,6 +72,13 @@ def handle_fulfil_order(job) -> None:
         locked.save(update_fields=["fulfilment_status", "fulfilment_note", "updated_at"])
 
     order.refresh_from_db()
+    enqueue_delivery(order)
+
+
+def handle_deliver_order(job) -> None:
+    order = Order.objects.select_related("invitation", "customer").get(pk=job.payload["order_id"])
+    if order.status != Order.Status.PAID or order.fulfilment_status != Order.Fulfilment.DONE or order.invitation is None:
+        return
     send_invitation_live(order)
 
 
