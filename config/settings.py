@@ -307,6 +307,11 @@ if EMAIL_MODE == "smtp" and not DEBUG and ERROR_EMAIL and ERROR_EMAIL.lower() !=
     LOGGING["handlers"]["mail_admins"] = {"class": "django.utils.log.AdminEmailHandler", "level": "ERROR"}
     LOGGING["loggers"]["django.request"] = {"handlers": ["console", "mail_admins"], "level": "ERROR", "propagate": False}
 
+# In testmodus nooit echte betalingen: met Mollie alleen een testsleutel (test_...). Een live-sleutel
+# hoort alleen bij VIERLIEF_MODE=live (zie hieronder); de site start anders niet.
+if TEST_MODE and PAYMENT_PROVIDER == "mollie" and MOLLIE_API_KEY and not MOLLIE_API_KEY.startswith("test_"):
+    raise RuntimeError("Testmodus accepteert alleen een Mollie-testsleutel (MOLLIE_API_KEY=test_...).")
+
 # In live-modus mogen testvoorzieningen niet actief zijn.
 if not TEST_MODE:
     if PAYMENT_PROVIDER == "test":

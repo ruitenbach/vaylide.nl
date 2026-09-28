@@ -120,7 +120,11 @@ def create_custom_order(custom_request, *, user) -> Order:
 def create_payment(order: Order) -> Payment:
     if order.status == Order.Status.PAID:
         raise CheckoutError("Deze bestelling is al betaald.")
-    provider = get_provider()
+    try:
+        provider = get_provider()
+    except ProviderError as exc:
+        log.error("Betaalprovider niet beschikbaar voor %s: %s", order.number, exc)
+        raise CheckoutError("De betaalomgeving is tijdelijk niet bereikbaar. Je ontwerp is bewaard; probeer het zo opnieuw.") from exc
     payment = Payment.objects.create(order=order, provider=provider.code, amount_cents=order.total_cents, currency=order.currency)
     return_url = f"{settings.BASE_URL}{reverse('orders:status', args=[order.uid])}"
     webhook_url = f"{settings.BASE_URL}{reverse('orders:webhook', args=[provider.code])}"

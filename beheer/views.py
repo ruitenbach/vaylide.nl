@@ -537,8 +537,8 @@ def site_settings(request):
         return redirect("beheer:settings")
     integrations = [
         ("Modus", "Testmodus" if settings.TEST_MODE else "Live", settings.TEST_MODE),
-        ("Betalingen", {"test": "Testbetalingen (gesimuleerd)", "mollie": "Mollie"}.get(settings.PAYMENT_PROVIDER, settings.PAYMENT_PROVIDER),
-         settings.PAYMENT_PROVIDER == "test"),
+        ("Betalingen", {"test": "Testbetalingen (gesimuleerd)", "mollie": "Mollie (testsleutel, geen echt geld)" if settings.MOLLIE_API_KEY.startswith("test_") else ("Mollie (live)" if settings.MOLLIE_API_KEY else "Mollie (sleutel ontbreekt)")}.get(settings.PAYMENT_PROVIDER, settings.PAYMENT_PROVIDER),
+         settings.PAYMENT_PROVIDER == "test" or not settings.MOLLIE_API_KEY.startswith("live_")),
         ("E-mail", "Alleen bewaard (outbox)" if settings.EMAIL_MODE == "outbox" else f"SMTP via {settings.EMAIL_HOST}", settings.EMAIL_MODE == "outbox"),
         ("AI-hulp", f"Claude ({settings.AI_MODEL})" if ai_configured() else "Testmodus (geen API-sleutel)", not ai_configured()),
         ("Publieke adres", settings.BASE_URL, settings.BASE_URL.startswith("http://")),

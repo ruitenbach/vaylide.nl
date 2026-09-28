@@ -12,7 +12,7 @@
 </head>
 <body class="beheer-page">
 <a class="skip-link" href="#inhoud">Direct naar de inhoud</a>
-{% if TEST_MODE %}<div class="test-banner" role="note"><strong>Testomgeving</strong> · betalingen en e-mails zijn gesimuleerd</div>{% endif %}
+{% if TEST_MODE %}<div class="test-banner" role="note"><strong>Testomgeving</strong> · {{ TEST_BANNER }}</div>{% endif %}
 <header class="beheer-bar">
   <div class="container beheer-bar__inner">
     <a class="logo" href="{% url 'beheer:dashboard' %}">{% include "partials/logo.html" %}</a>

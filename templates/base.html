@@ -25,7 +25,7 @@
 </head>
 <body class="{% block body_class %}{% endblock %}">
 <a class="skip-link" href="#inhoud">Direct naar de inhoud</a>
-{% if TEST_MODE %}<div class="test-banner" role="note"><strong>Testomgeving</strong> · betalingen en e-mails zijn gesimuleerd</div>{% endif %}
+{% if TEST_MODE %}<div class="test-banner" role="note"><strong>Testomgeving</strong> · {{ TEST_BANNER }}</div>{% endif %}
 {% block header %}{% include "partials/header.html" %}{% endblock %}
 {% if messages %}<div class="container flash-wrap">{% for message in messages %}<p class="flash flash--{{ message.tags }}" role="status">{{ message }}</p>{% endfor %}</div>{% endif %}
 <main id="inhoud" tabindex="-1">

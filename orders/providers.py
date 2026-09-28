@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import secrets
 import urllib.error
 import urllib.request
@@ -21,6 +22,8 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .models import Payment
+
+log = logging.getLogger(__name__)
 
 
 class ProviderError(RuntimeError):
@@ -78,6 +81,9 @@ class MollieProvider:
         self.base = (base or settings.MOLLIE_API_BASE).rstrip("/")
         if not self.api_key:
             raise ProviderError("MOLLIE_API_KEY ontbreekt.")
+        # Tweede slot naast de controle in de instellingen: in testmodus nooit een live-sleutel gebruiken.
+        if settings.TEST_MODE and not self.api_key.startswith("test_"):
+            raise ProviderError("In testmodus is alleen een Mollie-testsleutel (test_...) toegestaan.")
 
     def _request(self, method: str, path: str, body: dict | None = None) -> dict:
         data = json.dumps(body).encode() if body is not None else None
@@ -111,6 +117,9 @@ class MollieProvider:
         }
         if webhook_url.startswith("https://"):
             body["webhookUrl"] = webhook_url
+        else:
+            # Mollie meldt alleen aan een https-adres. Zonder webhook volgt de status pas bij terugkeer van de klant.
+            log.warning("Geen webhook meegegeven: VIERLIEF_BASE_URL is geen https-adres (%s).", webhook_url)
         data = self._request("POST", "/payments", body)
         try:
             return data["id"], data["_links"]["checkout"]["href"]

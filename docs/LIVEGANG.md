@@ -27,7 +27,7 @@ Vaylide staat nu in testmodus. Er zijn geen betaalde diensten afgesloten en er i
 - [ ] **Back-ups van uploads** (`VIERLIEF_UPLOAD_DIR`) en een **hersteltest** van database en uploads samen.
 - [ ] **Mollie**:
   1. Maak een account aan en laat het verifiëren. Zet de gewenste betaalmethoden aan, zoals iDEAL.
-  2. Test eerst met een testsleutel: `VIERLIEF_MODE=test`, `VIERLIEF_PAYMENT_PROVIDER=mollie` en `MOLLIE_API_KEY=test_...`. Dit gebruikt de echte Mollie-omgeving zonder echt geld.
+  2. Test eerst met een testsleutel: `VIERLIEF_MODE=test`, `VIERLIEF_PAYMENT_PROVIDER=mollie` en `MOLLIE_API_KEY=test_...`. Dit gebruikt de echte Mollie-omgeving zonder echt geld; in testmodus weigert de site een `live_`-sleutel. Stappen en omgevingsvariabelen voor de testversie op Render: `docs/MOLLIE_TEST.md`.
   3. Ga daarna live met `MOLLIE_API_KEY=live_...` en `VIERLIEF_MODE=live`.
 
   De webhook-URL (`<VIERLIEF_BASE_URL>/webhooks/betaling/mollie/`) wordt per betaling automatisch meegegeven. De site moet daarvoor publiek bereikbaar zijn via https.
