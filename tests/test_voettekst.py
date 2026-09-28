@@ -33,8 +33,10 @@ class PaymentMethodsTests(VaylideTestCase):
         html = Client().get("/").content.decode()
         footer = html[html.index('<footer class="site-footer">'):]
         self.assertIn("Veilig betalen met", footer)
-        self.assertIn('class="betaalmiddel betaalmiddel--ideal">iDEAL<', footer)
-        self.assertIn('class="betaalmiddel betaalmiddel--paypal">PayPal<', footer)
+        self.assertIn('alt="iDEAL"', footer)
+        self.assertIn("img/betalen/ideal.webp", footer)
+        self.assertIn('alt="PayPal"', footer)
+        self.assertIn("img/betalen/paypal.webp", footer)
         self.assertLess(footer.index("iDEAL"), footer.index("PayPal"))
 
     def test_with_mollie_only_the_enabled_methods_are_shown(self):

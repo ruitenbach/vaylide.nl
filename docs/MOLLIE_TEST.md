@@ -55,6 +55,6 @@ niets afgeschreven", en in Beheer → Instellingen staat bij Betalingen "Mollie 
 - De voettekst en de bestelstap tonen de betaalmethoden die in je Mollie-account **aanstaan** (opgevraagd
   bij Mollie, een uur bewaard). Zet PayPal dus aan in Mollie (Instellingen → Betaalmethoden, ook voor
   testmodus); anders toont de site alleen iDEAL. Zonder Mollie of als Mollie even niet antwoordt:
-  `VIERLIEF_PAYMENT_METHODS` (standaard `ideal,paypal`).
+  `VIERLIEF_PAYMENT_METHODS` (standaard `ideal,paypal`). iDEAL en PayPal staan er met hun logo (aangeleverd door de eigenaar, in `static/img/betalen/`); andere methoden met hun naam.
 - Instagram en TikTok: Beheer → Instellingen. Een icoon verschijnt alleen als er een link is ingevuld.
   Instagram staat standaard op https://www.instagram.com/vaylidenl/.

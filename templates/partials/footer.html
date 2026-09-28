@@ -22,7 +22,7 @@
     <div class="site-footer__extra">
       {% with methods=PAYMENT_METHODS %}{% if methods %}<div class="site-footer__betalen">
         <p class="site-footer__kop">Veilig betalen met</p>
-        <ul class="betaalmiddelen">{% for m in methods %}<li class="betaalmiddel betaalmiddel--{{ m.id }}">{{ m.label }}</li>{% endfor %}</ul>
+        <ul class="betaalmiddelen">{% for m in methods %}<li class="betaalmiddel betaalmiddel--{{ m.id }}{% if m.logo %} betaalmiddel--logo{% endif %}">{% if m.logo %}<img src="{% static m.logo %}" alt="{{ m.label }}" width="{{ m.width }}" height="{{ m.height }}" loading="lazy" decoding="async">{% else %}{{ m.label }}{% endif %}</li>{% endfor %}</ul>
       </div>{% endif %}{% endwith %}
       {% with links=SOCIAL_LINKS %}{% if links %}<div class="site-footer__social">
         <p class="site-footer__kop">Volg ons</p>

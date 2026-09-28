@@ -1,4 +1,4 @@
-{% extends "studio/base_studio.html" %}{% load vl %}
+{% extends "studio/base_studio.html" %}{% load static vl %}
 {% block title %}Bestellen{% endblock %}
 {% block studio %}
 <div class="studio-intro">
@@ -53,7 +53,7 @@
     {% endif %}
   </section>
   {% if test_payments %}<p class="notice notice--test"><strong>Testbetaling</strong>In deze testomgeving is betalen gesimuleerd: er wordt niets afgeschreven.</p>{% elif TEST_MODE %}<p class="notice notice--test"><strong>Testbetaling via Mollie</strong>Je gaat naar de testpagina van Mollie en kiest daar zelf de uitkomst. Er wordt niets afgeschreven.</p>{% endif %}
-  {% with methods=PAYMENT_METHODS %}{% if methods %}<p class="betaal-uitleg">Je betaalt op de beveiligde betaalpagina van Mollie met <span class="betaalmiddelen betaalmiddelen--inline">{% for m in methods %}<span class="betaalmiddel betaalmiddel--{{ m.id }}">{{ m.label }}</span>{% endfor %}</span></p>{% endif %}{% endwith %}
+  {% with methods=PAYMENT_METHODS %}{% if methods %}<p class="betaal-uitleg">Je betaalt op de beveiligde betaalpagina van Mollie met <span class="betaalmiddelen betaalmiddelen--inline">{% for m in methods %}<span class="betaalmiddel betaalmiddel--{{ m.id }}{% if m.logo %} betaalmiddel--logo{% endif %}">{% if m.logo %}<img src="{% static m.logo %}" alt="{{ m.label }}" width="{{ m.width }}" height="{{ m.height }}" decoding="async">{% else %}{{ m.label }}{% endif %}</span>{% endfor %}</span></p>{% endif %}{% endwith %}
   <label class="check terms-check">{{ form.terms }}<span>Ik ga akkoord met de <a href="{% url 'core:terms' %}" target="_blank" rel="noopener">voorwaarden</a> en wil dat mijn uitnodiging direct na betaling wordt gepubliceerd.</span></label>
   {% for e in form.terms.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
   <div class="step-actions">

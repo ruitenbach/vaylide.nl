@@ -25,6 +25,11 @@ LABELS = {
     "kbc": "KBC/CBC",
     "giftcard": "Cadeaukaart",
 }
+# Logo's zoals aangeleverd door de eigenaar (static/img/betalen/, bijgesneden en verkleind). Zonder logo: de naam.
+LOGOS = {
+    "ideal": ("img/betalen/ideal.webp", 110, 96),
+    "paypal": ("img/betalen/paypal.webp", 97, 96),
+}
 # Volgorde op de site: de bekendste eerst.
 ORDER = ["ideal", "paypal", "applepay", "creditcard", "bancontact", "klarna", "banktransfer"]
 
@@ -36,7 +41,11 @@ def _as_list(ids) -> list[dict]:
         if m and m not in seen:
             seen.append(m)
     seen.sort(key=lambda m: ORDER.index(m) if m in ORDER else len(ORDER))
-    return [{"id": m, "label": LABELS.get(m, m.capitalize())} for m in seen]
+    methods = []
+    for m in seen:
+        logo, width, height = LOGOS.get(m, ("", 0, 0))
+        methods.append({"id": m, "label": LABELS.get(m, m.capitalize()), "logo": logo, "width": width, "height": height})
+    return methods
 
 
 def configured_methods() -> list[dict]:
