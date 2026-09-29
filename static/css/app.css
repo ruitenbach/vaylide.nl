@@ -63,6 +63,14 @@
 .repeat-list { display: grid; gap: .8rem; }
 .repeat-row { display: grid; gap: .7rem; padding: .9rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
 .js-enabled .repeat-row.is-empty { display: none; }
+/* Aanmelden: vaste extra vragen en oude eigen vragen */
+.vaste-vragen { display: grid; gap: .7rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); }
+.vaste-vraag { display: grid; gap: .3rem; align-content: start; padding: .9rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+.vaste-vraag .field { margin: 0; }
+.vaste-vraag__antwoord { margin: 0; font-size: .86rem; color: var(--muted); }
+.oude-vraag { margin-top: 1rem; }
+.oude-vraag p { margin: .3rem 0; }
+.oude-vraag__rij { border-top: 1px dashed var(--line-strong); padding-top: .4rem; margin-top: .4rem; }
 .program-row { grid-template-columns: 8rem 1fr; }
 .program-row__desc { grid-column: 1 / -1; }
 @media (max-width: 520px) { .program-row { grid-template-columns: 1fr; } }

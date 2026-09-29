@@ -11,6 +11,7 @@ from datetime import date, timedelta
 from django.utils import timezone
 
 from .content import default_content
+from .vragen import vraag
 
 DEFAULT_DEMO_OCCASION = {
     "liefde-op-papier": "bruiloft",
@@ -152,8 +153,8 @@ def demo_content(design_slug: str, occasion: str, palette_key: str = "", soort: 
         {"title": "Overnachten", "text": "In de buurt zijn verschillende hotels. Vraag ons gerust om tips."},
     ]
     content["rsvp"]["questions"] = [
-        {"id": "q1", "label": "Heb je dieetwensen of allergieën?", "type": "text", "options": [], "required": False},
-        {"id": "q2", "label": "Blijf je ook voor het avondfeest?", "type": "yesno", "options": [], "required": False},
+        vraag("aankomst", formal=False),
+        vraag("overnachten", formal=False),
     ]
 
     if occasion == "bruiloft":
@@ -269,8 +270,8 @@ def demo_content(design_slug: str, occasion: str, palette_key: str = "", soort: 
             {"title": "Blijven slapen", "text": "Er staat een logeerbed klaar. Laat het even weten als je wilt blijven."},
         ]
         content["rsvp"]["questions"] = [
-            {"id": "q1", "label": "Heb je dieetwensen of allergieën?", "type": "text", "options": [], "required": False},
-            {"id": "q2", "label": "Doe je mee met het cadeauspel?", "type": "yesno", "options": [], "required": False},
+            vraag("overnachten", formal=False),
+            vraag("vervoer", formal=False),
         ]
         content["contact"] = {"name": "Sanne", "phone": "", "email": "sanne@example.com",
                               "note": "Vragen, of wil je iets meenemen? Laat het Sanne weten."}
@@ -290,6 +291,6 @@ def demo_content(design_slug: str, occasion: str, palette_key: str = "", soort: 
         content["contact"] = {"name": "Mila (organisatie)", "phone": "", "email": "mila@example.com", "note": ""}
         content["sections"]["story"] = False
         content["rsvp"]["questions"] = [
-            {"id": "q1", "label": "Heeft u dieetwensen?", "type": "text", "options": [], "required": False},
+            vraag("parkeren", formal=True),
         ]
     return content

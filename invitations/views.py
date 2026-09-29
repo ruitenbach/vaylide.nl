@@ -10,6 +10,7 @@ from django.http import FileResponse, Http404, HttpResponse, JsonResponse, Strea
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_sameorigin
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods, require_POST
 
 from catalog.models import Template
@@ -178,6 +179,7 @@ def _success_texts(view, result):
     return f"Bedankt, {first}!", message
 
 
+@sensitive_post_parameters()  # antwoorden van gasten nooit in foutmeldingen (mails aan de eigenaar)
 @require_POST
 def rsvp_submit(request, slug):
     invitation = _live_invitation(slug)
@@ -229,6 +231,7 @@ def rsvp_submit(request, slug):
     return response
 
 
+@sensitive_post_parameters()
 @require_http_methods(["GET", "POST"])
 def rsvp_edit(request, slug, token):
     invitation = _live_invitation(slug)

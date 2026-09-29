@@ -54,7 +54,7 @@ Gecontroleerd in de code, zonder echte klantgegevens te bekijken.
 | Gezichten detecteren | Middelpunt van de uitsnede (`focus_x`, `focus_y`) en het aantal gezichten. Geen gezichtskenmerken. | `invitations/focus.py` (YuNet, lokaal) | Zolang de foto bestaat |
 | Bestelling en betaling | Bestelnummer, pakket, regels, bedragen, status, methode, Mollie-id, betaalmeldingen, versie van de voorwaarden, toestemming directe levering | `orders/models.py` | Blijft bewaard; bij het verwijderen van een account zonder naam, e-mail en kaarttitel |
 | Naar Mollie | Alleen bedrag, omschrijving `VAYLIDE <bestelnummer>`, adressen voor terugkeer en melding, en metadata (bestelnummer en betaalcode). Geen e-mail of naam. | `orders/providers.py` (getest) | Bij Mollie |
-| Aanmeldingen | Naam, komt ja/nee, aantal, antwoorden op eigen vragen, toelichting, versleutelde wijzigcode | `invitations/models.py` (`GuestResponse`) | 90 dagen nadat de uitnodiging offline ging (instelbaar in beheer) |
+| Aanmeldingen | Naam, komt ja/nee, aantal; als de organisator dat kiest ook antwoorden op vaste extra vragen en een toelichting (standaard uit). Oude uitnodigingen kunnen eigen vragen hebben. Versleutelde wijzigcode. | `invitations/models.py` (`GuestResponse`) | 90 dagen nadat de uitnodiging offline ging (instelbaar in beheer) |
 | Contact | Naam, e-mail, onderwerp, bericht | `core/models.py` | **Geen termijn** |
 | Herroeping | Naam, e-mail, bestelgegevens, toelichting, tijdstip | `orders/models.py` (`Withdrawal`) | **Geen termijn** |
 | Extra wensen | Onderwerp, omschrijving, berichten, bijlagen, AI-samenvatting | `wishes/models.py` | **Geen termijn** (wel weg bij verwijderen account) |
@@ -93,44 +93,141 @@ Getest op de homepage, `/ontwerpen/`, `/contact/`, `/privacy/`, `/maken/` en de 
 - **localStorage `vierlief-beweging`:** alleen na een tik op "Beweging"; weg als je het weer aanzet.
 - **sessionStorage `vierlief-open:<pad>`:** alleen op een echte uitnodiging (niet in de voorbeeldweergave).
 
-## Rol bij gastgegevens (beoordeling, geen juridisch oordeel)
+## Aanmelden zonder gevoelige gegevens ("optie A", besloten op 30 september 2026)
 
-- **Particuliere organisator** (bruiloft, verjaardag, kerst):
-  - De organisator valt waarschijnlijk onder de uitzondering voor huishoudelijk gebruik (art. 2 lid 2 sub c AVG).
-  - Volgens overweging 18 AVG blijft de AVG wel gelden voor wie de middelen levert. Dat is VAYLIDE.
-  - VAYLIDE bepaalt hoe de aanmeldingen worden opgeslagen, beveiligd en verwijderd. Voor die verwerking is VAYLIDE dan
-    waarschijnlijk **zelf verwerkingsverantwoordelijke**.
-  - Mogelijke grondslag: gerechtvaardigd belang, namelijk gasten laten reageren op een uitnodiging die ze ontvingen.
-  - De overeenkomst met de koper is **geen** grondslag voor gastgegevens: de gast is geen partij bij die overeenkomst.
-- **Zakelijke organisator** (gelegenheid "Zakelijk evenement", organisatie als afzender):
-  - De organisatie bepaalt het doel. Zij is waarschijnlijk **verwerkingsverantwoordelijke** en VAYLIDE **verwerker**.
-  - Dan is een **verwerkersovereenkomst nodig** (art. 28 AVG). Die bestaat nu niet.
-  - Een voorstel staat in `docs/VERWERKERSOVEREENKOMST.md`. De verklaring vervangt die overeenkomst niet.
-- **Wat gasten nu bij het formulier krijgen:**
-  - een korte tekst en een link naar onderdeel 4 van de verklaring;
-  - de naam van de organisator staat meestal op de kaart;
-  - een contactpersoon is optioneel.
-- **Besluit nodig:** `rol_gasten` in `core/privacyverklaring.py`.
+| Wat | Hoe | Waar |
+|---|---|---|
+| **Standaard alleen naam, aanwezigheid en aantal personen** | Bij nieuwe uitnodigingen staat de toelichting uit en zijn er geen extra vragen | `invitations/content.py` (`default_content`) |
+| **Aantal personen** | Blijft: nodig voor de catering en de totale capaciteit. Met "maximaal 1" verschijnt het veld niet. | Bestond al |
+| **Toelichting** | Blijft beschikbaar, maar staat standaard uit. Nodig voor praktische meldingen ("ik kom later"). De vraagtekst ligt vast: een eigen tekst ("Heb je allergieën?") is niet meer mogelijk. | `studio/forms.py` (`RsvpSettingsForm`) |
+| **Extra vragen alleen uit een vaste lijst** | 6 neutrale vragen: vervoer, parkeerplek, overnachten, geregeld vervoer, wanneer je erbij bent, en een liedje. Tekst en antwoordopties liggen vast (ook in u-vorm), dus een organisator kan via de antwoordopties niet alsnog iets gevoeligs vragen. | `invitations/vragen.py` |
+| **Uitleg bij elk vrij tekstveld** | "Vermeld hier geen medische informatie, allergieën, religieuze gegevens of andere gevoelige persoonsgegevens." Bij de toelichting en bij de open vraag (liedje), gekoppeld met `aria-describedby`. Ook op de pagina waar een gast een antwoord wijzigt. | `invitations/templates/invitations/partials/rsvp.html`, `rsvp_edit.html` |
+| **Controle op de server** | Het studioformulier bouwt vragen alleen uit de vaste lijst. Een zelfgemaakt verzoek met een eigen vraagtekst of toelichtingstekst wordt genegeerd (getest). Antwoorden buiten de opties, ontbrekende verplichte antwoorden en een te groot aantal personen worden geweigerd. Onbekende velden worden niet opgeslagen. | `studio/forms.py`, `invitations/rsvp.py` |
+| **Voorbeelden aangepast** | Weg: "dieetwensen" en "allergieën" in de websitetekst, de omschrijving van de extra optie (met migratie `catalog/0005`; een door de eigenaar gewijzigde tekst blijft staan), de voorbeeldkaarten en de testgegevens | `core/content.py`, `catalog/seed.py`, `invitations/demo.py`, `e2e/fixtures.py` |
+| **Geen kopieën in foutmeldingen** | Aanmeldformulieren zijn gemarkeerd met `sensitive_post_parameters`: ingevulde antwoorden komen niet in foutmails aan de eigenaar | `invitations/views.py` |
+| **Geen AI of externe controle** | Er is geen inhoudsanalyse toegevoegd. De rapportopdracht hieronder leest alleen vraagteksten van organisatoren, niet de antwoorden van gasten. | — |
 
-## Gevoelige gegevens bij het aanmelden
+## Bestaande uitnodigingen
 
-- **Wat er is:**
-  - Er zijn **geen vaste velden** naar gezondheid, religie of toegankelijkheid; er is niets toegevoegd.
-  - Wel kan de organisator tot 5 **eigen vragen** stellen, en die ook verplicht maken.
-- **Wat VAYLIDE zelf suggereert:** "dieetwensen of allergieën", in `core/content.py:144`, `catalog/seed.py:69` (omschrijving
-  extra optie), `invitations/demo.py` (voorbeeldkaarten) en `e2e/fixtures.py`.
-  - Allergieën zijn gezondheidsgegevens.
-  - Dieetwensen kunnen iets zeggen over gezondheid of geloof.
-  - Dat zijn bijzondere persoonsgegevens (art. 9 AVG). Een algemeen akkoord met de verklaring is daarvoor niet genoeg.
-- **Voorstel (besluit `gevoelige_vragen`), kies een van deze:**
-  - **a)** De voorbeelden aanpassen naar iets neutraals, zoals vervoer of een liedje voor de playlist. Bij het maken van een
-    eigen vraag de tip geven om niet naar gezondheid, geloof of andere gevoelige gegevens te vragen.
-  - **b)** Als dieetwensen of allergieën mogelijk moeten blijven:
-    - zo'n vraag altijd optioneel maken;
-    - er een aparte, niet vooraf aangevinkte uitdrukkelijke toestemming bij vragen;
-    - uitleggen wie het ziet en wanneer het wordt verwijderd;
-    - de bewaartermijn kort houden.
-  - Dit is **niet** in de code veranderd, want het is een productkeuze.
+**Niets van klanten is veranderd of verwijderd.**
+- Gepubliceerde uitnodigingen bewaren hun eigen kopie van de vragen en blijven werken zoals ze waren. Alleen de uitleg
+  bij vrije tekstvelden verschijnt nu ook daar.
+- Een concept met een oude eigen vraag of eigen toelichtingsvraag toont die in de studio onder "Eigen vragen van eerder".
+  De organisator kan zo'n vraag alleen nog weghalen, niet wijzigen. Opslaan zonder weghalen laat alles staan (getest).
+
+**Tellen zonder inhoud te tonen:** `python manage.py rsvp_vragen_rapport`
+- Het resultaat bevat alleen aantallen: uitnodigingen met oude eigen vragen (concept en gepubliceerd), de soort vraag,
+  verplichte vragen, en trefwoordcategorieën in de vraagtekst (gezondheid of dieet, geloof, toegankelijkheid).
+- Ook geteld: eigen toelichtingsvragen, aanmeldingen met een antwoord op zo'n vraag en ingevulde toelichtingen.
+- Er komen geen vraagteksten, namen, antwoorden of links in het resultaat (getest).
+
+**Lokaal (testgegevens):**
+- 70 uitnodigingen, 12 aanmeldingen;
+- 0 oude eigen vragen en 0 eigen toelichtingsvragen;
+- 0 aanmeldingen met een risicoantwoord of een ingevulde toelichting.
+
+**Op de testsite (Render) niet gecontroleerd:** daar kan ik niet bij. **Open punt vóór livegang:** draai de opdracht daar
+(Render → Shell). Staan er gepubliceerde uitnodigingen met een oude eigen vraag die de vaste lijst omzeilt, beslis dan
+per geval met de organisator:
+- weghalen en opnieuw publiceren;
+- laten staan tot de uitnodiging verloopt;
+- of de antwoorden eerder verwijderen.
+
+Het rapport geeft alleen aan dat er een risico is. Het oordeel blijft handwerk.
+
+## Rolverdeling per verwerking (beoordeling, geen juridisch oordeel)
+
+Getoetst aan wie feitelijk het doel en de essentiële middelen bepaalt. Essentiële middelen zijn volgens de EDPB:
+- welke gegevens;
+- hoe lang;
+- wie er toegang heeft;
+- van wie.
+
+| Verwerking | Wie bepaalt wat | Voorlopige rol VAYLIDE | Grondslag |
+|---|---|---|---|
+| Klantaccounts, bestellingen, betalingen, administratie | VAYLIDE: doel en middelen | **Verwerkingsverantwoordelijke** | Overeenkomst en wettelijke plicht |
+| Kaartinhoud (namen, foto's, contactpersoon) | Organisator: wat erop staat en aan wie de link gaat. VAYLIDE: vorm en looptijd van de dienst. | **Verwerker** voor de organisator, mits geen eigen gebruik | Voor de organisator: meestal gerechtvaardigd belang, of de huishoudelijke uitzondering |
+| Aanmeldingen en gastenlijst | Organisator: aanmelden aan of uit, welke vaste vragen, maximum, deadline, gebruik van de antwoorden. VAYLIDE: de vaste lijst en de standaardbewaartermijn. | **Verwerker**, met voorbehoud (zie hieronder) | Voor de organisator. De overeenkomst met de koper is **geen** grondslag voor gegevens van gasten. |
+| Beveiliging en misbruikpreventie (IP-code, limieten, spamveld, logs) | VAYLIDE | **Verwerkingsverantwoordelijke** | Gerechtvaardigd belang |
+| Back-ups en herstel | VAYLIDE, als beveiligingsmaatregel | Als verwerker (art. 32) voor kaart- en gastgegevens; verantwoordelijke voor eigen gegevens | — |
+| Ondersteuning | Op verzoek van de organisator of de gast | Verwerker; zelf verantwoordelijk bij een beveiligingsincident | — |
+| Eigen gebruik van gastgegevens | **Gebeurt niet:** geen marketing, analyse of AI op aanmeldingen | Zou VAYLIDE verantwoordelijke maken (art. 28 lid 10) en een eigen grondslag vergen | — |
+
+**Particulier tegenover zakelijk:**
+- Bij een **particuliere** organisator geldt vaak de huishoudelijke uitzondering (art. 2 lid 2 sub c AVG). De AVG geldt
+  dan niet voor die organisator. Dat maakt VAYLIDE **niet automatisch verwerkingsverantwoordelijke**:
+  - de EDPB schrijft dat de AVG blijft gelden voor de dienstverlener "acting as a processor and providing the means",
+    en dat die dan alle verplichtingen uit art. 28 moet naleven (EDPB Opinion 7/2024, punt 19 en 20, en overweging 18);
+  - niet elk gebruik door een particulier valt onder de uitzondering (zelfde punt 19), bijvoorbeeld een vereniging of een
+    zzp'er.
+- Bij een **zakelijke** organisator is die organisatie verwerkingsverantwoordelijke. VAYLIDE is verwerker, en er is een
+  overeenkomst volgens art. 28 lid 3 nodig. De AP zegt ook: wie gegevens voor eigen doelen of buiten de opdracht
+  verwerkt, is voor dat deel zelf verantwoordelijke.
+
+**Voorbehoud:** VAYLIDE bepaalt zelf een deel van de essentiële middelen: de vaste vragen, de velden en de
+standaardbewaartermijn van 90 dagen.
+- Een verwerker mag een vooraf ingerichte dienst aanbieden, als de verantwoordelijke die inrichting actief aanvaardt en om
+  aanpassing kan vragen (EDPB Guidelines 07/2020, punt 30 en 84).
+- Bij platforms en standaardtools kan ook **gezamenlijke verantwoordelijkheid** ontstaan (punt 64 tot 67).
+- De rol als verwerker is dus verdedigbaar, mits:
+  - de verwerkersvoorwaarden de inrichting beschrijven en de organisator die aanvaardt;
+  - VAYLIDE de gegevens niet voor eigen doelen gebruikt;
+  - instructies van de organisator (zoals eerder verwijderen) worden gevolgd.
+- **Juridisch te beoordelen.**
+
+**Wat dit betekent:**
+- Een voorstel voor verwerkersvoorwaarden voor alle organisatoren staat in `docs/VERWERKERSOVEREENKOMST.md`.
+- In de privacyverklaring staat de rol als "[Voorstel, juridisch te beoordelen]". Het besluit `rol_gasten` blijft open,
+  dus live starten wordt geweigerd tot het is ingevuld.
+
+## Procedure bij onverwachte gevoelige gegevens
+
+Ook met vaste vragen kan iemand in de toelichting of het liedjesveld iets gevoeligs zetten. De uitleg bij het veld
+verkleint dat risico, maar neemt de verantwoordelijkheid niet weg.
+
+1. **Wie beoordeelt:**
+   - alleen de eigenaar van VAYLIDE (de enige met toegang tot de database);
+   - geen andere personen, geen AI-dienst en geen automatische controle van antwoorden.
+2. **Hoe VAYLIDE het merkt:**
+   - via een melding van een gast of de organisator, of toevallig bij ondersteuning;
+   - VAYLIDE doorzoekt antwoorden niet uit zichzelf.
+3. **Toegang beperken:**
+   - het beheer toont geen aanmeldingen;
+   - kijk alleen naar het ene antwoord waar het om gaat;
+   - verwijs in e-mail, notities en tickets naar de uitnodiging en de aanmelding (de code), nooit naar de inhoud;
+   - maak geen kopieën, schermafbeeldingen of exports;
+   - foutmails bevatten geen aanmeldgegevens (gebouwd).
+4. **Maatregel:**
+   - **De gast vraagt het zelf:** wijzen op de persoonlijke link (zelf wijzigen of verwijderen). Lukt dat niet, dan de
+     organisator vragen de aanmelding te verwijderen, of, na instructie, de inhoud van dat ene veld wissen.
+   - **VAYLIDE ziet het zelf:** de organisator informeren (zonder de inhoud te herhalen) en voorstellen het te laten
+     verwijderen. VAYLIDE is verwerker, dus verwijderen gebeurt in overleg met of op instructie van de organisator.
+     Uitzondering: direct gevaar of een beveiligingsincident.
+   - **Een oude eigen vraag vraagt naar gevoelige gegevens:** met de organisator de vraag weghalen en opnieuw publiceren,
+     en afspreken wat er met de gegeven antwoorden gebeurt.
+   - **Gevoelige gegevens zijn bij de verkeerde persoon beland:** behandelen als mogelijk datalek (art. 33 en 34 AVG) en
+     de organisator direct informeren.
+5. **Termijnen:**
+   - **[Termijn vaststellen]** voor reactie en uitvoering. Verzoeken van gasten vallen voor de organisator onder de
+     wettelijke termijn van een maand.
+   - Wat verwijderd is, kan nog in back-ups staan tot die zijn vervangen (nu 14 nachten). Bij terugzetten opnieuw
+     verwijderen.
+6. **Vastleggen:** datum, soort melding, genomen maatregel en wie is geïnformeerd. Niet de gevoelige inhoud zelf.
+7. **Nog niet gebouwd (voorstel):** een beheerfunctie om één veld van één aanmelding te wissen, met registratie zonder de
+   inhoud. Nu kan de organisator alleen de hele aanmelding verwijderen, en de eigenaar alleen via de database.
+
+## Geparkeerd: "optie B" (dieet, allergieën en gezondheid)
+
+Niet gebouwd en niet aangezet. Een latere functie voor dieetwensen of allergieën vraagt eerst een eigen beoordeling van:
+- een passende grondslag (art. 6) **én** een uitzondering voor bijzondere persoonsgegevens (art. 9 lid 2, bijvoorbeeld
+  uitdrukkelijke toestemming);
+- duidelijke informatie vooraf, bij het veld zelf;
+- beperkte toegang (alleen wie het nodig heeft) en een aparte, korte bewaartermijn;
+- een werkende procedure om de toestemming in te trekken en de gegevens te verwijderen;
+- een nieuwe DPIA-afweging.
+
+Een algemeen privacyvinkje of akkoord met de voorwaarden is daarvoor onvoldoende. Let bij zakelijke evenementen op de
+afhankelijkheid tussen werkgever en werknemer: toestemming is daar zelden vrij.
 
 ## Foto's en AI
 
@@ -151,8 +248,9 @@ Getest op de homepage, `/ontwerpen/`, `/contact/`, `/privacy/`, `/maken/` en de 
 - **DPIA-beoordeling:** gemaakt met de lijst van de AP en de 9 EDPB-criteria (vuistregel: 2 of meer = DPIA).
   - **Gezichtsdetectie:** hoogstens 1 criterium (nieuwe technologie). Geen biometrische identificatie, niet grootschalig.
     **Niet verplicht**; leg de onderbouwing vast.
-  - **Aanmeldingen:** alleen met gevoelige eigen vragen 1 criterium (gevoelige gegevens). Het gaat om kleine aantallen per
-    uitnodiging. Nu **niet verplicht**. Opnieuw beoordelen als de aantallen groot worden of als optie b wordt gekozen.
+  - **Aanmeldingen:** met de vaste vragenlijst (optie A) worden geen gevoelige gegevens uitgevraagd. Het gaat om kleine
+    aantallen per uitnodiging. **Niet verplicht.** Opnieuw beoordelen als de aantallen groot worden, als optie B ooit wordt
+    gebouwd, of als oude eigen vragen op de testsite toch gevoelige gegevens blijken te vragen.
   - **Anthropic:** 1 criterium (nieuwe technologie), gewone gegevens. **Niet verplicht.**
   - **Eigen gezichten:** foto's van gezichten, mogelijk kinderen, generatieve AI buiten de EER; 2 of meer criteria. **DPIA
     vóór aanzetten.**
@@ -203,7 +301,13 @@ als bewijs bewaren en dan wissen. Nu wist `anonymize_user` het alleen bij het ve
   optioneel. De naam op de kaart is meestal genoeg; dit wordt niet afgedwongen.
 - **Verwijderde gegevens in back-ups:** die kunnen tot 14 dagen in een back-up blijven staan. Dat staat in de tekst.
   Terugzetten zonder opnieuw te verwijderen is handwerk (`core/backup.py`); maak er een vaste stap van.
-- **Foutmails:** die kunnen ingevulde formuliervelden bevatten, zoals antwoorden van gasten.
+- **Foutmails:** die kunnen ingevulde formuliervelden bevatten. Voor de aanmeldformulieren is dat nu uitgezet
+  (`sensitive_post_parameters`); voor contact, herroepen en extra wensen nog niet (voorstel: ook daar).
+- **Wijzigcode in de adresbalk:** de persoonlijke link om een antwoord te wijzigen bevat de code in het pad, dus die komt
+  in de toegangslogs van de server en van Render. Dat geeft toegang tot één antwoord. Voorstel: de code uit het logformaat
+  weglaten, of een kortere geldigheid.
+- **Oude eigen vragen:** uitnodigingen van vóór 30 september 2026 kunnen nog een eigen vraag bevatten. De privacyverklaring
+  zegt dat. Zie "Bestaande uitnodigingen".
 - **Export van eigen inhoud:** alleen de gastenlijst kan geëxporteerd worden, niet de foto's en teksten. Dat raakt het recht
   op overdracht.
 - **Gevolg van de controle bij livegang:** in live-modus mag geen besluit meer open staan. Dat is bewust streng.
@@ -218,20 +322,33 @@ als bewijs bewaren en dan wissen. Nu wist `anonymize_user` het alleen bij het ve
 5. **AI:** wil je tekstvoorstellen via Anthropic, controleer en teken dan de verwerkersovereenkomst en zet
    `VIERLIEF_AI_AFSPRAKEN` (de doorgifte-afspraken in één zin). Anders geen `ANTHROPIC_API_KEY` op Render.
 6. **Render controleren:** of de geplande taak draait, hoe lang logs bewaard worden, en of `ANTHROPIC_API_KEY` gezet is.
-7. **Verwerkersovereenkomst voor zakelijke klanten:** zie `docs/VERWERKERSOVEREENKOMST.md`.
-8. **Privacy-e-mailadres:** nu info@vantorstudio.nl (voorlopig).
+7. **Verwerkersvoorwaarden voor alle organisatoren:** zie `docs/VERWERKERSOVEREENKOMST.md`.
+8. **Oude eigen vragen op de testsite:** draai `python manage.py rsvp_vragen_rapport` in de Render-shell en beslis per
+   geval (zie "Bestaande uitnodigingen").
+9. **De vaste vragenlijst:** controleer de 6 vragen en antwoordopties in `invitations/vragen.py`. Nieuwe vragen alleen na
+   beoordeling.
+10. **Procedure bij onverwachte gevoelige gegevens:** de reactietermijn vaststellen, en besluiten of er een beheerfunctie
+   komt om één veld te wissen.
+11. **Privacy-e-mailadres:** nu info@vantorstudio.nl (voorlopig).
 
 ## Juridisch te beoordelen
 
-1. **Rol en grondslag bij gastgegevens:** particulier tegenover zakelijk, en of gerechtvaardigd belang past.
-2. **Eigen vragen met mogelijke gezondheidsgegevens:** optie a of b hierboven.
-3. **Grondslag voor gegevens van anderen op de kaart:** foto's, namen, contactpersoon.
-4. **DPIA-oordeel:** geen verplichte DPIA voor wat nu actief is; wel een DPIA vóór eigen gezichten.
-5. **De voorgestelde bewaartermijnen.**
-6. **Doorgifte naar de VS:** Render (DPF of standaardcontractbepalingen) en, als het aan staat, Anthropic.
-7. **Mollie als zelfstandig verantwoordelijke:** klopt de omschrijving in onderdeel 7?
-8. **Zonder cookiebanner:** alleen functionele cookies en opslag, zoals in onderdeel 10.
-9. **De reactietermijn en de tekst over identiteitscontrole** in onderdeel 12.
+1. **Rolverdeling per verwerking:** is VAYLIDE verwerker voor kaartinhoud en aanmeldingen, ook al bepaalt VAYLIDE de vaste
+   vragen en de standaardbewaartermijn, of is er gezamenlijke verantwoordelijkheid? Dezelfde vraag bij particulieren
+   onder de huishoudelijke uitzondering (EDPB Opinion 7/2024, punt 19 en 20).
+2. **Verwerkersvoorwaarden:** kunnen die in de algemene voorwaarden worden opgenomen voor alle organisatoren, ook
+   consumenten? En welke meldtermijn bij datalekken?
+3. **De vaste vragenlijst:** is die neutraal genoeg? Bijvoorbeeld: kan "Wanneer ben je erbij?" of "geregeld vervoer"
+   iets gevoeligs onthullen?
+4. **Oude eigen vragen op gepubliceerde uitnodigingen:** mag VAYLIDE als verwerker zo'n vraag laten staan tot het einde
+   van de looptijd, of moet er ingegrepen worden?
+5. **Grondslag voor gegevens van anderen op de kaart:** foto's, namen, contactpersoon.
+6. **DPIA-oordeel:** geen verplichte DPIA voor wat nu actief is; wel een DPIA vóór eigen gezichten.
+7. **De voorgestelde bewaartermijnen.**
+8. **Doorgifte naar de VS:** Render (DPF of standaardcontractbepalingen) en, als het aan staat, Anthropic.
+9. **Mollie als zelfstandig verantwoordelijke:** klopt de omschrijving in onderdeel 7?
+10. **Zonder cookiebanner:** alleen functionele cookies en opslag, zoals in onderdeel 10.
+11. **De reactietermijn en de tekst over identiteitscontrole** in onderdeel 12.
 
 ## Getest
 
@@ -245,6 +362,9 @@ Zie `docs/CONTROLES.md`, onder "Privacyverklaring".
 - [AP: Biometrie](https://autoriteitpersoonsgegevens.nl/nl/onderwerpen/identificatie/biometrie)
 - [AP: Cookies](https://autoriteitpersoonsgegevens.nl/nl/onderwerpen/internet-telefoon-tv-en-post/cookies)
 - [AP: Gezondheid](https://www.autoriteitpersoonsgegevens.nl/nl/onderwerpen/gezondheid)
+- [AP: Verantwoordelijke en verwerker](https://autoriteitpersoonsgegevens.nl/themas/basis-avg/avg-algemeen/verantwoordelijke-en-verwerker)
+- [EDPB Opinion 7/2024 (EU Cloud Service Data Protection, Auditor-criteria), punt 17 tot 20 over de huishoudelijke uitzondering](https://www.edpb.europa.eu/system/files/2024-04/edpb_opinion_202407_opiniononauditorcertificationcriteria_en.pdf)
+- [EDPB Guidelines 07/2020 over verwerkingsverantwoordelijke en verwerker (versie 2.1), punt 30, 40, 64 tot 67 en 84](https://www.edpb.europa.eu/system/files/2023-10/EDPB_guidelines_202007_controllerprocessor_final_en.pdf)
 - [Render: Data Processing Addendum](https://render.com/dpa)
 - [Mollie: Privacy](https://www.mollie.com/legal/privacy)
 - [Anthropic Privacy Center: bewaartermijn API-gegevens](https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data)

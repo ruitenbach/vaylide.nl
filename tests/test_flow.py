@@ -34,7 +34,7 @@ class FullJourneyTests(VaylideTestCase):
         c.post(f"/maken/{uid}/programma/", {"rev": inv.draft_rev, "actie": "volgende", "p0_time": "14:00", "p0_title": "Ceremonie"})
         inv.refresh_from_db()
         c.post(f"/maken/{uid}/aanmelden/", {"rev": inv.draft_rev, "actie": "volgende", "enabled": "on", "deadline": future_date(100),
-                                            "max_party_size": "3", "ask_remark": "on", "remark_label": "Nog iets?"})
+                                            "max_party_size": "3", "ask_remark": "on"})
         inv.refresh_from_db()
         self.assertEqual(inv.draft_content["rsvp"]["max_party_size"], 3)
 
@@ -226,9 +226,11 @@ class InvalidInputTests(VaylideTestCase):
         response = self.post("aanmelden", {"enabled": "on", "deadline": future_date(10), "max_party_size": "99"})
         self.assertContains(response, "Maximaal 10.")
 
-    def test_choice_question_needs_two_options(self):
-        response = self.post("aanmelden", {"enabled": "on", "deadline": future_date(10), "max_party_size": "2", "q0_label": "Menu?", "q0_type": "choice", "q0_options": "Vis"})
-        self.assertContains(response, "minimaal twee keuzes")
+    def test_at_most_five_fixed_questions(self):
+        data = {"enabled": "on", "deadline": future_date(10), "max_party_size": "2"}
+        data.update({f"vraag_{key}": "on" for key in ("vervoer", "parkeren", "overnachten", "pendel", "aankomst", "liedje")})
+        response = self.post("aanmelden", data)
+        self.assertContains(response, "Kies maximaal 5 extra vragen.")
 
     def test_checkout_rejects_incomplete_invitation_and_unknown_package(self):
         customer = self.make_customer("inc@example.com")

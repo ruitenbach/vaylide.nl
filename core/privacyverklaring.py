@@ -21,8 +21,10 @@ BESLUITEN: dict[str, str | None] = {
     "rol_gasten": None,
     # Grondslag voor gegevens van anderen in de kaartinhoud (namen, foto's, contactpersoon).
     "grondslag_kaartinhoud": None,
-    # Wat mag een organisator vragen met eigen vragen (bijv. dieetwensen of allergieën = mogelijk gezondheidsgegevens)?
-    "gevoelige_vragen": None,
+    # Besloten door de eigenaar op 30-09-2026 (optie A): alleen vaste, neutrale extra vragen (invitations/vragen.py).
+    "gevoelige_vragen": "Extra vragen kiest de organisator uit onze vaste lijst met neutrale vragen, zoals over vervoer of "
+                        "overnachten. Via VAYLIDE wordt niet gevraagd naar gezondheid, allergieën, geloof of andere "
+                        "gevoelige gegevens, en bij open tekstvelden staat dat je die daar ook niet moet invullen.",
     # Bewaartermijnen die de code nog niet uitvoert.
     "bewaar_account": None,
     "bewaar_gekochte_kaarten": None,

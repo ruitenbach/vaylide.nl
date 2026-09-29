@@ -20,6 +20,7 @@ from catalog.occasions import display_title, doc_kind, monogram, occasion_config
 from catalog.paar import view as paar_view
 
 from .content import HEX_COLOR, TIMEZONE_LABELS, card_kind, event_expected, event_times, normalize_content, parse_date, without_event
+from .vragen import HINT_GEVOELIG
 
 WEEKDAYS = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"]
 MONTHS = [
@@ -574,6 +575,8 @@ def build_view(
             "ask_remark": bool(rsvp_cfg.get("ask_remark", True)),
             "remark_label": (rsvp_cfg.get("remark_label") or "Wil je nog iets laten weten?").strip()[:120],
             "questions": questions,
+            # Bij elk vrij tekstveld (open vraag en toelichting), zie invitations/vragen.py.
+            "hint_gevoelig": HINT_GEVOELIG,
             "action": options.rsvp_action,
             "existing": options.existing_response,
         },

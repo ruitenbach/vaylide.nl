@@ -19,25 +19,31 @@
       {% include "studio/_field.html" with field=form.capacity %}
     </div>
     {% include "studio/_check.html" with field=form.ask_remark %}
-    {% include "studio/_field.html" with field=form.remark_label %}
+    {% if form.oude_toelichting %}
+    <div class="notice notice--warning oude-vraag"><strong>Eigen vraag bij de toelichting</strong><p>"{{ form.oude_toelichting }}". Eigen vraagteksten kunnen niet meer. Deze blijft staan tot je de standaardvraag kiest.</p>
+      {% include "studio/_check.html" with field=form.remark_standaard %}</div>
+    {% endif %}
   </section>
   <section class="studio-block" aria-labelledby="blok-vragen">
     <h2 class="studio-block__title" id="blok-vragen">Extra vragen (optioneel) <span class="badge">{{ feature_badges.extra_questions }}</span></h2>
-    <p class="hint">Bijvoorbeeld over dieetwensen. Onderdeel van Compleet of als extra optie. Vraag niet meer dan nodig.</p>
-    <div class="repeat-list" data-repeat="vragen">
-      {% for qid, label, qtype, options, required in form.question_fields %}
-      <div class="repeat-row question-row{% if not label.value and forloop.counter > 2 %} is-empty{% endif %}" data-repeat-row>
-        {{ qid }}
-        {% include "studio/_field.html" with field=label %}
-        <div class="form-row">
-          {% include "studio/_field.html" with field=qtype %}
-          {% include "studio/_field.html" with field=options %}
-        </div>
-        {% include "studio/_check.html" with field=required %}
+    <p class="hint">Kies uit deze vaste vragen; eigen vragen zijn niet mogelijk. Zo vraag je geen gevoelige gegevens, zoals over gezondheid, allergieën of geloof. Vraag niet meer dan nodig: maximaal {{ form.max_vragen }}. Onderdeel van Compleet of als extra optie.</p>
+    {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors.0 }}</div>{% endif %}
+    <div class="vaste-vragen">
+      {% for kies, verplicht, v in form.question_fields %}
+      <div class="vaste-vraag">
+        {% include "studio/_check.html" with field=kies %}
+        <p class="hint vaste-vraag__antwoord">{% if v.type == "yesno" %}Antwoord: ja of nee{% elif v.type == "choice" %}Antwoord: {{ v.options|join:", " }}{% else %}Open antwoord (gasten zien erbij dat ze geen gevoelige gegevens moeten invullen){% endif %}</p>
+        {% include "studio/_check.html" with field=verplicht %}
       </div>
       {% endfor %}
-      <button type="button" class="btn btn--ghost btn--sm" data-repeat-add hidden>+ Vraag toevoegen</button>
     </div>
+    {% if form.old_question_fields %}
+    <div class="notice notice--warning oude-vraag">
+      <strong>Eigen vragen van eerder</strong>
+      <p>Deze vragen maakte je voordat alleen vaste vragen mogelijk waren. Ze blijven staan, maar je kunt ze niet meer wijzigen. Haal ze liever weg als ze naar gevoelige gegevens vragen.</p>
+      {% for q, weg in form.old_question_fields %}<div class="oude-vraag__rij"><p>"{{ q.label }}"</p>{% include "studio/_check.html" with field=weg %}</div>{% endfor %}
+    </div>
+    {% endif %}
   </section>
   {% include "studio/_actions.html" %}
 </form>

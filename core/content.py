@@ -60,7 +60,7 @@ FEATURES = [
     ("wekker", "Afteller", "In de juiste tijdzone."),
     ("programma", "Programma", "Van ontvangst tot feest op een tijdlijn."),
     ("locatie", "Locatie en route", "Met een knop naar de kaart."),
-    ("gasten", "Aanmelden zonder account", "Aanwezig en met hoeveel personen. Eigen vragen met Compleet of als extra optie."),
+    ("gasten", "Aanmelden zonder account", "Aanwezig en met hoeveel personen. Extra vragen uit een vaste lijst met Compleet of als extra optie."),
     ("agenda", "In de agenda", "Google, Apple en Outlook."),
     ("delen", "Delen", "Via WhatsApp, een link of een QR-code."),
     ("muziek", "Muziek", "Start pas als de gast erop tikt."),
@@ -141,7 +141,7 @@ TEXT_SAMPLES = [
 TIPS = [
     ("agenda", "Kies een aanmelddatum", "Een paar weken voor de dag. Dan weet je op tijd met hoeveel gasten je rekent."),
     ("programma", "Zet het programma erin", "Gasten zien meteen wanneer de ceremonie, het diner of het feest begint."),
-    ("gasten", "Stel je eigen vraag", "Bijvoorbeeld over dieetwensen of vervoer. Met Compleet of als extra optie."),
+    ("gasten", "Extra vragen", "Kies uit vaste vragen, bijvoorbeeld over vervoer of overnachten. Met Compleet of als extra optie."),
     ("kleuren", "Geef een dresscode mee", "Met een paar kleuren erbij weten gasten precies wat je bedoelt."),
     ("fotos", "Kies rustige foto's", "Je bepaalt zelf welk deel in beeld komt, zodat tekst goed leesbaar blijft."),
     ("delen", "Deel op jouw manier", "Stuur de link via WhatsApp of e-mail, of zet de QR-code op een kaart."),

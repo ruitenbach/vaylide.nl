@@ -14,7 +14,7 @@ cp .env.example .env                      # zet een eigen DJANGO_SECRET_KEY; gee
 .venv/bin/python manage.py migrate        # leest ook de ontwerpen in (sync_designs)
 .venv/bin/python manage.py createsuperuser
 .venv/bin/python manage.py runserver      # http://127.0.0.1:8000, testmodus
-.venv/bin/python manage.py test tests     # 394 tests, moeten altijd slagen
+.venv/bin/python manage.py test tests     # 411 tests, moeten altijd slagen
 ```
 
 Visuele controles (Node met Playwright en Chromium): zie "Zelf herhalen" in `docs/CONTROLES.md` (`e2e/klantreis.cjs` voor de hele klantreis, `e2e/fixtures.py`, `e2e/controle2.cjs`, `e2e/toegankelijkheid.cjs` en `e2e/effecten.cjs`). Beelden opnieuw maken: `tools/logo/README.md` (logo en iconen), `tools/merkbeelden/README.md` (website), `tools/generate_demo_images.py` (voorbeeldbeelden), `tools/winterlicht/README.md` (de kerstkaart Winterlicht), `tools/gloria/maak_tekeningen.py` (vleugels en engelen van Gloria), `tools/aan_tafel/maak_tekeningen.py` (slinger en hulst van Aan tafel), `tools/voor_altijd/maak_tekeningen.py` (krans, takje en ringen van Voor altijd), `tools/eerste_dans/maak_tekeningen.py` (bruidspaar, kroonluchter en bloemenslinger van Eerste dans), `docs/BALZAAL.md` (beeldlagen en haarkleuren van Balzaal), `docs/GEZICHTEN.md` (eigen gezichten via een beeld-API; staat uit) en `e2e/make_design_images.cjs` (kaartbeelden van de ontwerpen). Een losse voorvertoning zonder server (om te delen): `python tools/voorvertoning.py <map> [ontwerp ...]`. De 3D-wereld op de homepage (voorbeeldkaart die omdraait, gouden kaart, sterretjes, kerstpodium) en de sterretjes in de paginakoppen: `static/js/hero3d.js` (omdraaien werkt altijd; beweging stilgezet bij 'minder beweging'). Themabeelden: `tools/merkbeelden/voorbeelden.cjs`.
@@ -34,6 +34,7 @@ Visuele controles (Node met Playwright en Chromium): zie "Zelf herhalen" in `doc
 | Klantomgeving, extra wensen, beheer | `portal/`, `wishes/`, `beheer/` |
 | Beveiligingsheaders en CSP | `core/middleware.py`, `core/csp.py` |
 | Privacyverklaring | `core/templates/core/privacy.html`; feiten, aanbieders, cookies en open besluiten in `core/privacyverklaring.py` (in live-modus weigert `manage.py check` zolang er iets open staat). Zie `docs/PRIVACY.md` |
+| Aanmelden (RSVP) | Extra vragen alleen uit de vaste, neutrale lijst in `invitations/vragen.py` (geen eigen vraagteksten; niet uitbreiden zonder beoordeling), controle in `invitations/rsvp.py`, tellen van oude eigen vragen: `manage.py rsvp_vragen_rapport` |
 
 ## Vaste regels van de eigenaar
 

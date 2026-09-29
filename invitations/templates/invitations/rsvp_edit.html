@@ -48,14 +48,15 @@
         <label for="rsvp-{{ q.field }}">{{ q.label }}</label>
         {% if q.type == "choice" %}<select id="rsvp-{{ q.field }}" name="{{ q.field }}"><option value="">Maak een keuze</option>{% for o in q.options %}<option{% if val == o %} selected{% endif %}>{{ o }}</option>{% endfor %}</select>
         {% elif q.type == "yesno" %}<select id="rsvp-{{ q.field }}" name="{{ q.field }}"><option value="">Maak een keuze</option><option{% if val == "Ja" %} selected{% endif %}>Ja</option><option{% if val == "Nee" %} selected{% endif %}>Nee</option></select>
-        {% else %}<input id="rsvp-{{ q.field }}" type="text" name="{{ q.field }}" maxlength="300" value="{{ val }}">{% endif %}
+        {% else %}<p class="field__hint" id="rsvp-{{ q.field }}-hint">{{ v.rsvp.hint_gevoelig }}</p><input id="rsvp-{{ q.field }}" type="text" name="{{ q.field }}" maxlength="300" value="{{ val }}" aria-describedby="rsvp-{{ q.field }}-hint">{% endif %}
         {% if err %}<p class="field__error">{{ err }}</p>{% endif %}
       </div>
       {% endwith %}{% endfor %}
       {% if v.rsvp.ask_remark %}
       <div class="field">
         <label for="rsvp-remark">{{ v.rsvp.remark_label }} <span class="field__hint">optioneel</span></label>
-        <textarea id="rsvp-remark" name="remark" rows="3" maxlength="1000">{{ rsvp_form.values.remark }}</textarea>
+        <p class="field__hint" id="rsvp-remark-hint">{{ v.rsvp.hint_gevoelig }}</p>
+        <textarea id="rsvp-remark" name="remark" rows="3" maxlength="1000" aria-describedby="rsvp-remark-hint">{{ rsvp_form.values.remark }}</textarea>
       </div>
       {% endif %}
       <button type="submit" class="inv-btn inv-btn--primary rsvp__submit">Wijziging opslaan</button>

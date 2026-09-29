@@ -29,6 +29,7 @@ from catalog.models import Template  # noqa: E402
 from invitations.images import process_photo  # noqa: E402
 from invitations.models import GuestResponse, Invitation, MediaAsset  # noqa: E402
 from invitations.services import create_draft, save_draft  # noqa: E402
+from invitations.vragen import vraag  # noqa: E402
 from orders.models import Payment  # noqa: E402
 from orders.services import start_checkout, sync_payment  # noqa: E402
 
@@ -109,7 +110,7 @@ for template in Template.objects.all():
                          "gallery": [{"asset": g, "x": 50, "y": 50, "zoom": 1, "caption": "Onderschrift"} for g in gallery]}
     content["sections"] = dict(content["sections"], story=True, gallery=True)
     content["rsvp"] = dict(content["rsvp"], deadline=(today + timedelta(days=150)).isoformat(), max_party_size=4,
-                           questions=[{"id": "q1", "label": "Heb je dieetwensen of allergieën die we moeten weten?", "type": "text", "options": [], "required": False}])
+                           questions=[vraag("liedje", formal=False)])
     inv = save_draft(inv, expected_rev=None, content=content, user=owner)
     inv = publish(inv, owner)
     out[f"{slug}:lang"] = inv.public_path

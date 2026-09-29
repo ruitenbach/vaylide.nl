@@ -796,3 +796,38 @@ testklanten uit `e2e/klantreis_setup.py`.
   `/privacy/`, `/inloggen/`, `/account/wensen/nieuw/`, de fotostap en drie voorbeelduitnodigingen met het aanmeldformulier.
 - **In de browser bekeken** (375 pixels, geen horizontaal scrollen): de privacyverklaring; de tabellen staan op een smal
   scherm als kaartjes onder elkaar.
+
+## Aanmelden zonder gevoelige gegevens, optie A (30 september 2026)
+
+Lokaal, branch `claude/privacyverklaring`, testmodus, met fictieve testgegevens.
+
+- `manage.py test tests`: 411 tests, alle geslaagd (nieuw: `tests/test_rsvp_vragen.py`, 17 tests). Getest:
+  - de vaste vragen zijn neutraal, ook in de antwoordopties;
+  - een aangepaste tekst of optie telt als eigen vraag;
+  - nieuwe uitnodigingen: alleen naam, aanwezigheid en aantal personen;
+  - geen "dieetwensen" of "allergieën" op de site en in de extra optie;
+  - de studio biedt alleen vaste vragen, en een zelfgemaakt verzoek met een eigen vraagtekst of toelichtingstekst wordt
+    genegeerd;
+  - u-vorm bij een zakelijk evenement;
+  - oude eigen vragen blijven staan tot ze worden weggehaald, en tellen mee voor het maximum;
+  - standaardformulier zonder vrij tekstveld; de uitleg staat bij beide vrije velden;
+  - aanmelden en afmelden;
+  - controle op de server: verplichte vraag, optie buiten de lijst, te veel personen, onbekend veld;
+  - weergave voor de organisator en CSV-export;
+  - een gepubliceerde uitnodiging met een oude eigen vraag blijft werken;
+  - het rapport toont geen inhoud en verandert niets;
+  - aanmeldgegevens komen niet in foutmeldingen.
+- **Klantreis in Chromium** (`e2e/klantreis.cjs`, uitgebreid): 48/48 op 390 en 1366 pixels, onder meer:
+  - vaste vragen kiezen en opslaan, zonder veld voor een eigen vraagtekst;
+  - Compleet betalen;
+  - de uitleg twee keer in het formulier van de gast;
+  - de server weigert een lege verplichte vraag en een optie buiten de lijst;
+  - aanmelden met 2 personen en een antwoord;
+  - een tweede gast meldt zich af;
+  - de organisator ziet vraag, antwoord en afmelding;
+  - CSV-regel `Gast Klantreis;ja;2;Met de auto;Dancing Queen`.
+- **Toegankelijkheid** (`e2e/toegankelijkheid.cjs`): 0 bevindingen op 24 pagina's (Aan tafel, Liefde op papier en
+  Winterlicht, alle kleuren, dicht en open). De volledige run over alle ontwerpen bleef lokaal na 24 minuten hangen en is
+  afgebroken: **niet opnieuw uitgevoerd**.
+- `manage.py rsvp_vragen_rapport` lokaal: 70 uitnodigingen, 0 oude eigen vragen, 0 eigen toelichtingsvragen. **Op
+  Render niet uitgevoerd.**

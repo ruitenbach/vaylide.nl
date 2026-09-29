@@ -94,8 +94,9 @@ def default_content(occasion: str, palette_key: str = "") -> dict:
             "deadline": "",
             "max_party_size": 2,
             "capacity": None,
-            "ask_remark": True,
-            "remark_label": "Wil je nog iets laten weten?",
+            # Standaard alleen naam, aanwezigheid en aantal personen (keuze eigenaar 30-09-2026, zie invitations/vragen.py).
+            "ask_remark": False,
+            "remark_label": "Wilt u nog iets laten weten?" if cfg.get("formal") else "Wil je nog iets laten weten?",
             "questions": [],
         },
         "closing_text": "",

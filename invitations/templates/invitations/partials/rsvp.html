@@ -45,7 +45,8 @@
     <div class="field{% if q.type != 'text' %} field--choice{% endif %}" data-when-attending>
       {% if q.type == "text" %}
         <label for="rsvp-{{ q.field }}">{{ q.label }}{% if not q.required %} <span class="field__hint">optioneel</span>{% endif %}</label>
-        <input id="rsvp-{{ q.field }}" type="text" name="{{ q.field }}" maxlength="300" value="{{ val }}"{% if q.required %} required{% endif %}>
+        <p class="field__hint" id="rsvp-{{ q.field }}-hint">{{ v.rsvp.hint_gevoelig }}</p>
+        <input id="rsvp-{{ q.field }}" type="text" name="{{ q.field }}" maxlength="300" value="{{ val }}" aria-describedby="rsvp-{{ q.field }}-hint"{% if q.required %} required{% endif %}>
       {% elif q.type == "yesno" %}
         <fieldset><legend>{{ q.label }}{% if not q.required %} <span class="field__hint">optioneel</span>{% endif %}</legend>
           <label class="choice"><input type="radio" name="{{ q.field }}" value="Ja"{% if val == "Ja" %} checked{% endif %}{% if q.required %} required{% endif %}><span>Ja</span></label>
@@ -64,7 +65,8 @@
     {% if v.rsvp.ask_remark %}
     <div class="field">
       <label for="rsvp-remark">{{ v.rsvp.remark_label }} <span class="field__hint">optioneel</span></label>
-      <textarea id="rsvp-remark" name="remark" rows="3" maxlength="1000">{{ rsvp_form.values.remark|default:'' }}</textarea>
+      <p class="field__hint" id="rsvp-remark-hint">{{ v.rsvp.hint_gevoelig }}</p>
+      <textarea id="rsvp-remark" name="remark" rows="3" maxlength="1000" aria-describedby="rsvp-remark-hint">{{ rsvp_form.values.remark|default:'' }}</textarea>
     </div>
     {% endif %}
     <p class="rsvp__status" role="status" aria-live="polite" data-rsvp-status></p>

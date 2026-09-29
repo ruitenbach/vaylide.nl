@@ -30,8 +30,8 @@ async function login(context, email) {
   return p;
 }
 
-async function pay(p, uid, outcome, name) {
-  await p.goto(`${base}/maken/${uid}/bestellen/?package=essentieel`);
+async function pay(p, uid, outcome, name, pkg = "essentieel") {
+  await p.goto(`${base}/maken/${uid}/bestellen/?package=${pkg}`);
   await p.check("input[name=terms]");
   await p.check("input[name=direct_leveren]");
   await Promise.all([p.waitForURL("**/betalen/test/**"), p.click("button[name=actie][value=betalen]")]);
@@ -91,7 +91,17 @@ async function pay(p, uid, outcome, name) {
   check("Nepbestand wordt geweigerd met een melding", afterFake === after && /niet|foto|bestand/i.test(status + body), `melding: '${status.trim().slice(0, 90)}'`);
   await shot(pa, "fotos");
 
-  const phase = await pay(pa, data.paid, "betaald", "betaald");
+  // Aanmelden: alleen vaste extra vragen (optie A); eigen vraagteksten bestaan niet meer.
+  await pa.goto(`${base}/maken/${data.paid}/aanmelden/`);
+  check("Aanmelden: geen eigen vraagtekst mogelijk", (await pa.$$("input[name=q0_label], input[name=remark_label]")).length === 0, "");
+  for (const naam of ["vraag_vervoer", "verplicht_vervoer", "vraag_liedje", "ask_remark"]) await pa.check(`input[name=${naam}]`, { force: true });
+  await Promise.all([pa.waitForNavigation(), pa.click("button[name=actie][value=opslaan]")]);
+  await pa.goto(`${base}/maken/${data.paid}/aanmelden/`);
+  const gekozen = await pa.$$eval("input[name^=vraag_]:checked", (els) => els.map((e) => e.name).join(","));
+  check("Aanmelden: vaste vragen opgeslagen", gekozen === "vraag_vervoer,vraag_liedje", gekozen);
+  await shot(pa, "aanmelden-vaste-vragen");
+
+  const phase = await pay(pa, data.paid, "betaald", "betaald", "compleet");
   await shot(pa, "status-betaald");
   check("Geslaagde betaling: bestelling online", phase === "live", `fase ${phase}`);
   const publicUrl = await pa.getAttribute("a[href*='/u/']", "href").catch(() => null);
@@ -107,22 +117,55 @@ async function pay(p, uid, outcome, name) {
     check("Gast opent de uitnodiging", r.status() === 200, `status ${r.status()}`);
     await pg.click("[data-open]", { force: true }).catch(() => {});
     await pg.waitForTimeout(3500);
-    await pg.fill("form[action$='/aanmelden/'] input[name=name]", "Gast Klantreis");
-    await pg.check("form[action$='/aanmelden/'] input[name=attending][value=ja]", { force: true }).catch(() => {});
+    const form = "form[action$='/aanmelden/']";
+    const hints = await pg.$$eval(`${form} .field__hint`, (els) => els.filter((e) => /geen medische informatie/.test(e.textContent)).length);
+    check("Aanmelden: uitleg bij beide vrije tekstvelden", hints === 2, `${hints} keer`);
+    check("Aanmelden: vaste vraag met vaste opties", !!(await pg.$(`${form} select[name=q_vervoer] option:text("Met de auto")`)), "");
     await pg.waitForTimeout(3200); // formulier niet sneller dan een mens
+    // Controle op de server, buiten de browsercontrole om: verplichte vraag en onbekende optie.
+    const velden = await pg.$$eval(`${form} input[type=hidden]`, (els) => Object.fromEntries(els.map((e) => [e.name, e.value])));
+    const actie = new URL(await pg.getAttribute(form, "action"), pg.url()).href;
+    const post = (extra) => pg.request.post(actie, { form: { ...velden, name: "Server Test", attending: "ja", party_size: "1", ...extra }, headers: { Accept: "application/json" } });
+    const zonder = await (await post({})).json().catch(() => ({}));
+    const fout = await (await post({ q_vervoer: "Halal menu" })).json().catch(() => ({}));
+    check("Server weigert: verplichte vraag leeg en optie buiten de lijst", !!(zonder.errors && zonder.errors.q_vervoer && fout.errors && fout.errors.q_vervoer), JSON.stringify([zonder.errors, fout.errors]).slice(0, 120));
+    await pg.fill(`${form} input[name=name]`, "Gast Klantreis");
+    await pg.check(`${form} input[name=attending][value=ja]`, { force: true }).catch(() => {});
+    await pg.selectOption(`${form} select[name=party_size]`, "2").catch(() => {});
+    await pg.selectOption(`${form} select[name=q_vervoer]`, "Met de auto");
+    await pg.fill(`${form} input[name=q_liedje]`, "Dancing Queen");
+    await pg.$eval(`${form} input[name=q_liedje]`, (el) => el.scrollIntoView({ block: "center" }));
+    await pg.waitForTimeout(1800);
+    await pg.screenshot({ path: path.join(out, `${width}-gast-formulier.png`) });
     await pg.click("form[action$='/aanmelden/'] button[type=submit]");
     await pg.waitForTimeout(2000);
     const done = await pg.textContent("main").catch(() => "");
     check("Gast meldt zich aan", /bedankt|ontvangen|je antwoord/i.test(done || ""), (done || "").replace(/\s+/g, " ").match(/(bedankt|ontvangen|je antwoord)[^.]{0,60}/i)?.[0] || "geen bevestiging gevonden");
     await shot(pg, "gast-aangemeld");
+    // Tweede gast meldt zich af.
+    const pg2 = await (await browser.newContext(ctxOpts)).newPage();
+    watch(pg2);
+    await pg2.goto(publicUrl.startsWith("http") ? publicUrl : base + publicUrl);
+    await pg2.click("[data-open]", { force: true }).catch(() => {});
+    await pg2.waitForTimeout(3500);
+    await pg2.fill(`${form} input[name=name]`, "Gast Afmelder");
+    await pg2.check(`${form} input[name=attending][value=nee]`, { force: true });
+    await pg2.waitForTimeout(3200);
+    await pg2.click(`${form} button[type=submit]`);
+    await pg2.waitForTimeout(2000);
+    check("Tweede gast meldt zich af", /bedankt|ontvangen|je antwoord|jammer/i.test((await pg2.textContent("main").catch(() => "")) || ""), "");
   }
 
   // ---- Klant A ziet het antwoord en kan exporteren ----
   const guestsResp = await pa.goto(`${base}/account/uitnodiging/${data.paid}/gasten/`);
   const guestsText = await pa.textContent("main");
   check("Antwoord zichtbaar in Mijn Vaylide", guestsResp.status() === 200 && guestsText.includes("Gast Klantreis"), `status ${guestsResp.status()}`);
+  check("Organisator ziet vaste vraag en antwoord", guestsText.includes("Hoe kom je?") && guestsText.includes("Met de auto"), "");
+  check("Organisator ziet ook de afmelding", guestsText.includes("Gast Afmelder"), "");
   const csv = await pa.request.get(`${base}/account/uitnodiging/${data.paid}/gasten/export.csv`);
-  check("Gastenlijst exporteren (CSV)", csv.status() === 200 && (await csv.text()).includes("Gast Klantreis"), `status ${csv.status()}`);
+  const csvText = await csv.text();
+  check("Gastenlijst exporteren (CSV)", csv.status() === 200 && csvText.includes("Gast Klantreis"), `status ${csv.status()}`);
+  check("CSV met vaste vraag, antwoord en aantal", csvText.includes("Hoe kom je?") && /Gast Klantreis;ja;2;Met de auto;Dancing Queen/.test(csvText), "");
   await shot(pa, "gasten");
   const qr = await pa.request.get(`${base}/account/uitnodiging/${data.paid}/qr.png`);
   check("QR-code downloaden", qr.status() === 200 && (qr.headers()["content-type"] || "").includes("image/png"), `status ${qr.status()}`);

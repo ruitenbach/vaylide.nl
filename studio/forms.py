@@ -7,7 +7,6 @@ compleet zijn; ingevulde gegevens worden dan toch bewaard.
 from __future__ import annotations
 
 import re
-import secrets
 from datetime import date, timedelta
 
 from django import forms
@@ -15,11 +14,11 @@ from django.utils import timezone
 
 from catalog import envelop, paar
 from catalog.occasions import OCCASION_CHOICES, occasion_config
+from invitations import vragen
 from invitations.content import (
     MAX_PRACTICAL_ITEMS,
     MAX_PROGRAM_ITEMS,
     MAX_QUESTIONS,
-    QUESTION_TYPES,
     SOORTEN,
     TIMEZONES,
     card_kind,
@@ -328,6 +327,10 @@ class ProgramForm(StepForm):
 
 
 class RsvpSettingsForm(StepForm):
+    """Aanmelden: standaard alleen naam, aanwezigheid en aantal personen. Extra vragen alleen uit de vaste lijst
+    (invitations/vragen.py); geen eigen vraagteksten of antwoordopties, zodat er geen gevoelige gegevens worden
+    uitgevraagd. Oude eigen vragen blijven staan tot de organisator ze weghaalt."""
+
     enabled = forms.BooleanField(label="Gasten kunnen zich aanmelden via de uitnodiging", required=False)
     deadline = forms.DateField(label="Aanmelden kan tot en met", required=False, widget=DATE_WIDGET,
                                error_messages={"invalid": "Vul een geldige datum in."})
@@ -337,41 +340,46 @@ class RsvpSettingsForm(StepForm):
     capacity = forms.IntegerField(label="Maximaal aantal gasten in totaal (optioneel)", min_value=1, max_value=5000, required=False,
                                   help_text="Als dit aantal is bereikt, sluit het aanmelden automatisch.",
                                   error_messages={"min_value": "Minimaal 1.", "invalid": "Vul een getal in."})
-    ask_remark = forms.BooleanField(label="Gasten kunnen een toelichting meesturen", required=False)
-    remark_label = forms.CharField(label="Vraag bij de toelichting", max_length=120, required=False)
+    ask_remark = forms.BooleanField(label="Gasten kunnen een korte toelichting meesturen", required=False,
+                                    help_text="Bijvoorbeeld dat iemand later komt. Gasten zien erbij dat ze geen gevoelige "
+                                              "gegevens moeten invullen. De vraag zelf ligt vast.")
+    remark_standaard = forms.BooleanField(label="Gebruik de standaardvraag bij de toelichting", required=False)
+    max_vragen = MAX_QUESTIONS
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        c = self.content
-        rsvp = c.get("rsvp") or {}
-        questions = list(rsvp.get("questions") or [])
-        self.question_rows = MAX_QUESTIONS
-        for i in range(self.question_rows):
-            self.fields[f"q{i}_id"] = forms.CharField(required=False, widget=forms.HiddenInput, max_length=12)
-            self.fields[f"q{i}_label"] = forms.CharField(label="Vraag", max_length=140, required=False)
-            self.fields[f"q{i}_type"] = forms.ChoiceField(label="Soort antwoord", choices=QUESTION_TYPES, required=False)
-            self.fields[f"q{i}_options"] = forms.CharField(label="Keuzes (gescheiden door komma's)", max_length=300, required=False)
-            self.fields[f"q{i}_required"] = forms.BooleanField(label="Verplicht", required=False)
+        rsvp = self.content.get("rsvp") or {}
+        questions = [q for q in rsvp.get("questions") or [] if isinstance(q, dict)]
+        self.formal = bool(occasion_config(self.occasion).get("formal"))
+        self.oude_vragen = vragen.eigen_vragen(questions)
+        self.oude_toelichting = (rsvp.get("remark_label") or "").strip() if vragen.eigen_toelichting(rsvp) else ""
+        chosen = {q.get("id"): q for q in questions if vragen.is_vast(q)}
+        for v in vragen.VRAGEN:
+            self.fields[f"vraag_{v['key']}"] = forms.BooleanField(
+                label=v["label_u"] if self.formal else v["label"], required=False, help_text=v["uitleg"])
+            self.fields[f"verplicht_{v['key']}"] = forms.BooleanField(label="Verplicht", required=False)
+        for i, _q in enumerate(self.oude_vragen):
+            self.fields[f"oud_{i}_weg"] = forms.BooleanField(label="Deze vraag weghalen", required=False)
         if not self.is_bound:
-            self.initial["enabled"] = bool((c.get("sections") or {}).get("rsvp"))
+            self.initial["enabled"] = bool((self.content.get("sections") or {}).get("rsvp"))
             self.initial["deadline"] = parse_date(rsvp.get("deadline"))
             self.initial["max_party_size"] = rsvp.get("max_party_size") or 2
             self.initial["capacity"] = rsvp.get("capacity")
-            self.initial["ask_remark"] = bool(rsvp.get("ask_remark", True))
-            self.initial["remark_label"] = rsvp.get("remark_label") or "Wil je nog iets laten weten?"
-            for i, q in enumerate(questions[: self.question_rows]):
-                self.initial[f"q{i}_id"] = q.get("id", "")
-                self.initial[f"q{i}_label"] = q.get("label", "")
-                self.initial[f"q{i}_type"] = q.get("type", "text")
-                self.initial[f"q{i}_options"] = ", ".join(q.get("options") or [])
-                self.initial[f"q{i}_required"] = bool(q.get("required"))
+            self.initial["ask_remark"] = bool(rsvp.get("ask_remark", False))
+            for key, q in chosen.items():
+                self.initial[f"vraag_{key}"] = True
+                self.initial[f"verplicht_{key}"] = bool(q.get("required"))
 
     @property
     def question_fields(self):
-        return [
-            (self[f"q{i}_id"], self[f"q{i}_label"], self[f"q{i}_type"], self[f"q{i}_options"], self[f"q{i}_required"])
-            for i in range(self.question_rows)
-        ]
+        return [(self[f"vraag_{v['key']}"], self[f"verplicht_{v['key']}"], v) for v in vragen.VRAGEN]
+
+    @property
+    def old_question_fields(self):
+        return [(q, self[f"oud_{i}_weg"]) for i, q in enumerate(self.oude_vragen)]
+
+    def _kept_old(self, d) -> list[dict]:
+        return [q for i, q in enumerate(self.oude_vragen) if not d.get(f"oud_{i}_weg")]
 
     def clean(self):
         data = super().clean()
@@ -379,33 +387,26 @@ class RsvpSettingsForm(StepForm):
         deadline = data.get("deadline")
         if deadline and event_day and deadline > event_day:
             self.add_error("deadline", "De deadline moet op of vóór de datum van het evenement liggen.")
-        for i in range(self.question_rows):
-            label = _s(data.get(f"q{i}_label"))
-            qtype = data.get(f"q{i}_type") or "text"
-            options = [o.strip() for o in _s(data.get(f"q{i}_options")).split(",") if o.strip()]
-            if label and qtype == "choice" and len(options) < 2:
-                self.add_error(f"q{i}_options", "Geef minimaal twee keuzes, gescheiden door komma's.")
+        total = sum(1 for v in vragen.VRAGEN if data.get(f"vraag_{v['key']}")) + len(self._kept_old(data))
+        if total > MAX_QUESTIONS:
+            self.add_error(None, f"Kies maximaal {MAX_QUESTIONS} extra vragen.")
         return data
 
     def apply(self, content: dict) -> dict:
         d = self.cleaned_data
         content.setdefault("sections", {})["rsvp"] = bool(d.get("enabled"))
-        questions = []
-        for i in range(self.question_rows):
-            label = _s(d.get(f"q{i}_label"))
-            if not label:
-                continue
-            qid = re.sub(r"[^a-z0-9]", "", _s(d.get(f"q{i}_id")).lower())[:12] or "q" + secrets.token_hex(3)
-            qtype = d.get(f"q{i}_type") or "text"
-            options = [o.strip()[:60] for o in _s(d.get(f"q{i}_options")).split(",") if o.strip()][:8]
-            questions.append({"id": qid, "label": label, "type": qtype, "options": options if qtype == "choice" else [],
-                              "required": bool(d.get(f"q{i}_required"))})
+        old = content.get("rsvp") or {}
+        questions = [vragen.vraag(v["key"], formal=self.formal, required=bool(d.get(f"verplicht_{v['key']}")))
+                     for v in vragen.VRAGEN if d.get(f"vraag_{v['key']}")]
+        questions += self._kept_old(d)  # oude eigen vragen: alleen weghalen, niet wijzigen (zie docs/PRIVACY.md)
+        standaard = vragen.TOELICHTING_LABEL_U if self.formal else vragen.TOELICHTING_LABEL
+        remark_label = self.oude_toelichting if self.oude_toelichting and not d.get("remark_standaard") else standaard
         content["rsvp"] = {
             "deadline": d["deadline"].isoformat() if d.get("deadline") else "",
             "max_party_size": d.get("max_party_size") or 1,
             "capacity": d.get("capacity"),
             "ask_remark": bool(d.get("ask_remark")),
-            "remark_label": _s(d.get("remark_label")) or "Wil je nog iets laten weten?",
+            "remark_label": remark_label,
             "questions": questions,
         }
         return content

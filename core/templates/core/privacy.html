@@ -23,7 +23,7 @@
   <h3>Inhoud van je kaart</h3>
   <p>Wat je zelf invult of uploadt: namen, datum, tijd, locatie en adres, programma, dresscode, persoonlijke teksten, foto's, muziek, een eigen logo of initialen voor het lakzegel, en eventueel een contactpersoon met telefoonnummer of e-mailadres. Die inhoud kan gegevens van andere mensen bevatten. Zet er alleen gegevens en foto's op die je met de genodigden mag delen.</p>
   <h3>Gegevens van gasten</h3>
-  <p>Wie reageert op een uitnodiging, vult in: naam, of hij of zij komt, met hoeveel personen, eventueel een toelichting en de antwoorden op eigen vragen van de organisator. Welke velden verplicht zijn, staat bij het formulier. Wij vragen gasten niet om een account, e-mailadres of telefoonnummer. Om je antwoord later te kunnen wijzigen krijg je een persoonlijke link; wij bewaren daarvan alleen een versleutelde versie.</p>
+  <p>Wie reageert op een uitnodiging, vult standaard alleen in: naam, of hij of zij komt en met hoeveel personen. Heeft de organisator dat gekozen, dan ook antwoorden op extra vragen uit onze vaste lijst (zoals over vervoer of overnachten) en een korte toelichting. Welke velden verplicht zijn, staat bij het formulier. Wij vragen gasten niet om een account, e-mailadres of telefoonnummer. Om je antwoord later te kunnen wijzigen krijg je een persoonlijke link; wij bewaren daarvan alleen een versleutelde versie.</p>
   <h3>Contact, extra wensen en herroepen</h3>
   <p>Stuur je ons een bericht via het contactformulier, dan bewaren wij je naam, e-mailadres, onderwerp en bericht. Vraag je in Mijn VAYLIDE om een extra wens, dan bewaren wij je omschrijving, onze berichten en je bijlagen. Gebruik je de knop om de overeenkomst te ontbinden, dan bewaren wij je naam, e-mailadres, bestelgegevens en toelichting, en het tijdstip.</p>
   <h3>Technische gegevens</h3>
@@ -39,7 +39,7 @@
       <tr><td data-label="Doel">De site beveiligen, misbruik beperken en fouten oplossen</td><td data-label="Grondslag (AVG)">Gerechtvaardigd belang: een veilige en werkende dienst</td></tr>
       <tr><td data-label="Doel">Vragen via het contactformulier beantwoorden</td><td data-label="Grondslag (AVG)">Stappen vóór een overeenkomst, of gerechtvaardigd belang: je vraag beantwoorden</td></tr>
       <tr><td data-label="Doel">Gegevens van anderen in de inhoud van je kaart</td><td data-label="Grondslag (AVG)">{{ besluit.grondslag_kaartinhoud|invul:"[grondslag en rol vaststellen]" }}</td></tr>
-      <tr><td data-label="Doel">Aanmeldingen van gasten en de gastenlijst</td><td data-label="Grondslag (AVG)">Zie onderdeel 4</td></tr>
+      <tr><td data-label="Doel">Aanmeldingen van gasten en de gastenlijst</td><td data-label="Grondslag (AVG)">Zie onderdeel 4. De overeenkomst met de klant is geen grondslag voor gegevens van gasten.</td></tr>
       <tr><td data-label="Doel">De nieuwsbrief</td><td data-label="Grondslag (AVG)">Jouw toestemming, met een apart vinkje dat standaard uit staat</td></tr>
     </tbody>
   </table></div>
@@ -48,8 +48,9 @@
 
   <h2 id="gasten">4. Uitnodigingen, aanmeldingen en de organisator</h2>
   <p>Als je reageert op een uitnodiging, gaat je antwoord naar de organisator: de klant die de uitnodiging maakte. Alleen die ziet de gastenlijst in Mijn VAYLIDE en kan die downloaden. Andere gasten zien jouw antwoord niet. In ons beheer zijn aanmeldingen niet zichtbaar. Technisch kunnen wij wel bij de database, en dat doen wij alleen als het nodig is, bijvoorbeeld voor ondersteuning of herstel.</p>
-  <p>{{ besluit.rol_gasten|invul:"[rol van VAYLIDE en de organisator en de grondslag vaststellen, apart voor particuliere en zakelijke organisatoren]" }}</p>
-  <p>De organisator kan eigen vragen toevoegen. {{ besluit.gevoelige_vragen|invul:"[beleid voor gevoelige vragen, zoals over gezondheid of dieet, vaststellen]" }}</p>
+  {% if besluit.rol_gasten %}<p>{{ besluit.rol_gasten }}</p>{% else %}<p><mark class="invulveld">[Voorstel, juridisch te beoordelen]</mark> De organisator bepaalt of gasten zich kunnen aanmelden, welke vragen uit onze vaste lijst worden gesteld en wat er met de antwoorden gebeurt. Wij bewaren en tonen de antwoorden alleen voor de organisator en gebruiken ze niet voor eigen doelen. Daarvoor werken wij als verwerker voor de organisator. Organiseert iemand een feest in de privésfeer, dan geldt de AVG vaak niet voor die organisator zelf, maar wel voor ons; wij houden ons dan aan dezelfde verplichtingen. Voor onze eigen doelen, zoals het beveiligen van de site en het tegengaan van misbruik, zijn wij zelf verantwoordelijk.</p>{% endif %}
+  <p>{{ besluit.gevoelige_vragen|invul:"[beleid voor gevoelige vragen vaststellen]" }} Uitnodigingen die vóór 30 september 2026 zijn gemaakt, kunnen nog een eigen vraag van de organisator bevatten.</p>
+  <p>Heb je toch gevoelige informatie ingevuld? Pas je antwoord aan of verwijder het via je persoonlijke link, of vraag de organisator of ons om hulp. Wij bekijken antwoorden niet uit onszelf, sturen ze niet naar een AI-dienst en nemen ze niet op in foutmeldingen.</p>
   <p>Je kunt je eigen antwoord altijd wijzigen of verwijderen via je persoonlijke link. Heb je een andere privacyvraag over een uitnodiging, neem dan contact op met de organisator of met ons. Hoort je verzoek bij de organisator, dan helpen wij het daar terecht te laten komen.</p>
 
   <h2 id="bekijken">5. Wie je kaart kan bekijken</h2>

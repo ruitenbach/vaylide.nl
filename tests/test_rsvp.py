@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from invitations.models import GuestResponse
 from invitations.services import publish_draft, save_draft
+from invitations.vragen import vraag
 
 from .helpers import VaylideTestCase
 
@@ -119,18 +120,17 @@ class RsvpTests(VaylideTestCase):
 
     def test_extra_questions_only_when_entitled(self):
         content = dict(self.inv.draft_content)
-        content["rsvp"] = dict(content["rsvp"], questions=[{"id": "q1", "label": "Dieetwensen?", "type": "text", "options": [], "required": True}])
+        content["rsvp"] = dict(content["rsvp"], questions=[vraag("vervoer", formal=False, required=True)])
         self.inv = save_draft(self.inv, expected_rev=None, content=content, user=self.owner)
         publish_draft(self.inv, user=self.owner, source="customer", expected_rev=None)
         # Essentieel bevat geen extra vragen: niet tonen en niet verplichten.
         page = Client().get(self.inv.public_path)
-        self.assertNotContains(page, "Dieetwensen?")
+        self.assertNotContains(page, "Hoe kom je?")
         self.assertTrue(self.rsvp(Client(), self.inv, name="Zonder vraag").json()["ok"])
 
     def test_extra_questions_with_compleet(self):
         owner = self.make_customer("compleet@example.com")
-        content_q = [{"id": "q1", "label": "Dieetwensen?", "type": "text", "options": [], "required": True},
-                     {"id": "q2", "label": "Menu", "type": "choice", "options": ["Vis", "Vega"], "required": False}]
+        content_q = [vraag("liedje", formal=False, required=True), vraag("vervoer", formal=False)]
         inv = self.make_invitation(owner=owner)
         content = dict(inv.draft_content)
         content["rsvp"] = dict(content["rsvp"], questions=content_q)
@@ -138,12 +138,12 @@ class RsvpTests(VaylideTestCase):
         self.pay(inv, owner, package="compleet")
         inv.refresh_from_db()
         page = Client().get(inv.public_path)
-        self.assertContains(page, "Dieetwensen?")
+        self.assertContains(page, "Welk nummer mag niet ontbreken?")
         missing = self.rsvp(Client(), inv, name="Z")
-        self.assertIn("q_q1", missing.json()["errors"])
-        bad_choice = self.rsvp(Client(), inv, name="Z", q_q1="geen", q_q2="Vlees")
-        self.assertIn("q_q2", bad_choice.json()["errors"])
-        ok = self.rsvp(Client(), inv, name="Z", q_q1="Notenallergie", q_q2="Vega")
+        self.assertIn("q_liedje", missing.json()["errors"])
+        bad_choice = self.rsvp(Client(), inv, name="Z", q_liedje="Dancing Queen", q_vervoer="Per helikopter")
+        self.assertIn("q_vervoer", bad_choice.json()["errors"])
+        ok = self.rsvp(Client(), inv, name="Z", q_liedje="Dancing Queen", q_vervoer="Met de auto")
         self.assertTrue(ok.json()["ok"])
         answer = GuestResponse.objects.get(invitation=inv)
-        self.assertEqual([a["value"] for a in answer.answers], ["Notenallergie", "Vega"])
+        self.assertEqual([a["value"] for a in answer.answers], ["Dancing Queen", "Met de auto"])

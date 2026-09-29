@@ -66,7 +66,7 @@ DEFAULT_ADDONS = [
     {"code": "verhaal", "name": "Persoonlijk verhaal", "description": "Een eigen sectie voor jullie verhaal.",
      "price_cents": 600, "feature": "story", "sort_order": 30},
     {"code": "extra-vragen", "name": "Extra vragen bij aanmelden",
-     "description": "Tot 5 eigen vragen, bijvoorbeeld over dieetwensen.",
+     "description": "Tot 5 extra vragen uit een vaste lijst, bijvoorbeeld over vervoer of overnachten.",
      "price_cents": 600, "feature": "extra_questions", "sort_order": 40},
     {"code": "langer-online", "name": "Langer online", "description": "Je uitnodiging blijft 12 maanden langer online.",
      "price_cents": 1200, "extra_months": 12, "sort_order": 50},
