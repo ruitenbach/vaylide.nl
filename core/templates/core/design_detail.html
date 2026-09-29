@@ -16,9 +16,10 @@
           <ul class="segmented" aria-label="Toon het voorbeeld als uitnodiging of als wenskaart">{% for s in soorten %}<li><a class="segmented__item" href="{{ s.url }}" data-soort-link data-soort="{{ s.key }}"{% if s.current %} aria-current="true"{% endif %}>{{ s.label }}</a></li>{% endfor %}</ul>
           <p class="segmented__hint">{% if soort == "wenskaart" %}Alleen een kerstgroet, zonder datum, locatie of aanmelden.{% else %}Met datum, locatie en aanmelden, bijvoorbeeld voor het kerstdiner.{% endif %}</p>
         </dd></div>{% endif %}
-        <div><dt>Kleur</dt><dd class="swatch-picker">
-          <p class="swatch-picker__name" aria-live="polite">{% for p in palettes %}{% if p.current %}<span data-kleur-naam>{{ p.name }}</span>{% endif %}{% endfor %}</p>
-          <ul class="swatch-picker__list" aria-label="Kies een kleur voor het voorbeeld">{% for p in palettes %}<li><a class="swatch" href="{{ p.url }}" data-palette-link data-kleur="{{ p.key }}" data-naam="{{ p.name }}" title="{{ p.name }}"{% if p.current %} aria-current="true"{% endif %} style="--s1:{{ p.swatch.0 }};--s2:{{ p.swatch.1|default:p.swatch.0 }};--s3:{{ p.swatch.2|default:p.swatch.1|default:p.swatch.0 }}"><span class="visually-hidden">{{ p.name }}</span></a></li>{% endfor %}</ul>
+        <div><dt>Kleur</dt><dd class="kleurkeuze">
+          {# Per kleurvariant een knop met drie kleurbolletjes en de naam; de gekozen variant heeft een donkere rand. #}
+          <p class="visually-hidden" aria-live="polite">Gekozen kleur: {% for p in palettes %}{% if p.current %}<span data-kleur-naam>{{ p.name }}</span>{% endif %}{% endfor %}</p>
+          <ul class="kleurkeuze__lijst" aria-label="Kies een kleur voor het voorbeeld">{% for p in palettes %}<li><a class="kleur-optie" href="{{ p.url }}" data-palette-link data-kleur="{{ p.key }}" data-naam="{{ p.name }}"{% if p.current %} aria-current="true"{% endif %}><span class="kleur-optie__stalen" aria-hidden="true"><span style="background:{{ p.swatch.0 }}"></span><span style="background:{{ p.swatch.1|default:p.swatch.0 }}"></span><span style="background:{{ p.swatch.2|default:p.swatch.1|default:p.swatch.0 }}"></span></span><span class="kleur-optie__naam">{{ p.name }}</span></a></li>{% endfor %}</ul>
         </dd></div>
       </dl>
       <form class="occasion-picker" method="get">

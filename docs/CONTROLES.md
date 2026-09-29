@@ -513,3 +513,9 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
   - Gevonden en opgelost: na een mislukte poging kreeg de nieuwe poging dezelfde taaksleutel en liep niet. Nu een
     teller die altijd oploopt.
 - Niet getest: de echte Gemini-API (geen sleutel) en de kwaliteit en gelijkenis van echte bewerkingen.
+
+## Kleurkeuze op de ontwerppagina (29 september 2026)
+
+- De losse ronde stalen zijn vervangen door knoppen met drie kleurbolletjes en de naam van de kleurvariant; de gekozen variant heeft een donkere rand.
+- `manage.py test tests`: 289 tests, alle geslaagd.
+- In Chromium op 1366, 390 en 360 pixels (Middernacht, Winterlicht, Eerste dans): een andere kleur kiezen werkt zonder herladen en de knop wordt gemarkeerd; geen horizontaal scrollen en geen fouten.
