@@ -79,3 +79,41 @@
 @keyframes ont-glans { 0% { background-position: 100% 0; } 50%, 100% { background-position: 0% 0; } }
 
 @media (forced-colors: active) { .onthulling__hoera { color: CanvasText; background: none; } }
+
+/* ---------- Onder de onthulling: verwerking en bon (orders/_besteloverzicht.html) ---------- */
+.bestel-overzicht { background: linear-gradient(180deg, #F4ECDF, var(--ivory, #FBF8F2) 70%); padding: clamp(2.2rem, 5vw, 3.5rem) 0 clamp(2.5rem, 6vw, 4rem); border-top: 1px solid rgba(201, 164, 92, .35); }
+.bestel-overzicht__inner { display: grid; gap: 1.5rem; align-items: start; }
+@media (min-width: 900px) { .bestel-overzicht__inner { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 2.5rem; } }
+.bestel-overzicht__kicker { margin: 0 0 .35rem; font-size: .76rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text, #7A5A2E); }
+.bestel-overzicht__titel, .bestel-bon__titel { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 3vw, 1.9rem); color: var(--ink); }
+/* tijdlijn: vier stappen met gouden vinkjes, verbonden door een lijn */
+.bestel-stappen { list-style: none; margin: 1.4rem 0 0; padding: 0; display: grid; gap: 0; }
+.bestel-stap { position: relative; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: .9rem; padding-bottom: 1.25rem; }
+.bestel-stap:last-child { padding-bottom: 0; }
+.bestel-stap::before { content: ""; position: absolute; left: 1.1rem; top: 2.2rem; bottom: 0; width: 2px; margin-left: -1px; background: linear-gradient(180deg, #D9BE84, rgba(217, 190, 132, .35)); }
+.bestel-stap:last-child::before { display: none; }
+.bestel-stap__bol { width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center; background: #fff; box-shadow: inset 0 0 0 2px #D9BE84; }
+.bestel-stap.is-klaar .bestel-stap__bol { background: linear-gradient(135deg, #F1D993, #C9A45C); box-shadow: 0 4px 10px -4px rgba(150, 110, 40, .6); }
+.bestel-stap.is-klaar .bestel-stap__bol::before { content: "✓"; color: #3A2A12; font-weight: 800; font-size: 1rem; }
+.bestel-stap__tekst { display: grid; gap: .1rem; padding-top: .25rem; }
+.bestel-stap__tekst strong { font-size: 1rem; color: var(--ink); }
+.bestel-stap__tekst span { font-size: .9rem; color: var(--muted); }
+@media (min-width: 900px) {
+  .bestel-stappen { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+  .bestel-stap { grid-template-columns: 1fr; gap: .7rem; padding-bottom: 0; }
+  .bestel-stap::before { left: 2.2rem; right: -1rem; top: 1.1rem; bottom: auto; width: auto; height: 2px; margin: -1px 0 0; background: linear-gradient(90deg, #D9BE84, rgba(217, 190, 132, .35)); }
+  .bestel-stap__tekst { padding-top: 0; }
+}
+/* de bon */
+.bestel-bon { background: #fff; border-radius: 16px; padding: 1.4rem 1.5rem 1.3rem; box-shadow: 0 0 0 1px rgba(201, 164, 92, .35), 0 24px 44px -30px rgba(70, 50, 25, .55); position: relative; }
+.bestel-bon::before { content: ""; position: absolute; left: 1.5rem; right: 1.5rem; top: 0; height: 3px; border-radius: 0 0 3px 3px; background: linear-gradient(90deg, #E9C877, #C9A45C); }
+.bestel-bon__gegevens { margin: 1rem 0 .9rem; display: grid; gap: .4rem; }
+.bestel-bon__gegevens div { display: flex; justify-content: space-between; gap: 1rem; font-size: .93rem; }
+.bestel-bon__gegevens dt { color: var(--muted); }
+.bestel-bon__gegevens dd { margin: 0; font-weight: 600; color: var(--ink); text-align: right; }
+.bestel-bon__regels { width: 100%; border-collapse: collapse; font-size: .95rem; border-top: 1px dashed var(--line-strong, #D6C8B4); }
+.bestel-bon__regels td, .bestel-bon__regels th { padding: .6rem 0; text-align: left; border-bottom: 1px dashed var(--line-strong, #D6C8B4); }
+.bestel-bon__regels .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; padding-left: 1rem; }
+.bestel-bon__regels tfoot th { border-bottom: 0; padding-top: .8rem; font-size: 1.2rem; font-family: var(--font-display); font-weight: 400; }
+.bestel-bon__regels tfoot th span { font-family: var(--font-body); font-size: .78rem; color: var(--muted); }
+.bestel-bon__link { display: inline-block; margin-top: .9rem; font-size: .9rem; font-weight: 600; color: var(--accent-text, #7A5A2E); }

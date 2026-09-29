@@ -1,0 +1,28 @@
+{% comment %}Onder de onthulling: hoe de bestelling is verwerkt (tijdlijn) en de bon. Alleen als de uitnodiging online staat.{% endcomment %}
+<section class="bestel-overzicht" aria-labelledby="verwerking-titel">
+  <div class="container bestel-overzicht__inner">
+    <div class="bestel-overzicht__stappen">
+      <p class="bestel-overzicht__kicker">Bestelling {{ order.number }}</p>
+      <h2 class="bestel-overzicht__titel" id="verwerking-titel">Zo is je bestelling verwerkt</h2>
+      <ol class="bestel-stappen">
+        <li class="bestel-stap is-klaar"><span class="bestel-stap__bol" aria-hidden="true"></span><span class="bestel-stap__tekst"><strong>Betaling bevestigd</strong><span>door de betaalprovider{% if order.paid_at %}, {{ order.paid_at|date:"j F H:i" }}{% endif %}</span></span></li>
+        <li class="bestel-stap{% if state.confirmation_email == 'sent' or state.confirmation_email == 'test' %} is-klaar{% endif %}"><span class="bestel-stap__bol" aria-hidden="true"></span><span class="bestel-stap__tekst"><strong>Bevestiging per e-mail</strong><span>{% if state.confirmation_email == 'test' %}testmodus: niet echt verstuurd{% elif state.confirmation_email == 'failed' %}wordt opnieuw geprobeerd{% else %}naar {{ order.customer.email }}{% endif %}</span></span></li>
+        <li class="bestel-stap is-klaar"><span class="bestel-stap__bol" aria-hidden="true"></span><span class="bestel-stap__tekst"><strong>{{ doc_kind|capfirst }} gepubliceerd</strong><span>op je eigen link</span></span></li>
+        <li class="bestel-stap{% if state.live_email == 'sent' or state.live_email == 'test' %} is-klaar{% endif %}"><span class="bestel-stap__bol" aria-hidden="true"></span><span class="bestel-stap__tekst"><strong>Link en QR-code per e-mail</strong><span>{% if state.live_email == 'test' %}testmodus: niet echt verstuurd{% elif state.live_email == 'failed' %}wordt opnieuw geprobeerd; je link staat hierboven{% else %}zodat je hem altijd terugvindt{% endif %}</span></span></li>
+      </ol>
+    </div>
+    <aside class="bestel-bon" aria-labelledby="bon-titel">
+      <h2 class="bestel-bon__titel" id="bon-titel">Je bestelling</h2>
+      <dl class="bestel-bon__gegevens">
+        <div><dt>Bestelnummer</dt><dd>{{ order.number }}</dd></div>
+        <div><dt>Datum</dt><dd>{{ order.paid_at|default:order.created_at|date:"j F Y" }}</dd></div>
+        {% if method_label %}<div><dt>Betaald met</dt><dd>{{ method_label }}</dd></div>{% endif %}
+      </dl>
+      <table class="bestel-bon__regels">
+        <tbody>{% for line in order.lines.all %}<tr><td>{{ line.description }}</td><td class="num">{{ line.total_display }}</td></tr>{% endfor %}</tbody>
+        <tfoot><tr><th>Totaal <span>incl. btw</span></th><th class="num">{{ order.total_display }}</th></tr></tfoot>
+      </table>
+      <a class="bestel-bon__link" href="{% url 'portal:home' %}">Alle bestellingen in Mijn VAYLIDE</a>
+    </aside>
+  </div>
+</section>

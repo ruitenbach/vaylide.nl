@@ -688,3 +688,8 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
   - de binnenkant is ingetogen crème;
   - "Bekijk het voorbeeld" staat onder de envelop, niet meer over de namen;
   - sluiten gaat in omgekeerde volgorde: eerst de kaart, dan de klep.
+- **Onder "Gefeliciteerd"** (`orders/_besteloverzicht.html`):
+  - een tijdlijn "Zo is je bestelling verwerkt" met gouden vinkjes: op de computer naast elkaar, op smallere schermen
+    onder elkaar;
+  - een bon met bestelnummer, datum, betaalmethode, de onderdelen en het totaal.
+  - Lokaal bekeken op 731 pixels, zonder horizontaal scrollen. De test controleert de tijdlijn en de bon.

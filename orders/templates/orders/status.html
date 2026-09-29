@@ -4,7 +4,7 @@
 {% block extra_css %}{% if state.phase == "live" %}<link rel="stylesheet" href="{% static 'css/onthulling.css' %}">{% endif %}{% endblock %}
 {% block extra_js %}<script src="{% static 'js/order-status.js' %}" defer></script>{% if state.phase == "live" %}<script src="{% static 'js/onthulling.js' %}" defer></script>{% endif %}{% endblock %}
 {% block content %}
-{% if state.phase == "live" %}{% include "orders/_onthulling.html" %}{% endif %}
+{% if state.phase == "live" %}{% include "orders/_onthulling.html" %}{% include "orders/_besteloverzicht.html" %}{% else %}
 <section class="section--tight">
   <div class="container container--narrow">
     <div class="card order-status" data-order-status="{% url 'orders:status_json' order.uid %}" data-phase="{{ state.phase }}">
@@ -60,4 +60,5 @@
     </div>
   </div>
 </section>
+{% endif %}
 {% endblock %}

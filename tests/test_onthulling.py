@@ -21,6 +21,11 @@ class RevealTests(VaylideTestCase):
         self.assertContains(page, "https://wa.me/?text=")
         self.assertContains(page, f"/account/uitnodiging/{inv.uid}/qr.svg")
         self.assertContains(page, inv.public_url)
+        # daaronder: de tijdlijn en de bon
+        self.assertContains(page, "Zo is je bestelling verwerkt")
+        self.assertContains(page, 'class="bestel-bon"')
+        self.assertContains(page, order.total_display)
+        self.assertContains(page, "Alle bestellingen in Mijn VAYLIDE")
 
     def test_unpaid_order_has_no_show(self):
         customer = self.make_customer()

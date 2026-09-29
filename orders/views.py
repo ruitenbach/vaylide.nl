@@ -76,7 +76,11 @@ def status(request, uid):
     order.refresh_from_db()
     state = _state(order)
     kind = doc_kind(order.invitation.occasion) if order.invitation else "uitnodiging"
-    return render(request, "orders/status.html", {"order": order, "state": state, "payment": order.latest_payment, "doc_kind": kind})
+    payment = order.latest_payment
+    from .methods import LABELS
+
+    method_label = LABELS.get((payment.method or "").lower(), "") if payment else ""
+    return render(request, "orders/status.html", {"order": order, "state": state, "payment": payment, "doc_kind": kind, "method_label": method_label})
 
 
 @login_required
