@@ -626,8 +626,6 @@ def checkout_step(request, inv: Invitation):
     except PricingError as exc:
         quotes = []
         messages.error(request, str(exc))
-    if is_special(inv.template_version) and special_addon(inv.template_version.template) is None:
-        messages.warning(request, f"{inv.template_version.template.name} is een special en is nog niet te bestellen: de prijs wordt nog vastgesteld. Je ontwerp blijft bewaard.")
     best = recommended(quotes)
     codes = {q.package.code for q in quotes}
     chosen = next((c for c in (request.POST.get("wissel"), request.POST.get("package"), request.GET.get("package"), inv.package_code)

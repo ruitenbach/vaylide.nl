@@ -23,20 +23,24 @@ class SpecialsTests(VaylideTestCase):
         self.assertNotIn("/ontwerpen/balzaal/", grid)
         self.assertIn("/ontwerpen/balzaal/", specials)
 
-    def test_not_orderable_without_its_own_price(self):
+    def test_without_its_own_price_a_special_costs_the_package_price(self):
+        # Keuze van de eigenaar (september 2026): tijdelijk geen meerprijs, dus gewoon te bestellen.
         customer = self.make_customer()
         inv = self.make_invitation(owner=customer, template="balzaal")
-        with self.assertRaises(PricingError):
-            build_quote(inv.draft_content, Package.objects.get(code="essentieel"), template_version=inv.template_version)
-        with self.assertRaises((PricingError, CheckoutError)):
-            start_checkout(inv, user=customer, package_code="essentieel", optional_codes=[], terms_accepted=True)
+        essentieel = Package.objects.get(code="essentieel")
+        quote = build_quote(inv.draft_content, essentieel, template_version=inv.template_version)
+        self.assertEqual(quote.total_cents, essentieel.price_cents)
+        self.assertEqual([line.code for line in quote.lines], ["pakket:essentieel"])
         client = Client()
         client.force_login(customer)
-        self.assertContains(client.get(f"/maken/{inv.uid}/bestellen/"), "nog niet te bestellen")
+        self.assertNotContains(client.get(f"/maken/{inv.uid}/bestellen/"), "nog niet te bestellen")
+        with self.captureOnCommitCallbacks(execute=True):
+            payment = start_checkout(inv, user=customer, package_code="essentieel", optional_codes=[], terms_accepted=True)
+        self.assertEqual(payment.order.total_cents, essentieel.price_cents)
         # Een optie met de verkeerde code telt niet: elke special heeft een eigen prijs.
         AddOn.objects.create(code="special-iets-anders", name="Andere special", price_cents=100, feature="special")
-        with self.assertRaises(PricingError):
-            build_quote(inv.draft_content, Package.objects.get(code="essentieel"), template_version=inv.template_version)
+        quote = build_quote(inv.draft_content, essentieel, template_version=inv.template_version)
+        self.assertEqual(quote.total_cents, essentieel.price_cents)
 
     def test_with_its_price_the_surcharge_is_a_visible_line(self):
         AddOn.objects.create(code=addon_code("balzaal"), name="Special Balzaal", price_cents=100, feature="special")  # testbedrag

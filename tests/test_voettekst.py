@@ -43,9 +43,10 @@ class PaymentMethodsTests(VaylideTestCase):
         mollie = override_settings(PAYMENT_PROVIDER="mollie", MOLLIE_API_KEY="test_nagebootst")
         mollie.enable()
         self.addCleanup(mollie.disable)
-        answer = {"_embedded": {"methods": [{"id": "paypal"}, {"id": "ideal"}, {"id": "applepay"}]}}
+        answer = {"_embedded": {"methods": [{"id": "paypal"}, {"id": "ideal"}, {"id": "applepay"}, {"id": "creditcard"}, {"id": "klarna"}, {"id": "riverty"}]}}
         with mock.patch("orders.providers.urllib.request.urlopen", return_value=_Response(answer)) as urlopen:
-            self.assertEqual([m["label"] for m in available_methods()], ["iDEAL", "PayPal", "Apple Pay"])
+            # Alleen wat de eigenaar wil tonen (iDEAL, creditcard, PayPal), ook als er in Mollie meer aanstaat.
+            self.assertEqual([m["label"] for m in available_methods()], ["iDEAL", "PayPal", "Creditcard"])
             available_methods()  # uit de cache
             self.assertEqual(urlopen.call_count, 1)
             self.assertIn("/methods", urlopen.call_args[0][0].full_url)

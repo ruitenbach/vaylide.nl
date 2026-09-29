@@ -77,10 +77,12 @@ def build_quote(content: dict, package: Package, optional_codes: list[str] | Non
         needed.add("special")
     for feature in sorted(needed - quote.features):
         if feature == "special":
-            # Elke special heeft een eigen meerprijs (code special-<ontwerp>); zonder die optie is hij niet te bestellen.
+            # Elke special kan een eigen meerprijs hebben (code special-<ontwerp>). Zonder die optie geldt tijdelijk
+            # gewoon de pakketprijs (keuze van de eigenaar, september 2026).
             addon = special_addon(template_version.template)
             if addon is None:
-                raise PricingError(f"{template_version.template.name} is een special en is nog niet te bestellen: de prijs wordt nog vastgesteld.")
+                quote.features.add(feature)
+                continue
         else:
             addon = AddOn.objects.filter(is_active=True, feature=feature).order_by("price_cents").first()
         if addon is None:

@@ -259,6 +259,9 @@ MOLLIE_API_KEY = env("MOLLIE_API_KEY")
 MOLLIE_API_BASE = env("MOLLIE_API_BASE", "https://api.mollie.com/v2")
 # Betaalmethoden op de site als Mollie ze niet kan melden (of zonder Mollie). Met Mollie tonen we wat daar aanstaat.
 PAYMENT_METHODS = env_list("VIERLIEF_PAYMENT_METHODS", "ideal,paypal")
+# Welke methoden de site ooit toont (keuze van de eigenaar, september 2026: iDEAL, creditcard en PayPal). Staat er in
+# Mollie meer aan (bijv. Klarna), dan verschijnt dat pas op de site als het hier wordt toegevoegd.
+PAYMENT_METHODS_SHOWN = env_list("VIERLIEF_PAYMENT_METHODS_SHOWN", "ideal,creditcard,paypal")
 
 # --- Eigen gezichten op het bruidspaar (optioneel, zie docs/GEZICHTEN.md) ------------------------------
 # Standaard UIT. Pas aanzetten na akkoord over beeld-API, kosten, kwaliteit, privacytekst en de prijs (extra optie

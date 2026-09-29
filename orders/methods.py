@@ -39,10 +39,11 @@ ORDER = ["ideal", "paypal", "applepay", "creditcard", "bancontact", "klarna", "k
 
 
 def _as_list(ids) -> list[dict]:
+    allowed = {m.strip().lower() for m in settings.PAYMENT_METHODS_SHOWN}
     seen = []
     for m in ids:
         m = (m or "").strip().lower()
-        if m and m not in seen:
+        if m and m not in seen and m in allowed:
             seen.append(m)
     seen.sort(key=lambda m: ORDER.index(m) if m in ORDER else len(ORDER))
     methods = []
