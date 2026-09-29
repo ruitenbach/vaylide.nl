@@ -6,7 +6,6 @@
   <span class="zenv__vak">
     <span class="zenv__kaart" id="{{ id }}-kaart">
       <img src="{{ kaart }}" alt="{{ kaart_alt }}" width="{{ kaart_w|default:500 }}" height="{{ kaart_h|default:700 }}" decoding="async">
-      {% if link_url %}<a class="zenv__link" href="{{ link_url }}">{% icon "afspelen" %}<span>{{ link_label }}</span></a>{% endif %}
     </span>
   </span>
   <svg class="zenv__voor" viewBox="0 0 200 140" preserveAspectRatio="none" aria-hidden="true" focusable="false">
@@ -32,5 +31,6 @@
     </svg>
     <span class="zenv__zegel"></span>
   </span>
+  {% if link_url %}<a class="zenv__link" href="{{ link_url }}">{% icon "afspelen" %}<span>{{ link_label }}</span></a>{% endif %}
   {% if knop %}<button type="button" class="zenv__knop" aria-expanded="{% if open %}true{% else %}false{% endif %}" aria-controls="{{ id }}-kaart"><span class="zenv__hint">Tik om te openen</span><span class="visually-hidden">{{ knop }}</span></button>{% endif %}
 </div>

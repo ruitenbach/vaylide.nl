@@ -683,3 +683,8 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
     voorwaarden. Zonder adres.
 - **In Chromium (lokaal):** envelop Salie, zegel Goud en initialen "J&M" gekozen. De live kaart toont bij de stap Stijl de
   dichte envelop en werkt zich bij.
+- Envelop bijgewerkt (homepage, 1280 pixels, lokaal bekeken):
+  - na het openvouwen verdwijnt de klep zacht, zodat er geen gouden punten meer naast de kaart uitsteken;
+  - de binnenkant is ingetogen crème;
+  - "Bekijk het voorbeeld" staat onder de envelop, niet meer over de namen;
+  - sluiten gaat in omgekeerde volgorde: eerst de kaart, dan de klep.
