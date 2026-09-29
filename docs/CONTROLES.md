@@ -616,3 +616,15 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
   - Bestellen bekeken op 1280 en 390 pixels, zonder horizontaal scrollen.
   - Op "Upgraden naar Compleet" geklikt: het totaal werd € 69.
 - `e2e/klantreis.cjs` gebruikt nu `?package=essentieel`. Het script is niet opnieuw gedraaid.
+
+## De onthulling na betaling (29 september 2026)
+
+- `manage.py test tests`: 338 tests, alle geslaagd (nieuw: `tests/test_onthulling.py`).
+  - De show verschijnt alleen bij een gepubliceerde uitnodiging, met delen via WhatsApp, de QR-code en de link.
+  - Alle animaties hangen aan `.is-spelen`. Het script zet die klasse niet bij 'minder beweging'.
+- In Chromium (lokaal, testbetaling gesimuleerd) op 1280 en 390 pixels:
+  - de envelop gaat open en de kaart komt omhoog;
+  - confetti, vuurwerk en goudstof;
+  - daarna de titel en de knoppen;
+  - geen fouten in de console en geen horizontaal scrollen.
+- Nog niet op Render: niet gepusht op verzoek van de eigenaar (die testte toen de Mollie-betalingen).

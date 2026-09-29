@@ -1,22 +1,16 @@
 {% extends "base.html" %}{% load static vl %}
 {% block title %}Bestelling {{ order.number }}{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex">{% endblock %}
-{% block extra_js %}<script src="{% static 'js/order-status.js' %}" defer></script>{% endblock %}
+{% block extra_css %}{% if state.phase == "live" %}<link rel="stylesheet" href="{% static 'css/onthulling.css' %}">{% endif %}{% endblock %}
+{% block extra_js %}<script src="{% static 'js/order-status.js' %}" defer></script>{% if state.phase == "live" %}<script src="{% static 'js/onthulling.js' %}" defer></script>{% endif %}{% endblock %}
 {% block content %}
+{% if state.phase == "live" %}{% include "orders/_onthulling.html" %}{% endif %}
 <section class="section--tight">
   <div class="container container--narrow">
     <div class="card order-status" data-order-status="{% url 'orders:status_json' order.uid %}" data-phase="{{ state.phase }}">
       <p class="eyebrow">Bestelling {{ order.number }}</p>
       {% if state.phase == "live" %}
-        <h1>Je {{ doc_kind }} staat online</h1>
-        <p class="lead">Je betaling is ontvangen en je {{ doc_kind }} is gepubliceerd.</p>
-        <div class="share-box">
-          <label class="field"><span class="label">Jouw link</span><input class="input" type="text" readonly value="{{ state.public_url }}" data-select-all></label>
-          <div class="btn-row">
-            <a class="btn btn--primary" href="{{ state.public_url }}" target="_blank" rel="noopener">Bekijk je {{ doc_kind }}</a>
-            <a class="btn btn--secondary" href="{% url 'portal:invitation' order.invitation.uid %}">Naar Mijn Vaylide</a>
-          </div>
-        </div>
+        <h2 class="h-small">Zo is je bestelling verwerkt</h2>
       {% elif state.phase == "processing" %}
         <h1>Betaling ontvangen</h1>
         <p class="lead">We publiceren je {{ doc_kind }}. Dit scherm werkt zichzelf bij.</p>

@@ -1,0 +1,34 @@
+{% load static vl %}{% comment %}De onthulling na een geslaagde betaling: envelop open, kaart omhoog, confetti en vuurwerk (static/js/onthulling.js).
+   Zonder JavaScript en bij 'minder beweging' staat alles meteen in de eindstand.{% endcomment %}
+{% with inv=order.invitation %}
+<section class="onthulling" data-onthulling aria-labelledby="onthulling-titel">
+  <canvas class="onthulling__confetti" data-confetti aria-hidden="true"></canvas>
+  <div class="onthulling__licht" aria-hidden="true"></div>
+  <div class="container onthulling__inner">
+    <div class="onthulling__podium" aria-hidden="true">
+      <span class="onthulling__gloed"></span>
+      <span class="onthulling__env-achter"></span>
+      <img class="onthulling__kaart" src="{% if inv %}{% design_image inv.template_version.template.slug %}{% endif %}" alt="" width="400" height="500" decoding="async">
+      <span class="onthulling__env-voor"></span>
+      <span class="onthulling__klep"><span class="onthulling__zegel"></span></span>
+    </div>
+    <div class="onthulling__tekst">
+      <p class="onthulling__kicker"><span class="onthulling__vink" aria-hidden="true"></span>Betaald · bestelling {{ order.number }}</p>
+      <h1 class="onthulling__titel" id="onthulling-titel"><span class="onthulling__hoera">Gefeliciteerd!</span> <span class="onthulling__sub">Je {{ doc_kind }} staat online</span></h1>
+      {% if inv.title %}<p class="onthulling__namen">{{ inv.title }}</p>{% endif %}
+      <p class="onthulling__lead">Het is zover: je gasten kunnen je {{ doc_kind }} nu openen. Deel je link of laat ze de QR-code scannen.</p>
+      <div class="onthulling__acties">
+        <a class="onthulling__knop onthulling__knop--goud" href="{{ state.public_url }}" target="_blank" rel="noopener">Bekijk je {{ doc_kind }}<span class="visually-hidden"> (opent in nieuw venster)</span></a>
+        <a class="onthulling__knop" href="https://wa.me/?text={{ state.public_url|urlencode:'' }}" target="_blank" rel="noopener">Delen via WhatsApp<span class="visually-hidden"> (opent in nieuw venster)</span></a>
+        <button type="button" class="onthulling__knop" data-kopieer="{{ state.public_url }}" hidden>Link kopiëren</button>
+      </div>
+      <div class="onthulling__deel">
+        <label class="onthulling__link"><span class="visually-hidden">Jouw link</span><input type="text" readonly value="{{ state.public_url }}" data-select-all></label>
+        {% if inv %}<a class="onthulling__qr" href="{% url 'portal:qr' inv.uid 'png' %}?download=1" title="QR-code downloaden"><img src="{% url 'portal:qr' inv.uid 'svg' %}" alt="QR-code naar je {{ doc_kind }}" width="96" height="96"><span>QR-code downloaden</span></a>{% endif %}
+      </div>
+      <p class="onthulling__verder"><a href="{% if inv %}{% url 'portal:invitation' inv.uid %}{% else %}{% url 'portal:home' %}{% endif %}">Naar Mijn Vaylide</a> · gastenlijst, wijzigingen en je QR-code staan daar ook.</p>
+      <button type="button" class="onthulling__opnieuw" data-onthulling-opnieuw hidden>Nog een keer vieren</button>
+    </div>
+  </div>
+</section>
+{% endwith %}
