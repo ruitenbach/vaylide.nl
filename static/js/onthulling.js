@@ -1,4 +1,4 @@
-/* De onthulling na een geslaagde betaling: de show (de kaart draait om, titel) via CSS-klasse .is-spelen, plus
+/* De onthulling na een geslaagde betaling: de show (envelop open, kaart omhoog, titel) via CSS-klasse .is-spelen, plus
    gouden confetti, vuurwerk en goudstof op een canvas. Bij 'minder beweging' geen show: alles staat al in de
    eindstand (zie onthulling.css). Zonder JavaScript ook. */
 (function () {
@@ -43,7 +43,7 @@
   function rand(a, b) { return a + Math.random() * (b - a); }
   function pick(list) { return list[(Math.random() * list.length) | 0]; }
 
-  // Een uitbarsting confetti vanuit een punt (bijv. de kaart), omhoog en opzij.
+  // Een uitbarsting confetti vanuit een punt (bijv. de envelop), omhoog en opzij.
   function burst(x, y, count, power) {
     for (var i = 0; i < count; i++) {
       var angle = rand(-Math.PI * 0.95, -Math.PI * 0.05);
@@ -140,15 +140,18 @@
     timers = [];
     parts = [];
     sparks = [];
+    var env = stage.querySelector(".zenv");
     stage.classList.remove("is-spelen");
+    if (env) env.classList.remove("is-open");  // dicht beginnen; in de eindstand (zonder show) staat hij open
     void stage.offsetWidth;  // de CSS-animaties opnieuw laten beginnen
     stage.classList.add("is-spelen");
+    if (env) later(1000, function () { env.classList.add("is-open"); });
     if (!ctx) return;
     size();
     dustUntil = performance.now() + 14000;
     run();
-    // Op het moment dat de kaart omgedraaid is: confetti, daarna vuurwerk.
-    later(1900, function () { var p = podiumPoint(); burst(p.x, p.y, 170, 15); run(); });
+    // Op het moment dat de kaart uit de envelop komt: confetti, daarna vuurwerk.
+    later(2350, function () { var p = podiumPoint(); burst(p.x, p.y, 170, 15); run(); });
     later(2300, function () { burst(width * 0.08, height * 0.95, 70, 17); burst(width * 0.92, height * 0.95, 70, 17); run(); });
     [2800, 3400, 4100, 4900, 5600].forEach(function (t, i) {
       later(t, function () { firework(rand(width * 0.15, width * 0.85), rand(height * 0.12, height * 0.45)); run(); if (i === 1) { var p = podiumPoint(); burst(p.x, p.y, 60, 11); } });

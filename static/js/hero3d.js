@@ -1,6 +1,6 @@
 /* Vaylide: de 3D-wereld op de homepage en de sprankelende koppen op de andere pagina's.
-   - De voorbeeldkaart in de kop draait om met een tik, klik of Enter (werkt ook bij 'minder beweging'); op de computer ook bij aanwijzen (CSS).
-   - De voorbeeldkaart en de gouden kaart kantelen mee met de muis; zonder muis (telefoon) bewegen ze vanzelf rustig heen en weer.
+   - De envelop in de kop opent met een tik, klik of Enter (werkt ook bij 'minder beweging'); op de computer ook bij aanwijzen (CSS).
+   - De envelop en de gouden kaart kantelen mee met de muis; zonder muis (telefoon) bewegen ze vanzelf rustig heen en weer.
    - Gouden sterretjes twinkelen door de hele kop, ook achter de tekst; bewegen over de kop laat een spoortje glitter achter.
    - [data-sparkles]: een sectie met zacht zwevende sterretjes (kerstpodium, paginakoppen).
    - [data-tilt3d]: een waaier kaarten die meekantelt met de muis.
@@ -8,14 +8,16 @@
 (function () {
   "use strict";
 
-  // Voorbeeldkaart: omdraaien en terug. Staat los van de beweging, zodat hij altijd werkt.
-  document.querySelectorAll("[data-flipkaart]").forEach(function (kaart) {
-    var knop = kaart.querySelector(".flipkaart__knop");
+  // Envelop: openen en sluiten. Staat los van de beweging, zodat hij altijd werkt.
+  document.querySelectorAll("[data-envelop]").forEach(function (env) {
+    var knop = env.querySelector(".zenv__knop");
+    var hint = env.querySelector(".zenv__hint");
     if (!knop) return;
     knop.addEventListener("click", function () {
-      var open = !kaart.classList.contains("is-open");
-      kaart.classList.toggle("is-open", open);
+      var open = !env.classList.contains("is-open");
+      env.classList.toggle("is-open", open);
       knop.setAttribute("aria-expanded", open ? "true" : "false");
+      if (hint) hint.textContent = open ? "Tik om te sluiten" : "Tik om te openen";
     });
   });
 

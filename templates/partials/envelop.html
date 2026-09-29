@@ -1,0 +1,36 @@
+{% load static vl %}{% comment %}De zachte envelop (homepage en de onthulling na betaling): ronde klep en opening als vectorvormen, de klep vouwt
+   soepel open (2D, geen 3D-randen) en de kaart glijdt omhoog. Parameters: id, kaart (afbeelding), kaart_alt, kaart_w, kaart_h,
+   link_url en link_label (optioneel), knop (een knop om te openen), open (begint open, bijv. de eindstand zonder JavaScript).{% endcomment %}
+<div class="zenv{% if open %} is-open{% endif %}" data-envelop>
+  <span class="zenv__achter" aria-hidden="true"></span>
+  <span class="zenv__vak">
+    <span class="zenv__kaart" id="{{ id }}-kaart">
+      <img src="{{ kaart }}" alt="{{ kaart_alt }}" width="{{ kaart_w|default:500 }}" height="{{ kaart_h|default:700 }}" decoding="async">
+      {% if link_url %}<a class="zenv__link" href="{{ link_url }}">{% icon "afspelen" %}<span>{{ link_label }}</span></a>{% endif %}
+    </span>
+  </span>
+  <svg class="zenv__voor" viewBox="0 0 200 140" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="{{ id }}-voor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FCF6EC"/><stop offset="1" stop-color="#EEDFC6"/></linearGradient>
+    </defs>
+    <path d="M0 9 Q0 0 9 0 L12 0 Q100 108 188 0 L191 0 Q200 0 200 9 L200 131 Q200 140 191 140 L9 140 Q0 140 0 131 Z" fill="url(#{{ id }}-voor)"/>
+    <path d="M2 138 Q70 92 100 86 Q130 92 198 138" fill="none" stroke="rgba(122, 90, 46, .13)" stroke-width=".8"/>
+    <path d="M12 0.6 Q100 107 188 0.6" fill="none" stroke="rgba(255, 255, 255, .8)" stroke-width="1"/>
+  </svg>
+  <img class="zenv__logo" src="{% static 'img/merk/vaylide-logo.webp' %}" alt="" width="350" height="240" decoding="async" aria-hidden="true">
+  <span class="zenv__klep" aria-hidden="true">
+    <svg class="zenv__klep-buiten" viewBox="0 0 200 90" preserveAspectRatio="none" focusable="false">
+      <defs><linearGradient id="{{ id }}-klep" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4E9D6"/><stop offset="1" stop-color="#E9D9BE"/></linearGradient></defs>
+      <path d="M0 0 H200 L200 3 Q100 172 0 3 Z" fill="url(#{{ id }}-klep)"/>
+    </svg>
+    <svg class="zenv__klep-binnen" viewBox="0 0 200 90" preserveAspectRatio="none" focusable="false">
+      <defs>
+        <linearGradient id="{{ id }}-voering" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D9B872"/><stop offset=".5" stop-color="#F3DFA6"/><stop offset="1" stop-color="#BF9750"/></linearGradient>
+        <pattern id="{{ id }}-motief" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="url(#{{ id }}-voering)"/><rect width="1.4" height="10" fill="rgba(255, 255, 255, .28)"/></pattern>
+      </defs>
+      <path d="M0 0 H200 L200 3 Q100 172 0 3 Z" fill="url(#{{ id }}-motief)"/>
+    </svg>
+    <span class="zenv__zegel"></span>
+  </span>
+  {% if knop %}<button type="button" class="zenv__knop" aria-expanded="{% if open %}true{% else %}false{% endif %}" aria-controls="{{ id }}-kaart"><span class="zenv__hint">Tik om te openen</span><span class="visually-hidden">{{ knop }}</span></button>{% endif %}
+</div>

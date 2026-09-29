@@ -62,12 +62,12 @@ class BrandMarkAndFlipTests(VaylideTestCase):
             self.assertIn("img/merk/vaylide-v.webp", html, slug)
         self.assertTrue((settings.BASE_DIR / "static/img/merk/vaylide-v.webp").is_file())
 
-    def test_celebration_card_flips_instead_of_an_envelope(self):
+    def test_celebration_uses_the_soft_envelope(self):
         customer = self.make_customer()
         inv = self.published(owner=customer)
         client = Client()
         client.force_login(customer)
         page = client.get(f"/bestelling/{Order.objects.get(invitation=inv).uid}/").content.decode()
-        self.assertIn("onthulling__draai", page)
-        self.assertIn("img/merk/vaylide-logo.webp", page)  # het hele logo op de achterkant
-        self.assertNotIn("onthulling__klep", page)
+        self.assertIn('class="zenv is-open" data-envelop', page)  # eindstand open (zonder JavaScript en bij minder beweging)
+        self.assertIn("img/merk/vaylide-logo.webp", page)  # het hele logo op de envelop
+        self.assertNotIn("zenv__knop", page)
