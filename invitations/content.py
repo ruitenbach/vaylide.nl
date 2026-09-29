@@ -101,7 +101,8 @@ def default_content(occasion: str, palette_key: str = "") -> dict:
         "closing_text": "",
         "photos": {"hero": None, "gallery": []},
         "music": {"asset": None, "title": ""},
-        "style": {"palette": palette_key, "opening": True},
+        # haar: gekozen haarkleuren van het bruidspaar (alleen bij ontwerpen met een paar, zie catalog/paar.py).
+        "style": {"palette": palette_key, "opening": True, "haar": {"man": "", "vrouw": ""}},
         "sections": {
             "countdown": True,
             "story": bool(cfg.get("story_default")),

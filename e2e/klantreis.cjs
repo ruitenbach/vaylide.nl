@@ -124,6 +124,8 @@ async function pay(p, uid, outcome, name) {
   const csv = await pa.request.get(`${base}/account/uitnodiging/${data.paid}/gasten/export.csv`);
   check("Gastenlijst exporteren (CSV)", csv.status() === 200 && (await csv.text()).includes("Gast Klantreis"), `status ${csv.status()}`);
   await shot(pa, "gasten");
+  const qr = await pa.request.get(`${base}/account/uitnodiging/${data.paid}/qr.png`);
+  check("QR-code downloaden", qr.status() === 200 && (qr.headers()["content-type"] || "").includes("image/png"), `status ${qr.status()}`);
 
   // ---- Afgebroken betaling en opnieuw betalen ----
   const phase2 = await pay(pa, data.cancel, "geannuleerd", "geannuleerd");
@@ -147,7 +149,7 @@ async function pay(p, uid, outcome, name) {
   const b = await browser.newContext(ctxOpts);
   const pb = await login(b, data.b);
   for (const url of [`/account/uitnodiging/${data.paid}/`, `/account/uitnodiging/${data.paid}/gasten/`, `/account/uitnodiging/${data.paid}/gasten/export.csv`,
-    `/maken/${data.paid}/gegevens/`, orderUrl.replace(base, "")]) {
+    `/maken/${data.paid}/gegevens/`, `/account/uitnodiging/${data.paid}/qr.png`, orderUrl.replace(base, "")]) {
     const r = await pb.goto(base + url);
     check(`Andere klant krijgt 404: ${url.slice(0, 48)}`, r.status() === 404, `status ${r.status()}`);
   }

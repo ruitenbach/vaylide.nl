@@ -465,3 +465,25 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
   - Gevonden en opgelost: cijfers in Cormorant lazen als letters ("1" als "I"); getallen staan nu in DM Sans.
 - Kaartbeeld gemaakt met `e2e/make_design_images.cjs`.
   - Het script zet nu `--inv-banner-h: 0px`, omdat het de voorbeeldbalk verbergt.
+
+## Balzaal: standaardkaart en haarkleur (29 september 2026)
+
+- `manage.py test tests`: 278 tests, alle geslaagd (nieuw: `tests/test_balzaal.py`).
+  - Beelden: klein genoeg, transparant, niet uitgerekt.
+  - Echte tekst in de kop, zegel volgens pakket, beweging alleen met beweging aan.
+  - De haarkleurkeuze is verborgen zolang er beelden ontbreken. Met alle beelden (nagebootst) wordt de keuze bewaard
+    en getoond; na een andere wijziging blijft de keuze staan; onbekende waarden vallen terug op het standaardpaar.
+- `e2e/effecten.cjs` voor Balzaal: 8/8.
+- `e2e/toegankelijkheid.cjs` voor beide kleuren, dicht en open: geen bevindingen.
+- In Chromium (Playwright):
+  - openen op 390 pixels in vier momenten: envelop, zaal, paar, bloemen en namen;
+  - zonder JavaScript direct leesbaar met paar en namen;
+  - 'minder beweging': geen lopende animaties;
+  - op 360, 390, 768 en 1366 pixels geen horizontaal scrollen en geen fouten.
+  - Gevonden en opgelost: tekst onder de bloemen en de locatie achter het hoofd van de bruidegom (namen nu op één
+    regel, tekst boven de bloemen); lichte strepen in de gesloten envelop.
+  - Gevonden en opgelost: het kaartbeeld toonde geen paar (bevroren intro-animatie). De lagen verschijnen nu alleen
+    tijdens een echte opening.
+- Hele klantreis met Balzaal (`KLANTREIS_ONTWERP=balzaal e2e/klantreis.cjs`): 37/37 op 1366 en 39/39 op 390 pixels.
+  - Nieuw in de controle: de QR-code downloaden, en 404 voor een andere klant.
+- Niet gedaan: de haarkleurvarianten (acht beelden ontbreken, zie `docs/BALZAAL.md`).

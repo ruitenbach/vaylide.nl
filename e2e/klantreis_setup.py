@@ -52,7 +52,8 @@ def draft(owner, template, occasion, names):
 
 
 a, b = customer("a"), customer("b")
-paid_inv = draft(a, "liefde-op-papier", "bruiloft", {"partner_1": "Test", "partner_2": "Klantreis"})
+# Ontwerp voor de betaalde uitnodiging; ander ontwerp testen met KLANTREIS_ONTWERP=balzaal.
+paid_inv = draft(a, os.environ.get("KLANTREIS_ONTWERP", "liefde-op-papier"), "bruiloft", {"partner_1": "Test", "partner_2": "Klantreis"})
 cancel_inv = draft(a, "winterlicht", "kerst", {"family": "Familie Klantreis"})
 b_inv = draft(b, "confetti", "verjaardag", {"person_name": "Kim", "age": "30"})
 password = secrets.token_urlsafe(18)

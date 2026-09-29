@@ -1,0 +1,185 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Balzaal v1 — bruiloftsontwerp: een ivoren envelop met lakzegel; daarachter een balzaal (foto), het bruidspaar en bloemen als
+   aparte beeldlagen met warm licht en een subtiele diepte. Beelden: designs/balzaal/v1/img/ (fictieve personen). Het paar per
+   haarkleur staat in catalog/paar.py. Alle tekst is echte tekst. Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/pinyon-script-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="{% static 'designs/balzaal/v1/img/balzaal-600.webp' %}" imagesrcset="{% static 'designs/balzaal/v1/img/balzaal-600.webp' %} 600w, {% static 'designs/balzaal/v1/img/balzaal.webp' %} 941w" imagesizes="(min-width: 600px) 560px, 100vw">
+<script src="{% static 'designs/balzaal/v1/balzaal.js' %}" defer></script>{% endblock %}
+
+{% block cover %}
+<section class="cover bz-cover" data-cover data-duration="3400" data-fx-delay="450" data-fx-intro="2300" aria-label="Openingsscherm">
+  <div class="bz-cover__licht" aria-hidden="true"></div>
+  <div class="bz-env" aria-hidden="true">
+    <span class="bz-env__achter"></span>
+    <span class="bz-env__kaart"><span class="bz-env__kaarttekst">Save the date</span></span>
+    <span class="bz-env__voor"></span>
+    <span class="bz-env__klepschaduw"></span>
+    <span class="bz-env__klep"></span>
+  </div>
+  <div class="bz-cover__boven">
+    <p class="bz-cover__kicker">{{ v.kicker }}</p>
+    <p class="bz-cover__namen">{% if v.is_couple %}{{ v.names.0 }} <span class="bz-amp">&amp;</span> {{ v.names.1 }}{% else %}{{ v.names.0 }}{% endif %}</p>
+  </div>
+  <div class="fx-slot" data-fx-slot="cover" aria-hidden="true"></div>
+  {# Lakzegel: initialen met het persoonlijk zegel (Compleet), anders een standaardmotief in rood of groen. #}
+  <a href="#uitnodiging" class="bz-zegel fx-pulse" data-open data-fx-origin data-fx-tilt aria-label="Open de {{ v.doc_kind }}"{% if not v.seal_personal %} style="--bz-seal:{{ v.seal_std.base }};--bz-seal-2:{{ v.seal_std.light }};--bz-seal-ink:{{ v.seal_std.ink }}"{% endif %}>
+    <span class="bz-zegel__was" aria-hidden="true"><span class="bz-zegel__mono">{% if v.seal_personal %}{{ v.monogram }}{% else %}<svg class="seal-motief" viewBox="0 0 24 24" width="1.15em" height="1.15em" focusable="false"><path d="M12 1.5Q13.2 10.8 22.5 12Q13.2 13.2 12 22.5Q10.8 13.2 1.5 12Q10.8 10.8 12 1.5Z" fill="currentColor"/></svg>{% endif %}</span></span>
+  </a>
+  <div class="bz-cover__onder">
+    <p class="bz-cover__hint">Tik op het zegel</p>
+    {% if v.show.music %}<button type="button" class="bz-cover__music" data-open data-open-music><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor"/></svg>Openen met muziek</button>{% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<header class="bz-hero" data-bz-diepte>
+  <div class="bz-laag bz-laag--zaal" aria-hidden="true">
+    <img class="bz-zaal" src="{% static 'designs/balzaal/v1/img/balzaal-600.webp' %}" srcset="{% static 'designs/balzaal/v1/img/balzaal-600.webp' %} 600w, {% static 'designs/balzaal/v1/img/balzaal.webp' %} 941w" sizes="(min-width: 600px) 560px, 100vw" alt="" width="941" height="1672" fetchpriority="high" decoding="async">
+  </div>
+  <div class="bz-licht" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="fx-slot bz-hero__fx" data-fx-slot="hero" aria-hidden="true"></div>
+  <div class="bz-hero__tekst">
+    <p class="bz-kicker fx-intro" style="--fx-d:2">{{ v.kicker }}</p>
+    <h1 class="bz-names bz-names--{{ v.names_size }} fx-names">{% if v.is_couple %}<span class="bz-names__one">{{ v.names.0 }}</span> <span class="bz-names__amp" aria-label="en">&amp;</span> <span class="bz-names__two">{{ v.names.1 }}</span>{% else %}<span>{{ v.names.0 }}</span>{% endif %}</h1>
+    {% if v.subnames %}<p class="bz-hero__members fx-intro" style="--fx-d:4">{{ v.subnames }}</p>{% endif %}
+    {% if v.has_event and v.date %}<p class="bz-hero__date fx-intro" style="--fx-d:5"><span>{{ v.weekday }}</span><span class="bz-hero__num">{{ v.date_numeric }}</span>{% if v.time_display %}<span>{{ v.time_display }}</span>{% endif %}</p>
+    {% if v.venue %}<p class="bz-hero__venue fx-intro" style="--fx-d:6">{{ v.venue }}</p>{% endif %}{% endif %}
+  </div>
+  {% if v.paar %}<div class="bz-laag bz-laag--paar"><img class="bz-paar" src="{{ v.paar.src_small }}" srcset="{{ v.paar.src_small }} 560w, {{ v.paar.src }} 900w" sizes="(min-width: 600px) 440px, 82vw" alt="{{ v.paar.alt }}" width="900" height="1217" decoding="async" data-paar="{{ v.paar.man }}-{{ v.paar.vrouw }}"></div>{% endif %}
+  <div class="bz-laag bz-laag--bloemen" aria-hidden="true">
+    <img class="bz-bloemen" src="{% static 'designs/balzaal/v1/img/bloemen-600.webp' %}" srcset="{% static 'designs/balzaal/v1/img/bloemen-600.webp' %} 600w, {% static 'designs/balzaal/v1/img/bloemen.webp' %} 941w" sizes="(min-width: 600px) 560px, 100vw" alt="" width="941" height="1672" decoding="async">
+  </div>
+  <a class="bz-scroll fx-intro" href="#bz-verder" style="--fx-d:8">Scroll verder<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+</header>
+
+<div class="bz-body" id="bz-verder">
+{% if v.tagline %}
+<section class="bz-sec bz-intro" data-reveal aria-label="Welkom">
+  <p class="bz-intro__tagline">{{ v.tagline }}</p>
+</section>
+{% endif %}
+
+{% if v.has_event and v.date %}
+<section class="bz-sec bz-date" data-reveal aria-labelledby="bz-date-title">
+  <h2 id="bz-date-title" class="bz-h2">Save the date</h2>
+  <p class="visually-hidden">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>
+  <div class="bz-boog" aria-hidden="true">
+    <span class="bz-boog__dag">{{ v.weekday }}</span>
+    <strong class="bz-boog__num">{{ v.day }}</strong>
+    <span class="bz-boog__maand">{{ v.month_name }}</span>
+    <span class="bz-boog__jaar">{{ v.year }}</span>
+  </div>
+  {% if v.time_display %}<p class="bz-date__tijd">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+</section>
+{% endif %}
+
+{% if v.welcome or v.hero %}
+<section class="bz-sec bz-letter" data-reveal aria-label="Welkom">
+  {% if v.hero %}<figure class="bz-foto bz-letter__photo"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 380px, 76vw" %}</div></figure>{% endif %}
+  {% if v.welcome %}<div class="bz-letter__text">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="bz-sec bz-story" data-reveal aria-labelledby="bz-story-title">
+  <h2 id="bz-story-title" class="bz-h2">{{ v.story_title }}</h2>
+  <div class="bz-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="bz-sec bz-program" data-reveal aria-labelledby="bz-program-title">
+  <h2 id="bz-program-title" class="bz-h2">Het programma</h2>
+  <ol class="bz-tijdlijn" data-fx-stagger>
+    {% for item in v.program %}
+    <li class="bz-tl">
+      <span class="bz-tl__ruit" aria-hidden="true"></span>
+      <div class="bz-tl__tekst">
+        {% if item.time %}<p class="bz-tl__tijd">{{ item.time }}</p>{% endif %}
+        <h3 class="bz-tl__titel">{{ item.title }}</h3>
+        {% if item.description %}<p class="bz-tl__desc">{{ item.description }}</p>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="bz-sec bz-count" data-reveal aria-labelledby="bz-count-title">
+  <h2 id="bz-count-title" class="bz-h2">{% if v.is_past %}Dank je wel{% else %}Nog even en het is zover{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="bz-sec bz-place" data-reveal aria-labelledby="bz-place-title">
+  <h2 id="bz-place-title" class="bz-h2">Locatie</h2>
+  {% if v.venue %}<p class="bz-place__venue">{{ v.venue }}</p>{% endif %}
+  {% if v.address_lines %}<address class="bz-place__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+  {% if v.date_display %}<p class="bz-place__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="bz-sec bz-dress" data-reveal aria-labelledby="bz-dress-title">
+  <h2 id="bz-dress-title" class="bz-h2">Dresscode</h2>
+  {% if v.dresscode_colors %}<ul class="bz-kleuren" aria-label="Kleuren voor de dresscode">
+    {% for c in v.dresscode_colors %}<li class="bz-kleur" style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+  {% for p in v.dresscode_text %}<p class="bz-dress__text">{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="bz-sec bz-gallery" data-reveal aria-labelledby="bz-gallery-title">
+  <h2 id="bz-gallery-title" class="bz-h2">Momenten</h2>
+  <ul class="bz-photos">
+    {% for photo in v.gallery %}<li class="bz-foto"><figure><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 600px) 250px, 44vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="bz-sec bz-practical" data-reveal aria-labelledby="bz-practical-title">
+  <h2 id="bz-practical-title" class="bz-h2">Goed om te weten</h2>
+  <dl class="bz-practical__list" data-fx-stagger>
+    {% for item in v.practical %}<div class="bz-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="bz-sec bz-rsvp" id="aanmelden" data-reveal aria-labelledby="bz-rsvp-title">
+  <h2 id="bz-rsvp-title" class="bz-h2">{% if v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+  <div class="bz-card">
+    {% include "invitations/partials/rsvp.html" %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="bz-sec bz-contact" data-reveal aria-labelledby="bz-contact-title">
+  <h2 id="bz-contact-title" class="bz-h2">Vragen?</h2>
+  {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+  <p class="bz-contact__name">{{ v.contact.name }}</p>
+  <p class="bz-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="bz-sec bz-closing" data-reveal aria-label="Afsluiting">
+  <div class="bz-closing__kroon" aria-hidden="true"><span class="bz-closing__ster"></span></div>
+  <p class="bz-closing__wish">Wij kijken ernaar uit</p>
+  {% if v.show.closing %}{% for p in v.closing %}<p class="bz-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  {% include "invitations/partials/share_buttons.html" %}
+</section>
+</div>
+{% endblock %}

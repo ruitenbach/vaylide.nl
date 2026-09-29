@@ -16,6 +16,7 @@ from django.utils import timezone
 
 from catalog.effects import effect_view
 from catalog.occasions import display_title, doc_kind, monogram, occasion_config
+from catalog.paar import view as paar_view
 
 from .content import HEX_COLOR, TIMEZONE_LABELS, card_kind, event_expected, event_times, normalize_content, parse_date, without_event
 
@@ -485,6 +486,8 @@ def build_view(
         "seal_personal": "zegel" in features,
         "seal_color": seal_color(palette_key),
         "seal_std": SEAL_COLORS[seal_color(palette_key)],
+        # Het bruidspaar als beeldlaag (Balzaal): de afbeelding bij de gekozen haarkleuren, anders het standaardpaar.
+        "paar": paar_view(template_version, content),
         "welcome": _paragraphs(content.get("welcome_text")),
         "date": day,
         "date_display": nl_date(day) if day else "",

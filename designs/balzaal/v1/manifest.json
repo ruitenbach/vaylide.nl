@@ -1,0 +1,124 @@
+{
+  "slug": "balzaal",
+  "version": 1,
+  "name": "Balzaal",
+  "tagline": "Een envelop met lakzegel, en daarachter een balzaal met jullie als bruidspaar",
+  "description": "Een ivoren envelop met een lakzegel. Na een tik breekt het zegel, gaat de klep open en verschijnt een lichte balzaal met kroonluchters en een doorkijk op het meer. Het bruidspaar en de bloemen komen rustig tevoorschijn, met warm licht en een subtiele diepte. Daaronder jullie namen, de datum, het programma, de locatie en het aanmelden. De afbeeldingen zijn fictieve voorbeeldpersonen.",
+  "style_notes": "Balzaal, kroonluchter, marmer, witte rozen en hortensia's, bruidspaar in wit en zwart, luxe en licht",
+  "occasions": [
+    "bruiloft",
+    "verloving"
+  ],
+  "sort_order": 7,
+  "opening": "envelop",
+  "opening_label": "Envelop met lakzegel",
+  "demo_melody": "canon",
+  "kaartbeeld": "open",
+  "paar": {
+    "haarkleuren": [
+      "zwart",
+      "bruin",
+      "blond"
+    ],
+    "standaard": {
+      "man": "bruin",
+      "vrouw": "blond"
+    },
+    "alt": "Voorbeeld van een bruidspaar in een balzaal (fictieve personen)"
+  },
+  "palettes": [
+    {
+      "key": "ivoor",
+      "name": "Ivoor en goud",
+      "swatch": [
+        "#F4ECDD",
+        "#FFFDF8",
+        "#C9A45C"
+      ],
+      "vars": {
+        "--bz-page": "#EFE6D8",
+        "--bz-bg": "#FFFDF8",
+        "--bz-bg-2": "#F7F0E6",
+        "--bz-ink": "#2A2621",
+        "--bz-muted": "#5A5047",
+        "--bz-accent": "#7A5A2E",
+        "--bz-accent-ink": "#FFFFFF",
+        "--bz-gold": "#C9A45C",
+        "--bz-gold-2": "#74551C",
+        "--bz-line": "#E8DECF",
+        "--bz-hero-ink": "#26303F",
+        "--bz-hero-accent": "#6A4B20",
+        "--bz-env": "#F6EFE3",
+        "--bz-env-2": "#E6D8C2",
+        "--bz-env-ink": "#5A4630",
+        "--bz-seal": "#8C6A2C",
+        "--bz-seal-2": "#AA8544",
+        "--bz-seal-ink": "#FFF8E6",
+        "--fx-1": "#FFFFFF",
+        "--fx-2": "#E7CF9A",
+        "--fx-3": "#F3E3B8",
+        "--fx-4": "#FFF4DC",
+        "--fx-bg": "#FFFDF8"
+      }
+    },
+    {
+      "key": "hemelsblauw",
+      "name": "Zacht blauw",
+      "swatch": [
+        "#C9D8EA",
+        "#FBFBFA",
+        "#C9A45C"
+      ],
+      "vars": {
+        "--bz-page": "#E7EDF3",
+        "--bz-bg": "#FBFBFA",
+        "--bz-bg-2": "#EFF3F8",
+        "--bz-ink": "#1F2A3D",
+        "--bz-muted": "#4A566B",
+        "--bz-accent": "#2E4870",
+        "--bz-accent-ink": "#FFFFFF",
+        "--bz-gold": "#C9A45C",
+        "--bz-gold-2": "#76571F",
+        "--bz-line": "#DCE3EC",
+        "--bz-hero-ink": "#1F2A3D",
+        "--bz-hero-accent": "#2E4870",
+        "--bz-env": "#F2F5F9",
+        "--bz-env-2": "#D8E1EC",
+        "--bz-env-ink": "#34445E",
+        "--bz-seal": "#56709A",
+        "--bz-seal-2": "#7189B2",
+        "--bz-seal-ink": "#FBF6E8",
+        "--fx-1": "#FFFFFF",
+        "--fx-2": "#C9D8EA",
+        "--fx-3": "#E7CF9A",
+        "--fx-4": "#FFF4DC",
+        "--fx-bg": "#FBFBFA"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "goudstof",
+    "knal": "blaadjes",
+    "viering": "harten",
+    "namen": "schrijf",
+    "onthul": "zacht",
+    "extra": [
+      "kenburns",
+      "tik"
+    ]
+  },
+  "changelog": "Eerste versie."
+}

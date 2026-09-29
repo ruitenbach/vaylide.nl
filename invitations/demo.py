@@ -22,6 +22,7 @@ DEFAULT_DEMO_OCCASION = {
     "aan-tafel": "kerst",
     "voor-altijd": "bruiloft",
     "eerste-dans": "bruiloft",
+    "balzaal": "bruiloft",
 }
 
 DESIGN_IMAGES = {
@@ -68,6 +69,7 @@ DESIGN_IMAGES = {
     "aan-tafel": ["kerst-kaarsen", "kaarslicht", "kerst-lichtjes", "kerst-boom", "goud-lichtjes"],
     "voor-altijd": ["rozen", "waterverf-bloesem", "bloemblaadjes", "eucalyptus", "duinen-staand"],
     "eerste-dans": ["waterverf-bloesem", "rozen", "kaarslicht", "bloemblaadjes", "zijde-goud"],
+    "balzaal": ["rozen", "waterverf-bloesem", "kaarslicht", "bloemblaadjes", "zijde-goud"],
 }
 IMAGE_SIZES = {
     "waterverf-bloesem": (1200, 1500),

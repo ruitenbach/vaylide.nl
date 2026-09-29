@@ -20,6 +20,16 @@
       {% endfor %}
     </div>
   </fieldset>
+  {% if form.hair_enabled %}
+  <fieldset class="studio-block">
+    <legend class="studio-block__title">Het bruidspaar</legend>
+    <p class="hint">Kies de haarkleur van het voorbeeldpaar op de kaart. Houding en kleding blijven hetzelfde.</p>
+    <div class="form-row">
+      <div class="field"><span class="label">{{ form.haar_man.label }}</span><div class="chips">{% for r in form.haar_man %}<label class="chip">{{ r.tag }} {{ r.choice_label }}</label>{% endfor %}</div></div>
+      <div class="field"><span class="label">{{ form.haar_vrouw.label }}</span><div class="chips">{% for r in form.haar_vrouw %}<label class="chip">{{ r.tag }} {{ r.choice_label }}</label>{% endfor %}</div></div>
+    </div>
+  </fieldset>
+  {% endif %}
   <section class="studio-block" aria-labelledby="blok-opening">
     <h2 class="studio-block__title" id="blok-opening">Openingsanimatie</h2>
     {% include "studio/_check.html" with field=form.opening %}

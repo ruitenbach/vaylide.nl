@@ -13,6 +13,7 @@ from datetime import date, timedelta
 from django import forms
 from django.utils import timezone
 
+from catalog import paar
 from catalog.occasions import OCCASION_CHOICES, occasion_config
 from invitations.content import (
     MAX_PRACTICAL_ITEMS,
@@ -532,12 +533,21 @@ class StyleForm(StepForm):
         self.fields["palette"].choices = [(p["key"], p["name"]) for p in template_version.palettes]
         for key, label in self.SECTION_FIELDS:
             self.fields[f"s_{key}"] = forms.BooleanField(label=label, required=False)
+        # Haarkleur van het bruidspaar (Balzaal): alleen als alle combinaties als beeld bestaan (catalog/paar.py).
+        self.hair_enabled = paar.choice_enabled(template_version)
+        if self.hair_enabled:
+            kleuren = [(k, paar.HAARKLEUR_LABELS.get(k, k.capitalize())) for k in paar.config(template_version)["haarkleuren"]]
+            self.fields["haar_man"] = forms.ChoiceField(label="Haarkleur man", choices=kleuren, widget=forms.RadioSelect)
+            self.fields["haar_vrouw"] = forms.ChoiceField(label="Haarkleur vrouw", choices=kleuren, widget=forms.RadioSelect)
         if not self.is_bound:
             style = self.content.get("style") or {}
             self.initial["palette"] = style.get("palette") or template_version.default_palette_key
             self.initial["opening"] = bool(style.get("opening", True))
             for key, _ in self.SECTION_FIELDS:
                 self.initial[f"s_{key}"] = bool((self.content.get("sections") or {}).get(key))
+            if self.hair_enabled:
+                man, vrouw = paar.selection(template_version, self.content)
+                self.initial["haar_man"], self.initial["haar_vrouw"] = man, vrouw
 
     def palette_options(self):
         return [(p, self["palette"]) for p in self.template_version.palettes]
@@ -547,7 +557,11 @@ class StyleForm(StepForm):
 
     def apply(self, content: dict) -> dict:
         d = self.cleaned_data
-        content["style"] = {"palette": d["palette"], "opening": bool(d.get("opening"))}
+        haar = dict((content.get("style") or {}).get("haar") or {})
+        if self.hair_enabled:
+            haar = {"man": d["haar_man"], "vrouw": d["haar_vrouw"]}
+        # Een eerder gekozen haarkleur blijft bewaard, ook als de keuze (tijdelijk) niet getoond wordt.
+        content["style"] = {"palette": d["palette"], "opening": bool(d.get("opening")), "haar": haar}
         sections = content.setdefault("sections", {})
         for key, _ in self.SECTION_FIELDS:
             if key not in self.hidden_sections:
