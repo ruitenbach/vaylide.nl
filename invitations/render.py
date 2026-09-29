@@ -196,6 +196,15 @@ def seal_color(palette_key: str) -> str:
     return "groen" if any(w in key for w in GREEN_PALETTE_WORDS) else "rood"
 
 
+def _paar_met_eigen(template_version, content: dict, resolver) -> dict | None:
+    """Het bruidspaar; met een goedgekeurde eigen versie (gezichten/) komt de hele scène uit die afbeelding."""
+    view = paar_view(template_version, content)
+    eigen = ((content.get("style") or {}).get("paar_eigen")) or ""
+    if view is not None and eigen and resolver is not None and resolver.meta(eigen) is not None:
+        view = dict(view, scene=resolver.url(eigen, "groot"), scene_small=resolver.url(eigen, "middel"))
+    return view
+
+
 def _paragraphs(text: str) -> list[str]:
     text = (text or "").strip()
     if not text:
@@ -487,7 +496,7 @@ def build_view(
         "seal_color": seal_color(palette_key),
         "seal_std": SEAL_COLORS[seal_color(palette_key)],
         # Het bruidspaar als beeldlaag (Balzaal): de afbeelding bij de gekozen haarkleuren, anders het standaardpaar.
-        "paar": paar_view(template_version, content),
+        "paar": _paar_met_eigen(template_version, content, options.resolver),
         "welcome": _paragraphs(content.get("welcome_text")),
         "date": day,
         "date_display": nl_date(day) if day else "",

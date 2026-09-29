@@ -1,0 +1,63 @@
+{% extends "studio/base_studio.html" %}{% load static %}
+{% block title %}Onze eigen gezichten{% endblock %}
+{% block extra_js %}{{ block.super }}<script src="{% static 'js/gezichten.js' %}" defer></script>{% endblock %}
+{% block studio %}
+<div class="studio-intro">
+  <h1>Onze eigen gezichten</h1>
+  <p class="lead">Wil je dat het bruidspaar op de kaart op jullie lijkt? Upload een foto van allebei. Wij maken er een persoonlijke versie van, met dezelfde witte jurk, zwarte smoking, houding en balzaal. Je ziet het resultaat eerst zelf en keurt het goed vóór je betaalt.</p>
+  <p><a href="{% url 'studio:step' inv.uid 'stijl' %}">&larr; Terug naar Stijl</a> · Je kunt ook gewoon het voorbeeldpaar houden.</p>
+</div>
+{% if messages %}{% for m in messages %}<p class="notice notice--{% if m.tags == 'error' %}error{% else %}success{% endif %}" role="{% if m.tags == 'error' %}alert{% else %}status{% endif %}">{{ m }}</p>{% endfor %}{% endif %}
+
+<section class="studio-block" aria-labelledby="gz-uitleg">
+  <h2 class="studio-block__title" id="gz-uitleg">Welke foto werkt goed?</h2>
+  <ul class="hint">
+    <li>Eén persoon per foto, recht of licht schuin van voren, met het hele gezicht en het haar in beeld.</li>
+    <li>Goed licht, scherp, zonder zonnebril of zware filters. Minimaal 400 pixels; JPG, PNG of WebP, tot 10 MB.</li>
+    <li>Het haar op de kaart volgt de foto. Exacte gelijkenis kunnen we niet garanderen: het is een bewerking, geen foto.</li>
+  </ul>
+  <p class="hint">Je foto's worden verwerkt door een externe beeldbewerkingsdienst en staan daarna alleen voor jou (en het Vaylide-team) in je account. Je kunt ze altijd verwijderen. Zie de <a href="{% url 'core:privacy' %}">privacyverklaring</a>.</p>
+</section>
+
+{% if locked %}
+<p class="notice notice--warning">Deze uitnodiging is betaald. Het bruidspaar ligt vast; er worden geen nieuwe voorbeelden gemaakt.</p>
+{% elif available %}
+<form method="post" enctype="multipart/form-data" class="form studio-block" data-once>
+  {% csrf_token %}
+  <input type="hidden" name="actie" value="uploaden">
+  <h2 class="studio-block__title">Jullie foto's</h2>
+  <div class="form-row">
+    <div class="field">
+      <label for="foto-vrouw">Foto van de bruid</label>
+      {% if req.photo_bride %}<img class="gz-duim" src="{% url 'gezichten:image' inv.uid 'vrouw' %}" alt="Geüploade foto van de bruid" width="120" height="150">{% endif %}
+      <input id="foto-vrouw" type="file" name="foto_vrouw" accept="image/jpeg,image/png,image/webp">
+    </div>
+    <div class="field">
+      <label for="foto-man">Foto van de bruidegom</label>
+      {% if req.photo_groom %}<img class="gz-duim" src="{% url 'gezichten:image' inv.uid 'man' %}" alt="Geüploade foto van de bruidegom" width="120" height="150">{% endif %}
+      <input id="foto-man" type="file" name="foto_man" accept="image/jpeg,image/png,image/webp">
+    </div>
+  </div>
+  {% if not allow_single %}<p class="hint">Er zijn twee foto's nodig: één van de bruid en één van de bruidegom.</p>{% endif %}
+  <label class="check"><input type="checkbox" name="toestemming" value="ja" required><span>{{ consent_text }}</span></label>
+  <button class="btn btn--secondary" type="submit">Foto's opslaan</button>
+</form>
+{% endif %}
+
+{% if req %}
+<section class="studio-block" aria-labelledby="gz-voorbeeld" data-gezichten-status="{% url 'gezichten:status' inv.uid %}" data-status="{{ req.status }}">
+  <h2 class="studio-block__title" id="gz-voorbeeld">Jullie voorbeeld</h2>
+  <p class="gz-status" aria-live="polite"><strong>{{ req.get_status_display }}</strong>{% if req.status == "bezig" %} · dit duurt meestal minder dan een minuut; deze pagina ververst vanzelf{% endif %}</p>
+  {% if req.error %}<p class="notice notice--error" role="alert">{{ req.error }}</p>{% endif %}
+  <p class="small muted">Nog {{ req.attempts_left }} van {{ req.attempts_allowed }} pogingen over.</p>
+  {% if req.result %}<figure class="gz-resultaat"><img src="{% url 'gezichten:image' inv.uid 'voorbeeld' %}" alt="Voorbeeld van jullie persoonlijke bruidspaar" width="470" height="836"><figcaption class="small muted">Alleen jij ziet dit voorbeeld tot je het goedkeurt.</figcaption></figure>{% endif %}
+  {% if not locked and available %}
+  <div class="btn-row">
+    {% if req.status == "klaar" %}<form method="post" data-once>{% csrf_token %}<input type="hidden" name="actie" value="goedkeuren"><button class="btn btn--primary" type="submit">Dit voorbeeld goedkeuren</button></form>{% endif %}
+    {% if req.status != "bezig" and req.consent_at and req.attempts_left %}<form method="post" data-once>{% csrf_token %}<input type="hidden" name="actie" value="maken"><button class="btn btn--secondary" type="submit">{% if req.result %}Nieuwe poging{% else %}Maak ons voorbeeld{% endif %}</button></form>{% endif %}
+  </div>
+  {% endif %}
+  <form method="post" class="gz-verwijder" data-once data-confirm="Je foto's en voorbeelden verwijderen?">{% csrf_token %}<input type="hidden" name="actie" value="verwijderen"><button class="btn btn--ghost btn--sm" type="submit">Foto's en voorbeelden verwijderen</button></form>
+</section>
+{% endif %}
+{% endblock %}

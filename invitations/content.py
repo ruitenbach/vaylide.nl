@@ -102,7 +102,8 @@ def default_content(occasion: str, palette_key: str = "") -> dict:
         "photos": {"hero": None, "gallery": []},
         "music": {"asset": None, "title": ""},
         # haar: gekozen haarkleuren van het bruidspaar (alleen bij ontwerpen met een paar, zie catalog/paar.py).
-        "style": {"palette": palette_key, "opening": True, "haar": {"man": "", "vrouw": ""}},
+        # paar_eigen: goedgekeurde eigen versie van het bruidspaar (upload-id, zie gezichten/).
+        "style": {"palette": palette_key, "opening": True, "haar": {"man": "", "vrouw": ""}, "paar_eigen": ""},
         "sections": {
             "countdown": True,
             "story": bool(cfg.get("story_default")),
@@ -288,6 +289,9 @@ def referenced_assets(content: dict) -> set[str]:
     music = content.get("music") or {}
     if music.get("asset"):
         uids.add(str(music["asset"]))
+    eigen = ((content.get("style") or {}).get("paar_eigen")) or ""
+    if eigen:
+        uids.add(str(eigen))
     return uids
 
 
@@ -303,4 +307,6 @@ def required_features(content: dict) -> set[str]:
         needed.add("music")
     if sections.get("rsvp") and (content.get("rsvp") or {}).get("questions"):
         needed.add("extra_questions")
+    if ((content.get("style") or {}).get("paar_eigen")):
+        needed.add("gezichten")
     return needed

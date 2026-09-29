@@ -104,5 +104,17 @@ def apply_retention(now=None) -> dict:
     for invitation in stale:
         delete_invitation(invitation)
 
+    # Eigen gezichten: na betaling zijn de geüploade foto's en losse voorbeelden niet meer nodig (de goedgekeurde versie blijft).
+    from gezichten.models import FaceRequest
+    from orders.models import Order
+
+    paid_invitations = Order.objects.filter(status=Order.Status.PAID).values_list("invitation_id", flat=True)
+    cleaned = 0
+    for req in FaceRequest.objects.filter(invitation_id__in=paid_invitations).exclude(photo_bride="", photo_groom="", result=""):
+        req.delete_files()
+        req.save()
+        cleaned += 1
+    report["opgeschoonde_gezichtfotos"] = cleaned
+
     report["verwijderde_inlogcodes"] = LoginCode.objects.filter(created_at__lt=now - timedelta(days=2)).delete()[0]
     return report

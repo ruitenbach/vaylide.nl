@@ -222,3 +222,9 @@ pre.error-body { white-space: pre-wrap; font-size: .8rem; background: var(--fore
   .tabs__end { margin-left: 0; }
   .tabs a, .tabs__button { font-size: .9rem; }
 }
+
+/* Onze eigen gezichten (gezichten/) */
+.gz-duim { display: block; width: 120px; height: 150px; object-fit: cover; border-radius: 10px; margin: .4rem 0; box-shadow: 0 0 0 1px var(--line); }
+.gz-resultaat { margin: 1rem 0; }
+.gz-resultaat img { width: min(100%, 360px); height: auto; border-radius: 14px; box-shadow: 0 16px 30px -18px rgba(40, 30, 20, .5); }
+.gz-verwijder { margin-top: 1.2rem; }

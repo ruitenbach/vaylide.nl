@@ -55,5 +55,7 @@ beoordelen" (⚖).
       zeven waarden uit `docs/BACKUP.md` in Render, en de versleutelingssleutel ook op een veilige plek buiten de server.
 - [ ] **AI-hulp**: aanzetten (Anthropic-sleutel, kosten per gebruik, vermelding in de privacyverklaring) of uit laten.
 - [ ] **Domein**: wanneer omzetten, en staat er nu iets op de hosting bij Vimexx dat moet blijven? Zie `docs/DOMEIN.md`.
+- [ ] **Eigen gezichten (Balzaal)**: beslis over de beeld-API (voorstel: Google Gemini 3 Pro Image, ca. € 0,13 per generatie), de verkoopprijs (voorstel € 12,50–14,95), en laat de privacytekst en verwerkersovereenkomst met Google beoordelen (⚖). Zie `docs/GEZICHTEN.md`.
+- [ ] **Haarkleuren Balzaal**: acht beelden laten maken (zie `docs/BALZAAL.md`).
 - [ ] **TikTok**: link naar het account (Instagram staat er al: `https://www.instagram.com/vaylidenl/`).
 - [ ] **Render-abonnement**: welke back-ups van de database krijg je bij het gekozen abonnement (dagelijks, herstel naar een tijdstip)?

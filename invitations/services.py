@@ -74,6 +74,12 @@ def clean_asset_refs(invitation: Invitation, content: dict) -> dict:
     music = content.get("music") or {}
     if music.get("asset") and str(music["asset"]) not in audio:
         content["music"]["asset"] = None
+    # Eigen bruidspaar (gezichten/): alleen een goedgekeurde afbeelding van deze uitnodiging.
+    style = content.get("style") or {}
+    if style.get("paar_eigen") and not MediaAsset.objects.filter(
+        invitation=invitation, kind=MediaAsset.Kind.SCENE, uid=str(style["paar_eigen"])
+    ).exists():
+        content.setdefault("style", {})["paar_eigen"] = ""
     return content
 
 

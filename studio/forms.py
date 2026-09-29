@@ -561,7 +561,8 @@ class StyleForm(StepForm):
         if self.hair_enabled:
             haar = {"man": d["haar_man"], "vrouw": d["haar_vrouw"]}
         # Een eerder gekozen haarkleur blijft bewaard, ook als de keuze (tijdelijk) niet getoond wordt.
-        content["style"] = {"palette": d["palette"], "opening": bool(d.get("opening")), "haar": haar}
+        eigen = (content.get("style") or {}).get("paar_eigen") or ""
+        content["style"] = {"palette": d["palette"], "opening": bool(d.get("opening")), "haar": haar, "paar_eigen": eigen}
         sections = content.setdefault("sections", {})
         for key, _ in self.SECTION_FIELDS:
             if key not in self.hidden_sections:

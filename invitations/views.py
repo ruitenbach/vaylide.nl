@@ -316,7 +316,7 @@ def serve_asset(request, asset: MediaAsset, variant: str, *, cache_seconds=3600)
         raise Http404()
     if variant == "audio" and asset.kind != MediaAsset.Kind.AUDIO:
         raise Http404()
-    if variant != "audio" and asset.kind != MediaAsset.Kind.PHOTO:
+    if variant != "audio" and asset.kind not in (MediaAsset.Kind.PHOTO, MediaAsset.Kind.SCENE):
         raise Http404()
     field = getattr(asset, field_name)
     if not field or not field.name or not field.storage.exists(field.name):

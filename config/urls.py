@@ -12,6 +12,7 @@ urlpatterns = [
     path("", include("invitations.urls")),
     path("", include("accounts.urls")),
     path("", include("orders.urls")),
+    path("maken/", include("gezichten.urls")),  # vóór de editor: /maken/<id>/gezichten/
     path("maken/", include("studio.urls")),
     path("account/", include("portal.urls")),
     path("beheer/", include("beheer.urls")),

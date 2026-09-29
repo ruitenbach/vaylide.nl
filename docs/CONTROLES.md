@@ -487,3 +487,29 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
 - Hele klantreis met Balzaal (`KLANTREIS_ONTWERP=balzaal e2e/klantreis.cjs`): 37/37 op 1366 en 39/39 op 390 pixels.
   - Nieuw in de controle: de QR-code downloaden, en 404 voor een andere klant.
 - Niet gedaan: de haarkleurvarianten (acht beelden ontbreken, zie `docs/BALZAAL.md`).
+
+## Balzaal: eigen gezichten (29 september 2026)
+
+- `manage.py test tests`: 289 tests, alle geslaagd (nieuw: `tests/test_gezichten.py`, met fictieve foto's).
+  - **Standaard uit:** onzichtbaar zonder functie, sleutel of prijs.
+  - **Uploaden:** toestemming verplicht, nepbestand geweigerd, twee foto's nodig.
+  - **Voorbeeld:** wordt gemaakt en telt als poging; een herhaalde taak maakt geen tweede beeld.
+  - **Toegang:** alleen de eigenaar ziet foto's en voorbeeld.
+  - **Van goedkeuren tot publiceren:** goedkeuren zet een 'scene'-upload op de kaart; de bestelling telt de extra
+    optie mee; na betaling staat precies die versie op de openbare kaart, zonder nieuwe generatie; daarna ligt het vast.
+  - **Opruimen:** de nachtelijke opschoning verwijdert de losse foto's.
+  - **Pogingen:** zijn beperkt; een mislukte poging telt niet; bij drukte volgt één herhaling.
+  - **Verwijderen:** haalt bestanden en de eigen versie weg; een verwijzing naar een upload van iemand anders wordt
+    genegeerd.
+  - **Gemini-koppeling (nagebootst):** sleutel alleen in de header (niet in de URL of logs), drie beelden in het
+    verzoek, begrijpelijke foutmeldingen.
+- In Chromium (Playwright), lokale server met `VIERLIEF_FACES_PROVIDER=test`, 12/12 geslaagd, zowel direct als met
+  achtergrondverwerking:
+  - de knop in Stijl, geen toestemming geweigerd, foto's opslaan;
+  - voorbeeld maken, waarbij de pagina vanzelf ververst, en de pogingen tellen;
+  - goedkeuren en het voorbeeld in de editor;
+  - de optie in de bestelling, testbetaling, en de gast ziet de goedgekeurde versie;
+  - na betaling vast, geen JavaScript-fouten.
+  - Gevonden en opgelost: na een mislukte poging kreeg de nieuwe poging dezelfde taaksleutel en liep niet. Nu een
+    teller die altijd oploopt.
+- Niet getest: de echte Gemini-API (geen sleutel) en de kwaliteit en gelijkenis van echte bewerkingen.

@@ -12,6 +12,8 @@ FEATURES = {
     "extra_questions": "Extra vragen bij aanmelden",
     # Lakzegel met de eigen initialen. Zonder deze functie toont het zegel een standaardmotief in rood of groen.
     "zegel": "Persoonlijk zegel",
+    # Eigen gezichten op het bruidspaar (Balzaal, gezichten/). Alleen als extra optie; de prijs zet de eigenaar.
+    "gezichten": "Eigen gezichten op het bruidspaar",
 }
 
 # Welke sectie of instelling hoort bij welke functie.

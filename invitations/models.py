@@ -157,6 +157,7 @@ class MediaAsset(models.Model):
     class Kind(models.TextChoices):
         PHOTO = "photo", "Foto"
         AUDIO = "audio", "Muziek"
+        SCENE = "scene", "Eigen bruidspaar"  # goedgekeurde afbeelding uit gezichten/ (niet bij de foto's)
 
     uid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name="assets")

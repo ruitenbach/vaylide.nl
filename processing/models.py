@@ -53,6 +53,7 @@ class Job(models.Model):
 JOB_LABELS = {
     "fulfil_order": "Bestelling verwerken en publiceren",
     "deliver_order": "Link en QR-code aan de koper leveren",
+    "generate_faces": "Voorbeeld met eigen gezichten maken (beeld-API)",
     "fulfil_custom_order": "Maatwerkbetaling verwerken",
     "send_email": "E-mail versturen",
     "assess_request": "Aanvraag laten samenvatten (AI)",

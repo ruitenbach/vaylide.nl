@@ -30,6 +30,13 @@
     </div>
   </fieldset>
   {% endif %}
+  {% if faces_link %}
+  <section class="studio-block" aria-labelledby="blok-gezichten">
+    <h2 class="studio-block__title" id="blok-gezichten">Onze eigen gezichten (optioneel)</h2>
+    <p class="hint">Laat het bruidspaar op jullie lijken: upload een foto van allebei en keur het voorbeeld goed vóór je betaalt.</p>
+    <a class="btn btn--secondary btn--sm" href="{% url 'gezichten:page' inv.uid %}">Eigen gezichten{% if faces_status %} · {{ faces_status }}{% endif %}</a>
+  </section>
+  {% endif %}
   <section class="studio-block" aria-labelledby="blok-opening">
     <h2 class="studio-block__title" id="blok-opening">Openingsanimatie</h2>
     {% include "studio/_check.html" with field=form.opening %}

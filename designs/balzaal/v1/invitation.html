@@ -35,9 +35,15 @@
 
 {% block content %}
 <header class="bz-hero" data-bz-diepte>
+  {% if v.paar.scene %}{# Eigen versie uit gezichten/: zaal en paar samen in één afbeelding. #}
+  <div class="bz-laag bz-laag--zaal bz-laag--eigen">
+    <img class="bz-zaal" src="{{ v.paar.scene_small }}" srcset="{{ v.paar.scene_small }} 1000w, {{ v.paar.scene }} 2000w" sizes="(min-width: 600px) 560px, 100vw" alt="{{ v.paar.alt_eigen|default:'Het bruidspaar in een balzaal' }}" width="941" height="1672" fetchpriority="high" decoding="async" data-paar="eigen">
+  </div>
+  {% else %}
   <div class="bz-laag bz-laag--zaal" aria-hidden="true">
     <img class="bz-zaal" src="{% static 'designs/balzaal/v1/img/balzaal-600.webp' %}" srcset="{% static 'designs/balzaal/v1/img/balzaal-600.webp' %} 600w, {% static 'designs/balzaal/v1/img/balzaal.webp' %} 941w" sizes="(min-width: 600px) 560px, 100vw" alt="" width="941" height="1672" fetchpriority="high" decoding="async">
   </div>
+  {% endif %}
   <div class="bz-licht" aria-hidden="true"><span></span><span></span><span></span></div>
   <div class="fx-slot bz-hero__fx" data-fx-slot="hero" aria-hidden="true"></div>
   <div class="bz-hero__tekst">
@@ -47,7 +53,7 @@
     {% if v.has_event and v.date %}<p class="bz-hero__date fx-intro" style="--fx-d:5"><span>{{ v.weekday }}</span><span class="bz-hero__num">{{ v.date_numeric }}</span>{% if v.time_display %}<span>{{ v.time_display }}</span>{% endif %}</p>
     {% if v.venue %}<p class="bz-hero__venue fx-intro" style="--fx-d:6">{{ v.venue }}</p>{% endif %}{% endif %}
   </div>
-  {% if v.paar %}<div class="bz-laag bz-laag--paar"><img class="bz-paar" src="{{ v.paar.src_small }}" srcset="{{ v.paar.src_small }} 560w, {{ v.paar.src }} 900w" sizes="(min-width: 600px) 440px, 82vw" alt="{{ v.paar.alt }}" width="900" height="1217" decoding="async" data-paar="{{ v.paar.man }}-{{ v.paar.vrouw }}"></div>{% endif %}
+  {% if v.paar and not v.paar.scene %}<div class="bz-laag bz-laag--paar"><img class="bz-paar" src="{{ v.paar.src_small }}" srcset="{{ v.paar.src_small }} 560w, {{ v.paar.src }} 900w" sizes="(min-width: 600px) 440px, 82vw" alt="{{ v.paar.alt }}" width="900" height="1217" decoding="async" data-paar="{{ v.paar.man }}-{{ v.paar.vrouw }}"></div>{% endif %}
   <div class="bz-laag bz-laag--bloemen" aria-hidden="true">
     <img class="bz-bloemen" src="{% static 'designs/balzaal/v1/img/bloemen-600.webp' %}" srcset="{% static 'designs/balzaal/v1/img/bloemen-600.webp' %} 600w, {% static 'designs/balzaal/v1/img/bloemen.webp' %} 941w" sizes="(min-width: 600px) 560px, 100vw" alt="" width="941" height="1672" decoding="async">
   </div>

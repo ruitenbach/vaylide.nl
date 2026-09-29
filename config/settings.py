@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     "studio",
     "portal",
     "beheer",
+    "gezichten",
 ]
 
 MIDDLEWARE = [
@@ -258,6 +259,20 @@ MOLLIE_API_KEY = env("MOLLIE_API_KEY")
 MOLLIE_API_BASE = env("MOLLIE_API_BASE", "https://api.mollie.com/v2")
 # Betaalmethoden op de site als Mollie ze niet kan melden (of zonder Mollie). Met Mollie tonen we wat daar aanstaat.
 PAYMENT_METHODS = env_list("VIERLIEF_PAYMENT_METHODS", "ideal,paypal")
+
+# --- Eigen gezichten op het bruidspaar (optioneel, zie docs/GEZICHTEN.md) ------------------------------
+# Standaard UIT. Pas aanzetten na akkoord over beeld-API, kosten, kwaliteit, privacytekst en de prijs (extra optie
+# met functie 'gezichten' in Beheer → Prijzen). Zonder sleutel of optie blijft de knop onzichtbaar.
+FACES_ENABLED = env_bool("VIERLIEF_FACES_ENABLED", False)
+FACES_PROVIDER = env("VIERLIEF_FACES_PROVIDER", "gemini").lower()  # gemini, of test (alleen in testmodus: nagebootst)
+GEMINI_API_KEY = env("GEMINI_API_KEY")
+FACES_MODEL = env("VIERLIEF_FACES_MODEL", "gemini-3-pro-image")
+FACES_API_BASE = env("VIERLIEF_FACES_API_BASE", "https://generativelanguage.googleapis.com/v1beta")
+FACES_FREE_ATTEMPTS = int(env("VIERLIEF_FACES_ATTEMPTS", "3"))
+FACES_MAX_BYTES = 10 * 1024 * 1024
+# Een generatie kan tot ~2 minuten duren, langer dan een webverzoek mag duren: daarom in een achtergronddraad na het
+# antwoord (de takenwachtrij vangt een onderbreking op). In de tests uit, zodat alles in hetzelfde proces blijft.
+FACES_BACKGROUND = env_bool("VIERLIEF_FACES_BACKGROUND", True)
 
 # --- Tweede back-uplocatie (optioneel, zie docs/BACKUP.md) -----------------------
 # Een versleutelde kopie van elke nachtelijke back-up naar S3-compatibele opslag. Uit tot alles is ingevuld.

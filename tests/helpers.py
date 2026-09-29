@@ -60,6 +60,7 @@ class VaylideTestCase(TestCase):
             EMAIL_MODE="outbox",
             PAYMENT_PROVIDER="test",
             JOBS_RUN_INLINE=True,
+            FACES_BACKGROUND=False,
             ANTHROPIC_API_KEY="",
             BASE_URL="https://vaylide.test",
             # Tests mogen niet afhangen van een eerdere collectstatic (manifest).

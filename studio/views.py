@@ -224,6 +224,13 @@ def step(request, uid, step):
             rev = posted_rev or inv.draft_rev
     else:
         form = form_class(content=content, occasion=inv.occasion, locked=_locked(request, inv), **extra_kwargs)
+    faces_link, faces_status = False, ""
+    if step == "stijl" and request.user.is_authenticated and (inv.owner_id == request.user.id or request.user.is_staff):
+        from gezichten import services as gezichten
+
+        face_req = gezichten.get_request(inv)
+        faces_link = gezichten.feature_available(inv) or face_req is not None
+        faces_status = face_req.get_status_display().lower() if face_req else ""
 
     return render(
         request,
@@ -237,6 +244,8 @@ def step(request, uid, step):
             conflict=conflict,
             photos=photos,
             audio=audio,
+            faces_link=faces_link,
+            faces_status=faces_status,
             content=content,
             cfg=occasion_config(inv.occasion),
             ai_available=True,
