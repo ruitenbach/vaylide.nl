@@ -65,6 +65,9 @@ class Invitation(models.Model):
     last_published_at = models.DateTimeField(null=True, blank=True)
     available_until = models.DateTimeField("online tot", null=True, blank=True)
 
+    # Het pakket dat de klant bij de start koos (te wijzigen bij Bestellen); de rechten volgen pas na betaling.
+    package_code = models.CharField("gekozen pakket", max_length=40, blank=True)
+
     # Rechten na betaling (uit pakket en extra opties).
     features = models.JSONField(default=list, blank=True)
     max_gallery_photos = models.PositiveSmallIntegerField(default=0)

@@ -43,9 +43,33 @@
     </div>
     {% if form.template.errors %}<p class="field__error">{{ form.template.errors.0 }}</p>{% endif %}
   </fieldset>
+  {% if packages %}
+  <fieldset class="studio-block" id="pakket">
+    <legend class="studio-block__title"><span class="studio-block__num">3</span> Pakket</legend>
+    <p class="hint">Je betaalt pas aan het eind. Kies je Essentieel, dan kun je bij het bestellen nog upgraden of losse onderdelen toevoegen.</p>
+    <div class="start-pakketten">
+      {% for p in packages %}
+      <label class="radio-card start-pakket{% if p.is_featured %} is-uitgelicht{% endif %}">
+        <input type="radio" name="pakket" value="{{ p.code }}"{% if p.code == chosen_package %} checked{% endif %}>
+        <span class="start-pakket__kop"><strong>{{ p.name }}</strong>{% if p.is_featured %}<span class="badge badge--live">Alles erin</span>{% endif %}</span>
+        <span class="start-pakket__prijs">{{ p.price_cents|euro }}</span>
+        <span class="small muted">{{ p.description }}</span>
+        <ul class="start-pakket__lijst">{% for h in p.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
+      </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+  {% endif %}
   <div class="step-actions step-actions--start">
-    <p class="small muted">Je begint zonder account. Om je ontwerp te bewaren en later verder te gaan, bevestig je je e-mailadres met een code.</p>
-    <button class="btn btn--primary" type="submit">Begin met dit ontwerp &rarr;</button>
+    {% if user.is_authenticated and not user.is_staff %}
+    <p class="start-account small">Je bent ingelogd als <strong>{{ user.email }}</strong>. Je ontwerp wordt bewaard in Mijn Vaylide.</p>
+    {% elif not user.is_authenticated %}
+    <div class="start-account">
+      <p class="small"><strong>Doorgaan als gast</strong> kan: je hebt pas een account nodig bij het bestellen (met een code per e-mail, geen wachtwoord).</p>
+      <p class="small muted">Al een account? <a href="{{ login_url }}">Log eerst in</a>, dan staat je ontwerp meteen in Mijn Vaylide, bij je andere ontwerpen en bestellingen.</p>
+    </div>
+    {% endif %}
+    <button class="btn btn--primary" type="submit">{% if user.is_authenticated %}Begin met dit ontwerp{% else %}Doorgaan als gast{% endif %} &rarr;</button>
   </div>
 </form>
 {% endblock %}

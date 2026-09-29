@@ -22,7 +22,7 @@
           {% if inv.stats %}<p class="item__meta">{{ inv.stats.yes }} aanwezig ({{ inv.stats.persons }} {% if inv.stats.persons == 1 %}persoon{% else %}personen{% endif %}) · {{ inv.stats.no }} afwezig</p>{% endif %}
           <div class="item__actions">
             {% if inv.paid or inv.is_published %}<a class="btn btn--secondary btn--sm" href="{% url 'portal:invitation' inv.uid %}">Beheren</a>{% if inv.public_url and inv.status == "live" %}<a class="btn btn--ghost btn--sm" href="{{ inv.public_url }}" target="_blank" rel="noopener">Bekijken</a>{% endif %}
-            {% else %}<a class="btn btn--primary btn--sm" href="{% url 'studio:resume' inv.uid %}">Verder gaan</a><a class="btn btn--ghost btn--sm" href="{% url 'studio:step' inv.uid 'voorbeeld' %}">Voorbeeld</a>{% endif %}
+            {% else %}<a class="btn btn--primary btn--sm" href="{% url 'studio:resume' inv.uid %}">Verder bewerken</a><a class="btn btn--secondary btn--sm" href="{% url 'studio:step' inv.uid 'bestellen' %}">Afrekenen</a><a class="btn btn--ghost btn--sm" href="{% url 'studio:step' inv.uid 'voorbeeld' %}">Voorbeeld</a>{% endif %}
           </div>
         </div>
       </li>

@@ -67,14 +67,14 @@
   </section>
 
   <section class="studio-block" aria-labelledby="blok-verhaal">
-    <h2 class="studio-block__title" id="blok-verhaal">Jullie verhaal <span class="badge">Compleet of extra optie</span></h2>
+    <h2 class="studio-block__title" id="blok-verhaal">Jullie verhaal <span class="badge">{{ feature_badges.story }}</span></h2>
     {% include "studio/_field.html" with field=form.story_title %}
     {% include "studio/_field.html" with field=form.story_text %}
     {% include "studio/_ai.html" with ai_field="story" %}
   </section>
 
   <section class="studio-block" aria-labelledby="blok-muziek">
-    <h2 class="studio-block__title" id="blok-muziek">Muziek <span class="badge">Compleet of extra optie</span></h2>
+    <h2 class="studio-block__title" id="blok-muziek">Muziek <span class="badge">{{ feature_badges.music }}</span></h2>
     <p class="hint">Start nooit vanzelf. MP3 of M4A, max. {{ upload_limits.audio_max_bytes|filesizeformat }}.</p>
     {% if audio %}
     <fieldset>

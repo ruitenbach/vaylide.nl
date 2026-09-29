@@ -1,4 +1,4 @@
-{% extends "studio/base_studio.html" %}
+{% extends "studio/base_studio.html" %}{% load vl %}
 {% block title %}Stijl en onderdelen{% endblock %}
 {% block studio %}
 <div class="studio-intro">
@@ -47,7 +47,7 @@
     <p class="hint">Lege onderdelen worden altijd verborgen.</p>
     <div class="section-toggles">
       {% for key, field in form.section_fields %}
-      <label class="check section-toggle">{{ field }}<span>{{ field.label }}{% if key == "story" or key == "gallery" or key == "music" %} <span class="badge">{% if key in features %}inbegrepen{% else %}Compleet of extra optie{% endif %}</span>{% endif %}</span></label>
+      <label class="check section-toggle">{{ field }}<span>{{ field.label }}{% if key == "story" or key == "gallery" or key == "music" %} <span class="badge">{% if key in features %}inbegrepen{% else %}{{ feature_badges|get_item:key }}{% endif %}</span>{% endif %}</span></label>
       {% endfor %}
     </div>
   </fieldset>

@@ -7,37 +7,71 @@
   <p class="lead">Nog één klik en je uitnodiging is klaar om te delen. Je betaalt eenmalig; zodra je betaling is bevestigd, staat je kaart automatisch online met je eigen link en QR-code.</p>
 </div>
 {% if error %}<div class="form-errors" role="alert">{{ error }}</div>{% endif %}
-{% if issues %}<div class="notice notice--warning"><strong>Nog niet compleet</strong><ul>{% for i in issues %}<li>{{ i.message }} <a href="{% url 'studio:step' inv.uid i.step %}">Aanpassen</a></li>{% endfor %}</ul></div>{% endif %}
+{% include "studio/_controle.html" with issues=issues alleen_nodig=True %}
 <form method="post" class="form checkout" data-once novalidate>
   {% csrf_token %}
   <input type="hidden" name="actie" value="herberekenen" data-checkout-action>
+  {% if quote %}
+  <input type="hidden" name="package" value="{{ quote.package.code }}">
+  <section class="studio-block" aria-labelledby="pakket-titel">
+    <h2 class="studio-block__title" id="pakket-titel">Jouw pakket</h2>
+    <div class="pakket-keuze{% if upgrade %} pakket-keuze--met-upgrade{% endif %}">
+      <article class="pakket-kaart pakket-kaart--gekozen" aria-label="Gekozen pakket: {{ quote.package.name }}">
+        <p class="pakket-kaart__label">Jouw keuze</p>
+        <h3 class="pakket-kaart__naam">{{ quote.package.name }}</h3>
+        <p class="pakket-kaart__prijs">{{ quote.package.price_cents|euro }}</p>
+        <ul class="pakket-kaart__lijst">{% for h in quote.package.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
+        {% if downgrade %}<button type="submit" class="link-plain small" name="wissel" value="{{ downgrade.package.code }}" formnovalidate>Liever {{ downgrade.package.name }} ({{ downgrade.package.price_cents|euro }})?</button>{% endif %}
+      </article>
+      {% if upgrade %}
+      <article class="pakket-upgrade" aria-labelledby="upgrade-titel">
+        <p class="pakket-upgrade__label">{% if upgrade.diff_cents <= 0 %}Voordeliger voor jou{% else %}Upgrade{% endif %}</p>
+        <h3 class="pakket-upgrade__titel" id="upgrade-titel">{{ upgrade.quote.package.name }}</h3>
+        <p class="pakket-upgrade__prijs">{% if upgrade.diff_cents > 0 %}+ {{ upgrade.diff_display }}{% elif upgrade.diff_cents == 0 %}Zelfde prijs{% else %}{{ upgrade.diff_display }} goedkoper{% endif %}</p>
+        <p class="small">{% if upgrade.diff_cents <= 0 %}Met de onderdelen die je gebruikt, is {{ upgrade.quote.package.name }} {% if upgrade.diff_cents < 0 %}goedkoper{% else %}even duur{% endif %} en krijg je er meer bij:{% else %}Alles uit {{ quote.package.name }}, en daarbij:{% endif %}</p>
+        <ul class="pakket-upgrade__lijst">{% for g in upgrade.gains %}<li>{{ g }}</li>{% endfor %}</ul>
+        <button type="submit" class="btn btn--primary btn--block" name="wissel" value="{{ upgrade.quote.package.code }}" formnovalidate>Upgraden naar {{ upgrade.quote.package.name }}</button>
+      </article>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if losse_extras %}
+  <section class="studio-block" aria-labelledby="losse-titel">
+    <h2 class="studio-block__title" id="losse-titel">Los bij te kopen bij {{ quote.package.name }}</h2>
+    <p class="hint">Gebruik je een onderdeel, dan staat het vanzelf op je rekening. Zet je het uit, dan vervalt de meerprijs.</p>
+    <ul class="losse-extras">
+      {% for x in losse_extras %}
+      <li class="losse-extra{% if x.in_use %} is-in-gebruik{% endif %}">
+        <span class="losse-extra__naam">{{ x.label }}<span class="small muted"> {{ x.description }}</span></span>
+        <span class="losse-extra__prijs">{{ x.price }}</span>
+        {% if x.in_use %}<span class="losse-extra__status">In gebruik</span>{% else %}<a class="losse-extra__actie" href="{% url 'studio:step' inv.uid x.step %}">Toevoegen</a>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+  {% else %}
   <fieldset class="studio-block">
     <legend class="studio-block__title">Kies je pakket</legend>
-    <div class="package-grid">
-      {% for q in quotes %}
-      <label class="radio-card package-card">
-        <input type="radio" name="package" value="{{ q.package.code }}"{% if q.package.code == quote.package.code %} checked{% endif %} data-recalc>
-        <span class="package-card__head"><strong>{{ q.package.name }}</strong>{% if best and q.package.code == best.package.code %}<span class="badge badge--live">Voordeligst voor jou</span>{% endif %}</span>
-        <span class="package-card__total">{{ q.total_display }}</span>
-        <span class="small muted">{{ q.package.description }} · {{ q.availability_months }} maanden online</span>
-        {% for line in q.required_addon_lines %}<span class="small">+ {{ line.description }} ({{ line.total_display }}): {{ line.reason|lower }}</span>{% endfor %}
-      </label>
-      {% endfor %}
-    </div>
-    <noscript><button type="submit" class="btn btn--ghost btn--sm">Bedrag bijwerken</button></noscript>
+    <p class="muted">Er is op dit moment geen pakket beschikbaar voor dit ontwerp.</p>
   </fieldset>
+  {% endif %}
+
   {% if optional %}
   <fieldset class="studio-block">
     <legend class="studio-block__title">Extra opties</legend>
     {% for a in optional %}<label class="check"><input type="checkbox" name="extras" value="{{ a.code }}"{% if a.code in selected_extras %} checked{% endif %} data-recalc><span>{{ a.name }} ({{ a.price_display }}) <span class="hint">{{ a.description }}</span></span></label>{% endfor %}
+    <noscript><button type="submit" class="btn btn--ghost btn--sm">Bedrag bijwerken</button></noscript>
   </fieldset>
   {% endif %}
+
   {% if quote %}
-  <section class="studio-block" aria-labelledby="overzicht-titel">
+  <section class="studio-block bon" aria-labelledby="overzicht-titel">
     <h2 class="studio-block__title" id="overzicht-titel">Overzicht</h2>
-    <table class="table-simple">
-      <tbody>{% for line in quote.lines %}<tr><td>{{ line.description }}</td><td class="num">{{ line.total_display }}</td></tr>{% endfor %}</tbody>
-      <tfoot><tr><th>Totaal (incl. btw)</th><th class="num">{{ quote.total_display }}</th></tr></tfoot>
+    <table class="bon__tabel">
+      <tbody>{% for line in quote.lines %}<tr><td>{{ line.description }}{% if line.reason %}<span class="bon__reden">{{ line.reason }}</span>{% endif %}</td><td class="num">{{ line.total_display }}</td></tr>{% endfor %}</tbody>
+      <tfoot><tr><th>Totaal <span class="bon__btw">incl. btw</span></th><th class="num">{{ quote.total_display }}</th></tr></tfoot>
     </table>
     <p class="small muted">Je uitnodiging blijft {{ quote.availability_months }} maanden online vanaf publicatie. Het bedrag wordt aan de serverzijde berekend.</p>
   </section>
@@ -61,5 +95,6 @@
     <a class="btn btn--ghost" href="{% url 'studio:step' inv.uid 'voorbeeld' %}">&larr; Terug naar voorbeeld</a>
     <button type="submit" class="btn btn--primary step-actions__next" name="actie" value="betalen"{% if issues or anonymous or not user.is_authenticated or user.is_staff %} disabled{% endif %}>Betalen{% if quote %} {{ quote.total_display }}{% endif %} &rarr;</button>
   </div>
+  {% if issues or anonymous or not user.is_authenticated %}<p class="betaal-hint small muted">{% if issues %}Betalen kan zodra de punten bovenaan zijn aangevuld.{% else %}Bevestig eerst je e-mailadres; daarna kun je betalen.{% endif %}</p>{% endif %}
 </form>
 {% endblock %}

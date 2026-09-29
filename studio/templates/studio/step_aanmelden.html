@@ -22,7 +22,7 @@
     {% include "studio/_field.html" with field=form.remark_label %}
   </section>
   <section class="studio-block" aria-labelledby="blok-vragen">
-    <h2 class="studio-block__title" id="blok-vragen">Extra vragen (optioneel)</h2>
+    <h2 class="studio-block__title" id="blok-vragen">Extra vragen (optioneel) <span class="badge">{{ feature_badges.extra_questions }}</span></h2>
     <p class="hint">Bijvoorbeeld over dieetwensen. Onderdeel van Compleet of als extra optie. Vraag niet meer dan nodig.</p>
     <div class="repeat-list" data-repeat="vragen">
       {% for qid, label, qtype, options, required in form.question_fields %}

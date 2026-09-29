@@ -64,6 +64,13 @@ Gedane rondes:
 
 15. **Foto's automatisch uitlijnen** (29 september 2026): bij het uploaden zoekt YuNet, een klein neuraal netwerk via OpenCV op onze eigen server, de gezichten. Foto's gaan nergens heen en het kost niets per foto. Het model staat in `invitations/models_ai/` (MIT-licentie). De foto wordt op de gezichten uitgelijnd. Is er nog geen hoofdfoto, dan wordt de beste foto (het liefst met twee gezichten) automatisch de hoofdfoto. De galerij vullen we niet vanzelf, omdat dat een betaalde optie is. De klant versleept de foto met muis of vinger en zoomt met de schuifbalk; "Automatisch uitlijnen" zet de foto terug. Nieuwe pakketten: `opencv-python-headless` en `numpy` (samen ongeveer 80 MB bij het bouwen op Render; OpenCV wordt pas geladen bij de eerste foto).
 
+16. **Pakket bij de start** (29 september 2026): de klant kiest bij de start Essentieel of Compleet (`Invitation.package_code`, logica in `studio/pakket.py`). In de editor staat bij verhaal, galerij, muziek en extra vragen "In Compleet" of "Extra optie · €…". Bij Bestellen:
+    - staat "Jouw pakket";
+    - bij Essentieel met een upgrade naar Compleet (het prijsverschil wordt berekend) en de losse onderdelen;
+    - bij Compleet alleen echte extra's, zoals "Langer online".
+
+    De controle is een checklist (`studio/_controle.html`). Beginnen kan als gast; een account (met een code per e-mail) is pas nodig bij het bestellen. "Inloggen" staat zichtbaar in de kop. Nog open: envelop- en zegelkeuze en favorieten (wachten op een besluit van de eigenaar).
+
 Wat getest is en hoe: `docs/CONTROLES.md`. Kort, na ronde 7: 160 tests (op SQLite), een browsercontrole op 840 pagina's (vier schermformaten, alle 34 ontwerpen, 272 gedragscontroles; Winterlicht daarna opnieuw op de definitieve stand), 272 controles van de effecten en een meting van de belasting (alle 34 ontwerpen), toegankelijkheid en contrast van alle 34 ontwerpen in alle 106 kleurvarianten, het contrast van de tekst op de tekening van het kerstraam, en axe op de gewijzigde websitepagina's. Na ronde 6: 139 tests (op SQLite; op PostgreSQL 16 in ronde 5), een browsercontrole op 816 pagina's (vier schermformaten, alle 33 ontwerpen, 264 gedragscontroles), toegankelijkheid van de website en een lokale nabootsing van de Render-instellingen met PostgreSQL. Uit ronde 5 (in ronde 6 veranderden aan de uitnodigingen alleen de naam onderaan en het tabblad-icoon): 264 controles van de effecten (ook stilzetten en 'minder beweging'), een meting van de belasting op een vertraagde processor, en toegankelijkheid en contrast van alle ontwerpen in alle kleuren.
 
 Voorvertoning (statisch, alleen om te kijken): https://claude.ai/artifact/DYkTUBCKzn63jE8Mk9x28M

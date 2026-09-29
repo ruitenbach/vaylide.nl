@@ -596,3 +596,23 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
 - In Chromium (lokaal, 1100 en 1366 pixels breed) bekeken: de gouden lijst, de gloed bij het bijwerken en de betaalpagina.
 - Niet gedaan: klassieke scrollbalken van Windows nagebootst. Mijn testbrowser toont zwevende scrollbalken; het
   verbergen gebeurt met dezelfde CSS die de telefoonvoorbeelden op de site al gebruiken.
+
+## Pakket bij de start, 'Jouw pakket' met upgrade, controle als checklist (29 september 2026)
+
+- `manage.py test tests`: 335 tests, alle geslaagd (nieuw: `tests/test_pakket.py`).
+  - **Start:** het pakket kiezen wordt onthouden; een onbekend pakket wordt genegeerd.
+  - **Editor:** de labels volgen het pakket ("In Compleet", of bij Essentieel "Extra optie · € 9" met de prijs uit Beheer).
+  - **Bestellen bij Essentieel:** "Jouw keuze", "Upgraden naar Compleet" (+ € 30) en de losse onderdelen.
+  - **Na de upgrade:**
+    - het pakket blijft onthouden;
+    - er is geen upgrade meer en geen losse onderdelen;
+    - muziek is niet meer aan te vinken;
+    - "Langer online" blijft kiesbaar.
+  - **Controle:** een checklist met "Nodig", of "Alles is compleet".
+  - **Account:** "Doorgaan als gast" en "Log eerst in" op de start; "Inloggen" in de kop; "Afrekenen" bij een concept
+    in Mijn Vaylide.
+- In Chromium (lokaal):
+  - Het beginscherm met de pakketten bekeken op 1280 pixels.
+  - Bestellen bekeken op 1280 en 390 pixels, zonder horizontaal scrollen.
+  - Op "Upgraden naar Compleet" geklikt: het totaal werd € 69.
+- `e2e/klantreis.cjs` gebruikt nu `?package=essentieel`. Het script is niet opnieuw gedraaid.

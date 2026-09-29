@@ -15,7 +15,7 @@
     <div class="site-header__actions">
       {% if user.is_staff %}<a class="link-quiet" href="{% url 'beheer:dashboard' %}">Beheer</a>{% endif %}
       <a class="icon-link" href="{% url 'core:search' %}" aria-label="Zoeken" title="Zoeken">{% icon "zoeken" %}</a>
-      <a class="icon-link" href="{% url 'portal:home' %}" aria-label="{% if user.is_authenticated %}Mijn Vaylide{% else %}Inloggen bij Mijn Vaylide{% endif %}" title="Mijn Vaylide">{% icon "tas" %}</a>
+      <a class="site-header__account" href="{% if user.is_authenticated %}{% url 'portal:home' %}{% else %}{% url 'accounts:login' %}{% endif %}">{% icon "tas" %}<span>{% if user.is_authenticated %}Mijn Vaylide{% else %}Inloggen{% endif %}</span></a>
       <a class="btn btn--primary btn--sm site-header__cta" href="{% url 'studio:start' %}">Start nu</a>
     </div>
     <details class="mobile-nav">

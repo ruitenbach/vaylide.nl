@@ -1,0 +1,27 @@
+{% load vl %}{% comment %}Controle van de uitnodiging als nette checklist. Verwacht: issues (lijst met .blocking, .message, .step), inv, step_labels.
+   Met 'alleen_nodig' toont hij alleen wat bestellen tegenhoudt.{% endcomment %}
+{% with open_count=issues|length %}
+<section class="controle{% if issues %} controle--open{% else %} controle--ok{% endif %}" aria-labelledby="controle-titel">
+  <div class="controle__head">
+    <span class="controle__icon" aria-hidden="true"></span>
+    <div>
+      <h2 class="controle__title" id="controle-titel">{% if not issues %}Alles is compleet{% elif alleen_nodig %}Nog {{ open_count }} punt{{ open_count|pluralize:"en" }} voordat je kunt bestellen{% else %}Controle van je uitnodiging{% endif %}</h2>
+      <p class="controle__sub">{% if not issues %}Je uitnodiging is klaar. Lees de teksten nog één keer rustig door.{% elif alleen_nodig %}{% if open_count == 1 %}Vul dit punt aan{% else %}Vul deze punten aan{% endif %}; je ontwerp blijft bewaard.{% else %}<strong>Nodig</strong> houdt bestellen tegen, een <strong>tip</strong> is een suggestie.{% endif %}</p>
+    </div>
+  </div>
+  {% if issues %}
+  <ol class="controle__list">
+    {% for i in issues %}
+    <li class="controle__item controle__item--{% if i.blocking %}nodig{% else %}tip{% endif %}">
+      <span class="controle__dot" aria-hidden="true"></span>
+      <div class="controle__body">
+        <span class="controle__label">{% if i.blocking %}Nodig{% else %}Tip{% endif %}{% with label=step_labels|get_item:i.step %}{% if label %} · {{ label }}{% endif %}{% endwith %}</span>
+        <span class="controle__text">{{ i.message }}</span>
+      </div>
+      <a class="controle__fix" href="{% url 'studio:step' inv.uid i.step %}">Aanpassen<span class="visually-hidden">: {{ i.message }}</span></a>
+    </li>
+    {% endfor %}
+  </ol>
+  {% endif %}
+</section>
+{% endwith %}

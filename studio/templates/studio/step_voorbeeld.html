@@ -17,12 +17,7 @@
     </div>
   </div>
   <aside class="preview-aside">
-    <h2 class="h-small">Controle</h2>
-    {% if issues %}
-    <ul class="issue-list">
-      {% for issue in issues %}<li class="{% if issue.blocking %}is-blocking{% else %}is-warning{% endif %}"><span class="badge {% if issue.blocking %}badge--error{% else %}badge--warning{% endif %}">{% if issue.blocking %}Nodig{% else %}Tip{% endif %}</span> {{ issue.message }} <a href="{% url 'studio:step' inv.uid issue.step %}">Aanpassen</a></li>{% endfor %}
-    </ul>
-    {% else %}<p class="notice notice--success"><strong>Alles is compleet.</strong>Controleer de teksten nog één keer rustig.</p>{% endif %}
+    {% include "studio/_controle.html" with issues=issues %}
     <ul class="edit-links">
       <li><a href="{% url 'studio:step' inv.uid 'gegevens' %}">Gegevens aanpassen</a></li>
       {% if wenskaart %}<li><a href="{% url 'studio:step' inv.uid 'programma' %}">Afsluiting</a></li>{% else %}

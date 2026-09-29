@@ -12,9 +12,10 @@ from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_http_methods, require_POST
 
-from catalog.models import Package, Template
+from catalog.models import Package, Template, format_euro
 from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, occasion_config
 from catalog.specials import is_special, special_addon
+from studio import pakket
 from core.ai import AIUnavailable, suggest_text
 from core.utils import ip_fingerprint, rate_limit, wants_json
 from invitations.access import get_accessible_invitation, remember_draft, session_drafts
@@ -85,7 +86,10 @@ def _context(request, inv: Invitation, step: str, **extra) -> dict:
         "is_staff_edit": request.user.is_authenticated and request.user.is_staff,
         "anonymous": inv.owner_id is None,
         "save_url": f"{reverse('accounts:login')}?doel=bewaren&next={reverse('studio:step', args=[inv.uid, step])}",
+        "step_labels": STEP_LABELS,
     }
+    if step in ("fotos", "stijl", "aanmelden"):
+        ctx["feature_badges"] = pakket.feature_badges(pakket.chosen_package(inv))
     ctx.update(extra)
     return ctx
 
@@ -108,6 +112,10 @@ def start(request):
             owner = request.user if request.user.is_authenticated and not request.user.is_staff else None
             inv = create_draft(occasion=form.cleaned_data["occasion"], template=form.cleaned_data["template_obj"], owner=owner,
                                palette=request.POST.get("kleur", "")[:40], soort=request.POST.get("soort", "")[:20])
+            package_code = request.POST.get("pakket", "")
+            if package_code in {p.code for p in pakket.active_packages()}:
+                inv.package_code = package_code
+                inv.save(update_fields=["package_code"])
             remember_draft(request, inv)
             return redirect("studio:step", uid=inv.uid, step="gegevens")
     else:
@@ -115,6 +123,9 @@ def start(request):
     shown = by_occasion([t for t in templates if not occasion or t.supports(occasion)], occasion)
     if chosen and occasion and chosen not in [t.slug for t in shown]:
         chosen = ""
+    packages = pakket.active_packages()
+    wanted = request.GET.get("pakket") or request.POST.get("pakket") or ""
+    chosen_pkg = next((p for p in packages if p.code == wanted), None) or pakket.default_package(packages)
     existing = []
     if request.user.is_authenticated and not request.user.is_staff:
         existing = list(Invitation.objects.filter(owner=request.user, status=Invitation.Status.DRAFT).order_by("-updated_at")[:3])
@@ -133,6 +144,9 @@ def start(request):
             "kleur": (request.GET.get("kleur") or request.POST.get("kleur") or "")[:40],
             "soort": s if (s := request.GET.get("soort") or request.POST.get("soort") or "") in ("uitnodiging", "wenskaart") else "",
             "existing": existing,
+            "packages": packages,
+            "chosen_package": chosen_pkg.code if chosen_pkg else "",
+            "login_url": f"{reverse('accounts:login')}?next={request.get_full_path()}",
             "progress": progress("gelegenheid" if not occasion else "ontwerp"),
             "progress_current": {"number": 1 if not occasion else 2, "label": "Gelegenheid" if not occasion else "Ontwerp"},
             "progress_pct": round(100 * (1 if not occasion else 2) / 9),
@@ -609,8 +623,24 @@ def checkout_step(request, inv: Invitation):
     if is_special(inv.template_version) and special_addon(inv.template_version.template) is None:
         messages.warning(request, f"{inv.template_version.template.name} is een special en is nog niet te bestellen: de prijs wordt nog vastgesteld. Je ontwerp blijft bewaard.")
     best = recommended(quotes)
-    chosen = request.POST.get("package") or request.GET.get("package") or (best.package.code if best else "")
+    codes = {q.package.code for q in quotes}
+    chosen = next((c for c in (request.POST.get("wissel"), request.POST.get("package"), request.GET.get("package"), inv.package_code)
+                   if c and c in codes), best.package.code if best else "")
     quote = next((q for q in quotes if q.package.code == chosen), best)
+    owner_here = request.user.is_authenticated and inv.owner_id == request.user.id
+    if quote and quote.package.code != inv.package_code and (owner_here or inv.owner_id is None):
+        inv.package_code = quote.package.code  # een upgrade of ander pakket onthouden
+        inv.save(update_fields=["package_code"])
+    upgrade = downgrade = None
+    if quote:
+        target = pakket.upgrade_target(quote.package, packages)
+        upgrade_quote = next((q for q in quotes if target and q.package.code == target.code), None)
+        if upgrade_quote:
+            upgrade = {"quote": upgrade_quote, "diff_cents": upgrade_quote.total_cents - quote.total_cents,
+                       "gains": [h for h in (upgrade_quote.package.highlights or []) if not h.lower().startswith("alles uit")]}
+            upgrade["diff_display"] = format_euro(abs(upgrade["diff_cents"]))
+        smaller = [q for q in quotes if q.package.price_cents < quote.package.price_cents]
+        downgrade = max(smaller, key=lambda q: q.package.price_cents) if smaller else None
     form = CheckoutForm(request.POST or None, packages=packages, optional=optional,
                         initial={"package": chosen, "extras": selected_extras})
     error = ""
@@ -632,5 +662,6 @@ def checkout_step(request, inv: Invitation):
         "studio/step_bestellen.html",
         _context(request, inv, "bestellen", form=form, quotes=quotes, quote=quote, best=best, optional=optional,
                  selected_extras=selected_extras, issues=issues, error=error, test_payments=settings.PAYMENT_PROVIDER == "test",
+                 upgrade=upgrade, downgrade=downgrade, losse_extras=pakket.extras_for(quote.package, quote) if quote else [],
                  login_url=f"{reverse('accounts:login')}?doel=bewaren&next={reverse('studio:step', args=[inv.uid, 'bestellen'])}"),
     )
