@@ -161,6 +161,7 @@ class MediaAsset(models.Model):
         PHOTO = "photo", "Foto"
         AUDIO = "audio", "Muziek"
         SCENE = "scene", "Eigen bruidspaar"  # goedgekeurde afbeelding uit gezichten/ (niet bij de foto's)
+        LOGO = "logo", "Logo op het zegel"  # eigen (bedrijfs)logo op het lakzegel, met doorzichtigheid
 
     uid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, related_name="assets")

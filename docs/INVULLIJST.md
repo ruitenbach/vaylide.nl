@@ -7,9 +7,9 @@ beoordelen" (⚖).
 ## Bedrijfsgegevens (nu nergens op de site)
 
 - [ ] Handelsnaam en rechtsvorm (eenmanszaak, vof, bv …)
-- [ ] KvK-nummer
-- [ ] Vestigingsadres (of een correspondentieadres, als dat mag)
-- [ ] Btw-identificatienummer, of: valt het bedrijf onder de kleineondernemersregeling (KOR)?
+- [x] KvK-nummer: 94261423 (op de site; aan te passen met `VIERLIEF_KVK`)
+- [ ] Vestigingsadres: bewust niet op de site (keuze van de eigenaar). ⚖ Laten beoordelen of dat mag (Handelsregisterwet en regels voor webwinkels).
+- [x] Btw-id: NL212227221B02 (op de site; `VIERLIEF_BTW`)
 - [ ] E-mailadres voor klanten op het eigen domein (nu `VIERLIEF_CONTACT_EMAIL` in Render) en voor meldingen (`VIERLIEF_OWNER_EMAIL`)
 - [ ] Telefoonnummer (⚖ laten beoordelen of dit verplicht op de site moet)
 - Waar het komt: voettekst of contactpagina, privacyverklaring ("Wie zijn wij") en voorwaarden.

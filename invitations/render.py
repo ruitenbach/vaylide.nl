@@ -15,6 +15,7 @@ from django.templatetags.static import static
 from django.utils import timezone
 
 from catalog.effects import effect_view
+from catalog import envelop
 from catalog.occasions import display_title, doc_kind, monogram, occasion_config
 from catalog.paar import view as paar_view
 
@@ -460,7 +461,16 @@ def build_view(
     for key, value in (overrides.get("css_vars") or {}).items():
         if key in css_vars and isinstance(value, str) and (HEX_COLOR.match(value) or value.startswith("rgba(")):
             css_vars[key] = value
+    css_vars.update(envelop.envelope_vars(template_version, content))  # envelopkleur naar keuze
     palette_style = "".join(f"{k}:{v};" for k, v in css_vars.items())
+    seal_personal = "zegel" in features
+    env_choice = envelop.choice(content)
+    seal_chosen = envelop.seal_colors(content)
+    seal_initials = envelop.clean_initials(env_choice.get("initialen")) if seal_personal else ""
+    seal_logo = ""
+    if seal_personal and env_choice.get("zegel") == "logo" and env_choice.get("logo") and options.resolver is not None \
+            and options.resolver.meta(env_choice["logo"]) is not None:
+        seal_logo = options.resolver.url(env_choice["logo"], "groot")
 
     location_text = ", ".join([venue] + address_lines)
     calendar = None
@@ -501,11 +511,14 @@ def build_view(
         "kicker": kicker,
         "headline_custom": bool(headline),
         "tagline": tagline,
-        "monogram": monogram(occasion, content),
-        # Lakzegel: initialen alleen met de functie 'zegel' (Compleet); anders een standaardmotief in rood of groen.
-        "seal_personal": "zegel" in features,
+        "monogram": seal_initials or monogram(occasion, content),
+        # Lakzegel: persoonlijk met de functie 'zegel' (initialen of een eigen logo); anders een standaardmotief in rood
+        # of groen. seal_override: de gekozen zegelkleur, of het standaardzegel; None = de kleur van het ontwerp.
+        "seal_personal": seal_personal,
         "seal_color": seal_color(palette_key),
         "seal_std": SEAL_COLORS[seal_color(palette_key)],
+        "seal_override": seal_chosen or (None if seal_personal else SEAL_COLORS[seal_color(palette_key)]),
+        "seal_logo": seal_logo,
         # Het bruidspaar als beeldlaag (Balzaal): de afbeelding bij de gekozen haarkleuren, anders het standaardpaar.
         "paar": _paar_met_eigen(template_version, content, options.resolver),
         "welcome": _paragraphs(content.get("welcome_text")),

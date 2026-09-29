@@ -13,7 +13,7 @@ from datetime import date, timedelta
 from django import forms
 from django.utils import timezone
 
-from catalog import paar
+from catalog import envelop, paar
 from catalog.occasions import OCCASION_CHOICES, occasion_config
 from invitations.content import (
     MAX_PRACTICAL_ITEMS,
@@ -539,8 +539,25 @@ class StyleForm(StepForm):
             kleuren = [(k, paar.HAARKLEUR_LABELS.get(k, k.capitalize())) for k in paar.config(template_version)["haarkleuren"]]
             self.fields["haar_man"] = forms.ChoiceField(label="Haarkleur man", choices=kleuren, widget=forms.RadioSelect)
             self.fields["haar_vrouw"] = forms.ChoiceField(label="Haarkleur vrouw", choices=kleuren, widget=forms.RadioSelect)
+        # Envelop en lakzegel naar keuze (catalog/envelop.py), alleen bij ontwerpen met een zegel.
+        self.has_seal = envelop.has_seal(template_version)
+        self.has_envelope = envelop.has_envelope(template_version)
+        if self.has_envelope:
+            self.fields["env_kleur"] = forms.ChoiceField(label="Kleur van de envelop", required=False, widget=forms.RadioSelect,
+                                                         choices=[("", "Zoals het ontwerp")] + [(k, v[0]) for k, v in envelop.ENVELOP_KLEUREN.items()])
+        if self.has_seal:
+            self.fields["zegel_kleur"] = forms.ChoiceField(label="Kleur van het lakzegel", required=False, widget=forms.RadioSelect,
+                                                           choices=[("", "Zoals het ontwerp")] + [(k, v[0]) for k, v in envelop.ZEGEL_KLEUREN.items()])
+            self.fields["zegel"] = forms.ChoiceField(label="Op het zegel", widget=forms.RadioSelect, required=False,
+                                                     choices=list(envelop.ZEGEL_INHOUD.items()))
+            self.fields["initialen"] = forms.CharField(label="Initialen op het zegel", max_length=20, required=False,
+                                                       help_text="Hoogstens 5 tekens, bijvoorbeeld S&D. Leeg: we maken ze uit jullie namen.")
         if not self.is_bound:
             style = self.content.get("style") or {}
+            if self.has_seal:
+                keuze = envelop.choice(self.content)
+                self.initial.update({"env_kleur": keuze["kleur"], "zegel_kleur": keuze["zegel_kleur"],
+                                     "zegel": keuze["zegel"] or "initialen", "initialen": keuze["initialen"]})
             self.initial["palette"] = style.get("palette") or template_version.default_palette_key
             self.initial["opening"] = bool(style.get("opening", True))
             for key, _ in self.SECTION_FIELDS:
@@ -561,8 +578,16 @@ class StyleForm(StepForm):
         if self.hair_enabled:
             haar = {"man": d["haar_man"], "vrouw": d["haar_vrouw"]}
         # Een eerder gekozen haarkleur blijft bewaard, ook als de keuze (tijdelijk) niet getoond wordt.
-        eigen = (content.get("style") or {}).get("paar_eigen") or ""
-        content["style"] = {"palette": d["palette"], "opening": bool(d.get("opening")), "haar": haar, "paar_eigen": eigen}
+        style = dict(content.get("style") or {})  # andere keuzes (eigen gezichten, logo) blijven bewaard
+        style.update({"palette": d["palette"], "opening": bool(d.get("opening")), "haar": haar})
+        if self.has_seal:
+            keuze = envelop.choice(content)
+            keuze.update({"zegel_kleur": d.get("zegel_kleur") or "", "zegel": d.get("zegel") or "initialen",
+                          "initialen": envelop.clean_initials(d.get("initialen"))})
+            if self.has_envelope:
+                keuze["kleur"] = d.get("env_kleur") or ""
+            style["envelop"] = keuze
+        content["style"] = style
         sections = content.setdefault("sections", {})
         for key, _ in self.SECTION_FIELDS:
             if key not in self.hidden_sections:

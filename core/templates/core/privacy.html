@@ -8,7 +8,7 @@
 </div></section>
 <section class="section section--flush"><div class="container container--mid prose">
   <h2>Wie zijn wij</h2>
-  <p>VAYLIDE maakt digitale uitnodigingen. Contact: <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>.</p>
+  <p>VAYLIDE maakt digitale uitnodigingen. Contact: <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>.{% if KVK %} KvK-nummer {{ KVK }}.{% endif %}{% if BTW %} Btw-id {{ BTW }}.{% endif %}</p>
   <h2>Welke gegevens verwerken we</h2>
   <ul>
     <li><strong>Klanten:</strong> e-mailadres (om in te loggen en berichten te sturen), eventueel je naam, de gegevens van je uitnodiging, geüploade foto's en muziek, bestel- en betaalgegevens, en berichten over extra wensen.</li>

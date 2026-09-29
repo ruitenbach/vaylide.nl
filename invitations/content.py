@@ -103,7 +103,9 @@ def default_content(occasion: str, palette_key: str = "") -> dict:
         "music": {"asset": None, "title": ""},
         # haar: gekozen haarkleuren van het bruidspaar (alleen bij ontwerpen met een paar, zie catalog/paar.py).
         # paar_eigen: goedgekeurde eigen versie van het bruidspaar (upload-id, zie gezichten/).
-        "style": {"palette": palette_key, "opening": True, "haar": {"man": "", "vrouw": ""}, "paar_eigen": ""},
+        # envelop: envelop en lakzegel naar keuze (catalog/envelop.py).
+        "style": {"palette": palette_key, "opening": True, "haar": {"man": "", "vrouw": ""}, "paar_eigen": "",
+                  "envelop": {"kleur": "", "zegel_kleur": "", "zegel": "initialen", "initialen": "", "logo": ""}},
         "sections": {
             "countdown": True,
             "story": bool(cfg.get("story_default")),
@@ -292,6 +294,9 @@ def referenced_assets(content: dict) -> set[str]:
     eigen = ((content.get("style") or {}).get("paar_eigen")) or ""
     if eigen:
         uids.add(str(eigen))
+    logo = (((content.get("style") or {}).get("envelop")) or {}).get("logo") or ""
+    if logo:
+        uids.add(str(logo))
     return uids
 
 

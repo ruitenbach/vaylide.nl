@@ -9,7 +9,7 @@
         <div class="a-env__front"><span class="a-env__to a-env__to--{{ v.names_size }}">{{ v.title }}</span></div>
         <div class="a-env__flap"></div>
       </div>
-      <a href="#uitnodiging" class="a-seal fx-pulse" data-open data-fx-origin aria-label="Open de uitnodiging"{% if not v.seal_personal %} style="--a-seal:{{ v.seal_std.base }};color:{{ v.seal_std.ink }}"{% endif %}><span aria-hidden="true">{% if v.seal_personal %}{{ v.monogram }}{% else %}<svg class="seal-motief" viewBox="0 0 24 24" width="1.15em" height="1.15em" focusable="false"><path d="M12 1.5Q13.2 10.8 22.5 12Q13.2 13.2 12 22.5Q10.8 13.2 1.5 12Q10.8 10.8 12 1.5Z" fill="currentColor"/></svg>{% endif %}</span></a>
+      <a href="#uitnodiging" class="a-seal fx-pulse" data-open data-fx-origin aria-label="Open de uitnodiging"{% if v.seal_override %} style="--a-seal:{{ v.seal_override.base }};color:{{ v.seal_override.ink }}"{% endif %}><span aria-hidden="true">{% if v.seal_logo %}<img class="zegel-logo" src="{{ v.seal_logo }}" alt="">{% elif v.seal_personal %}{{ v.monogram }}{% else %}<svg class="seal-motief" viewBox="0 0 24 24" width="1.15em" height="1.15em" focusable="false"><path d="M12 1.5Q13.2 10.8 22.5 12Q13.2 13.2 12 22.5Q10.8 13.2 1.5 12Q10.8 10.8 12 1.5Z" fill="currentColor"/></svg>{% endif %}</span></a>
     </div>
     <p class="a-cover__hint">Tik op het zegel om te openen</p>
     {% include "_atelier/v1/parts/music.html" %}

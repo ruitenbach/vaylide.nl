@@ -28,6 +28,8 @@ def vierlief(request):
         "PAYMENT_METHODS": available_methods,
         "SOCIAL_LINKS": social_links,
         "CONTACT_EMAIL": settings.CONTACT_EMAIL,
+        "KVK": settings.COMPANY_KVK,
+        "BTW": settings.COMPANY_VAT,
         "BASE_URL": settings.BASE_URL,
         "CURRENT_YEAR": timezone.localdate().year,
         "SLOGAN": "Elk bijzonder moment begint met een uitnodiging.",

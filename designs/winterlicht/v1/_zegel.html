@@ -1,5 +1,5 @@
 {# Lakzegel met een takje hulst en den eronder. Kleuren uit de kleurvariant (--wl-seal*); zonder persoonlijk zegel (Compleet) een standaardmotief in rood of groen. #}
-<svg class="wl-seal__svg wl-seal__svg--m{{ v.monogram|length }}" viewBox="0 0 160 160" aria-hidden="true" focusable="false"{% if not v.seal_personal %} style="--wl-seal:{{ v.seal_std.base }};--wl-seal-2:{{ v.seal_std.light }};--wl-seal-ink:{{ v.seal_std.ink }}"{% endif %}>
+<svg class="wl-seal__svg wl-seal__svg--m{{ v.monogram|length }}" viewBox="0 0 160 160" aria-hidden="true" focusable="false"{% if v.seal_override %} style="--wl-seal:{{ v.seal_override.base }};--wl-seal-2:{{ v.seal_override.light }};--wl-seal-ink:{{ v.seal_override.ink }}"{% endif %}>
   <defs>
     <radialGradient id="wl-wax" cx="38%" cy="32%" r="72%">
       <stop offset="0" style="stop-color:var(--wl-seal-2)"/>
@@ -36,7 +36,7 @@
     <circle cx="77" cy="42.5" r="1.3"/><circle cx="77" cy="109.5" r="1.3"/><circle cx="43.5" cy="76" r="1.3"/><circle cx="110.5" cy="76" r="1.3"/>
     <path d="M77 36.6l1.1 2.3 2.4.3-1.8 1.6.5 2.4-2.2-1.2-2.2 1.2.5-2.4-1.8-1.6 2.4-.3z"/>
   </g>
-  {% if v.seal_personal %}<text class="wl-seal__mono wl-seal__mono--shade" x="78" y="78" text-anchor="middle" dominant-baseline="central">{{ v.monogram }}</text>
+  {% if v.seal_logo %}<image class="zegel-logo" href="{{ v.seal_logo }}" x="52" y="51" width="50" height="50" preserveAspectRatio="xMidYMid meet"/>{% elif v.seal_personal %}<text class="wl-seal__mono wl-seal__mono--shade" x="78" y="78" text-anchor="middle" dominant-baseline="central">{{ v.monogram }}</text>
   <text class="wl-seal__mono" x="77" y="76.5" text-anchor="middle" dominant-baseline="central" style="fill:var(--wl-seal-ink)">{{ v.monogram }}</text>{% else %}<path class="wl-seal__motief" d="M77 54Q79.5 73.5 99 76Q79.5 78.5 77 98Q74.5 78.5 55 76Q74.5 73.5 77 54Z" style="fill:var(--wl-seal-ink)"/>{% endif %}
   <ellipse cx="58" cy="42" rx="16" ry="7" transform="rotate(-28 58 42)" fill="#fff" opacity=".22"/>
 </svg>

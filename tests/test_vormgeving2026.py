@@ -95,10 +95,12 @@ class PagesTests(VaylideTestCase):
 
 
 class SealTests(VaylideTestCase):
-    def test_compleet_includes_the_personal_seal(self):
+    def test_every_package_includes_the_personal_seal(self):
+        # Keuze van de eigenaar (september 2026): envelop en lakzegel naar keuze voor alle pakketten.
         self.assertIn("zegel", Package.objects.get(code="compleet").features)
-        self.assertNotIn("zegel", Package.objects.get(code="essentieel").features)
-        self.assertNotIn("Openingsanimatie met persoonlijk zegel", Package.objects.get(code="essentieel").highlights)
+        self.assertIn("zegel", Package.objects.get(code="essentieel").features)
+        self.assertIn("Envelop en lakzegel naar keuze, met jullie initialen of eigen logo", Package.objects.get(code="essentieel").highlights)
+        self.assertNotIn("Persoonlijk zegel met jullie initialen", Package.objects.get(code="compleet").highlights)
 
     def test_seal_colour_follows_the_palette(self):
         self.assertEqual(seal_color("salie"), "groen")

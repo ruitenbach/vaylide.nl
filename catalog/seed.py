@@ -23,11 +23,11 @@ DEFAULT_PACKAGES = [
         "description": "Alles voor een complete, persoonlijke uitnodiging.",
         "price_cents": 3900,
         "availability_months": 6,
-        "features": [],
+        "features": ["zegel"],
         "max_gallery_photos": 0,
         "highlights": [
             "Alle ontwerpen en kleurvarianten",
-            "Openingsanimatie met standaard lakzegel (rood of groen)",
+            "Envelop en lakzegel naar keuze, met jullie initialen of eigen logo",
             "Afteller, programma, locatie en routeknop",
             "Aanmeldformulier met gastenlijst en export",
             "Eigen link, QR-code en agenda-knop",
@@ -47,7 +47,6 @@ DEFAULT_PACKAGES = [
         "max_gallery_photos": 12,
         "highlights": [
             "Alles uit Essentieel",
-            "Persoonlijk zegel met jullie initialen",
             "Persoonlijk verhaal",
             "Fotogalerij tot 12 foto's",
             "Eigen muziek (start pas na een tik)",

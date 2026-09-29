@@ -201,3 +201,8 @@ fieldset.field { border: 0; padding: 0; margin: 0; display: grid; gap: .45rem; }
   .music__toggle { width: 48px; height: 48px; padding: 0; justify-content: center; }
   .music__label { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
+
+/* Eigen logo op het lakzegel (stap Stijl): licht 'geperst' in de lak, in de kleur van het zegel. */
+.zegel-logo { display: block; width: 1.9em; height: 1.9em; object-fit: contain; opacity: .92;
+  filter: grayscale(1) brightness(2.4) sepia(.3) drop-shadow(0 1px 0 rgba(0, 0, 0, .45)); }
+image.zegel-logo { filter: grayscale(1) brightness(2.4) sepia(.3) drop-shadow(0 1px 0 rgba(0, 0, 0, .45)); }

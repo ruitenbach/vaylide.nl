@@ -596,8 +596,9 @@
     var main = document.getElementById("uitnodiging");
     if (!cover || !main) return;
     var key = "vierlief-open:" + location.pathname;
-    var skip = /^#(aanmelden|aanmelden-formulier|uitnodiging)/.test(location.hash) || html.hasAttribute("data-live");
-    try { if (sessionStorage.getItem(key)) skip = true; } catch (e) { /* privémodus */ }
+    var skip = /^#(aanmelden|aanmelden-formulier|uitnodiging)/.test(location.hash) || (html.hasAttribute("data-live") && html.getAttribute("data-live") !== "stijl");  // bij Stijl: de envelop laten zien
+    // De live kaart in de editor onthoudt niets: bij Stijl altijd de dichte envelop.
+    if (!html.hasAttribute("data-live")) { try { if (sessionStorage.getItem(key)) skip = true; } catch (e) { /* privémodus */ } }
     if (skip) { finish(true); return; }
 
     html.classList.add("has-cover");

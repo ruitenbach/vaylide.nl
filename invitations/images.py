@@ -141,3 +141,41 @@ def sniff_attachment(uploaded) -> tuple[str, str]:
                 continue
             return content_type, ext
     raise UploadError("Dit bestandstype wordt niet ondersteund. Gebruik een PDF, JPG, PNG of WebP.")
+
+
+LOGO_MAX_SIDE = 600
+
+
+def process_logo(uploaded) -> ProcessedPhoto:
+    """Een eigen logo voor het lakzegel: opnieuw opgeslagen als WebP met doorzichtigheid (zonder metadata), hoogstens
+    600 pixels. Een witte achtergrond (bijv. bij JPG) wordt doorzichtig gemaakt, zodat het logo in de lak valt."""
+    limits = settings.UPLOAD_LIMITS
+    if uploaded.size > 5 * 1024 * 1024:
+        raise UploadError("Dit logo is te groot. Het maximum is 5 MB.")
+    try:
+        uploaded.seek(0)
+        with Image.open(uploaded) as probe:
+            fmt = probe.format
+            probe.verify()
+        if fmt not in ("PNG", "WEBP", "JPEG", "MPO"):
+            raise UploadError("Gebruik een PNG-, WebP- of JPG-bestand voor je logo.")
+        uploaded.seek(0)
+        with Image.open(uploaded) as img:
+            img = ImageOps.exif_transpose(img).convert("RGBA")
+            if min(img.size) < 60:
+                raise UploadError("Dit logo is te klein. Kies een bestand van minimaal 60 pixels.")
+            if img.getchannel("A").getextrema()[0] == 255:  # geen doorzichtigheid: bijna-wit wordt doorzichtig
+                pixels = [(r, g, b, 0 if min(r, g, b) > 238 else a) for r, g, b, a in img.getdata()]
+                img.putdata(pixels)
+            bbox = img.getchannel("A").getbbox()
+            if bbox:
+                img = img.crop(bbox)
+            img.thumbnail((LOGO_MAX_SIDE, LOGO_MAX_SIDE), Image.Resampling.LANCZOS)
+            buffer = io.BytesIO()
+            img.save(buffer, "WEBP", quality=90, method=4)
+    except Image.DecompressionBombError:
+        raise UploadError("Dit logo heeft te veel pixels. Verklein het en probeer het opnieuw.")
+    except (UnidentifiedImageError, OSError, SyntaxError):
+        raise UploadError("Dit bestand is geen geldige afbeelding. Gebruik een PNG-, WebP- of JPG-bestand.")
+    data = ContentFile(buffer.getvalue(), name="logo.webp")
+    return ProcessedPhoto(large=data, medium=data, thumb=data, width=img.width, height=img.height, size_bytes=data.size)

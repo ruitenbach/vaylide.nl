@@ -663,3 +663,23 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
   - uitloggen via Mijn VAYLIDE.
 - **Betaalmethoden:** Klarna (alle varianten als één) en Riverty worden herkend. Logo's voor creditcard, Klarna en Riverty
   zijn er nog niet (zie `docs/INVULLIJST.md`).
+
+## Envelop en lakzegel naar keuze, KvK en btw, betaalmethoden (29 september 2026)
+
+- `manage.py test tests`: 354 tests, alle geslaagd (nieuw: `tests/test_envelop.py`).
+  - **Het blok "Envelop en lakzegel":** staat alleen bij ontwerpen met een zegel.
+  - **Keuzes op de kaart:** de envelopkleur, de zegelkleur en de initialen verschijnen op de kaart. Initialen worden
+    opgeschoond.
+  - **Eigen logo:**
+    - het logo komt op het zegel, met doorzichtigheid (hoogstens 600 pixels);
+    - een witte achtergrond wordt doorzichtig;
+    - na betaling staat het logo ook op de gepubliceerde uitnodiging;
+    - na verwijderen gaat het zegel terug naar initialen.
+  - **Andere stijlkeuzes** (zoals eigen gezichten) blijven bewaard.
+  - **Pakketten:** Essentieel heeft nu ook het persoonlijk zegel (migratie `catalog/0004`). Prijzen zijn niet gewijzigd.
+  - **Specials:** zonder eigen meerprijs geldt de pakketprijs.
+  - **Betaalmethoden:** alleen iDEAL, creditcard en PayPal, ook als er in Mollie meer aanstaat.
+  - **KvK 94261423 en btw-id NL212227221B02:** in de voettekst, bij Contact, in de privacyverklaring en in de
+    voorwaarden. Zonder adres.
+- **In Chromium (lokaal):** envelop Salie, zegel Goud en initialen "J&M" gekozen. De live kaart toont bij de stap Stijl de
+  dichte envelop en werkt zich bij.

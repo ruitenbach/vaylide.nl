@@ -14,13 +14,14 @@ from django.views.decorators.http import require_http_methods, require_POST
 
 from catalog.models import Package, Template, format_euro
 from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, occasion_config
+from catalog.envelop import choice as envelop_choice
 from catalog.specials import is_special, special_addon
 from studio import pakket
 from core.ai import AIUnavailable, suggest_text
 from core.utils import ip_fingerprint, rate_limit, wants_json
 from invitations.access import get_accessible_invitation, remember_draft, session_drafts
 from invitations.content import SECTION_LABELS, card_kind, normalize_content, publish_issues, referenced_assets
-from invitations.images import UploadError, process_photo, sniff_audio
+from invitations.images import UploadError, process_logo, process_photo, sniff_audio
 from invitations.models import Invitation, MediaAsset, Source
 from invitations.render import PathResolver, RenderOptions, build_view
 from invitations.services import (
@@ -234,6 +235,10 @@ def step(request, uid, step):
     else:
         form = form_class(content=content, occasion=inv.occasion, locked=_locked(request, inv), **extra_kwargs)
     faces_link, faces_status = False, ""
+    zegel_logo = None
+    if step == "stijl":
+        logo_uid = envelop_choice(content).get("logo") or ""
+        zegel_logo = inv.assets.filter(kind=MediaAsset.Kind.LOGO, uid=logo_uid).first() if logo_uid else None
     if step == "stijl" and request.user.is_authenticated and (inv.owner_id == request.user.id or request.user.is_staff):
         from gezichten import services as gezichten
 
@@ -254,6 +259,7 @@ def step(request, uid, step):
             photos=photos,
             audio=audio,
             faces_link=faces_link,
+            zegel_logo=zegel_logo,
             faces_status=faces_status,
             content=content,
             cfg=occasion_config(inv.occasion),
@@ -473,6 +479,24 @@ def upload(request, uid):
             asset.file_thumb.save("klein.webp", processed.thumb, save=False)
             asset.save()
             created.append(asset)
+        logo = request.FILES.get("zegel_logo")
+        if logo:
+            try:
+                processed = process_logo(logo)
+            except UploadError as exc:
+                errors.append(f"{(logo.name or 'logo')[:120]}: {exc}")
+            else:
+                asset = MediaAsset(invitation=inv, kind=MediaAsset.Kind.LOGO, original_name=(logo.name or "logo")[:120], content_type="image/webp",
+                                   size_bytes=processed.size_bytes, width=processed.width, height=processed.height,
+                                   uploaded_by=request.user if request.user.is_authenticated else None)
+                asset.file.save("logo.webp", processed.large, save=False)
+                asset.save()
+                created.append(asset)
+                content = _content(inv)
+                content["style"].setdefault("envelop", {}).update({"logo": str(asset.uid), "zegel": "logo"})
+                save_draft(inv, expected_rev=None, content=content, user=request.user, source=_source(request))
+                messages.success(request, "Je logo staat op het lakzegel.")
+                return redirect(f"{reverse('studio:step', args=[inv.uid, 'stijl'])}#envelop")
         music = request.FILES.get("muziek")
         if music:
             try:
@@ -487,7 +511,7 @@ def upload(request, uid):
                 asset.file.save(f"muziek{ext}", music, save=False)
                 asset.save()
                 created.append(asset)
-        if not photos and not music:
+        if not photos and not music and not logo:
             errors.append("Kies eerst een bestand.")
     placed = _auto_hero(request, inv, [a for a in created if a.kind == MediaAsset.Kind.PHOTO])
     if placed:
@@ -544,6 +568,9 @@ def delete_asset(request, uid, asset_uid):
     if (content.get("music") or {}).get("asset") == uid_str:
         content["music"]["asset"] = None
         content["sections"]["music"] = False
+    keuze = (content.get("style") or {}).get("envelop") or {}
+    if keuze.get("logo") == uid_str:  # logo van het zegel: terug naar initialen
+        keuze.update({"logo": "", "zegel": "initialen"})
     save_draft(inv, expected_rev=None, content=content, user=request.user, source=_source(request))
     inv.refresh_from_db()
     still_used = uid_str in referenced_by_any_version(inv)
@@ -554,6 +581,8 @@ def delete_asset(request, uid, asset_uid):
             asset.delete_files()
             asset.delete()
         messages.success(request, "Het bestand is verwijderd.")
+    if asset.kind == MediaAsset.Kind.LOGO:
+        return redirect(f"{reverse('studio:step', args=[inv.uid, 'stijl'])}#envelop")
     return redirect(f"{reverse('studio:step', args=[inv.uid, 'fotos'])}#uploads")
 
 

@@ -37,6 +37,30 @@
     <a class="btn btn--secondary btn--sm" href="{% url 'gezichten:page' inv.uid %}">Eigen gezichten{% if faces_status %} · {{ faces_status }}{% endif %}</a>
   </section>
   {% endif %}
+  {% if form.has_seal %}
+  <fieldset class="studio-block" id="envelop">
+    <legend class="studio-block__title">Envelop en lakzegel</legend>
+    <p class="hint">Maak de opening helemaal van jullie: kies de kleuren en zet jullie initialen of een eigen logo op het zegel. Je ziet het meteen op je kaart.</p>
+    {% if form.has_envelope %}
+    <div class="field"><span class="label">{{ form.env_kleur.label }}</span>
+      <div class="kleurstalen">{% for r in form.env_kleur %}<label class="kleurstaal">{{ r.tag }}<span class="kleurstaal__bol kleurstaal__bol--{{ r.data.value|default:'ontwerp' }}" aria-hidden="true"></span><span>{{ r.choice_label }}</span></label>{% endfor %}</div>
+    </div>
+    {% endif %}
+    <div class="field"><span class="label">{{ form.zegel_kleur.label }}</span>
+      <div class="kleurstalen">{% for r in form.zegel_kleur %}<label class="kleurstaal">{{ r.tag }}<span class="kleurstaal__bol kleurstaal__bol--zegel-{{ r.data.value|default:'ontwerp' }}" aria-hidden="true"></span><span>{{ r.choice_label }}</span></label>{% endfor %}</div>
+    </div>
+    <div class="field"><span class="label">{{ form.zegel.label }}</span>
+      <div class="chips">{% for r in form.zegel %}<label class="chip">{{ r.tag }} {{ r.choice_label }}</label>{% endfor %}</div>
+    </div>
+    {% include "studio/_field.html" with field=form.initialen %}
+    <div class="zegel-logo-upload">
+      {% if zegel_logo %}<p class="zegel-logo-upload__nu"><img src="{% url 'studio:media' inv.uid zegel_logo.uid 'groot' %}" alt="Je logo" width="64" height="64"> <span class="small">Je logo staat klaar. Kies 'Eigen logo' hierboven om het te gebruiken.</span> <button type="submit" class="link-button small" form="delete-{{ zegel_logo.uid }}">verwijderen</button></p>{% endif %}
+      <label class="field"><span class="label">Eigen logo uploaden (bijv. van je bedrijf)</span><input type="file" name="zegel_logo" accept="image/png,image/webp,image/jpeg" form="upload-logo-form"></label>
+      <button type="submit" class="btn btn--secondary btn--sm" form="upload-logo-form" formnovalidate>Logo uploaden</button>
+      <p class="hint">PNG met doorzichtige achtergrond werkt het mooist. Een witte achtergrond maken we zelf doorzichtig.</p>
+    </div>
+  </fieldset>
+  {% endif %}
   <section class="studio-block" aria-labelledby="blok-opening">
     <h2 class="studio-block__title" id="blok-opening">Openingsanimatie</h2>
     {% include "studio/_check.html" with field=form.opening %}
@@ -53,4 +77,6 @@
   </fieldset>
   {% include "studio/_actions.html" %}
 </form>
+<form method="post" action="{% url 'studio:upload' inv.uid %}" enctype="multipart/form-data" id="upload-logo-form">{% csrf_token %}</form>
+{% if zegel_logo %}<form method="post" id="delete-{{ zegel_logo.uid }}" action="{% url 'studio:delete_asset' inv.uid zegel_logo.uid %}" data-confirm="Dit logo verwijderen?">{% csrf_token %}</form>{% endif %}
 {% endblock %}

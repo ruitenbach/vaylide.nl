@@ -29,6 +29,7 @@
     <aside class="contact-aside">
       <p><strong>Al een uitnodiging?</strong><br>Gebruik <a href="{% url 'portal:wish_new' %}">Extra wensen of hulp</a> in Mijn VAYLIDE. Dan zien we meteen om welke uitnodiging het gaat.</p>
       <p><strong>E-mail</strong><br><a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a></p>
+      {% if KVK or BTW %}<p><strong>Bedrijfsgegevens</strong><br>{% if KVK %}KvK-nummer {{ KVK }}{% endif %}{% if KVK and BTW %}<br>{% endif %}{% if BTW %}Btw-id {{ BTW }}{% endif %}</p>{% endif %}
     </aside>
   </div>
 </section>
