@@ -1,7 +1,7 @@
 {% load static vl %}{% comment %}De onthulling na een geslaagde betaling: de envelop gaat open, je kaart komt eruit, confetti en vuurwerk (static/js/onthulling.js).
    Zonder JavaScript en bij 'minder beweging' staat alles meteen in de eindstand.{% endcomment %}
 {% with inv=order.invitation %}
-<section class="onthulling" data-onthulling aria-labelledby="onthulling-titel">
+<section class="onthulling" data-onthulling data-phase="live" aria-labelledby="onthulling-titel">
   <canvas class="onthulling__confetti" data-confetti aria-hidden="true"></canvas>
   <div class="onthulling__licht" aria-hidden="true"></div>
   <div class="container onthulling__inner">

@@ -693,3 +693,27 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
     onder elkaar;
   - een bon met bestelnummer, datum, betaalmethode, de onderdelen en het totaal.
   - Lokaal bekeken op 731 pixels, zonder horizontaal scrollen. De test controleert de tijdlijn en de bon.
+
+## Totaalcontrole vóór het online zetten (29 september 2026)
+
+- `manage.py test tests`: 354 tests, alle geslaagd. `makemigrations --check`: geen ontbrekende migraties.
+- **Klantreis in Chromium** (`e2e/klantreis.cjs`, lokaal, testmodus), op 390 én 1366 pixels: **39/39** controles. Doorlopen:
+  - inloggen met code, alle stappen, foto uploaden (goed en fout);
+  - geslaagde betaling met publicatie en de onthulling;
+  - gast meldt zich aan, antwoord en export in Mijn VAYLIDE, QR-code;
+  - afgebroken betaling en opnieuw betalen;
+  - toegangsrechten (andere klant 404, zonder login naar inloggen, klant niet in het beheer);
+  - het beheer;
+  - geen JavaScript-fouten.
+  - De eerste run liep vast: het testscript zocht op de bedankpagina een kenmerk (`data-phase`) dat met de nieuwe opmaak
+    wegviel. Teruggezet, daarna alles geslaagd.
+- **Toegankelijkheid** (axe-core, WCAG 2.0/2.1 A en AA): **0 overtredingen** op 24 pagina's (12 pagina's op 390 en 1366
+  pixels). Dat zijn: home, collectie, prijzen, contact, voorwaarden, start, Mijn VAYLIDE, gegevens, stap Stijl (envelop en
+  zegel), stap Foto's, de bedankpagina (onthulling en bon), en de start zonder gelegenheid.
+- **Live-modus met nep-waarden (geen echte sleutels):**
+  - zonder betaalprovider weigert de site te starten;
+  - in testmodus weigert hij een live-sleutel;
+  - `check --deploy` geeft alleen de bewuste meldingen W005 en W021.
+- **Testsite (zonder wachtwoord):**
+  - `/healthz` geeft 200 en de pagina's geven 401;
+  - de Mollie-webhook is bereikbaar (400 zonder id), de gesimuleerde betaling bestaat niet (404).
