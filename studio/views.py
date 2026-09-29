@@ -178,14 +178,8 @@ def step(request, uid, step):
     # Een stap die bij deze kaart niet hoort (Aanmelden bij een wenskaart): door naar de volgende.
     if step in _skip(inv, content):
         return redirect("studio:step", uid=inv.uid, step=next_step(step, paid=invitation_is_paid(inv), skip=_skip(inv, content)))
-    extra_kwargs = {}
-    photos = audio = []
-    if step == "fotos":
-        photos = list(inv.assets.filter(kind=MediaAsset.Kind.PHOTO))
-        audio = list(inv.assets.filter(kind=MediaAsset.Kind.AUDIO))
-        extra_kwargs = {"photos": photos, "audio": audio}
-    if step == "stijl":
-        extra_kwargs = {"template_version": inv.template_version}
+    extra_kwargs = _form_kwargs(inv, step)
+    photos, audio = extra_kwargs.get("photos", []), extra_kwargs.get("audio", [])
     conflict = None
     rev = inv.draft_rev
     if request.method == "POST":
@@ -253,8 +247,19 @@ def step(request, uid, step):
             upload_limits=settings.UPLOAD_LIMITS,
             section_labels=SECTION_LABELS,
             features=set(inv.features or []),
+            live_url=f"{reverse('studio:live_frame', args=[inv.uid])}?deel={step}",
+            live_update_url=reverse("studio:live_update", args=[inv.uid, step]),
         ),
     )
+
+
+def _form_kwargs(inv: Invitation, step: str) -> dict:
+    if step == "fotos":
+        return {"photos": list(inv.assets.filter(kind=MediaAsset.Kind.PHOTO)),
+                "audio": list(inv.assets.filter(kind=MediaAsset.Kind.AUDIO))}
+    if step == "stijl":
+        return {"template_version": inv.template_version}
+    return {}
 
 
 def _conflict_info(latest: Invitation, mine: dict, step: str) -> dict:
@@ -356,6 +361,47 @@ def preview_frame(request, uid):
     inv = get_accessible_invitation(request, uid)
     content = _content(inv)
     options = _preview_options(inv, content)
+    view = build_view(occasion=inv.occasion, content=content, overrides=inv.draft_overrides, template_version=inv.template_version, options=options)
+    return render(request, inv.template_version.template_path, {"v": view, "rsvp_form": {"client_token": "voorbeeld-formulier-0000", "form_ts": ""}})
+
+
+LIVE_PARTS = {"gegevens", "programma", "aanmelden", "fotos", "stijl"}
+
+
+def _live_key(inv: Invitation) -> str:
+    return f"vierlief-live:{inv.uid}"
+
+
+@require_POST
+def live_update(request, uid, step):
+    """Neemt wat de klant nu invult (nog niet opgeslagen) over in de live kaart. Slaat niets op in de uitnodiging:
+    het concept staat alleen in de eigen sessie en is alleen via ?concept=1 zichtbaar voor deze bezoeker."""
+    inv = get_accessible_invitation(request, uid)
+    form_class = FORM_CLASSES.get(step)
+    if form_class is None:
+        raise Http404()
+    if not rate_limit(f"live:{inv.pk}", 600, 3600):
+        return JsonResponse({"ok": False}, status=429)
+    content = _content(inv)
+    form = form_class(request.POST, content=content, occasion=inv.occasion, locked=_locked(request, inv), **_form_kwargs(inv, step))
+    if not form.is_valid():
+        return JsonResponse({"ok": False})
+    request.session[_live_key(inv)] = {"rev": inv.draft_rev, "content": form.apply(copy.deepcopy(content))}
+    return JsonResponse({"ok": True, "url": f"{reverse('studio:live_frame', args=[inv.uid])}?deel={step}&concept=1"})
+
+
+@xframe_options_sameorigin
+def live_frame(request, uid):
+    """De live kaart naast de invulstappen: meteen open, zonder testbalk, met de foto's gemarkeerd."""
+    inv = get_accessible_invitation(request, uid)
+    content = _content(inv)
+    draft = request.session.get(_live_key(inv)) if request.GET.get("concept") else None
+    if draft and draft.get("rev") == inv.draft_rev:
+        content = normalize_content(draft["content"], inv.occasion)
+    part = request.GET.get("deel", "")
+    options = _preview_options(inv, content)
+    options.embed = True
+    options.live = part if part in LIVE_PARTS else "kaart"
     view = build_view(occasion=inv.occasion, content=content, overrides=inv.draft_overrides, template_version=inv.template_version, options=options)
     return render(request, inv.template_version.template_path, {"v": view, "rsvp_form": {"client_token": "voorbeeld-formulier-0000", "form_ts": ""}})
 

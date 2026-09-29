@@ -538,3 +538,23 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
   - de echte dansvideo (proefscène);
   - de acht haarkleurscènes;
   - de echte Gemini-bewerking van eigen gezichten.
+
+## Je kaart, live naast de invulstappen (29 september 2026)
+
+- `manage.py test tests`: 315 tests, alle geslaagd (nieuw: `tests/test_live_kaart.py`).
+  - De kaart staat bij alle vijf invulstappen.
+  - Wat je invult verschijnt in de kaart zonder dat het wordt opgeslagen. Na opslaan wordt een verouderd concept genegeerd.
+  - Hoofdfoto en galerij zijn gemarkeerd.
+  - Een andere klant krijgt 404.
+  - Gasten krijgen nooit het live-script.
+  - Er staat geen commentaar als tekst op de pagina.
+- In Chromium (lokaal) op 1366×860 en 390×844, zonder horizontaal scrollen en zonder fouten in de console:
+  - Namen typen: ze staan direct op de kaart.
+  - Hoofdfoto kiezen: de kaart springt naar de foto, met het label "Hoofdfoto".
+  - Galerijfoto's kiezen: ze zijn gemarkeerd als "Fotogalerij".
+  - Na herladen toont de kaart ook de keuzes die de browser teruggezet heeft.
+  - De terug-knop van de browser krijgt er geen extra stappen bij.
+  - Op 390 px: de knop "Bekijk je kaart" opent de kaart schermvullend.
+- Niet gedaan:
+  - de toegankelijkheidscontrole met axe op de editorpagina's;
+  - Safari en echte telefoons.

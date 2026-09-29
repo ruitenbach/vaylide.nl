@@ -112,6 +112,7 @@ class Photo:
     caption: str = ""
     width: int | None = None
     height: int | None = None
+    role: str = ""  # 'hoofdfoto' of 'galerij' (voor de live kaart in de editor)
 
     @property
     def style(self) -> str:
@@ -180,6 +181,7 @@ class RenderOptions:
     existing_response: object | None = None
     music_synth: bool = False
     embed: bool = False
+    live: str = ""  # de live kaart in de editor: welk deel extra aandacht krijgt (bijv. 'fotos')
 
 
 # Standaard lakzegel (zonder de functie 'zegel'): een motief in plaats van initialen, in rood of in groen.
@@ -353,6 +355,8 @@ def build_view(
 
     resolver = options.resolver
     hero = resolve_photo(content["photos"].get("hero"), resolver, f"Foto bij de uitnodiging van {title}")
+    if hero:
+        hero.role = "hoofdfoto"
     gallery = []
     if "gallery" in features:
         for i, ref in enumerate(content["photos"].get("gallery") or []):
@@ -360,6 +364,7 @@ def build_view(
                 break
             photo = resolve_photo(ref, resolver, f"Foto {i + 1} van {title}")
             if photo:
+                photo.role = "galerij"
                 gallery.append(photo)
 
     program = []
@@ -476,6 +481,7 @@ def build_view(
         "is_preview": options.mode == "preview",
         "is_demo": options.mode == "demo",
         "embed": options.embed,
+        "live": options.live,
         "formal": formal,
         "occasion": occasion,
         "occasion_label": cfg["label"],

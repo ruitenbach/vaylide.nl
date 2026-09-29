@@ -233,3 +233,75 @@ pre.error-body { white-space: pre-wrap; font-size: .8rem; background: var(--fore
 .gz-haar legend { font-weight: 600; margin-bottom: .4rem; }
 .gz-haar label { display: inline-flex; align-items: center; gap: .5rem; }
 .gz-haar select { min-height: 44px; padding: .4rem .6rem; border-radius: 10px; border: 1px solid var(--line-strong); background: #fff; }
+
+/* ---------- Je kaart, live (studio/_live.html) ----------
+   De kaart staat rechtop voor een geopende envelop met lakzegel. De kaart zelf is de echte weergave (390 px breed,
+   geschaald met --s). Op kleine schermen achter een zwevende knop; vanaf 1100 px vast naast de invulvelden. */
+.studio-live { display: grid; gap: 1.5rem; padding-bottom: 4.5rem; }
+.studio-live__main { min-width: 0; }
+.live-kaart { --s: .6; --card-w: calc(390px * var(--s) + 16px); --card-h: calc(844px * var(--s) + 16px); }
+.live-kaart__toggle { list-style: none; cursor: pointer; }
+.live-kaart__toggle::-webkit-details-marker { display: none; }
+.live-kaart__toggle { position: fixed; right: 1rem; bottom: 1rem; z-index: 40; display: inline-flex; align-items: center; gap: .55rem;
+  padding: .75rem 1.15rem; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 600; box-shadow: var(--shadow-float); }
+/* envelopje als icoon */
+.live-kaart__toggle::before { content: ""; width: 1.15rem; height: .8rem; border: 2px solid currentColor; border-radius: 2px;
+  background: linear-gradient(to bottom right, transparent calc(50% - 1px), currentColor calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) left top / 50% 70% no-repeat,
+              linear-gradient(to bottom left, transparent calc(50% - 1px), currentColor calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) right top / 50% 70% no-repeat; }
+.live-kaart[open] .live-kaart__toggle-text { font-size: 0; }
+.live-kaart[open] .live-kaart__toggle-text::after { content: "Sluiten"; font-size: 1rem; }
+.live-kaart__panel { position: fixed; inset: 0; z-index: 35; display: grid; justify-items: center; align-content: start; gap: .7rem;
+  padding: 1.25rem 1rem 5.5rem; overflow-y: auto; background: var(--ivory); }
+.live-kaart__title { margin: 0; font-family: var(--font-display); font-size: 1.15rem; text-align: center; }
+.live-kaart__state { font-family: var(--font-body); font-size: .85rem; color: var(--muted); }
+.live-kaart__hint { margin: 0; max-width: 22rem; text-align: center; }
+
+/* het tafereel: envelop achter, kaart ervoor */
+.live-kaart__stage { position: relative; width: calc(var(--card-w) + 56px); padding: 92px 28px 22px; }
+.live-kaart__envelop { position: absolute; left: 0; right: 0; top: 132px; height: 58%; border-radius: 10px;
+  background:
+    linear-gradient(to top right, #E3D3BA 49.6%, transparent 50%) left bottom / 50% 58% no-repeat,
+    linear-gradient(to top left, #E3D3BA 49.6%, transparent 50%) right bottom / 50% 58% no-repeat,
+    linear-gradient(180deg, #F1E7D6, #E9DCC6);
+  box-shadow: 0 18px 36px -24px rgba(70, 50, 25, .55), inset 0 0 0 1px rgba(122, 90, 46, .12);
+  transform: rotate(-2.5deg); transform-origin: 50% 100%; }
+/* de opengeklapte klep, met het lakzegel op de punt */
+.live-kaart__klep { position: absolute; left: 0; right: 0; bottom: 100%; height: 96px; background: linear-gradient(0deg, #EADFCB, #E2D2B8);
+  clip-path: polygon(0 100%, 50% 0, 100% 100%); }
+.live-kaart__zegel { position: absolute; left: 50%; top: -118px; width: 46px; height: 46px; margin-left: -23px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #C9A45C, #8C6A2C 55%, #6A4B20); box-shadow: 0 3px 8px rgba(60, 40, 15, .35), inset 0 0 0 5px rgba(255, 240, 210, .18); }
+.live-kaart__zegel::after { content: ""; position: absolute; inset: 11px; border-radius: 50%; border: 1.5px solid rgba(255, 244, 220, .55); }
+
+.live-kaart__card { position: relative; width: var(--card-w); height: var(--card-h); padding: 8px; border-radius: 16px; background: var(--paper);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .8) inset, 0 0 0 1px var(--gold-soft), 0 24px 42px -26px rgba(55, 38, 18, .6);
+  overflow: hidden; transition: transform .45s cubic-bezier(.2, .8, .2, 1), box-shadow .45s ease; }
+.live-kaart__card iframe { width: 390px; height: 844px; border: 0; display: block; background: #fff; border-radius: 14px;
+  transform: scale(var(--s)); transform-origin: 0 0; }
+.live-kaart__badge { position: absolute; top: 16px; right: 16px; z-index: 2; display: inline-flex; align-items: center; gap: .35rem;
+  padding: .18rem .55rem; border-radius: 999px; background: rgba(38, 33, 29, .82); color: #fff; font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; pointer-events: none; }
+.live-kaart__badge::before { content: ""; width: .45rem; height: .45rem; border-radius: 50%; background: var(--gold); }
+/* bij elke wijziging komt de kaart even omhoog uit de envelop */
+.live-kaart__card.is-updating { transform: translateY(-10px); box-shadow: 0 1px 0 rgba(255, 255, 255, .8) inset, 0 0 0 1px var(--gold), 0 34px 52px -26px rgba(55, 38, 18, .7); }
+@media (prefers-reduced-motion: no-preference) {
+  .live-kaart__badge::before { animation: live-puls 2.4s ease-in-out infinite; }
+}
+@keyframes live-puls { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .live-kaart__card { transition: none; } .live-kaart__card.is-updating { transform: none; } }
+
+@media (min-height: 760px) { .live-kaart { --s: .68; } }
+@media (min-width: 1100px) {
+  .studio-live { grid-template-columns: minmax(0, 1fr) auto; gap: 2.5rem; align-items: start; padding-bottom: 0; }
+  .live-kaart { --s: .6; position: sticky; top: 5rem; }
+  .live-kaart__toggle { position: static; box-shadow: none; }
+  .js .live-kaart__toggle { display: none; }
+  .live-kaart__panel { position: static; padding: 0; overflow: visible; background: none; }
+  .live-kaart__hint { max-width: calc(var(--card-w) + 56px); }
+}
+@media (min-width: 1100px) and (min-height: 960px) { .live-kaart { --s: .7; } }
+
+/* Stap foto's: waar komt wat op de kaart? */
+.waar-komt-wat { max-width: 52rem; margin: 0 0 2rem; padding: 1.1rem 1.25rem; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--paper); }
+.waar-komt-wat__title { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; margin: 0 0 .6rem; }
+.waar-komt-wat__lijst { margin: 0 0 .6rem; padding-left: 1.3rem; display: grid; gap: .35rem; }
+.waar-komt-wat__lijst strong { margin-right: .25rem; }
+.waar-komt-wat .small { margin: 0; }

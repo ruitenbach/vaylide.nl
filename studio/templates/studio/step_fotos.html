@@ -5,6 +5,16 @@
   <h1>Foto's, verhaal en muziek</h1>
   <p class="lead">Kies per foto welk deel in beeld komt. Locatiegegevens halen we automatisch weg.</p>
 </div>
+<section class="waar-komt-wat" aria-labelledby="waar-titel">
+  <h2 class="waar-komt-wat__title" id="waar-titel">Waar komt wat op je kaart?</h2>
+  <ol class="waar-komt-wat__lijst">
+    <li><strong>Hoofdfoto</strong> <span>De grote foto op je kaart, bij jullie namen of welkomsttekst (dat verschilt per ontwerp). Je kiest er één.</span></li>
+    <li><strong>Fotogalerij</strong> <span>Een fotoblok verderop op de kaart, tot 12 foto's, elk met een eigen onderschrift.</span></li>
+    <li><strong>Verhaal</strong> <span>Een eigen blok met de titel die je kiest, onder de foto's.</span></li>
+    <li><strong>Muziek</strong> <span>Een knop op de kaart. Speelt pas als een gast erop tikt.</span></li>
+  </ol>
+  <p class="small muted">Geüploade foto's komen pas op je kaart als je ze hieronder kiest als hoofdfoto of voor de galerij. Op je kaart ernaast (op een telefoon: "Bekijk je kaart") zie je met een gouden rand waar ze staan.</p>
+</section>
 {% include "studio/_conflict.html" %}
 <section class="studio-block" id="uploads" aria-labelledby="blok-upload">
   <h2 class="studio-block__title" id="blok-upload">Foto's uploaden</h2>
@@ -25,7 +35,7 @@
   <section class="studio-block" aria-labelledby="blok-fotos">
     <h2 class="studio-block__title" id="blok-fotos">Jouw foto's</h2>
     {% if photos %}
-    <p class="hint">Kies een hoofdfoto en eventueel galerijfoto's (tot 12). Tik of sleep in een foto om het middelpunt te kiezen.</p>
+    <p class="hint">Kies een hoofdfoto en eventueel galerijfoto's (tot 12). Tik of sleep in een foto om het middelpunt te kiezen. De telefoon laat direct zien waar de foto komt.</p>
     <fieldset>
       <legend class="visually-hidden">Hoofdfoto</legend>
       <div class="photo-grid">

@@ -250,6 +250,59 @@
     });
   });
 
+  /* ---------- Je kaart, live naast de invulstappen: toont wat je invult, nog vóór het opslaan ---------- */
+  document.querySelectorAll("[data-live]").forEach(function (box) {
+    var frame = box.querySelector("[data-live-frame]");
+    var card = box.querySelector("[data-live-card]");
+    frame.addEventListener("load", function () { window.setTimeout(function () { card.classList.remove("is-updating"); }, 250); });
+    var state = box.querySelector("[data-live-state]");
+    var url = box.getAttribute("data-live-update");
+    var form = document.querySelector("form.studio-form");
+    var wide = window.matchMedia("(min-width: 1100px)");
+    function sync() { if (wide.matches) box.open = true; }
+    sync();
+    if (wide.addEventListener) wide.addEventListener("change", sync);
+    if (!form || !url || !window.fetch || !window.FormData) return;
+    var timer = null, busy = false, again = false, pending = false, jump = false;
+    function refresh() {
+      if (!box.open) { pending = true; return; }
+      if (busy) { again = true; return; }
+      busy = true;
+      pending = false;
+      state.textContent = "· bijwerken…";
+      fetch(url, { method: "POST", body: new FormData(form), credentials: "same-origin",
+                   headers: { "Accept": "application/json", "X-Requested-With": "fetch" } })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          state.textContent = "";
+          if (!data.ok || !data.url) return;
+          // Een foto gekozen: naar de foto's springen. Anders blijft de kaart staan waar hij stond.
+          var y = 0;
+          try { y = Math.round(frame.contentWindow.scrollY || 0); } catch (e) { y = 0; }
+          var keep = !jump && y > 0 ? "&y=" + y : "";
+          jump = false;
+          card.classList.add("is-updating");
+          // replace(): geen extra stap in de terug-knop van de browser.
+          frame.contentWindow.location.replace(data.url + keep);
+        })
+        .catch(function () { state.textContent = ""; })
+        .then(function () { busy = false; if (again) { again = false; schedule(); } });
+    }
+    function schedule(event) {
+      var name = event && event.target && event.target.name || "";
+      if (name === "hero" || /^g_/.test(name)) jump = true;
+      window.clearTimeout(timer);
+      timer = window.setTimeout(refresh, 600);
+    }
+    form.addEventListener("input", schedule);
+    form.addEventListener("change", schedule);
+    box.addEventListener("toggle", function () { if (box.open && pending) refresh(); });
+    // Na herladen of 'terug' zet de browser eerder ingevulde waarden terug: laat de kaart die ook tonen.
+    var nav = window.performance && performance.getEntriesByType ? performance.getEntriesByType("navigation")[0] : null;
+    if (nav && (nav.type === "reload" || nav.type === "back_forward")) schedule();
+    window.addEventListener("pageshow", function (event) { if (event.persisted) schedule(); });
+  });
+
   /* ---------- Bestellen: bedrag direct bijwerken bij een andere keuze ---------- */
   document.querySelectorAll("[data-recalc]").forEach(function (input) {
     input.addEventListener("change", function () {
