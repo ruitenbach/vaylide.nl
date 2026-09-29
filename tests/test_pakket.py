@@ -79,7 +79,7 @@ class GuestAndLoginTests(VaylideTestCase):
         self.assertContains(page, "Log eerst in")
 
     def test_header_shows_login_text(self):
-        self.assertContains(Client().get("/"), 'class="site-header__account" href="/inloggen/"')
+        self.assertContains(Client().get("/"), 'class="site-header__account" href="/inloggen/" aria-label="Inloggen"')
         client = Client()
         client.force_login(self.make_customer())
         self.assertContains(client.get("/"), "<span>Mijn VAYLIDE</span>")

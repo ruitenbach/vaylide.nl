@@ -143,10 +143,14 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
 }
 @media (max-width: 640px) {
   .site-header__inner { min-height: 4.4rem; gap: .5rem; }
-  .site-header__actions { display: none; }
-  .mobile-nav { margin-left: auto; }
+  /* Op de telefoon blijft alleen 'Inloggen' (of 'Mijn VAYLIDE') rechtsboven staan, naast het menu. */
+  .site-header__actions { margin-left: auto; }
+  .site-header__actions > :not(.site-header__account) { display: none; }
+  .site-header__account { min-height: 40px; padding: 0 .75rem 0 .6rem; font-size: .85rem; }
+  .mobile-nav { margin-left: .2rem; }
   .logo__img { height: 3.6rem; }
 }
+@media (max-width: 380px) { .site-header__account span { display: none; } .site-header__account { padding: 0 .6rem; } }
 
 /* ---------- Knoppen ---------- */
 .btn {

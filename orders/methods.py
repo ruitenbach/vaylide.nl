@@ -21,6 +21,10 @@ LABELS = {
     "applepay": "Apple Pay",
     "banktransfer": "Overboeking",
     "klarna": "Klarna",
+    "klarnapaylater": "Klarna",
+    "klarnasliceit": "Klarna",
+    "klarnapaynow": "Klarna",
+    "riverty": "Riverty",
     "belfius": "Belfius",
     "kbc": "KBC/CBC",
     "giftcard": "Cadeaukaart",
@@ -31,7 +35,7 @@ LOGOS = {
     "paypal": ("img/betalen/paypal.webp", 97, 96),
 }
 # Volgorde op de site: de bekendste eerst.
-ORDER = ["ideal", "paypal", "applepay", "creditcard", "bancontact", "klarna", "banktransfer"]
+ORDER = ["ideal", "paypal", "applepay", "creditcard", "bancontact", "klarna", "klarnapaylater", "klarnasliceit", "klarnapaynow", "riverty", "banktransfer"]
 
 
 def _as_list(ids) -> list[dict]:
@@ -42,7 +46,11 @@ def _as_list(ids) -> list[dict]:
             seen.append(m)
     seen.sort(key=lambda m: ORDER.index(m) if m in ORDER else len(ORDER))
     methods = []
+    shown = set()
     for m in seen:
+        if LABELS.get(m) in shown:
+            continue  # bijv. Klarna 'achteraf' en 'in delen': één logo
+        shown.add(LABELS.get(m, m))
         logo, width, height = LOGOS.get(m, ("", 0, 0))
         methods.append({"id": m, "label": LABELS.get(m, m.capitalize()), "logo": logo, "width": width, "height": height})
     return methods

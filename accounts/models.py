@@ -65,6 +65,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField("aangemaakt", default=timezone.now)
     email_verified_at = models.DateTimeField("e-mail bevestigd op", null=True, blank=True)
     anonymized_at = models.DateTimeField("gegevens verwijderd op", null=True, blank=True)
+    # Nieuwsbrief en acties: alleen met een eigen vinkje (standaard uit). Tijdstip en tekst van de toestemming bewaard.
+    newsletter = models.BooleanField("nieuwsbrief", default=False)
+    newsletter_since = models.DateTimeField("nieuwsbrief sinds", null=True, blank=True)
+    newsletter_consent = models.CharField("tekst bij de toestemming", max_length=300, blank=True)
 
     objects = UserManager()
 

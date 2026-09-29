@@ -314,8 +314,32 @@ def customers(request):
     query = request.GET.get("zoek", "").strip()
     if query:
         qs = qs.filter(Q(email__icontains=query) | Q(name__icontains=query))
+    only_newsletter = request.GET.get("nieuwsbrief") == "1"
+    if only_newsletter:
+        qs = qs.filter(newsletter=True)
     page = Paginator(qs, 40).get_page(request.GET.get("pagina"))
-    return render(request, "beheer/customers.html", {"page": page, "zoek": query})
+    total = User.objects.filter(is_staff=False, newsletter=True, is_active=True).count()
+    return render(request, "beheer/customers.html", {"page": page, "zoek": query, "alleen_nieuwsbrief": only_newsletter, "nieuwsbrief_totaal": total})
+
+
+@staff_required
+def newsletter_export(request):
+    """De nieuwsbrieflijst (alleen klanten die zelf het vinkje zetten), als CSV voor een nieuwsbriefdienst."""
+    import csv
+
+    from django.http import HttpResponse
+
+    from accounts.models import User
+
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = 'attachment; filename="nieuwsbrief-vaylide.csv"'
+    response.write("\ufeff")
+    writer = csv.writer(response, delimiter=";")
+    writer.writerow(["e-mailadres", "naam", "aangemeld op", "tekst bij de toestemming"])
+    for user in User.objects.filter(is_staff=False, newsletter=True, is_active=True).order_by("newsletter_since"):
+        safe = [str(v or "") for v in (user.email, user.name, user.newsletter_since and timezone.localtime(user.newsletter_since).strftime("%d-%m-%Y %H:%M"), user.newsletter_consent)]
+        writer.writerow(["'" + v if v[:1] in ("=", "+", "-", "@") else v for v in safe])
+    return response
 
 
 @staff_required

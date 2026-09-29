@@ -574,6 +574,7 @@ class CheckoutForm(forms.Form):
     package = forms.ChoiceField(label="Pakket", widget=forms.RadioSelect)
     extras = forms.MultipleChoiceField(label="Extra opties", required=False, widget=forms.CheckboxSelectMultiple)
     terms = forms.BooleanField(label="Ik ga akkoord met de voorwaarden", required=False)
+    nieuwsbrief = forms.BooleanField(required=False)  # los van de voorwaarden, standaard uit
 
     def __init__(self, *args, packages, optional, **kwargs):
         super().__init__(*args, **kwargs)

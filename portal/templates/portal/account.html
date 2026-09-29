@@ -13,6 +13,18 @@
     </form>
     <p class="small muted">Je logt in met een code die we naar je e-mailadres sturen. Wil je een ander e-mailadres gebruiken? Neem contact op.</p>
   </section>
+  <section class="panel">
+    <h2>Nieuwsbrief</h2>
+    {% if user.newsletter %}
+    <p>Je ontvangt de nieuwsbrief met inspiratie en acties (sinds {{ user.newsletter_since|date:"j F Y" }}).</p>
+    <form method="post">{% csrf_token %}<input type="hidden" name="actie" value="nieuwsbrief"><input type="hidden" name="nieuwsbrief" value="nee"><button type="submit" class="btn btn--secondary btn--sm">Afmelden</button></form>
+    {% else %}
+    <form method="post" class="form">{% csrf_token %}<input type="hidden" name="actie" value="nieuwsbrief">
+      <label class="check"><input type="checkbox" name="nieuwsbrief" value="ja" required><span>{{ nieuwsbrief_tekst }}</span></label>
+      <button type="submit" class="btn btn--secondary btn--sm">Aanmelden</button>
+    </form>
+    {% endif %}
+  </section>
   <section class="panel danger-zone">
     <h2>Account verwijderen</h2>
     <p class="small">Verwijdert je account, al je uitnodigingen, aanmeldingen, foto's en extra wensen. Bestelgegevens bewaren we geanonimiseerd voor de boekhouding.</p>

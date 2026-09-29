@@ -13,6 +13,7 @@ urlpatterns = [
     path("uitnodigingen/<uuid:uid>/", views.invitation_detail, name="invitation"),
     path("uitnodigingen/<uuid:uid>/gasten.csv", views.invitation_guests_export, name="invitation_guests_export"),
     path("klanten/", views.customers, name="customers"),
+    path("klanten/nieuwsbrief.csv", views.newsletter_export, name="newsletter_export"),
     path("klanten/<int:pk>/", views.customer_detail, name="customer"),
     path("wensen/", views.wishes, name="wishes"),
     path("wensen/<uuid:uid>/", views.wish_detail, name="wish"),

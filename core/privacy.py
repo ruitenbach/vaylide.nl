@@ -64,6 +64,7 @@ def anonymize_user(user) -> None:
         ContactMessage.objects.filter(email__iexact=email).delete()
         user.email = f"verwijderd-{user.pk}@vaylide.invalid"
         user.name = ""
+        user.newsletter, user.newsletter_since, user.newsletter_consent = False, None, ""
         user.is_active = False
         user.set_unusable_password()
         user.anonymized_at = timezone.now()

@@ -59,5 +59,7 @@ beoordelen" (⚖).
 - [ ] **Balzaal als special**: kies de meerprijs (extra optie `special-balzaal`, functie `special`). Tot dan is Balzaal niet te bestellen.
 - [ ] **Dans (Balzaal)**: akkoord op Google Veo 3.1 en het budget voor de proefscène (ca. $0,80 per poging met Fast, $3,20 met Standaard). Zie `docs/BALZAAL.md`.
 - [ ] **Haarkleuren Balzaal**: akkoord op het laten maken van acht scènes met de beeld-API (ca. $1,12 plus pogingen).
+- [ ] **Logo's creditcard, Klarna en Riverty**: als bestand aanleveren. Ze verschijnen alleen als de methode in Mollie aanstaat. Klarna en Riverty (achteraf betalen) vragen bij Mollie extra gegevens van de klant (adres en orderregels); dat is nog niet gebouwd. Eerst in Mollie testen.
+- [ ] **Nieuwsbrief**: laat de tekst bij het vinkje en de privacyverklaring beoordelen (⚖). Kies een nieuwsbriefdienst; de lijst staat in Beheer → Klanten → "Nieuwsbrieflijst downloaden".
 - [ ] **TikTok**: link naar het account (Instagram staat er al: `https://www.instagram.com/vaylidenl/`).
 - [ ] **Render-abonnement**: welke back-ups van de database krijg je bij het gekozen abonnement (dagelijks, herstel naar een tijdstip)?

@@ -267,6 +267,12 @@ def step(request, uid, step):
     )
 
 
+def _newsletter_text() -> str:
+    from accounts.newsletter import CONSENT_TEXT
+
+    return CONSENT_TEXT
+
+
 def _form_kwargs(inv: Invitation, step: str) -> dict:
     if step == "fotos":
         photos = list(inv.assets.filter(kind=MediaAsset.Kind.PHOTO))
@@ -650,6 +656,10 @@ def checkout_step(request, inv: Invitation):
         elif issues:
             error = "Je uitnodiging is nog niet compleet. Bekijk de punten hieronder."
         elif form.is_valid():
+            if form.cleaned_data.get("nieuwsbrief"):
+                from accounts.newsletter import subscribe
+
+                subscribe(request.user)
             try:
                 payment = start_checkout(inv, user=request.user, package_code=form.cleaned_data["package"],
                                          optional_codes=form.cleaned_data.get("extras") or [], terms_accepted=True)
@@ -662,6 +672,6 @@ def checkout_step(request, inv: Invitation):
         "studio/step_bestellen.html",
         _context(request, inv, "bestellen", form=form, quotes=quotes, quote=quote, best=best, optional=optional,
                  selected_extras=selected_extras, issues=issues, error=error, test_payments=settings.PAYMENT_PROVIDER == "test",
-                 upgrade=upgrade, downgrade=downgrade, losse_extras=pakket.extras_for(quote.package, quote) if quote else [],
+                 upgrade=upgrade, downgrade=downgrade, nieuwsbrief_tekst=_newsletter_text(), losse_extras=pakket.extras_for(quote.package, quote) if quote else [],
                  login_url=f"{reverse('accounts:login')}?doel=bewaren&next={reverse('studio:step', args=[inv.uid, 'bestellen'])}"),
     )

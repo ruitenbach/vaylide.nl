@@ -641,3 +641,25 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
 - Niet gedaan:
   - vloeiendheid gemeten op een echte telefoon;
   - de toegankelijkheidscontrole met axe op de homepage.
+
+## Zachte envelop, VAYLIDE in hoofdletters, nieuwsbrief, inloggen op de telefoon (29 september 2026)
+
+- `manage.py test tests`: 346 tests, alle geslaagd (nieuw: `tests/test_nieuwsbrief.py`).
+- **Envelop** (homepage en "Gefeliciteerd"), in Chromium (lokaal) op 1280 pixels:
+  - dicht: een ronde klep met lakzegel;
+  - openen: het zegel verdwijnt, de klep vouwt omhoog met de gouden voering, de kaart glijdt eruit;
+  - bij "Gefeliciteerd" komt de confetti op het moment dat de kaart eruit komt.
+- **VAYLIDE:** in hoofdletters in alle zichtbare tekst (pagina's, e-mails, meldingen, het beheer). Commentaar en technische
+  namen zijn niet aangepast.
+- **Nieuwsbrief:**
+  - bij het bestellen een eigen vinkje dat standaard uit staat; akkoord met de voorwaarden alleen is geen toestemming;
+  - vastgelegd met datum en de tekst van de toestemming;
+  - aan- en afmelden in Mijn VAYLIDE;
+  - in het beheer een kolom, een filter en een CSV-lijst;
+  - na het verwijderen van een account is de toestemming weg.
+- **Inloggen op de telefoon (390 pixels):**
+  - "Inloggen" staat rechtsboven naast het menu;
+  - de hele route doorlopen: e-mailadres, de code (in testmodus op het scherm), en je komt in Mijn VAYLIDE;
+  - uitloggen via Mijn VAYLIDE.
+- **Betaalmethoden:** Klarna (alle varianten als één) en Riverty worden herkend. Logo's voor creditcard, Klarna en Riverty
+  zijn er nog niet (zie `docs/INVULLIJST.md`).

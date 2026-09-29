@@ -91,6 +91,7 @@
   {% with methods=PAYMENT_METHODS %}{% if methods %}<p class="betaal-uitleg">Je betaalt op de beveiligde betaalpagina van Mollie met <span class="betaalmiddelen betaalmiddelen--inline">{% for m in methods %}<span class="betaalmiddel betaalmiddel--{{ m.id }}{% if m.logo %} betaalmiddel--logo{% endif %}">{% if m.logo %}<img src="{% static m.logo %}" alt="{{ m.label }}" width="{{ m.width }}" height="{{ m.height }}" decoding="async">{% else %}{{ m.label }}{% endif %}</span>{% endfor %}</span></p>{% endif %}{% endwith %}
   <label class="check terms-check">{{ form.terms }}<span>Ik ga akkoord met de <a href="{% url 'core:terms' %}" target="_blank" rel="noopener">voorwaarden</a> en wil dat mijn uitnodiging direct na betaling wordt gepubliceerd.</span></label>
   {% for e in form.terms.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+  {% if not user.newsletter %}<label class="check nieuwsbrief-check"><input type="checkbox" name="nieuwsbrief" value="on"{% if form.nieuwsbrief.value %} checked{% endif %}><span>{{ nieuwsbrief_tekst }} <span class="hint">Niet verplicht voor je bestelling.</span></span></label>{% endif %}
   <div class="step-actions">
     <a class="btn btn--ghost" href="{% url 'studio:step' inv.uid 'voorbeeld' %}">&larr; Terug naar voorbeeld</a>
     <button type="submit" class="btn btn--primary step-actions__next" name="actie" value="betalen"{% if issues or anonymous or not user.is_authenticated or user.is_staff %} disabled{% endif %}>Betalen{% if quote %} {{ quote.total_display }}{% endif %} &rarr;</button>

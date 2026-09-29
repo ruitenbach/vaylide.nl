@@ -1,13 +1,13 @@
 {% extends "beheer/base.html" %}
 {% block title %}Klanten{% endblock %}
 {% block content %}
-<div class="app-head"><div><p class="eyebrow">Beheer</p><h1>Klanten</h1></div></div>
-<form method="get" class="toolbar panel"><label class="field"><span class="label">Zoeken</span><input class="input" type="search" name="zoek" value="{{ zoek }}" placeholder="E-mail of naam"></label><button class="btn btn--secondary btn--sm" type="submit">Zoeken</button></form>
+<div class="app-head"><div><p class="eyebrow">Beheer</p><h1>Klanten</h1></div><div class="btn-row"><a class="btn btn--secondary btn--sm" href="{% url 'beheer:newsletter_export' %}">Nieuwsbrieflijst downloaden ({{ nieuwsbrief_totaal }})</a></div></div>
+<form method="get" class="toolbar panel"><label class="field"><span class="label">Zoeken</span><input class="input" type="search" name="zoek" value="{{ zoek }}" placeholder="E-mail of naam"></label><label class="check"><input type="checkbox" name="nieuwsbrief" value="1"{% if alleen_nieuwsbrief %} checked{% endif %}><span>Alleen met nieuwsbrief</span></label><button class="btn btn--secondary btn--sm" type="submit">Zoeken</button></form>
 <section class="panel">
   {% if page.object_list %}
   <div class="data-table-wrap"><table class="data-table data-table--cards">
-    <thead><tr><th>E-mail</th><th>Naam</th><th class="num">Uitnodigingen</th><th class="num">Bestellingen</th><th>Sinds</th></tr></thead>
-    <tbody>{% for c in page.object_list %}<tr><td data-label="E-mail"><a href="{% url 'beheer:customer' c.pk %}">{{ c.email }}</a>{% if c.anonymized_at %} <span class="badge badge--offline">verwijderd</span>{% endif %}</td><td data-label="Naam">{{ c.name|default:"—" }}</td><td data-label="Uitnodigingen" class="num">{{ c.n_invitations }}</td><td data-label="Bestellingen" class="num">{{ c.n_orders }}</td><td data-label="Sinds">{{ c.date_joined|date:"j-n-Y" }}</td></tr>{% endfor %}</tbody>
+    <thead><tr><th>E-mail</th><th>Naam</th><th class="num">Uitnodigingen</th><th class="num">Bestellingen</th><th>Nieuwsbrief</th><th>Sinds</th></tr></thead>
+    <tbody>{% for c in page.object_list %}<tr><td data-label="E-mail"><a href="{% url 'beheer:customer' c.pk %}">{{ c.email }}</a>{% if c.anonymized_at %} <span class="badge badge--offline">verwijderd</span>{% endif %}</td><td data-label="Naam">{{ c.name|default:"—" }}</td><td data-label="Uitnodigingen" class="num">{{ c.n_invitations }}</td><td data-label="Bestellingen" class="num">{{ c.n_orders }}</td><td data-label="Nieuwsbrief">{% if c.newsletter %}<span class="badge badge--live">ja</span>{% else %}<span class="muted">nee</span>{% endif %}</td><td data-label="Sinds">{{ c.date_joined|date:"j-n-Y" }}</td></tr>{% endfor %}</tbody>
   </table></div>
   {% if page.has_other_pages %}<nav class="pagination">{% if page.has_previous %}<a class="btn btn--ghost btn--sm" href="?pagina={{ page.previous_page_number }}&amp;zoek={{ zoek|urlencode }}">Vorige</a>{% endif %}<span>{{ page.number }} / {{ page.paginator.num_pages }}</span>{% if page.has_next %}<a class="btn btn--ghost btn--sm" href="?pagina={{ page.next_page_number }}&amp;zoek={{ zoek|urlencode }}">Volgende</a>{% endif %}</nav>{% endif %}
   {% else %}<p class="empty-state">Geen klanten gevonden.</p>{% endif %}

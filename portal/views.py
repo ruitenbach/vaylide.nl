@@ -220,6 +220,16 @@ def account(request):
             request.user.save(update_fields=["name"])
             messages.success(request, "Je naam is opgeslagen.")
             return redirect("portal:account")
+        if action == "nieuwsbrief":
+            from accounts.newsletter import subscribe, unsubscribe
+
+            if request.POST.get("nieuwsbrief") == "ja":
+                subscribe(request.user)
+                messages.success(request, "Je ontvangt voortaan onze nieuwsbrief. Afmelden kan altijd hier.")
+            else:
+                unsubscribe(request.user)
+                messages.success(request, "Je bent afgemeld voor de nieuwsbrief.")
+            return redirect("portal:account")
         if action == "verwijderen":
             if request.POST.get("bevestig") != "verwijderen":
                 messages.error(request, "Typ 'verwijderen' om te bevestigen.")
@@ -229,7 +239,9 @@ def account(request):
             anonymize_user(user)
             messages.success(request, "Je account en gegevens zijn verwijderd. Bestelgegevens bewaren we alleen voor de boekhouding.")
             return redirect("core:home")
-    return render(request, "portal/account.html", {})
+    from accounts.newsletter import CONSENT_TEXT
+
+    return render(request, "portal/account.html", {"nieuwsbrief_tekst": CONSENT_TEXT})
 
 
 # ------------------------------------------------------------ extra wensen
