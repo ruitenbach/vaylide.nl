@@ -1,34 +1,147 @@
-{% extends "base.html" %}
-{% block title %}Privacy{% endblock %}
-{% block description %}Hoe VAYLIDE omgaat met persoonsgegevens van klanten en gasten.{% endblock %}
+{% extends "base.html" %}{% load vl %}
+{% block title %}Privacyverklaring{% endblock %}
+{% block description %}Hoe VAYLIDE omgaat met persoonsgegevens van klanten, gasten en bezoekers.{% endblock %}
 {% block content %}
 <section class="page-head"><div class="container container--mid">
-  <h1>Privacy</h1>
-  <p class="notice notice--warning"><strong>Concept</strong>Deze tekst is een zorgvuldig opgesteld concept en nog niet juridisch gecontroleerd. De bedrijfsgegevens worden aangevuld vóór livegang.</p>
+  <p class="eyebrow">Concept · bijgewerkt op {{ versie|date:"j F Y" }}</p>
+  <h1>Privacyverklaring</h1>
+  <p class="notice notice--warning"><strong>Concept</strong>Deze verklaring beschrijft hoe de site nu werkt. Ze is nog niet juridisch beoordeeld.</p>
+  {% if open_punten %}<p class="notice notice--test"><strong>Invulvelden</strong>Nog vast te stellen: {{ open_punten|join:"; " }}. Deze versie is alleen bedoeld voor de afgeschermde testomgeving.</p>{% endif %}
 </div></section>
-<section class="section section--flush"><div class="container container--mid prose">
-  <h2>Wie zijn wij</h2>
-  <p>VAYLIDE maakt digitale uitnodigingen. Contact: <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>.{% if KVK %} KvK-nummer {{ KVK }}.{% endif %}{% if BTW %} Btw-id {{ BTW }}.{% endif %}</p>
-  <h2>Welke gegevens verwerken we</h2>
-  <ul>
-    <li><strong>Klanten:</strong> e-mailadres (om in te loggen en berichten te sturen), eventueel je naam, de gegevens van je uitnodiging, geüploade foto's en muziek, bestel- en betaalgegevens, en berichten over extra wensen.</li>
-    <li><strong>Gasten:</strong> naam, of je komt, het aantal personen, antwoorden op eventuele extra vragen en een optionele toelichting. We vragen gasten niet om een account, e-mailadres of telefoonnummer.</li>
-    <li><strong>Technisch:</strong> een sessiecookie om ingelogd te blijven en je ontwerp te bewaren, een cookie om een gegeven antwoord later te kunnen wijzigen, en een verkorte, niet-herleidbare code van je IP-adres om misbruik te beperken.</li>
+<section class="section section--flush"><div class="container container--mid prose voorwaarden privacy">
+  <p>VAYLIDE maakt digitale uitnodigingen en wenskaarten. Om de website te laten werken, bestellingen uit te voeren en gasten te laten reageren, verwerken wij persoonsgegevens. Hieronder lees je welke gegevens, waarom, met wie wij ze delen, hoe lang wij ze bewaren en welke rechten je hebt.</p>
+
+  <h2 id="wie">1. Wie verantwoordelijk is</h2>
+  <p>VAYLIDE is een handelsnaam van {{ b.juridische_naam|invul:"[juridische naam onderneming en rechtsvorm]" }}, ingeschreven bij de Kamer van Koophandel onder nummer {{ b.kvk|invul:"[KvK-nummer]" }}. Voor privacyvragen mail je naar <a href="mailto:{{ b.email }}">{{ b.email }}</a>. Het vestigingsadres en onze andere gegevens staan op <a href="{% url 'core:contact' %}">Contact &amp; bedrijfsgegevens</a>.</p>
+  <p>Wij zijn verwerkingsverantwoordelijke voor de verwerkingen waarvan wij zelf het doel en de middelen bepalen: je account, bestellingen en betalingen, klantcontact en de beveiliging van de site. Voor de gegevens van gasten lees je in <a href="#gasten">onderdeel 4</a> hoe het zit. Wij hebben geen functionaris voor gegevensbescherming.</p>
+
+  <h2 id="gegevens">2. Welke gegevens wij verwerken</h2>
+  <h3>Account en inloggen</h3>
+  <p>Je e-mailadres, en je naam als je die invult in Mijn VAYLIDE. Je logt in met een code die wij per e-mail sturen; er is geen wachtwoord. Die code bewaren wij alleen versleuteld (als hash). Hij is twintig minuten geldig en na vijf foute pogingen ongeldig. Ook bewaren wij of je de nieuwsbrief wilt ontvangen, met de tekst waarmee en het moment waarop je dat aangaf.</p>
+  <h3>Bestellingen en betalingen</h3>
+  <p>Bestelnummer, het ontwerp en de titel van je kaart, pakket en extra's, bedragen, de betaalstatus, de betaalmethode, de referentie van de betaalprovider, de aankoopdatum en de datum tot wanneer je kaart online staat. Ook bewaren wij met welke versie van de algemene voorwaarden je akkoord ging, en wanneer en met welke tekst je toestemming gaf voor directe levering. Rekening-, kaart- en PayPal-gegevens vul je in bij de betaalprovider; die krijgen wij niet.</p>
+  <h3>Inhoud van je kaart</h3>
+  <p>Wat je zelf invult of uploadt: namen, datum, tijd, locatie en adres, programma, dresscode, persoonlijke teksten, foto's, muziek, een eigen logo of initialen voor het lakzegel, en eventueel een contactpersoon met telefoonnummer of e-mailadres. Die inhoud kan gegevens van andere mensen bevatten. Zet er alleen gegevens en foto's op die je met de genodigden mag delen.</p>
+  <h3>Gegevens van gasten</h3>
+  <p>Wie reageert op een uitnodiging, vult in: naam, of hij of zij komt, met hoeveel personen, eventueel een toelichting en de antwoorden op eigen vragen van de organisator. Welke velden verplicht zijn, staat bij het formulier. Wij vragen gasten niet om een account, e-mailadres of telefoonnummer. Om je antwoord later te kunnen wijzigen krijg je een persoonlijke link; wij bewaren daarvan alleen een versleutelde versie.</p>
+  <h3>Contact, extra wensen en herroepen</h3>
+  <p>Stuur je ons een bericht via het contactformulier, dan bewaren wij je naam, e-mailadres, onderwerp en bericht. Vraag je in Mijn VAYLIDE om een extra wens, dan bewaren wij je omschrijving, onze berichten en je bijlagen. Gebruik je de knop om de overeenkomst te ontbinden, dan bewaren wij je naam, e-mailadres, bestelgegevens en toelichting, en het tijdstip.</p>
+  <h3>Technische gegevens</h3>
+  <p>Om misbruik te beperken (bijvoorbeeld te veel inlogpogingen) maken wij van je IP-adres een versleutelde, verkorte code die niet terug te rekenen is. Die code is hoogstens een uur in gebruik en wordt daarna, uiterlijk de volgende nacht, verwijderd. Onze webserver en onze hostingpartij registreren technische gegevens van verzoeken, zoals het tijdstip, de opgevraagde pagina en browserinformatie, en bij de hostingpartij mogelijk je IP-adres. Gaat er op de server iets mis, dan krijgen wij een foutmelding met de technische gegevens van dat verzoek.</p>
+
+  <h2 id="doelen">3. Waarom wij gegevens gebruiken</h2>
+  <div class="table-wrap"><table class="table-simple table-stapel">
+    <thead><tr><th scope="col">Doel</th><th scope="col">Grondslag (AVG)</th></tr></thead>
+    <tbody>
+      <tr><td data-label="Doel">Je account, inloggen, het maken en bewaren van je ontwerp, de bestelling uitvoeren, je kaart online zetten en je helpen</td><td data-label="Grondslag (AVG)">Uitvoering van de overeenkomst, of stappen op jouw verzoek vóór de overeenkomst</td></tr>
+      <tr><td data-label="Doel">Betalingen verwerken en de administratie bewaren</td><td data-label="Grondslag (AVG)">Uitvoering van de overeenkomst en een wettelijke plicht (fiscale bewaarplicht)</td></tr>
+      <tr><td data-label="Doel">Vastleggen van je akkoord met de voorwaarden, je toestemming voor directe levering en een herroeping</td><td data-label="Grondslag (AVG)">Wettelijke plicht en uitvoering van de overeenkomst</td></tr>
+      <tr><td data-label="Doel">De site beveiligen, misbruik beperken en fouten oplossen</td><td data-label="Grondslag (AVG)">Gerechtvaardigd belang: een veilige en werkende dienst</td></tr>
+      <tr><td data-label="Doel">Vragen via het contactformulier beantwoorden</td><td data-label="Grondslag (AVG)">Stappen vóór een overeenkomst, of gerechtvaardigd belang: je vraag beantwoorden</td></tr>
+      <tr><td data-label="Doel">Gegevens van anderen in de inhoud van je kaart</td><td data-label="Grondslag (AVG)">{{ besluit.grondslag_kaartinhoud|invul:"[grondslag en rol vaststellen]" }}</td></tr>
+      <tr><td data-label="Doel">Aanmeldingen van gasten en de gastenlijst</td><td data-label="Grondslag (AVG)">Zie onderdeel 4</td></tr>
+      <tr><td data-label="Doel">De nieuwsbrief</td><td data-label="Grondslag (AVG)">Jouw toestemming, met een apart vinkje dat standaard uit staat</td></tr>
+    </tbody>
+  </table></div>
+  <p>Verplichte velden zie je bij het invullen. Zonder je e-mailadres kunnen wij je niet laten inloggen en zonder betaling geen kaart publiceren. Andere velden zijn optioneel. Een toestemming kun je altijd intrekken; dat verandert niets aan wat daarvoor al rechtmatig gebeurde. Afmelden voor de nieuwsbrief kan in Mijn VAYLIDE onder Account.</p>
+  <p>Wij gebruiken je kaart en je foto's niet voor onze eigen reclame of als voorbeeld zonder je aparte toestemming.</p>
+
+  <h2 id="gasten">4. Uitnodigingen, aanmeldingen en de organisator</h2>
+  <p>Als je reageert op een uitnodiging, gaat je antwoord naar de organisator: de klant die de uitnodiging maakte. Alleen die ziet de gastenlijst in Mijn VAYLIDE en kan die downloaden. Andere gasten zien jouw antwoord niet. In ons beheer zijn aanmeldingen niet zichtbaar. Technisch kunnen wij wel bij de database, en dat doen wij alleen als het nodig is, bijvoorbeeld voor ondersteuning of herstel.</p>
+  <p>{{ besluit.rol_gasten|invul:"[rol van VAYLIDE en de organisator en de grondslag vaststellen, apart voor particuliere en zakelijke organisatoren]" }}</p>
+  <p>De organisator kan eigen vragen toevoegen. {{ besluit.gevoelige_vragen|invul:"[beleid voor gevoelige vragen, zoals over gezondheid of dieet, vaststellen]" }}</p>
+  <p>Je kunt je eigen antwoord altijd wijzigen of verwijderen via je persoonlijke link. Heb je een andere privacyvraag over een uitnodiging, neem dan contact op met de organisator of met ons. Hoort je verzoek bij de organisator, dan helpen wij het daar terecht te laten komen.</p>
+
+  <h2 id="bekijken">5. Wie je kaart kan bekijken</h2>
+  <p>Je uitnodiging is bereikbaar voor iedereen die de link heeft. Er is geen wachtwoord. Wij vragen zoekmachines om uitnodigingen niet op te nemen en ons zoeken op de site doorzoekt ze niet, maar een ontvanger kan de link doorsturen en wat op de kaart staat lezen, kopiëren of bewaren. Zet er daarom alleen informatie op die je met de genodigden wilt delen. Geüploade foto's op de kaart zijn net zo bereikbaar als de kaart zelf. Aanmeldingen zijn dat niet: die ziet alleen de organisator, na inloggen.</p>
+
+  <h2 id="fotos">6. Foto's en AI</h2>
+  <h3>Automatisch uitlijnen op gezichten</h3>
+  <p>Als je een foto uploadt, zoekt onze eigen server waar de gezichten staan, zodat de uitsnede goed valt. Dat gebeurt met een model dat op onze server draait; de foto gaat daarvoor niet naar een andere partij. Wij bewaren alleen het middelpunt van de uitsnede en het aantal gevonden gezichten. Er worden geen gezichtskenmerken opgeslagen en niemand wordt herkend of vergeleken. Je kunt de uitsnede altijd zelf verschuiven.</p>
+  {% if ai_actief %}
+  <h3>Tekstvoorstellen en extra wensen</h3>
+  <p>Vraag je om een tekstvoorstel, dan sturen wij wat je daarvoor invult en de gegevens van je kaart die nodig zijn (zoals namen, datum, tijd, locatie en programma) naar Anthropic, dat het voorstel met het taalmodel Claude maakt. Het voorstel komt pas op je kaart als jij het overneemt. Het onderwerp en de omschrijving van een extra wens sturen wij ook naar Anthropic voor een interne samenvatting; over je wens beslist altijd een mens. Wij sturen geen foto's naar Anthropic. Zie onderdeel 7 en 8.</p>
+  {% else %}
+  <p>Tekstvoorstellen maken wij nu zonder externe AI-dienst: je krijgt vaste voorbeeldteksten. Er gaan geen gegevens naar een AI-aanbieder.</p>
+  {% endif %}
+  {% if gezichten_actief %}<p>{{ ""|invul:"[de functie eigen gezichten staat aan: gegevensverwerking eerst laten beoordelen]" }}</p>{% else %}<p>De functie om eigen gezichten in een tekening te laten verwerken, staat uit.</p>{% endif %}
+
+  <h2 id="delen">7. Met wie wij gegevens delen</h2>
+  <p>Wij delen persoonsgegevens alleen als dat nodig is voor de doelen hierboven of als de wet ons dat verplicht. Wij verkopen je gegevens niet. Deze partijen ontvangen nu gegevens:</p>
+  <div class="table-wrap"><table class="table-simple table-stapel">
+    <thead><tr><th scope="col">Partij</th><th scope="col">Waarvoor</th><th scope="col">Welke gegevens</th><th scope="col">Rol</th></tr></thead>
+    <tbody>{% for s in aanbieders %}
+      <tr><td data-label="Partij">{{ s.naam|invul:"[naam en land aanbieder]" }}</td><td data-label="Waarvoor">{{ s.dienst }}</td><td data-label="Welke gegevens">{{ s.gegevens }}</td><td data-label="Rol">{{ s.rol }}</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+  <p>Met partijen die voor ons werken (verwerkers) gelden verwerkersafspraken. Mollie verwerkt je betaling onder eigen verantwoordelijkheid, met een eigen <a href="https://www.mollie.com/legal/privacy" rel="noopener">privacyverklaring</a>. Klik je op een uitnodiging op een link naar Google Maps, Google Agenda of WhatsApp, dan ga je naar die dienst en gelden hun regels; de uitnodiging laadt zelf niets van die diensten.</p>
+
+  <h2 id="eer">8. Verwerking buiten de Europese Economische Ruimte</h2>
+  <ul>{% for s in aanbieders %}{% if s.doorgifte is not None and s.doorgifte %}
+    <li><strong>{{ s.naam }}:</strong> {{ s.doorgifte }}</li>{% elif s.doorgifte is None %}
+    <li><strong>{{ s.naam|invul:"[aanbieder]" }}:</strong> {{ ""|invul:"[doorgifte en waarborgen invullen]" }}</li>{% endif %}{% endfor %}
+    <li>De overige partijen hierboven zijn gevestigd in de EER.</li>
   </ul>
-  <h2>Waarvoor</h2>
-  <p>Om je uitnodiging te maken, te publiceren en aanmeldingen bij te houden; om betalingen te verwerken; om je te informeren over je bestelling; en om vragen te beantwoorden. We gebruiken geen advertentie- of volgcookies.</p>
-  <h2>Wie kan wat zien</h2>
-  <p>Uitnodigingen zijn alleen bereikbaar via hun link en worden afgeschermd voor zoekmachines. Aanmeldingen zijn alleen zichtbaar voor de organisator (en voor ons als dat nodig is voor ondersteuning). Gasten zien elkaars antwoorden niet.</p>
-  <h2>Hoe lang bewaren we gegevens</h2>
+  <p>Een kopie van de waarborgen vraag je op via <a href="mailto:{{ b.email }}">{{ b.email }}</a>.</p>
+
+  <h2 id="bewaren">9. Hoe lang wij gegevens bewaren</h2>
+  <p>Je kaart staat online met Essentieel 6 maanden en met Compleet 12 maanden, vanaf de bevestigde betaling. Dat is de looptijd van de dienst, niet de bewaartermijn. De bewaartermijnen staan hieronder. Termijnen met 'automatisch' voert de site elke nacht zelf uit.</p>
+  <div class="table-wrap"><table class="table-simple table-stapel">
+    <thead><tr><th scope="col">Gegevens</th><th scope="col">Bewaartermijn</th></tr></thead>
+    <tbody>
+      <tr><td data-label="Gegevens">Inlogcodes</td><td data-label="Bewaartermijn">20 minuten geldig, na 2 dagen verwijderd (automatisch)</td></tr>
+      <tr><td data-label="Gegevens">Ontwerpen die nooit aan een bevestigd e-mailadres zijn gekoppeld, met hun foto's</td><td data-label="Bewaartermijn">{{ config.anonymous_draft_retention_days }} dagen na de laatste wijziging (automatisch)</td></tr>
+      <tr><td data-label="Gegevens">Ontwerpen in je account die nooit zijn besteld, met hun foto's</td><td data-label="Bewaartermijn">{{ config.unpaid_draft_retention_days }} dagen na de laatste wijziging (automatisch)</td></tr>
+      <tr><td data-label="Gegevens">Aanmeldingen van gasten</td><td data-label="Bewaartermijn">{{ config.guest_data_retention_days }} dagen nadat de uitnodiging offline ging (automatisch). De organisator of de gast kan ze eerder verwijderen.</td></tr>
+      <tr><td data-label="Gegevens">Gekochte kaarten, foto's en andere inhoud na de looptijd</td><td data-label="Bewaartermijn">{{ besluit.bewaar_gekochte_kaarten|invul:"[termijn na afloop van de looptijd]" }}</td></tr>
+      <tr><td data-label="Gegevens">Account</td><td data-label="Bewaartermijn">Tot je het verwijdert in Mijn VAYLIDE. {{ besluit.bewaar_account|invul:"[termijn voor accounts die niet meer worden gebruikt]" }}</td></tr>
+      <tr><td data-label="Gegevens">Bestel- en betaalgegevens</td><td data-label="Bewaartermijn">7 jaar (fiscale bewaarplicht). Verwijder je je account, dan blijven deze gegevens zonder naam, e-mailadres en kaarttitel bewaard.</td></tr>
+      <tr><td data-label="Gegevens">Contactberichten</td><td data-label="Bewaartermijn">{{ besluit.bewaar_contact|invul:"[termijn na afhandeling]" }}</td></tr>
+      <tr><td data-label="Gegevens">Extra wensen en bijlagen</td><td data-label="Bewaartermijn">{{ besluit.bewaar_wensen|invul:"[termijn na afhandeling]" }}</td></tr>
+      <tr><td data-label="Gegevens">Herroepingen</td><td data-label="Bewaartermijn">{{ besluit.bewaar_herroepingen|invul:"[termijn]" }}</td></tr>
+      <tr><td data-label="Gegevens">Verstuurde e-mails (kopie bij ons)</td><td data-label="Bewaartermijn">{{ besluit.bewaar_emails|invul:"[termijn]" }}</td></tr>
+      <tr><td data-label="Gegevens">Sessies (ingelogd blijven)</td><td data-label="Bewaartermijn">30 dagen, daarna verwijderd (automatisch)</td></tr>
+      <tr><td data-label="Gegevens">Code van je IP-adres tegen misbruik</td><td data-label="Bewaartermijn">Hoogstens een uur in gebruik, uiterlijk de volgende nacht verwijderd (automatisch)</td></tr>
+      <tr><td data-label="Gegevens">Technische logbestanden</td><td data-label="Bewaartermijn">{{ besluit.bewaar_logs|invul:"[termijn bij de hostingpartij]" }}</td></tr>
+      <tr><td data-label="Gegevens">Back-ups op de server</td><td data-label="Bewaartermijn">Elke nacht een nieuwe; de laatste 14 blijven bewaard, oudere worden verwijderd</td></tr>
+      {% if backup_actief %}<tr><td data-label="Gegevens">Versleutelde back-ups op de tweede locatie</td><td data-label="Bewaartermijn">{{ ""|invul:"[bewaarregel bij de aanbieder]" }}</td></tr>{% endif %}
+    </tbody>
+  </table></div>
+  <p>De fiscale bewaarplicht betekent niet dat wij foto's of gastenlijsten zeven jaar bewaren. Wat uit de site is verwijderd, kan nog in een back-up staan tot die back-up is vervangen. Moeten wij een back-up terugzetten, dan verwijderen wij gegevens die al verwijderd hadden moeten zijn opnieuw.</p>
+
+  <h2 id="cookies">10. Cookies en opslag in je browser</h2>
+  <p>Wij gebruiken alleen cookies en browseropslag die nodig zijn voor de werking en beveiliging van de site. Wij gebruiken geen advertentie-, analyse- of volgcookies en laden geen video's, lettertypen of andere onderdelen van andere partijen. Daarom vragen wij geen toestemming voor cookies.</p>
+  <div class="table-wrap"><table class="table-simple table-stapel">
+    <thead><tr><th scope="col">Naam</th><th scope="col">Soort</th><th scope="col">Waarvoor</th><th scope="col">Hoe lang</th></tr></thead>
+    <tbody>{% for c in cookies %}
+      <tr><td data-label="Naam"><code>{{ c.naam }}</code></td><td data-label="Soort">{{ c.soort }}</td><td data-label="Waarvoor">{{ c.doel }}</td><td data-label="Hoe lang">{{ c.duur }}</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+  <p>Je kunt cookies en browseropslag wissen in de instellingen van je browser. Dan word je uitgelogd en kun je een eerder gegeven antwoord alleen nog via je persoonlijke link wijzigen.</p>
+
+  <h2 id="beveiliging">11. Beveiliging</h2>
+  <p>Wij nemen onder meer deze maatregelen:</p>
   <ul>
-    <li>Een uitnodiging blijft online zolang je pakket dat aangeeft. Aanmeldingen van gasten verwijderen we {{ config.guest_data_retention_days }} dagen na het einde van die periode.</li>
-    <li>Ontwerpen zonder bevestigd e-mailadres verwijderen we na {{ config.anonymous_draft_retention_days }} dagen.</li>
-    <li>Ontwerpen van klanten die nooit zijn besteld, verwijderen we {{ config.unpaid_draft_retention_days }} dagen na de laatste wijziging.</li>
-    <li>Bestel- en betaalgegevens bewaren we zolang de wet dat voorschrijft (boekhoudplicht).</li>
+    <li>de site werkt alleen via een beveiligde verbinding (https);</li>
+    <li>inloggen met een eenmalige code die kort geldig is, met een grens aan het aantal pogingen;</li>
+    <li>klanten zien alleen hun eigen uitnodigingen, gastenlijsten en uploads; dat controleert de server bij elk verzoek;</li>
+    <li>de inlogcookie is niet door scripts op de pagina te lezen, en een strikte beveiligingsinstelling voorkomt dat de site onderdelen van buiten laadt;</li>
+    <li>codes om een antwoord te wijzigen en inlogcodes bewaren wij alleen versleuteld;</li>
+    <li>het beheer is alleen bereikbaar met een eigen login;</li>
+    <li>dagelijkse back-ups{% if backup_actief %}, met een versleutelde kopie op een tweede locatie{% endif %}.</li>
   </ul>
-  <h2>Verwerkers</h2>
-  <p>We werken met partijen voor hosting, e-mail en betalingen. Als de optionele AI-hulp is ingeschakeld, gaan de gegevens die jij invult voor een tekstvoorstel naar Anthropic (Claude), en ook de omschrijving van een extra wens, zodat wij er intern een samenvatting van krijgen. De definitieve lijst van verwerkers volgt bij livegang.</p>
-  <h2>Jouw rechten</h2>
-  <p>Je kunt je gegevens inzien, laten corrigeren of verwijderen. In Mijn VAYLIDE kun je zelf je uitnodiging, aanmeldingen en je account verwijderen. Gasten kunnen hun eigen antwoord wijzigen of verwijderen via hun persoonlijke link. Voor andere vragen: <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>.</p>
+  <p>Vermoed je een beveiligingsprobleem? Mail <a href="mailto:{{ b.email }}">{{ b.email }}</a>. Stuur geen inlogcodes, wachtwoorden of onnodige persoonsgegevens mee.</p>
+
+  <h2 id="rechten">12. Jouw rechten</h2>
+  <p>Afhankelijk van de verwerking heb je recht op inzage, correctie, verwijdering, beperking van de verwerking, overdracht van je gegevens en bezwaar tegen verwerking op grond van gerechtvaardigd belang. Een toestemming kun je altijd intrekken, en tegen direct marketing kun je altijd bezwaar maken.</p>
+  <p>Veel kun je zelf in Mijn VAYLIDE: je naam aanpassen, je nieuwsbrief uitzetten, een uitnodiging of een aanmelding verwijderen, de gastenlijst downloaden en je account verwijderen. Gasten wijzigen of verwijderen hun antwoord via hun persoonlijke link.</p>
+  <p>Voor andere verzoeken mail je naar <a href="mailto:{{ b.email }}">{{ b.email }}</a>. Wij reageren binnen een maand. Bij ingewikkelde of veel verzoeken kan dat met hoogstens twee maanden worden verlengd; dat laten wij je dan binnen de eerste maand weten, met de reden. Als het nodig is, controleren wij op een passende manier of het verzoek van jou komt. Stuur niet uit jezelf een kopie van je identiteitsbewijs. Kunnen wij een verzoek niet (helemaal) uitvoeren, bijvoorbeeld door een wettelijke bewaarplicht, dan leggen wij uit waarom.</p>
+  <p>Je kunt ook een klacht indienen bij de <a href="https://www.autoriteitpersoonsgegevens.nl" rel="noopener">Autoriteit Persoonsgegevens</a>.</p>
+
+  <h2 id="besluiten">13. Geautomatiseerde besluiten</h2>
+  <p>VAYLIDE neemt geen besluiten die uitsluitend geautomatiseerd zijn en die rechtsgevolgen voor je hebben of je op een vergelijkbare manier aanzienlijk treffen. Wij maken geen profielen.</p>
+
+  <h2 id="wijzigingen">14. Wijzigingen</h2>
+  <p>Wij passen deze verklaring aan als onze dienst of de verwerking van gegevens verandert. Bovenaan staat de datum van de laatste wijziging. Over belangrijke veranderingen informeren wij je op een passende manier. Is voor iets nieuws toestemming nodig, dan vragen wij die apart; een nieuwe versie van deze verklaring geldt niet als toestemming.</p>
 </div></section>
 {% endblock %}

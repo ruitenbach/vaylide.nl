@@ -214,7 +214,17 @@ def contact(request):
 
 
 def privacy(request):
-    return render(request, "core/privacy.html", {"config": SiteConfig.get()})
+    from django.conf import settings as dj_settings
+
+    from . import privacyverklaring as pv
+    from .company import company
+
+    return render(request, "core/privacy.html", {
+        "config": SiteConfig.get(), "b": company(), "versie": pv.VERSION, "besluit": pv.BESLUITEN,
+        "open_punten": pv.open_points(), "aanbieders": pv.suppliers(), "cookies": pv.cookies(),
+        "ai_actief": pv.ai_active(), "email_actief": pv.email_active(), "backup_actief": pv.backup_offsite_active(),
+        "gezichten_actief": dj_settings.FACES_ENABLED,
+    })
 
 
 def _terms_context(version: str) -> dict:

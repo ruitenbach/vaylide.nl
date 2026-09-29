@@ -73,7 +73,7 @@ eigenaar. De tekst is een **concept**. Hij is niet juridisch beoordeeld en de si
 - **Artikel 12:** controleer of de AI-hulp bij teksten en de functie eigen gezichten vooraf genoeg uitleg geven over de
   gegevensverwerking.
 - **Artikel 15, klachten binnen veertien dagen:** een belofte die de eigenaar zelf moet waarmaken; de site bewaakt dat niet.
-- **Privacyverklaring vergeleken:**
+- **Privacyverklaring vergeleken** (inmiddels uitgewerkt op de branch `claude/privacyverklaring`, zie `docs/PRIVACY.md`):
   - "Wie zijn wij" noemt geen juridische naam en geen adres;
   - de nieuwsbrief (toestemming en afmelden), de herroepingsgegevens en eventuele verwerking door Google (eigen gezichten,
     staat uit) worden nog niet genoemd;

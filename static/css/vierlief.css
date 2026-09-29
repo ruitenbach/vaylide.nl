@@ -544,6 +544,14 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
 .table-simple th { font-weight: 600; color: var(--muted); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
 .table-simple td.num, .table-simple th.num { text-align: right; white-space: nowrap; }
 .table-note { margin-top: .8rem; }
+/* Tabellen die op een smal scherm als kaartjes onder elkaar staan (privacyverklaring). */
+@media (max-width: 40rem) {
+  .table-stapel thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .table-stapel, .table-stapel tbody, .table-stapel tr, .table-stapel td { display: block; width: 100%; }
+  .table-stapel tr { padding: .6rem 0; border-bottom: 1px solid var(--line); }
+  .table-stapel td { border: 0; padding: .2rem 0; }
+  .table-stapel td::before { content: attr(data-label); display: block; font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+}
 
 /* ---------- Veelgestelde vragen ---------- */
 .faq { border-top: 1px solid var(--line); }

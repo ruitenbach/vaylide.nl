@@ -302,6 +302,13 @@ ANTHROPIC_API_KEY = env("ANTHROPIC_API_KEY")
 AI_MODEL = env("VIERLIEF_AI_MODEL", "claude-opus-5-5")
 AI_ENABLED = env_bool("VIERLIEF_AI_ENABLED", True)
 
+# --- Privacyverklaring (zie core/privacyverklaring.py en docs/PRIVACY.md) ------
+# Namen van aanbieders die de verklaring pas kan noemen als ze gekozen zijn. Leeg terwijl de koppeling actief is =
+# invulveld op de testversie; in live-modus weigert `manage.py check` dan.
+PRIVACY_EMAIL_PROVIDER = env("VIERLIEF_EMAIL_AANBIEDER")  # bijv. "Naam B.V. (Nederland)"
+PRIVACY_BACKUP_PROVIDER = env("VIERLIEF_BACKUP_AANBIEDER")
+PRIVACY_AI_AFSPRAKEN = env("VIERLIEF_AI_AFSPRAKEN")  # doorgifte-afspraken met Anthropic, na eigen controle
+
 # --- Verwerking --------------------------------------------------------------
 # Taken (publicatie, e-mail) worden direct na het opslaan geprobeerd. Mislukte
 # taken worden opnieuw geprobeerd door `manage.py process_jobs` (cron/worker).

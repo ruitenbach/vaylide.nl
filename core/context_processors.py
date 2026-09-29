@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from orders.methods import available_methods
 
+from .ai import ai_configured
 from .company import company
 
 
@@ -36,4 +37,6 @@ def vierlief(request):
         "BASE_URL": settings.BASE_URL,
         "CURRENT_YEAR": timezone.localdate().year,
         "SLOGAN": "Elk bijzonder moment begint met een uitnodiging.",
+        # Tekstvoorstellen via Anthropic (alleen met sleutel); de uitleg bij de knop hangt ervan af.
+        "AI_EXTERN": ai_configured,
     }

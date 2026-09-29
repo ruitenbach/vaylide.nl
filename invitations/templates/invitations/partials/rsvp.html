@@ -70,7 +70,7 @@
     <p class="rsvp__status" role="status" aria-live="polite" data-rsvp-status></p>
     <button type="submit" class="inv-btn inv-btn--primary rsvp__submit" data-rsvp-submit>{% if v.formal %}Verstuur uw antwoord{% else %}Verstuur mijn antwoord{% endif %}</button>
     {% if not v.rsvp.open %}<p class="rsvp__note">Dit is een voorbeeld. Antwoorden worden hier niet opgeslagen.</p>{% endif %}
-    <p class="rsvp__privacy">We vragen alleen wat nodig is voor de organisatie. Alleen de organisator ziet je antwoord.</p>
+    <p class="rsvp__privacy">Je antwoord gaat naar de organisator van deze uitnodiging; andere gasten zien het niet. Je kunt het later wijzigen of verwijderen. Lees de <a href="{% url 'core:privacy' %}#gasten" rel="noopener">privacyverklaring</a> van VAYLIDE.</p>
   </form>
 {% endif %}
 </div>

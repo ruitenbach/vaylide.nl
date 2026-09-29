@@ -14,6 +14,7 @@
       {% for e in field.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
     </div>
     {% endfor %}
+    <p class="small muted privacy-link">We gebruiken je aanvraag en bijlagen alleen om je wens te beoordelen en af te handelen. Zie de <a href="{% url 'core:privacy' %}">privacyverklaring</a>.</p>
     <button type="submit" class="btn btn--primary">Verstuur aanvraag</button>
   </form>
   <aside class="panel">

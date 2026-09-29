@@ -25,6 +25,7 @@
       <span class="hint">JPG, PNG of WebP · max. {{ upload_limits.photo_max_bytes|filesizeformat }} per foto · minimaal {{ upload_limits.photo_min_side }} pixels</span>
       <input id="upload-fotos" type="file" name="fotos" accept="image/jpeg,image/png,image/webp" multiple>
     </label>
+    <p class="hint privacy-link">Upload alleen foto's die je met je genodigden mag delen. Onze eigen server lijnt ze uit op de gezichten; niemand wordt herkend. Meer in de <a href="{% url 'core:privacy' %}#fotos" target="_blank" rel="noopener">privacyverklaring</a>.</p>
     <p class="upload-status" data-upload-status aria-live="polite"></p>
     <button type="submit" class="btn btn--secondary btn--sm" data-upload-submit>Uploaden</button>
   </form>

@@ -762,3 +762,37 @@ Lokaal op de branch `claude/algemene-voorwaarden`; niet online gezet.
   - een echte e-mail met de bijlage (de testomgeving gebruikt alleen de outbox);
   - afdrukken of opslaan als pdf in echte browsers;
   - een juridische toetsing.
+
+## Privacyverklaring (30 september 2026)
+
+Lokaal, branch `claude/privacyverklaring`, testmodus. Zonder echte klantgegevens; de klantreis gebruikt fictieve
+testklanten uit `e2e/klantreis_setup.py`.
+
+- `manage.py test tests`: 394 tests, alle geslaagd (nieuw: `tests/test_privacyverklaring.py`, 18 tests). Getest:
+  - alle onderdelen en de cookies staan erin;
+  - de bewaartermijnen komen uit de instellingen;
+  - de invulvelden zijn zichtbaar op de testversie;
+  - Mollie en Anthropic staan er alleen in als ze echt actief zijn;
+  - de e-maildienst moet een naam hebben;
+  - eigen gezichten staat uit, en aanzetten blokkeert de livegang;
+  - de controle vóór livegang: geen fout in testmodus, fout `vaylide.E001` in live-modus, en geen fout als alles is ingevuld;
+  - links in de footer, bij inloggen, contact, herroepen, foto's, bestellen, extra wens, het aanmeldformulier en de AI-hulp;
+  - het nieuwsbriefvinkje staat standaard uit;
+  - de levensduur van de cookies, en de aanmeldcookie is HttpOnly en hoort bij het pad van één uitnodiging;
+  - Mollie krijgt geen e-mailadres of naam;
+  - er zijn geen velden voor gezichtskenmerken;
+  - verlopen sessies en cachewaarden worden opgeruimd, geldige blijven.
+- `manage.py check` met nep-livewaarden: fout `vaylide.E001` met de lijst van open punten. Een verklaring met invulvelden
+  kan dus niet live.
+- **Browsercontrole cookies en opslag:**
+  - pagina's: `/`, `/ontwerpen/`, `/contact/`, `/privacy/`, `/maken/` en `/voorbeeld/aan-tafel/`;
+  - alle verzoeken gaan naar de eigen site;
+  - geen tracking, geen iframes;
+  - externe diensten (Google Agenda, Google Maps, WhatsApp) alleen als link;
+  - localStorage alleen `vierlief-beweging`, na een tik op "Beweging", en weg na weer aanzetten;
+  - `Set-Cookie`: alleen `vierlief_csrf` (1 jaar) op pagina's met een formulier.
+- **Klantreis in Chromium** (`e2e/klantreis.cjs`): 39/39 op 390 en 1366 pixels.
+- **Toegankelijkheid** (axe-core, WCAG 2.0/2.1 A en AA): 0 overtredingen op 32 pagina's (390 en 1366 pixels), onder meer
+  `/privacy/`, `/inloggen/`, `/account/wensen/nieuw/`, de fotostap en drie voorbeelduitnodigingen met het aanmeldformulier.
+- **In de browser bekeken** (375 pixels, geen horizontaal scrollen): de privacyverklaring; de tabellen staan op een smal
+  scherm als kaartjes onder elkaar.

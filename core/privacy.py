@@ -71,6 +71,20 @@ def anonymize_user(user) -> None:
         user.save()
 
 
+def _delete_expired_cache(now) -> int:
+    from django.conf import settings
+    from django.db import connection
+
+    table = settings.CACHES["default"].get("LOCATION")
+    if settings.CACHES["default"].get("BACKEND") != "django.core.cache.backends.db.DatabaseCache" or not table:
+        return 0
+    if table not in connection.introspection.table_names():
+        return 0
+    with connection.cursor() as cursor:
+        cursor.execute(f"DELETE FROM {connection.ops.quote_name(table)} WHERE expires < %s", [now])
+        return cursor.rowcount
+
+
 def apply_retention(now=None) -> dict:
     """Voert bewaartermijnen uit. Draai dagelijks: manage.py apply_retention."""
     from accounts.models import LoginCode
@@ -124,4 +138,12 @@ def apply_retention(now=None) -> dict:
     report["opgeschoonde_gezichtfotos"] = cleaned
 
     report["verwijderde_inlogcodes"] = LoginCode.objects.filter(created_at__lt=now - timedelta(days=2)).delete()[0]
+
+    # Verlopen sessies (na 30 dagen onbruikbaar) staan anders voor altijd in de database.
+    from django.contrib.sessions.models import Session
+
+    report["verwijderde_sessies"] = Session.objects.filter(expire_date__lt=now).delete()[0]
+
+    # Verlopen cachewaarden (o.a. de verkorte IP-codes van de limieten) ruimt de databasecache zelf niet altijd op.
+    report["verwijderde_cachewaarden"] = _delete_expired_cache(now)
     return report

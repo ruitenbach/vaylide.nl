@@ -2,7 +2,7 @@
   <details class="ai-help__panel">
     <summary><span aria-hidden="true">&#10022;</span> Tekstvoorstel laten maken</summary>
     <div class="ai-help__body">
-      <p class="small muted">Je krijgt een voorstel op basis van wat je al hebt ingevuld. Er worden geen gegevens verzonnen en er wordt niets opgeslagen zonder jouw akkoord.</p>
+      <p class="small muted">Je krijgt een voorstel op basis van wat je al hebt ingevuld. Er worden geen gegevens verzonnen en het voorstel komt pas op je kaart als jij het overneemt.{% if AI_EXTERN %} Wat je hier invult en de gegevens van je kaart die nodig zijn (zoals namen, datum en locatie) gaan daarvoor naar Anthropic (Claude), buiten de EU. Zie de <a href="{% url 'core:privacy' %}#fotos" target="_blank" rel="noopener">privacyverklaring</a>.{% else %} In deze versie krijg je vaste voorbeeldteksten; er gaat niets naar een AI-dienst.{% endif %}</p>
       <div class="form-row">
         <label class="field"><span class="label">Toon</span>
           <select class="input" data-ai-tone><option value="warm">Warm</option><option value="feestelijk">Feestelijk</option><option value="formeel">Formeel</option><option value="speels">Speels</option></select>
