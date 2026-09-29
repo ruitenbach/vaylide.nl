@@ -364,6 +364,7 @@ def preview_frame(request, uid):
     inv = get_accessible_invitation(request, uid)
     content = _content(inv)
     options = _preview_options(inv, content)
+    options.kader = request.GET.get("kader") == "1"
     view = build_view(occasion=inv.occasion, content=content, overrides=inv.draft_overrides, template_version=inv.template_version, options=options)
     return render(request, inv.template_version.template_path, {"v": view, "rsvp_form": {"client_token": "voorbeeld-formulier-0000", "form_ts": ""}})
 

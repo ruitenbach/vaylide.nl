@@ -1,5 +1,5 @@
 {% load static vl %}<!doctype html>
-<html lang="nl" class="inv inv-{{ v.design_slug }}{% if v.embed %} inv-embed{% endif %}{% if v.live %} inv-live{% endif %}{% if v.effects %} {{ v.effects.classes }}{% endif %}" data-mode="{{ v.mode }}"{% if v.live %} data-live="{{ v.live }}"{% endif %}{% if v.effects %} data-fx-sfeer="{{ v.effects.sfeer }}" data-fx-knal="{{ v.effects.knal }}" data-fx-viering="{{ v.effects.viering }}"{% if v.effects.tik %} data-fx-tik{% endif %}{% endif %}>
+<html lang="nl" class="inv inv-{{ v.design_slug }}{% if v.embed %} inv-embed{% endif %}{% if v.live %} inv-live{% endif %}{% if v.kader %} inv-kader{% endif %}{% if v.effects %} {{ v.effects.classes }}{% endif %}" data-mode="{{ v.mode }}"{% if v.live %} data-live="{{ v.live }}"{% endif %}{% if v.effects %} data-fx-sfeer="{{ v.effects.sfeer }}" data-fx-knal="{{ v.effects.knal }}" data-fx-viering="{{ v.effects.viering }}"{% if v.effects.tik %} data-fx-tik{% endif %}{% endif %}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

@@ -92,3 +92,34 @@ class LivePhoneTests(VaylideTestCase):
     def test_unknown_step_is_404_and_get_is_refused(self):
         self.assertEqual(self.client.post(f"{self.base}/voorbeeld/live/bestellen/", {}).status_code, 404)
         self.assertEqual(self.client.get(f"{self.base}/voorbeeld/live/gegevens/").status_code, 405)
+
+
+class PreviewFrameAndCheckoutTests(VaylideTestCase):
+    def setUp(self):
+        self.customer = self.make_customer()
+        self.inv = self.make_invitation(owner=self.customer)
+        self.client = Client()
+        self.client.force_login(self.customer)
+        self.base = f"/maken/{self.inv.uid}"
+
+    def test_preview_frame_hides_the_scrollbar_but_keeps_the_banner(self):
+        page = self.client.get(f"{self.base}/voorbeeld/").content.decode()
+        self.assertIn(f'src="{self.base}/voorbeeld/weergave/?kader=1"', page)
+        framed = self.client.get(f"{self.base}/voorbeeld/weergave/?kader=1").content.decode()
+        self.assertIn("inv-kader", framed)
+        self.assertIn("inv-banner", framed)  # de testbalk 'Voorbeeld' blijft
+        self.assertNotIn("inv-kader", self.client.get(f"{self.base}/voorbeeld/weergave/").content.decode())
+
+    def test_checkout_invites_to_finish(self):
+        self.assertContains(self.client.get(f"{self.base}/bestellen/"), "Je bent er bijna voor je unieke kaart!")
+
+    def test_live_card_has_shine_that_respects_reduced_motion(self):
+        from django.conf import settings
+
+        css = (settings.BASE_DIR / "static/css/app.css").read_text(encoding="utf-8")
+        start = css.index("/* ---------- Je kaart, live")
+        block = css[start:css.index("/* Stap foto's: waar komt wat", start)]
+        self.assertIn("@media (prefers-reduced-motion: no-preference)", block)
+        # alle doorlopende animaties van de kaart staan binnen die media-query
+        outside = block.replace(block[block.index("@media (prefers-reduced-motion: no-preference)"):block.index("@keyframes live-puls")], "")
+        self.assertNotIn("animation:", outside)

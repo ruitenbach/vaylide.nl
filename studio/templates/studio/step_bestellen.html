@@ -1,9 +1,10 @@
 {% extends "studio/base_studio.html" %}{% load static vl %}
 {% block title %}Bestellen{% endblock %}
 {% block studio %}
-<div class="studio-intro">
-  <h1>Controleer en bestel</h1>
-  <p class="lead">Eenmalig betalen. Na een bevestigde betaling staat je uitnodiging automatisch online.</p>
+<div class="studio-intro studio-intro--bijna">
+  <p class="studio-intro__kicker">Laatste stap</p>
+  <h1>Je bent er bijna voor je unieke kaart!</h1>
+  <p class="lead">Nog één klik en je uitnodiging is klaar om te delen. Je betaalt eenmalig; zodra je betaling is bevestigd, staat je kaart automatisch online met je eigen link en QR-code.</p>
 </div>
 {% if error %}<div class="form-errors" role="alert">{{ error }}</div>{% endif %}
 {% if issues %}<div class="notice notice--warning"><strong>Nog niet compleet</strong><ul>{% for i in issues %}<li>{{ i.message }} <a href="{% url 'studio:step' inv.uid i.step %}">Aanpassen</a></li>{% endfor %}</ul></div>{% endif %}

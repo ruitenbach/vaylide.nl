@@ -181,6 +181,7 @@ class RenderOptions:
     existing_response: object | None = None
     music_synth: bool = False
     embed: bool = False
+    kader: bool = False  # in een kader in de editor (stap Voorbeeld): geen scrollbalk, wel de testbalk
     live: str = ""  # de live kaart in de editor: welk deel extra aandacht krijgt (bijv. 'fotos')
 
 
@@ -482,6 +483,7 @@ def build_view(
         "is_demo": options.mode == "demo",
         "embed": options.embed,
         "live": options.live,
+        "kader": options.kader,
         "formal": formal,
         "occasion": occasion,
         "occasion_label": cfg["label"],

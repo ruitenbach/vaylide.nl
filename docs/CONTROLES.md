@@ -586,3 +586,13 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
   - echte klantfoto's (alleen fictieve beelden gebruikt);
   - slepen met een vinger op een echte telefoon;
   - Safari.
+
+## Live kaart met goudfolie, geen scrollbalk, wervende betaalpagina (29 september 2026)
+
+- `manage.py test tests`: 326 tests, alle geslaagd.
+  - Het voorbeeldkader in stap 8 laadt met `?kader=1`: geen scrollbalk, de testbalk blijft staan.
+  - Op de betaalpagina staat "Je bent er bijna voor je unieke kaart!".
+  - Alle doorlopende animaties van de live kaart staan onder 'prefers-reduced-motion: no-preference'.
+- In Chromium (lokaal, 1100 en 1366 pixels breed) bekeken: de gouden lijst, de gloed bij het bijwerken en de betaalpagina.
+- Niet gedaan: klassieke scrollbalken van Windows nagebootst. Mijn testbrowser toont zwevende scrollbalken; het
+  verbergen gebeurt met dezelfde CSS die de telefoonvoorbeelden op de site al gebruiken.
