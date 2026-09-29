@@ -558,3 +558,31 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
 - Niet gedaan:
   - de toegankelijkheidscontrole met axe op de editorpagina's;
   - Safari en echte telefoons.
+
+## Foto's automatisch uitlijnen en verslepen (29 september 2026)
+
+- `manage.py test tests`: 323 tests, alle geslaagd (nieuw: `tests/test_uitlijnen.py`).
+  - **Gezichten herkennen:** YuNet vindt beide gezichten van het fictieve Balzaal-paar. De ballonnenfoto (geen mensen)
+    geeft 0 gezichten.
+  - **Na het uploaden:**
+    - de foto met het paar wordt de hoofdfoto (niet de eerste foto), met het automatische middelpunt;
+    - een bestaande hoofdfoto wordt nooit vervangen;
+    - de galerij wordt niet vanzelf gevuld.
+  - **Oudere foto's** worden bij het openen van de stap alsnog uitgelijnd.
+  - **Zonder JavaScript** blijven de schuifbalken werken.
+- Handmatig, met alle 28 voorbeeldbeelden van de site (`static/img/demo/`), waarvan 1 met mensen (het Balzaal-paar):
+  - geen vals-positieve gezichten;
+  - ongeveer 0,12 tot 0,6 seconde per foto.
+  - De oudere OpenCV-methode (Haar) zag rozen en ballonnen aan voor gezichten; daarom YuNet.
+- In Chromium (lokaal):
+  - Twee foto's geüpload: het bruidspaar werd automatisch de hoofdfoto, met de melding erbij.
+  - Met de muis gesleept:
+    - verticaal van 44 naar 76 procent;
+    - ingezoomd (160%) ook horizontaal.
+  - De foto blijft binnen het kader. Hier zat eerst een fout: ingezoomd liep de foto over de pagina.
+  - "Automatisch uitlijnen" zet de foto terug.
+  - De live kaart werkt zich bij.
+- Niet gedaan:
+  - echte klantfoto's (alleen fictieve beelden gebruikt);
+  - slepen met een vinger op een echte telefoon;
+  - Safari.

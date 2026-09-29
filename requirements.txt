@@ -7,6 +7,9 @@ dj-database-url==3.1.2
 psycopg[binary]==3.3.6
 pillow==12.3.0
 segno==1.6.6
+# Foto's automatisch uitlijnen op gezichten (YuNet-model in invitations/models_ai/, draait lokaal).
+opencv-python-headless==4.14.0.94
+numpy==2.4.6
 anthropic==1.8.0
 pydantic==2.13.5
 tzdata==2026.4

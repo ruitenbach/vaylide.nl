@@ -170,6 +170,10 @@ class MediaAsset(models.Model):
     size_bytes = models.PositiveIntegerField(default=0)
     width = models.PositiveIntegerField(null=True, blank=True)
     height = models.PositiveIntegerField(null=True, blank=True)
+    # Automatisch uitlijnen (invitations/focus.py): middelpunt in procenten en het aantal gevonden gezichten.
+    focus_x = models.PositiveSmallIntegerField(null=True, blank=True)
+    focus_y = models.PositiveSmallIntegerField(null=True, blank=True)
+    faces = models.PositiveSmallIntegerField(null=True, blank=True)
     uploaded_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
@@ -182,6 +186,28 @@ class MediaAsset(models.Model):
 
     def __str__(self) -> str:
         return f"{self.get_kind_display()} {self.original_name}"
+
+    @property
+    def auto_x(self) -> int:
+        return 50 if self.focus_x is None else self.focus_x
+
+    @property
+    def auto_y(self) -> int:
+        return 50 if self.focus_y is None else self.focus_y
+
+    def analyse(self, save: bool = True) -> None:
+        """Middelpunt bepalen voor een foto van vóór het automatisch uitlijnen."""
+        from .focus import detect_file
+
+        source = self.file_medium or self.file
+        try:
+            with source.open("rb") as fh:
+                focus = detect_file(fh)
+        except (OSError, ValueError):
+            focus = None
+        self.focus_x, self.focus_y, self.faces = (focus.x, focus.y, focus.faces) if focus else (50, 50, 0)
+        if save:
+            self.save(update_fields=["focus_x", "focus_y", "faces"])
 
     @property
     def orientation(self) -> str:

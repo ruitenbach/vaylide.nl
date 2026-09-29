@@ -35,25 +35,25 @@
   <section class="studio-block" aria-labelledby="blok-fotos">
     <h2 class="studio-block__title" id="blok-fotos">Jouw foto's</h2>
     {% if photos %}
-    <p class="hint">Kies een hoofdfoto en eventueel galerijfoto's (tot 12). Tik of sleep in een foto om het middelpunt te kiezen. De telefoon laat direct zien waar de foto komt.</p>
+    <p class="hint">We lijnen elke foto automatisch uit op de gezichten. Liever anders? Sleep de foto met je muis of vinger en zoom in met de schuifbalk. Je kaart ernaast laat direct zien hoe het staat.</p>
     <fieldset>
       <legend class="visually-hidden">Hoofdfoto</legend>
       <div class="photo-grid">
         {% for row in form.photo_rows %}
-        <div class="photo-card" data-photo data-uid="{{ row.uid }}">
-          <div class="photo-card__frame ph" data-focus-frame>
-            <img src="{% url 'studio:media' inv.uid row.asset.uid 'middel' %}" alt="{{ row.asset.original_name }}" data-focus-img width="{{ row.asset.width }}" height="{{ row.asset.height }}" loading="lazy">
-            <span class="photo-card__marker" data-focus-marker aria-hidden="true"></span>
+        <div class="photo-card" data-photo data-uid="{{ row.uid }}" data-auto-x="{{ row.asset.auto_x }}" data-auto-y="{{ row.asset.auto_y }}">
+          <div class="photo-card__frame ph" data-focus-frame aria-label="Uitsnede van {{ row.asset.original_name }}: sleep de foto of gebruik de pijltjestoetsen">
+            <img src="{% url 'studio:media' inv.uid row.asset.uid 'middel' %}" alt="{{ row.asset.original_name }}" data-focus-img width="{{ row.asset.width }}" height="{{ row.asset.height }}" loading="lazy" draggable="false">
+            <span class="photo-card__drag" aria-hidden="true">Sleep om te verplaatsen</span>
           </div>
-          <p class="photo-card__meta small muted">{{ row.asset.width }}×{{ row.asset.height }} · {{ row.asset.orientation }}</p>
-          <label class="check"><input type="radio" name="hero" value="{{ row.uid }}"{% if form.hero.value == row.uid %} checked{% endif %}><span>Hoofdfoto</span></label>
-          <label class="check">{{ row.gallery }}<span>In de fotogalerij</span></label>
-          <details class="photo-card__adjust">
-            <summary>Uitsnede aanpassen</summary>
+          <p class="photo-card__meta small muted">{% if row.asset.faces == 1 %}1 gezicht gevonden · automatisch uitgelijnd{% elif row.asset.faces %}{{ row.asset.faces }} gezichten gevonden · automatisch uitgelijnd{% else %}Automatisch uitgelijnd{% endif %}</p>
+          <label class="range photo-card__zoom"><span>Inzoomen</span>{{ row.zoom }}</label>
+          <div class="photo-card__xy" data-focus-xy>
             <label class="range"><span>Horizontaal</span>{{ row.x }}</label>
             <label class="range"><span>Verticaal</span>{{ row.y }}</label>
-            <label class="range"><span>Inzoomen</span>{{ row.zoom }}</label>
-          </details>
+          </div>
+          <button type="button" class="link-button small photo-card__auto" data-focus-auto hidden>Automatisch uitlijnen</button>
+          <label class="check"><input type="radio" name="hero" value="{{ row.uid }}"{% if form.hero.value == row.uid %} checked{% endif %}><span>Hoofdfoto</span></label>
+          <label class="check">{{ row.gallery }}<span>In de fotogalerij</span></label>
           {% include "studio/_field.html" with field=row.caption %}
           <button type="submit" class="btn btn--danger btn--sm" form="delete-{{ row.uid }}">Verwijderen</button>
         </div>

@@ -449,8 +449,8 @@ class PhotosForm(StepForm):
             self.fields[f"c_{uid}"] = forms.CharField(label="Onderschrift (optioneel)", max_length=140, required=False)
             if not self.is_bound:
                 self.initial[f"g_{uid}"] = uid in gallery
-                self.initial[f"x_{uid}"] = int(float(ref.get("x", 50) or 50))
-                self.initial[f"y_{uid}"] = int(float(ref.get("y", 50) or 50))
+                self.initial[f"x_{uid}"] = int(float(ref["x"])) if ref.get("x") is not None else p.auto_x
+                self.initial[f"y_{uid}"] = int(float(ref["y"])) if ref.get("y") is not None else p.auto_y
                 self.initial[f"z_{uid}"] = int(float(ref.get("zoom", 1) or 1) * 100)
                 self.initial[f"c_{uid}"] = gallery.get(uid, {}).get("caption", "")
         if not self.is_bound:

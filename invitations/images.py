@@ -7,11 +7,14 @@ ongebruikelijke formaten niet ongewijzigd doorgegeven.
 from __future__ import annotations
 
 import io
+import logging
 from dataclasses import dataclass
 
 from django.conf import settings
 from django.core.files.base import ContentFile
 from PIL import Image, ImageOps, UnidentifiedImageError
+
+log = logging.getLogger(__name__)
 
 PHOTO_SIZES = {"groot": 2000, "middel": 1000, "klein": 420}
 ALLOWED_FORMATS = {"JPEG": "image/jpeg", "PNG": "image/png", "WEBP": "image/webp", "MPO": "image/jpeg"}
@@ -35,6 +38,7 @@ class ProcessedPhoto:
     width: int
     height: int
     size_bytes: int
+    focus: object = None  # focus.Focus: automatisch middelpunt en aantal gezichten
 
 
 def _human_mb(num: int) -> str:
@@ -67,6 +71,7 @@ def process_photo(uploaded) -> ProcessedPhoto:
                 raise UploadError(
                     f"Deze foto is te klein ({width}×{height} pixels). Kies een foto van minimaal {limits['photo_min_side']} pixels breed en hoog."
                 )
+            focus = _focus(img)
             outputs = {}
             for name, max_side in PHOTO_SIZES.items():
                 copy = img.copy()
@@ -85,7 +90,19 @@ def process_photo(uploaded) -> ProcessedPhoto:
         width=width,
         height=height,
         size_bytes=outputs["groot"].size,
+        focus=focus,
     )
+
+
+def _focus(img):
+    """Automatisch uitlijnen (gezichten, anders het drukste deel). Mag het uploaden nooit laten mislukken."""
+    from .focus import detect
+
+    try:
+        return detect(img)
+    except Exception:
+        log.warning("Automatisch uitlijnen mislukt", exc_info=True)
+        return None
 
 
 def sniff_audio(uploaded) -> str:

@@ -154,39 +154,88 @@
     }
   });
 
-  /* ---------- Uitsnede: middelpunt kiezen door te tikken of te slepen ---------- */
+  /* ---------- Uitsnede: de foto verslepen met muis of vinger (inzoomen met de schuifbalk) ----------
+     De foto staat al automatisch uitgelijnd (gezichten). Slepen verschuift de foto binnen het kader, zoals op een
+     telefoon. Zonder JavaScript blijven de schuifbalken Horizontaal en Verticaal gewoon werken. */
   document.querySelectorAll("[data-photo]").forEach(function (card) {
     var uid = card.getAttribute("data-uid");
     var frame = card.querySelector("[data-focus-frame]");
     var img = card.querySelector("[data-focus-img]");
-    var marker = card.querySelector("[data-focus-marker]");
     var x = card.querySelector("input[name='x_" + uid + "']");
     var y = card.querySelector("input[name='y_" + uid + "']");
     var z = card.querySelector("input[name='z_" + uid + "']");
+    var auto = card.querySelector("[data-focus-auto]");
+    var xy = card.querySelector("[data-focus-xy]");
     if (!frame || !x || !y) return;
+    card.classList.add("is-draggable");
+    if (xy) xy.hidden = true;
+    frame.tabIndex = 0;
+    var autoX = parseFloat(card.getAttribute("data-auto-x") || "50");
+    var autoY = parseFloat(card.getAttribute("data-auto-y") || "50");
+
+    function zoom() { return (parseFloat((z && z.value) || 100)) / 100; }
     function render() {
-      var px = parseFloat(x.value || 50), py = parseFloat(y.value || 50), zoom = (parseFloat((z && z.value) || 100)) / 100;
+      var px = parseFloat(x.value || 50), py = parseFloat(y.value || 50), zm = zoom();
       img.style.objectPosition = px + "% " + py + "%";
       img.style.transformOrigin = px + "% " + py + "%";
-      img.style.transform = zoom > 1.001 ? "scale(" + zoom + ")" : "";
-      marker.style.left = px + "%";
-      marker.style.top = py + "%";
+      img.style.transform = zm > 1.001 ? "scale(" + zm + ")" : "";
+      if (auto) auto.hidden = Math.round(px) === Math.round(autoX) && Math.round(py) === Math.round(autoY) && zm <= 1.001;
     }
-    function fromPointer(event) {
-      var rect = frame.getBoundingClientRect();
-      var px = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
-      var py = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100));
-      x.value = Math.round(px);
-      y.value = Math.round(py);
-      render();
+    function changed() {
       var form = x.form;
       if (form && form.markDirty) form.markDirty();
+      x.dispatchEvent(new Event("change", { bubbles: true }));  // de live kaart werkt zich bij
     }
-    var dragging = false;
-    frame.addEventListener("pointerdown", function (e) { dragging = true; frame.setPointerCapture(e.pointerId); fromPointer(e); });
-    frame.addEventListener("pointermove", function (e) { if (dragging) fromPointer(e); });
-    frame.addEventListener("pointerup", function () { dragging = false; });
+    function set(px, py) {
+      x.value = Math.round(Math.max(0, Math.min(100, px)));
+      y.value = Math.round(Math.max(0, Math.min(100, py)));
+      render();
+    }
+    // Hoeveel een procent verschuiven op het scherm is: het deel van de foto dat buiten het kader valt (met zoom).
+    function overflow(rect) {
+      var iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+      var cover = Math.max(rect.width / iw, rect.height / ih) * zoom();
+      return { w: iw * cover - rect.width, h: ih * cover - rect.height };
+    }
+
+    var start = null;
+    frame.addEventListener("pointerdown", function (e) {
+      if (e.button !== undefined && e.button !== 0) return;
+      start = { cx: e.clientX, cy: e.clientY, px: parseFloat(x.value || 50), py: parseFloat(y.value || 50), room: overflow(frame.getBoundingClientRect()) };
+      frame.setPointerCapture(e.pointerId);
+      frame.classList.add("is-dragging");
+      e.preventDefault();
+    });
+    frame.addEventListener("pointermove", function (e) {
+      if (!start) return;
+      var dx = e.clientX - start.cx, dy = e.clientY - start.cy;
+      // Naar rechts slepen = de foto schuift naar rechts = je ziet meer van de linkerkant.
+      set(start.room.w > 1 ? start.px - (dx / start.room.w) * 100 : start.px,
+          start.room.h > 1 ? start.py - (dy / start.room.h) * 100 : start.py);
+    });
+    function stop() {
+      if (!start) return;
+      start = null;
+      frame.classList.remove("is-dragging");
+      changed();
+    }
+    frame.addEventListener("pointerup", stop);
+    frame.addEventListener("pointercancel", stop);
+    frame.addEventListener("keydown", function (e) {
+      var step = e.shiftKey ? 10 : 2;
+      var moves = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
+      if (!moves[e.key]) return;
+      e.preventDefault();
+      set(parseFloat(x.value || 50) + moves[e.key][0], parseFloat(y.value || 50) + moves[e.key][1]);
+      changed();
+    });
+    if (auto) auto.addEventListener("click", function () {
+      if (z) z.value = 100;
+      set(autoX, autoY);
+      changed();
+    });
     [x, y, z].forEach(function (input) { if (input) input.addEventListener("input", render); });
+    if (img.complete) render(); else img.addEventListener("load", render);
     render();
   });
 
@@ -259,9 +308,9 @@
     var url = box.getAttribute("data-live-update");
     var form = document.querySelector("form.studio-form");
     var wide = window.matchMedia("(min-width: 1100px)");
-    function sync() { if (wide.matches) box.open = true; }
-    sync();
-    if (wide.addEventListener) wide.addEventListener("change", sync);
+    if (wide.matches) box.open = true;
+    // Breed: altijd open naast de stappen. Smaller geworden: dicht, anders ligt hij over het hele scherm.
+    if (wide.addEventListener) wide.addEventListener("change", function () { box.open = wide.matches; });
     if (!form || !url || !window.fetch || !window.FormData) return;
     var timer = null, busy = false, again = false, pending = false, jump = false;
     function refresh() {

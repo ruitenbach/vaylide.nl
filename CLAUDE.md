@@ -14,7 +14,7 @@ cp .env.example .env                      # zet een eigen DJANGO_SECRET_KEY; gee
 .venv/bin/python manage.py migrate        # leest ook de ontwerpen in (sync_designs)
 .venv/bin/python manage.py createsuperuser
 .venv/bin/python manage.py runserver      # http://127.0.0.1:8000, testmodus
-.venv/bin/python manage.py test tests     # 315 tests, moeten altijd slagen
+.venv/bin/python manage.py test tests     # 323 tests, moeten altijd slagen
 ```
 
 Visuele controles (Node met Playwright en Chromium): zie "Zelf herhalen" in `docs/CONTROLES.md` (`e2e/klantreis.cjs` voor de hele klantreis, `e2e/fixtures.py`, `e2e/controle2.cjs`, `e2e/toegankelijkheid.cjs` en `e2e/effecten.cjs`). Beelden opnieuw maken: `tools/logo/README.md` (logo en iconen), `tools/merkbeelden/README.md` (website), `tools/generate_demo_images.py` (voorbeeldbeelden), `tools/winterlicht/README.md` (de kerstkaart Winterlicht), `tools/gloria/maak_tekeningen.py` (vleugels en engelen van Gloria), `tools/aan_tafel/maak_tekeningen.py` (slinger en hulst van Aan tafel), `tools/voor_altijd/maak_tekeningen.py` (krans, takje en ringen van Voor altijd), `tools/eerste_dans/maak_tekeningen.py` (bruidspaar, kroonluchter en bloemenslinger van Eerste dans), `docs/BALZAAL.md` (beeldlagen en haarkleuren van Balzaal), `docs/GEZICHTEN.md` (eigen gezichten via een beeld-API; staat uit) en `e2e/make_design_images.cjs` (kaartbeelden van de ontwerpen). Een losse voorvertoning zonder server (om te delen): `python tools/voorvertoning.py <map> [ontwerp ...]`. De 3D-wereld op de homepage (envelop, gouden kaart, sterretjes, kerstpodium) en de sterretjes in de paginakoppen: `static/js/hero3d.js` (de envelop werkt altijd; beweging stilgezet bij 'minder beweging'). Themabeelden: `tools/merkbeelden/voorbeelden.cjs`.
@@ -29,7 +29,7 @@ Visuele controles (Node met Playwright en Chromium): zie "Zelf herhalen" in `doc
 | Uitnodigingsontwerpen | `designs/<code>/v<N>/` (manifest, template, stylesheet), weergave in `invitations/`. 30 ontwerpen delen de Atelier-opbouw in `designs/_atelier/v1/`; beschrijving en generator in `tools/atelier/`, keuzes en contrastcontrole in `catalog/atelier.py`. De kerstkaart Winterlicht (`designs/winterlicht/v1/`) heeft eigen getekende beelden uit `tools/winterlicht/` |
 | Gelegenheden | `catalog/occasions.py`; bij Kerst is het evenement optioneel (alleen een kerstgroet kan ook), zie `event_expected` in `invitations/content.py` |
 | Effecten op uitnodigingen | `invitations/static/invitations/effects.js` en `effects.css`; keuzes per ontwerp in het manifest (`effects`), opties en websiteteksten in `catalog/effects.py` |
-| Samenstellen, bestellen, betalen | `studio/`, `orders/` (testbetaling en Mollie achter één koppeling). Naast de invulstappen staat 'Je kaart, live' (`studio/templates/studio/_live.html`, views `live_update`/`live_frame`; in de kaart `invitations/static/invitations/live.js`) |
+| Samenstellen, bestellen, betalen | `studio/`, `orders/` (testbetaling en Mollie achter één koppeling). Foto's worden bij het uploaden automatisch uitgelijnd op gezichten (`invitations/focus.py`, YuNet-model in `invitations/models_ai/`, draait lokaal). Naast de invulstappen staat 'Je kaart, live' (`studio/templates/studio/_live.html`, views `live_update`/`live_frame`; in de kaart `invitations/static/invitations/live.js`) |
 | Verwerking na betaling en e-mail | `processing/` (takenwachtrij met herhalingen) |
 | Klantomgeving, extra wensen, beheer | `portal/`, `wishes/`, `beheer/` |
 | Beveiligingsheaders en CSP | `core/middleware.py`, `core/csp.py` |

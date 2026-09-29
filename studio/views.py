@@ -255,7 +255,10 @@ def step(request, uid, step):
 
 def _form_kwargs(inv: Invitation, step: str) -> dict:
     if step == "fotos":
-        return {"photos": list(inv.assets.filter(kind=MediaAsset.Kind.PHOTO)),
+        photos = list(inv.assets.filter(kind=MediaAsset.Kind.PHOTO))
+        for photo in [p for p in photos if p.focus_x is None][:24]:
+            photo.analyse()
+        return {"photos": photos,
                 "audio": list(inv.assets.filter(kind=MediaAsset.Kind.AUDIO))}
     if step == "stijl":
         return {"template_version": inv.template_version}
@@ -438,8 +441,11 @@ def upload(request, uid):
             except UploadError as exc:
                 errors.append(f"{name}: {exc}")
                 continue
+            focus = processed.focus
             asset = MediaAsset(invitation=inv, kind=MediaAsset.Kind.PHOTO, original_name=name, content_type="image/webp",
                                size_bytes=processed.size_bytes, width=processed.width, height=processed.height,
+                               focus_x=focus.x if focus else 50, focus_y=focus.y if focus else 50,
+                               faces=focus.faces if focus else 0,
                                uploaded_by=request.user if request.user.is_authenticated else None)
             asset.file.save("groot.webp", processed.large, save=False)
             asset.file_medium.save("middel.webp", processed.medium, save=False)
@@ -462,6 +468,9 @@ def upload(request, uid):
                 created.append(asset)
         if not photos and not music:
             errors.append("Kies eerst een bestand.")
+    placed = _auto_hero(request, inv, [a for a in created if a.kind == MediaAsset.Kind.PHOTO])
+    if placed:
+        messages.success(request, placed)
     if wants_json(request):
         return JsonResponse(
             {
@@ -480,6 +489,25 @@ def upload(request, uid):
     if created:
         messages.success(request, f"{len(created)} bestand(en) geüpload.")
     return redirect(f"{reverse('studio:step', args=[inv.uid, 'fotos'])}#uploads")
+
+
+def _auto_hero(request, inv: Invitation, new_photos: list) -> str:
+    """Nog geen hoofdfoto? Dan kiezen we er zelf een uit de nieuwe foto's: het liefst een foto van jullie tweeën,
+    uitgelijnd op de gezichten. De galerij vullen we niet vanzelf (dat is een extra optie met een prijs)."""
+    if not new_photos:
+        return ""
+    content = _content(inv)
+    if (content.get("photos") or {}).get("hero"):
+        return ""
+    rank = {2: 3, 1: 2}
+    best = max(enumerate(new_photos), key=lambda item: (rank.get(item[1].faces or 0, 1 if item[1].faces else 0), -item[0]))[1]
+    content["photos"]["hero"] = {"asset": str(best.uid), "x": best.auto_x, "y": best.auto_y, "zoom": 1.0}
+    try:
+        save_draft(inv, expected_rev=None, content=content, user=request.user, source=_source(request))
+    except DraftConflict:
+        return ""
+    who = {0: "", 1: ", uitgelijnd op het gezicht"}.get(best.faces or 0, ", uitgelijnd op de gezichten")
+    return f"{best.original_name or 'Je foto'} staat als hoofdfoto op je kaart{who}. Je kunt dit hieronder altijd aanpassen."
 
 
 @require_POST
