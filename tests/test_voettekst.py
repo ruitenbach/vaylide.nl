@@ -48,6 +48,11 @@ class PaymentMethodsTests(VaylideTestCase):
             # Alleen wat de eigenaar wil tonen (iDEAL, creditcard, PayPal), ook als er in Mollie meer aanstaat.
             self.assertEqual([m["label"] for m in available_methods()], ["iDEAL", "PayPal", "Creditcard"])
             available_methods()  # uit de cache
+            # Ook een oudere bewaarde lijst (van vóór de keuze van de eigenaar) toont alleen de toegestane methoden.
+            from django.core.cache import cache
+
+            cache.set("betaalmethoden:v2:test_", [{"id": "ideal"}, {"id": "klarna"}, {"id": "paybybank"}, {"id": "creditcard"}], 60)
+            self.assertEqual([m["id"] for m in available_methods()], ["ideal", "creditcard"])
             self.assertEqual(urlopen.call_count, 1)
             self.assertIn("/methods", urlopen.call_args[0][0].full_url)
 

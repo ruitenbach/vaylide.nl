@@ -717,3 +717,6 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
 - **Testsite (zonder wachtwoord):**
   - `/healthz` geeft 200 en de pagina's geven 401;
   - de Mollie-webhook is bereikbaar (400 zonder id), de gesimuleerde betaling bestaat niet (404).
+- Betaalmethoden op de testsite: daar stonden Klarna, Riverty en Pay by Bank nog, uit een bewaarde lijst van vóór de
+  update. De bewaarde lijst wordt nu ook gefilterd, en de sleutel is vernieuwd (`v2`). Creditcard heeft nu het aangeleverde
+  Mastercard-logo. Test in `tests/test_voettekst.py`.

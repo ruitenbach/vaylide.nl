@@ -25,6 +25,7 @@ LABELS = {
     "klarnasliceit": "Klarna",
     "klarnapaynow": "Klarna",
     "riverty": "Riverty",
+    "paybybank": "Pay by Bank",
     "belfius": "Belfius",
     "kbc": "KBC/CBC",
     "giftcard": "Cadeaukaart",
@@ -33,6 +34,7 @@ LABELS = {
 LOGOS = {
     "ideal": ("img/betalen/ideal.webp", 110, 96),
     "paypal": ("img/betalen/paypal.webp", 97, 96),
+    "creditcard": ("img/betalen/creditcard.webp", 154, 96),  # Mastercard, aangeleverd door de eigenaar
 }
 # Volgorde op de site: de bekendste eerst.
 ORDER = ["ideal", "paypal", "applepay", "creditcard", "bancontact", "klarna", "klarnapaylater", "klarnasliceit", "klarnapaynow", "riverty", "banktransfer"]
@@ -64,10 +66,12 @@ def configured_methods() -> list[dict]:
 def available_methods() -> list[dict]:
     if settings.PAYMENT_PROVIDER != "mollie" or not settings.MOLLIE_API_KEY:
         return configured_methods()
-    key = f"betaalmethoden:{settings.MOLLIE_API_KEY[:5]}"
+    key = f"betaalmethoden:v2:{settings.MOLLIE_API_KEY[:5]}"
     cached = cache.get(key)
     if cached is not None:
-        return cached
+        # Ook een bewaarde lijst volgt de keuze van de eigenaar (alleen de methoden die de site mag tonen).
+        allowed = {m.strip().lower() for m in settings.PAYMENT_METHODS_SHOWN}
+        return [m for m in cached if m.get("id") in allowed]
     from .providers import MollieProvider, ProviderError
 
     try:
