@@ -24,7 +24,7 @@
         <label class="onthulling__link"><span class="visually-hidden">Jouw link</span><input type="text" readonly value="{{ state.public_url }}" data-select-all></label>
         {% if inv %}<a class="onthulling__qr" href="{% url 'portal:qr' inv.uid 'png' %}?download=1" title="QR-code downloaden"><img src="{% url 'portal:qr' inv.uid 'svg' %}" alt="QR-code naar je {{ doc_kind }}" width="96" height="96"><span>QR-code downloaden</span></a>{% endif %}
       </div>
-      <p class="onthulling__verder"><a href="{% if inv %}{% url 'portal:invitation' inv.uid %}{% else %}{% url 'portal:home' %}{% endif %}">Naar Mijn Vaylide</a> · gastenlijst, wijzigingen en je QR-code staan daar ook.</p>
+      <p class="onthulling__verder"><a href="{% if inv %}{% url 'portal:invitation' inv.uid %}{% else %}{% url 'portal:home' %}{% endif %}">Naar Mijn VAYLIDE</a> · gastenlijst, wijzigingen en je QR-code staan daar ook.</p>
       <button type="button" class="onthulling__opnieuw" data-onthulling-opnieuw hidden>Nog een keer vieren</button>
     </div>
   </div>

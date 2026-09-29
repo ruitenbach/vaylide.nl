@@ -52,7 +52,7 @@ STEPS = [
     ("fotos", "Voeg foto's toe", "Je kiest zelf welk deel in beeld komt."),
     ("oog", "Bekijk je voorbeeld", "Op telefoon en computer; pas aan wat je wilt."),
     ("tas", "Betaal online", "Na een bevestigde betaling wordt je uitnodiging automatisch gepubliceerd."),
-    ("delen", "Deel en volg aanmeldingen", "Via link of QR-code. Antwoorden zie je in Mijn Vaylide."),
+    ("delen", "Deel en volg aanmeldingen", "Via link of QR-code. Antwoorden zie je in Mijn VAYLIDE."),
 ]
 
 FEATURES = [
@@ -75,7 +75,7 @@ FEATURE_GROUPS = [
 ]
 
 FAQ = [
-    ("Hoe werkt een digitale uitnodiging van Vaylide?",
+    ("Hoe werkt een digitale uitnodiging van VAYLIDE?",
      "Je kiest een ontwerp, vult de gegevens van je evenement in en bekijkt meteen een persoonlijk voorbeeld. "
      "Na de betaling wordt je uitnodiging automatisch gepubliceerd op een eigen link. Die deel je via WhatsApp, e-mail of met een QR-code."),
     ("Heb ik een account nodig?",
@@ -84,9 +84,9 @@ FAQ = [
     ("Moeten mijn gasten een account aanmaken?",
      "Nee. Gasten openen de link en geven aan of ze komen, eventueel met hoeveel personen. Ze kunnen hun antwoord later zelf wijzigen."),
     ("Kan ik na het publiceren nog iets aanpassen?",
-     "Ja. Je wijzigt de gegevens in Mijn Vaylide, bekijkt een voorbeeld en publiceert opnieuw. De link en de QR-code blijven hetzelfde."),
+     "Ja. Je wijzigt de gegevens in Mijn VAYLIDE, bekijkt een voorbeeld en publiceert opnieuw. De link en de QR-code blijven hetzelfde."),
     ("Wie kan de aanmeldingen zien?",
-     "Alleen jij, in Mijn Vaylide. Gasten zien elkaars antwoorden niet. Je kunt de gastenlijst exporteren naar een bestand voor Excel of Numbers."),
+     "Alleen jij, in Mijn VAYLIDE. Gasten zien elkaars antwoorden niet. Je kunt de gastenlijst exporteren naar een bestand voor Excel of Numbers."),
     ("Wordt mijn uitnodiging gevonden via Google?",
      "Nee. Uitnodigingen zijn alleen bereikbaar via de link en we vragen zoekmachines om ze niet op te nemen."),
     ("Kan ik muziek toevoegen?",
@@ -99,11 +99,11 @@ FAQ = [
      "Je betaalt online bij het afronden van je bestelling. Welke betaalmethoden beschikbaar zijn, zoals iDEAL, zie je bij het afrekenen."),
     ("Wanneer staat mijn uitnodiging online?",
      "Zodra de betaalprovider je betaling heeft bevestigd, wordt je uitnodiging automatisch gepubliceerd. "
-     "Je ziet de link direct in Mijn Vaylide en ontvangt hem ook per e-mail."),
+     "Je ziet de link direct in Mijn VAYLIDE en ontvangt hem ook per e-mail."),
     ("Hoe lang blijft mijn uitnodiging online?",
-     "Dat hangt af van je pakket. De einddatum zie je bij je uitnodiging in Mijn Vaylide. Langer online is als extra optie mogelijk."),
+     "Dat hangt af van je pakket. De einddatum zie je bij je uitnodiging in Mijn VAYLIDE. Langer online is als extra optie mogelijk."),
     ("Ik heb een bijzondere wens. Kan dat?",
-     "Gebruik 'Extra wensen of hulp nodig?' tijdens het samenstellen of in Mijn Vaylide. We bekijken je vraag persoonlijk. "
+     "Gebruik 'Extra wensen of hulp nodig?' tijdens het samenstellen of in Mijn VAYLIDE. We bekijken je vraag persoonlijk. "
      "Kost het iets extra, dan krijg je eerst een voorstel; we beginnen pas na jouw akkoord."),
     ("Wat gebeurt er met de gegevens na afloop?",
      "Na de beschikbaarheidsperiode gaat de uitnodiging offline en worden de gastgegevens na een vaste termijn verwijderd. "
@@ -112,7 +112,7 @@ FAQ = [
 
 # Homepage: een korte selectie veelgestelde vragen (vragen uit FAQ, plus één over delen). Alleen functies die er zijn.
 HOME_FAQ_QUESTIONS = [
-    "Hoe werkt een digitale uitnodiging van Vaylide?",
+    "Hoe werkt een digitale uitnodiging van VAYLIDE?",
     "Kan ik na het publiceren nog iets aanpassen?",
     "Hoe betaal ik?",
     "Wanneer staat mijn uitnodiging online?",

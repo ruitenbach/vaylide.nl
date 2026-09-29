@@ -211,7 +211,7 @@ def invitation_detail(request, uid):
                     return redirect("beheer:invitation", uid=inv.uid)
             elif action == "publiceren":
                 version = publish_draft(inv, user=request.user, source=Source.ADMIN, expected_rev=_rev(request),
-                                        note=(request.POST.get("note") or "Gepubliceerd door het Vaylide-team")[:200])
+                                        note=(request.POST.get("note") or "Gepubliceerd door het VAYLIDE-team")[:200])
                 messages.success(request, f"Versie {version.number} staat online.")
                 return redirect("beheer:invitation", uid=inv.uid)
             elif action == "herstellen":
@@ -378,7 +378,7 @@ def wish_detail(request, uid):
                 proposal_form = ProposalForm(request.POST)
                 if proposal_form.is_valid():
                     send_proposal(req, author=request.user, text=proposal_form.cleaned_data["text"], price_cents=proposal_form.price_cents())
-                    messages.success(request, "Voorstel verstuurd. De klant kan het accepteren in Mijn Vaylide.")
+                    messages.success(request, "Voorstel verstuurd. De klant kan het accepteren in Mijn VAYLIDE.")
                     return redirect("beheer:wish", uid=req.uid)
             elif action == "status":
                 status_form = StatusForm(request.POST)

@@ -82,7 +82,7 @@ class GuestAndLoginTests(VaylideTestCase):
         self.assertContains(Client().get("/"), 'class="site-header__account" href="/inloggen/"')
         client = Client()
         client.force_login(self.make_customer())
-        self.assertContains(client.get("/"), "<span>Mijn Vaylide</span>")
+        self.assertContains(client.get("/"), "<span>Mijn VAYLIDE</span>")
 
     def test_portal_offers_checkout_for_drafts(self):
         customer = self.make_customer()

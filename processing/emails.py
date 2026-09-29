@@ -126,7 +126,7 @@ def handle_send_email(job) -> None:
 # ------------------------------------------------------------ concrete e-mails
 
 def send_login_code(email: str, code: str, link_path: str, *, purpose: str = "login") -> OutboundEmail:
-    subject = "Je inlogcode voor Vaylide" if purpose == "login" else "Bevestig je e-mailadres voor Vaylide"
+    subject = "Je inlogcode voor VAYLIDE" if purpose == "login" else "Bevestig je e-mailadres voor VAYLIDE"
     return queue_email(
         to=email,
         subject=subject,

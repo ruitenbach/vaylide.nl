@@ -11,14 +11,14 @@
     <a class="btn btn--secondary" href="{% url 'studio:resume' inv.uid %}">Wijzigen</a>
   </div>
 </div>
-{% if inv.customer_locked %}<p class="notice notice--warning"><strong>Tijdelijk niet te wijzigen</strong>Het Vaylide-team werkt aan je uitnodiging{% if inv.lock_reason %} ({{ inv.lock_reason }}){% endif %}.</p>{% endif %}
+{% if inv.customer_locked %}<p class="notice notice--warning"><strong>Tijdelijk niet te wijzigen</strong>Het VAYLIDE-team werkt aan je uitnodiging{% if inv.lock_reason %} ({{ inv.lock_reason }}){% endif %}.</p>{% endif %}
 {% if processing_order %}
-<p class="notice notice--warning"><strong>Je betaling is ontvangen</strong>{% if processing_order.fulfilment_status == "attention" %}Het publiceren duurt langer dan normaal. We proberen het automatisch opnieuw en het Vaylide-team is ingeschakeld.{% else %}We publiceren je uitnodiging. Vernieuw deze pagina over een ogenblik.{% endif %} <a href="{% url 'orders:status' processing_order.uid %}">Status bekijken</a></p>
+<p class="notice notice--warning"><strong>Je betaling is ontvangen</strong>{% if processing_order.fulfilment_status == "attention" %}Het publiceren duurt langer dan normaal. We proberen het automatisch opnieuw en het VAYLIDE-team is ingeschakeld.{% else %}We publiceren je uitnodiging. Vernieuw deze pagina over een ogenblik.{% endif %} <a href="{% url 'orders:status' processing_order.uid %}">Status bekijken</a></p>
 {% endif %}
 {% if not paid and pending_order %}<p class="notice"><strong>Nog niet betaald</strong>Je bestelling {{ pending_order.number }} wacht op betaling. <a href="{% url 'orders:status' pending_order.uid %}">Afronden</a></p>{% endif %}
 {% if not paid and not pending_order %}<p class="notice"><strong>Concept</strong>Deze uitnodiging is nog niet besteld. <a href="{% url 'studio:resume' inv.uid %}">Verder gaan</a></p>{% endif %}
 {% if has_changes %}<p class="notice notice--warning"><strong>Wijzigingen nog niet gepubliceerd</strong>Je hebt aanpassingen opgeslagen die je gasten nog niet zien. <a href="{% url 'studio:step' inv.uid 'voorbeeld' %}">Bekijk en publiceer</a></p>{% endif %}
-{% if inv.published_version and inv.draft_updated_source == "admin" %}<p class="notice"><strong>Aangepast door het Vaylide-team</strong>Op {{ inv.draft_updated_at|date:"j F Y \o\m H:i" }}. Bekijk ze in het <a href="{% url 'studio:step' inv.uid 'voorbeeld' %}">voorbeeld</a>.</p>{% endif %}
+{% if inv.published_version and inv.draft_updated_source == "admin" %}<p class="notice"><strong>Aangepast door het VAYLIDE-team</strong>Op {{ inv.draft_updated_at|date:"j F Y \o\m H:i" }}. Bekijk ze in het <a href="{% url 'studio:step' inv.uid 'voorbeeld' %}">voorbeeld</a>.</p>{% endif %}
 
 <div class="app-grid app-grid--sidebar">
   <div class="app-grid">

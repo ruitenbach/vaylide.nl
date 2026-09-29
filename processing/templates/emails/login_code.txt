@@ -1,6 +1,6 @@
 Hallo,
 
-{% if purpose == "login" %}Je hebt gevraagd om in te loggen bij Vaylide.{% else %}Bevestig je e-mailadres om je ontwerp te bewaren en later verder te gaan.{% endif %}
+{% if purpose == "login" %}Je hebt gevraagd om in te loggen bij VAYLIDE.{% else %}Bevestig je e-mailadres om je ontwerp te bewaren en later verder te gaan.{% endif %}
 
 Je code is: {{ code }}
 
@@ -12,4 +12,4 @@ De code en de link zijn 20 minuten geldig en werken één keer.
 Heb je dit niet zelf aangevraagd? Dan kun je deze e-mail negeren.
 
 Hartelijke groet,
-Vaylide
+VAYLIDE

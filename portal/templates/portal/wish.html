@@ -24,7 +24,7 @@
         <div class="msg msg--customer"><p class="msg__meta">Jij · {{ req.created_at|date:"j F H:i" }}</p><p class="msg__body">{{ req.description }}</p></div>
         {% for m in thread %}
         <div class="msg {% if m.from_staff %}msg--staff{% else %}msg--customer{% endif %}">
-          <p class="msg__meta">{% if m.from_staff %}Vaylide{% else %}Jij{% endif %} · {{ m.created_at|date:"j F H:i" }}</p>
+          <p class="msg__meta">{% if m.from_staff %}VAYLIDE{% else %}Jij{% endif %} · {{ m.created_at|date:"j F H:i" }}</p>
           <p class="msg__body">{{ m.body }}</p>
           {% for a in m.attachments.all %}<p><a href="{% url 'portal:wish_attachment' req.uid a.uid %}">{{ a.original_name }}</a></p>{% endfor %}
         </div>

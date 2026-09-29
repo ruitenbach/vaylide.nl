@@ -45,7 +45,7 @@ class StepForm(forms.Form):
         for name, field in self.fields.items():
             if self.field_paths.get(name) in self.locked or name in self.locked:
                 field.disabled = True
-                field.help_text = "Handmatig aangepast door het Vaylide-team. Neem contact op om dit te wijzigen."
+                field.help_text = "Handmatig aangepast door het VAYLIDE-team. Neem contact op om dit te wijzigen."
 
     def missing(self) -> dict[str, str]:
         return {}

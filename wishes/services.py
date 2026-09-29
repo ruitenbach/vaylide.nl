@@ -111,7 +111,7 @@ def add_message(req: CustomRequest, *, author, body: str, from_staff: bool, inte
                 req.status = CustomRequest.Status.RECEIVED
         req.save()
     if from_staff and not internal:
-        send_wish_update(req, event_key=f"msg:{message.pk}", headline="Nieuw bericht van Vaylide")
+        send_wish_update(req, event_key=f"msg:{message.pk}", headline="Nieuw bericht van VAYLIDE")
     elif not from_staff:
         notify_owner_customer_message(req, message)
     return message

@@ -2,8 +2,8 @@ Hallo,
 
 {{ headline }} bij je aanvraag "{{ req.subject }}" ({{ req.reference }}).
 
-Bekijk het in Mijn Vaylide:
+Bekijk het in Mijn VAYLIDE:
 {{ link }}
 
 Hartelijke groet,
-Vaylide
+VAYLIDE

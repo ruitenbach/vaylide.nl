@@ -57,7 +57,7 @@ def decrypt_file(src: Path, dst: Path) -> Path:
     f = _fernet()
     with open(src, "rb") as inp, open(dst, "wb") as out:
         if inp.read(len(MAGIC)) != MAGIC:
-            raise OffsiteError("Dit is geen versleutelde Vaylide-back-up.")
+            raise OffsiteError("Dit is geen versleutelde VAYLIDE-back-up.")
         while head := inp.read(4):
             (size,) = struct.unpack(">I", head)
             try:

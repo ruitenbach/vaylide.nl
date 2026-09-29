@@ -1,8 +1,8 @@
 {% extends "portal/base_portal.html" %}{% load static vl %}
-{% block title %}Mijn Vaylide{% endblock %}
+{% block title %}Mijn VAYLIDE{% endblock %}
 {% block portal %}
 <div class="app-head">
-  <div><p class="eyebrow">Mijn Vaylide</p><h1>Welkom{% if user.name %}, {{ user.name }}{% endif %}</h1></div>
+  <div><p class="eyebrow">Mijn VAYLIDE</p><h1>Welkom{% if user.name %}, {{ user.name }}{% endif %}</h1></div>
   <div class="btn-row"><a class="btn btn--primary" href="{% url 'studio:start' %}">Nieuwe uitnodiging</a><a class="btn btn--secondary" href="{% url 'portal:wish_new' %}">Extra wensen of hulp nodig?</a></div>
 </div>
 <div class="app-grid app-grid--sidebar">

@@ -466,7 +466,7 @@ def build_view(
     calendar = None
     if start:
         cal_end = end or start + timedelta(hours=4)
-        details = f"Uitnodiging: {options.share_url}" if options.share_url else "Uitnodiging via Vaylide"
+        details = f"Uitnodiging: {options.share_url}" if options.share_url else "Uitnodiging via VAYLIDE"
         calendar = {
             "google": _google_calendar_url(title, start, cal_end, location_text, details),
             "ics": options.ics_url,

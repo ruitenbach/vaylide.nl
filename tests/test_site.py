@@ -11,7 +11,7 @@ class NewPagesTests(VaylideTestCase):
         self.assertContains(inspiration, 'id="tekst-bruiloft"')
         self.assertContains(inspiration, "/ontwerpen/?gelegenheid=babyshower")
         about = Client().get("/over-ons/")
-        self.assertContains(about, "Waarom Vaylide?")
+        self.assertContains(about, "Waarom VAYLIDE?")
         self.assertContains(about, "Onze visie")
         self.assertContains(about, "Maak van jouw moment een uitnodiging om naar uit te kijken.")
         self.assertContains(about, "Voor particulieren en bedrijven")
@@ -90,10 +90,10 @@ class BrandTests(VaylideTestCase):
 
         html = Client().get("/").content.decode()
         self.assertIn('class="logo__img"', html)
-        self.assertIn('alt="Vaylide"', html)
-        self.assertIn('aria-label="Vaylide, naar de homepage"', html)
+        self.assertIn('alt="VAYLIDE"', html)
+        self.assertIn('aria-label="VAYLIDE, naar de homepage"', html)
         self.assertIn("img/og-vaylide.jpg", html)
-        self.assertIn('<meta property="og:site_name" content="Vaylide">', html)
+        self.assertIn('<meta property="og:site_name" content="VAYLIDE">', html)
         for path in ("img/merk/vaylide-logo.webp", "img/favicon-32.png", "img/favicon-48.png", "img/icon-192.png",
                      "img/apple-touch-icon.png", "img/og-vaylide.jpg"):
             self.assertIn(path.rsplit(".", 1)[0], html, path)
@@ -111,14 +111,14 @@ class BrandTests(VaylideTestCase):
             html = response.content.decode()
             for old in ("Vierlief", "Vaylia"):
                 self.assertNotIn(old, html, url)
-            self.assertIn("Vaylide", html, url)
+            self.assertIn("VAYLIDE", html, url)
 
     def test_emails_show_logo_and_name(self):
         from processing.emails import send_login_code
 
         email = send_login_code("gast@example.com", "123456", "/inloggen/code/")
-        self.assertIn("Vaylide", email.subject)
-        self.assertIn('alt="Vaylide"', email.body_html)
+        self.assertIn("VAYLIDE", email.subject)
+        self.assertIn('alt="VAYLIDE"', email.body_html)
         self.assertIn("https://vaylide.test/static/img/merk/vaylide-logo.png", email.body_html)
         for old in ("Vierlief", "Vaylia"):
             self.assertNotIn(old, email.body_html + email.body_text + email.subject)

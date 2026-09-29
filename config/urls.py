@@ -3,8 +3,8 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
-admin.site.site_header = "Vaylide systeembeheer"
-admin.site.site_title = "Vaylide"
+admin.site.site_header = "VAYLIDE systeembeheer"
+admin.site.site_title = "VAYLIDE"
 admin.site.index_title = "Noodtoegang tot de database (gebruik bij voorkeur /beheer/)"
 
 urlpatterns = [

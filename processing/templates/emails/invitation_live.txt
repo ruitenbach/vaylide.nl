@@ -7,10 +7,10 @@ Je persoonlijke link:
 
 Deel de link via WhatsApp, e-mail of sms. In de bijlage vind je de QR-code, bijvoorbeeld voor een gedrukte kaart.
 
-In Mijn Vaylide zie je de aanmeldingen, pas je gegevens aan en publiceer je wijzigingen op dezelfde link:
+In Mijn VAYLIDE zie je de aanmeldingen, pas je gegevens aan en publiceer je wijzigingen op dezelfde link:
 {{ portal }}
 {% if invitation.available_until %}
 Je {{ doc_kind }} is online tot en met {{ invitation.available_until|date:"j F Y" }}.
 {% endif %}
 Hartelijke groet,
-Vaylide
+VAYLIDE

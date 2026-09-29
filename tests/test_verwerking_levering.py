@@ -106,7 +106,7 @@ class ErrorPageTests(VaylideTestCase):
         response = Client().get("/bestaat-echt-niet/")
         self.assertEqual(response.status_code, 404)
         self.assertContains(response, "Pagina niet gevonden", status_code=404)
-        self.assertContains(response, "Vaylide", status_code=404)
+        self.assertContains(response, "VAYLIDE", status_code=404)
 
 
 class LayoutRegressionTests(VaylideTestCase):

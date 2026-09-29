@@ -63,7 +63,7 @@ class ConflictTests(VaylideTestCase):
             "date": self.inv.draft_content["date"], "start_time": "14:00", "timezone": "Europe/Amsterdam",
             "venue_name": "Kasteel Test", "address": "Teststraat 1", "welcome_text": "Oude tekst van de klant."})
         self.assertContains(response, "deze uitnodiging is intussen gewijzigd")
-        self.assertContains(response, "Het Vaylide-team")
+        self.assertContains(response, "Het VAYLIDE-team")
         self.assertContains(response, "Welkomsttekst")
         self.inv.refresh_from_db()
         self.assertEqual(self.inv.draft_content["welcome_text"], "Handmatig door het team verbeterd.")

@@ -15,7 +15,7 @@
       .then(function (data) {
         if (data.phase !== phase) { window.location.reload(); return; }
         if (tries < 60) window.setTimeout(check, 2000);
-        else if (note) note.textContent = "Het duurt langer dan normaal. Vernieuw de pagina later of kijk in Mijn Vaylide.";
+        else if (note) note.textContent = "Het duurt langer dan normaal. Vernieuw de pagina later of kijk in Mijn VAYLIDE.";
       })
       .catch(function () { if (tries < 60) window.setTimeout(check, 4000); });
   }

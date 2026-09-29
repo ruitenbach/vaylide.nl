@@ -29,7 +29,7 @@ def _after_login(request, user):
         latest = Invitation.objects.filter(owner=user).order_by("-updated_at").first()
         if latest:
             send_draft_saved(latest, user)
-        messages.success(request, "Je bent ingelogd en je ontwerp is bewaard in Mijn Vaylide.")
+        messages.success(request, "Je bent ingelogd en je ontwerp is bewaard in Mijn VAYLIDE.")
     else:
         messages.success(request, "Je bent ingelogd.")
 

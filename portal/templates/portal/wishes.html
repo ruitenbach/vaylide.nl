@@ -1,7 +1,7 @@
 {% extends "portal/base_portal.html" %}
 {% block title %}Extra wensen{% endblock %}
 {% block portal %}
-<div class="app-head"><div><p class="eyebrow">Mijn Vaylide</p><h1>Extra wensen en vragen</h1></div><a class="btn btn--primary" href="{% url 'portal:wish_new' %}">Nieuwe aanvraag</a></div>
+<div class="app-head"><div><p class="eyebrow">Mijn VAYLIDE</p><h1>Extra wensen en vragen</h1></div><a class="btn btn--primary" href="{% url 'portal:wish_new' %}">Nieuwe aanvraag</a></div>
 <section class="panel">
   {% if wishes %}
   <ul class="item-list">{% for w in wishes %}<li class="item"><div class="item__top"><a class="item__title" href="{% url 'portal:wish' w.uid %}">{{ w.subject }}</a><span class="badge badge--{{ w.status }}">{{ w.get_status_display }}</span></div><p class="item__meta">{{ w.reference }}{% if w.invitation %} · {{ w.invitation.title }}{% endif %} · bijgewerkt {{ w.updated_at|date:"j F Y" }}{% if w.unread_by_customer %} · <strong>nieuw bericht</strong>{% endif %}</p></li>{% endfor %}</ul>

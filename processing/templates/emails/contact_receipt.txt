@@ -6,4 +6,4 @@ Je bericht:
 {{ msg.message }}
 
 Hartelijke groet,
-Vaylide
+VAYLIDE

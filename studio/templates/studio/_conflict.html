@@ -1,7 +1,7 @@
 {% if conflict %}
 <div class="notice notice--warning" role="alert">
   <strong>Let op: deze uitnodiging is intussen gewijzigd</strong>
-  {% if conflict.by_admin %}Het Vaylide-team{% else %}Iemand anders, of jij in een ander venster,{% endif %} heeft op {{ conflict.at|date:"j F \o\m H:i" }} wijzigingen opgeslagen. Jouw invoer hieronder is nog <strong>niet</strong> opgeslagen.
+  {% if conflict.by_admin %}Het VAYLIDE-team{% else %}Iemand anders, of jij in een ander venster,{% endif %} heeft op {{ conflict.at|date:"j F \o\m H:i" }} wijzigingen opgeslagen. Jouw invoer hieronder is nog <strong>niet</strong> opgeslagen.
   {% if conflict.fields %}De nieuwste versie wijkt af bij: {{ conflict.fields|join:", " }}.{% endif %}
   Controleer de velden. Klik opnieuw op opslaan om jouw versie te bewaren, of <a href="{{ request.path }}">laad de nieuwste versie</a>.
 </div>

@@ -28,7 +28,7 @@
         <div class="msg msg--customer"><p class="msg__meta">{{ req.customer.email }} · {{ req.created_at|date:"j F H:i" }}</p><p class="msg__body">{{ req.description }}</p></div>
         {% for m in thread %}
         <div class="msg {% if m.internal %}msg--internal{% elif m.from_staff %}msg--staff{% else %}msg--customer{% endif %}">
-          <p class="msg__meta">{% if m.internal %}Interne notitie{% elif m.from_staff %}Vaylide{% else %}Klant{% endif %}{% if m.author %} ({{ m.author.email }}){% endif %} · {{ m.created_at|date:"j F H:i" }}</p>
+          <p class="msg__meta">{% if m.internal %}Interne notitie{% elif m.from_staff %}VAYLIDE{% else %}Klant{% endif %}{% if m.author %} ({{ m.author.email }}){% endif %} · {{ m.created_at|date:"j F H:i" }}</p>
           <p class="msg__body">{{ m.body }}</p>
           {% for a in m.attachments.all %}<p><a href="{% url 'beheer:wish_attachment' req.uid a.uid %}">{{ a.original_name }}</a></p>{% endfor %}
         </div>

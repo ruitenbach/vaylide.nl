@@ -79,7 +79,7 @@
   <section class="studio-block" aria-labelledby="account-titel">
     <h2 class="studio-block__title" id="account-titel">Jouw e-mailadres</h2>
     {% if anonymous or not user.is_authenticated %}
-      <p>Bevestig je e-mailadres met een code. Daarmee bewaar je je ontwerp, ontvang je je link en log je later in bij Mijn Vaylide.</p>
+      <p>Bevestig je e-mailadres met een code. Daarmee bewaar je je ontwerp, ontvang je je link en log je later in bij Mijn VAYLIDE.</p>
       <a class="btn btn--secondary" href="{{ login_url }}">E-mailadres bevestigen</a>
     {% elif user.is_staff %}
       <p class="notice notice--warning">Je bent ingelogd als beheerder. Bestellen kan alleen de klant zelf.</p>

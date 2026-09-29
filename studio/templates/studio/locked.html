@@ -3,7 +3,7 @@
 {% block studio %}
 <div class="studio-intro">
   <h1>Even geduld</h1>
-  <p class="lead">Het Vaylide-team werkt op dit moment aan je uitnodiging{% if inv.lock_reason %} ({{ inv.lock_reason }}){% endif %}. Zodra dat klaar is, kun je weer zelf wijzigen.</p>
-  <p><a class="btn btn--secondary" href="{% url 'portal:invitation' inv.uid %}">Terug naar Mijn Vaylide</a></p>
+  <p class="lead">Het VAYLIDE-team werkt op dit moment aan je uitnodiging{% if inv.lock_reason %} ({{ inv.lock_reason }}){% endif %}. Zodra dat klaar is, kun je weer zelf wijzigen.</p>
+  <p><a class="btn btn--secondary" href="{% url 'portal:invitation' inv.uid %}">Terug naar Mijn VAYLIDE</a></p>
 </div>
 {% endblock %}

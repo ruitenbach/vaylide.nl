@@ -5,7 +5,7 @@
 {% block content %}
 <div class="app-page">
   <div class="container">
-    <nav class="tabs" aria-label="Mijn Vaylide">
+    <nav class="tabs" aria-label="Mijn VAYLIDE">
       <ul>
         <li><a href="{% url 'portal:home' %}"{% if request.resolver_match.url_name == 'home' %} aria-current="page"{% endif %}>Overzicht</a></li>
         <li><a href="{% url 'portal:wishes' %}"{% if 'wish' in request.resolver_match.url_name %} aria-current="page"{% endif %}>Extra wensen</a></li>

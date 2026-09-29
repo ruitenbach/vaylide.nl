@@ -62,11 +62,11 @@
   {% endif %}
   <div class="step-actions step-actions--start">
     {% if user.is_authenticated and not user.is_staff %}
-    <p class="start-account small">Je bent ingelogd als <strong>{{ user.email }}</strong>. Je ontwerp wordt bewaard in Mijn Vaylide.</p>
+    <p class="start-account small">Je bent ingelogd als <strong>{{ user.email }}</strong>. Je ontwerp wordt bewaard in Mijn VAYLIDE.</p>
     {% elif not user.is_authenticated %}
     <div class="start-account">
       <p class="small"><strong>Doorgaan als gast</strong> kan: je hebt pas een account nodig bij het bestellen (met een code per e-mail, geen wachtwoord).</p>
-      <p class="small muted">Al een account? <a href="{{ login_url }}">Log eerst in</a>, dan staat je ontwerp meteen in Mijn Vaylide, bij je andere ontwerpen en bestellingen.</p>
+      <p class="small muted">Al een account? <a href="{{ login_url }}">Log eerst in</a>, dan staat je ontwerp meteen in Mijn VAYLIDE, bij je andere ontwerpen en bestellingen.</p>
     </div>
     {% endif %}
     <button class="btn btn--primary" type="submit">{% if user.is_authenticated %}Begin met dit ontwerp{% else %}Doorgaan als gast{% endif %} &rarr;</button>

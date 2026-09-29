@@ -5,9 +5,9 @@
 <section class="section--tight">
   <div class="container container--narrow">
     <div class="auth-card card">
-      <p class="eyebrow">Mijn Vaylide</p>
+      <p class="eyebrow">Mijn VAYLIDE</p>
       <h1 class="auth-card__title">{% if purpose == "bewaren" %}Bewaar je ontwerp{% else %}Inloggen{% endif %}</h1>
-      <p class="lead">{% if purpose == "bewaren" %}Vul je e-mailadres in. We sturen je een code om je adres te bevestigen. Daarna staat je ontwerp veilig in Mijn Vaylide en kun je later verder, ook op een ander apparaat.{% else %}Vul je e-mailadres in. We sturen je een code waarmee je inlogt. Een wachtwoord is niet nodig.{% endif %}</p>
+      <p class="lead">{% if purpose == "bewaren" %}Vul je e-mailadres in. We sturen je een code om je adres te bevestigen. Daarna staat je ontwerp veilig in Mijn VAYLIDE en kun je later verder, ook op een ander apparaat.{% else %}Vul je e-mailadres in. We sturen je een code waarmee je inlogt. Een wachtwoord is niet nodig.{% endif %}</p>
       <form method="post" class="form" novalidate>
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
@@ -20,7 +20,7 @@
         </div>
         <button type="submit" class="btn btn--primary btn--block">Stuur mij een code</button>
       </form>
-      <p class="small muted auth-card__note">Nieuw bij Vaylide? Er wordt automatisch een account aangemaakt zodra je je e-mailadres bevestigt.</p>
+      <p class="small muted auth-card__note">Nieuw bij VAYLIDE? Er wordt automatisch een account aangemaakt zodra je je e-mailadres bevestigt.</p>
     </div>
   </div>
 </section>

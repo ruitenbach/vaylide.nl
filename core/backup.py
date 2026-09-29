@@ -82,7 +82,7 @@ def restore_backup(path: Path) -> dict:
             tar.extractall(tmp, filter="data")
         dump = tmp / "database.json"
         if not dump.is_file():
-            raise ValueError("Dit is geen Vaylide-back-up (database.json ontbreekt).")
+            raise ValueError("Dit is geen VAYLIDE-back-up (database.json ontbreekt).")
         with transaction.atomic():
             _clear_seeded_catalog()
             management.call_command("loaddata", str(dump), verbosity=0)

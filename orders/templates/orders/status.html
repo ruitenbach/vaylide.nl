@@ -16,7 +16,7 @@
         <p class="lead">We publiceren je {{ doc_kind }}. Dit scherm werkt zichzelf bij.</p>
       {% elif state.phase == "attention" %}
         <h1>Betaling ontvangen</h1>
-        <p class="lead">Je betaling is goed ontvangen, maar het publiceren duurt langer dan normaal. We proberen het automatisch opnieuw en het Vaylide-team is ingeschakeld. Je hoeft niets te doen.</p>
+        <p class="lead">Je betaling is goed ontvangen, maar het publiceren duurt langer dan normaal. We proberen het automatisch opnieuw en het VAYLIDE-team is ingeschakeld. Je hoeft niets te doen.</p>
       {% elif state.phase == "failed" %}
         <h1>Betaling niet gelukt</h1>
         <p class="lead">Er is niets afgeschreven. Je ontwerp is bewaard; je kunt het opnieuw proberen.</p>
@@ -25,10 +25,10 @@
         <p class="lead">Je hebt de betaling afgebroken. Je ontwerp is bewaard; je kunt het opnieuw proberen wanneer je wilt.</p>
       {% elif state.phase == "superseded" %}
         <h1>Deze bestelling is vervangen</h1>
-        <p class="lead">Je bent opnieuw begonnen met afrekenen. Bekijk je {{ doc_kind }} in Mijn Vaylide.</p>
+        <p class="lead">Je bent opnieuw begonnen met afrekenen. Bekijk je {{ doc_kind }} in Mijn VAYLIDE.</p>
       {% else %}
         <h1>We wachten op de bevestiging van je betaling</h1>
-        <p class="lead">Dit duurt meestal een paar seconden. Dit scherm werkt zichzelf bij; je kunt het ook later terugvinden in Mijn Vaylide.</p>
+        <p class="lead">Dit duurt meestal een paar seconden. Dit scherm werkt zichzelf bij; je kunt het ook later terugvinden in Mijn VAYLIDE.</p>
       {% endif %}
 
       <ol class="progress-list" aria-label="Voortgang">

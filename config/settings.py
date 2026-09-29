@@ -250,7 +250,7 @@ EMAIL_HOST_PASSWORD = env("SMTP_PASS")
 EMAIL_USE_SSL = env_bool("SMTP_SSL", EMAIL_PORT == 465)
 EMAIL_USE_TLS = env_bool("SMTP_STARTTLS", EMAIL_PORT == 587)
 EMAIL_TIMEOUT = 20
-DEFAULT_FROM_EMAIL = env("VIERLIEF_FROM_EMAIL", f"Vaylide <{CONTACT_EMAIL}>")
+DEFAULT_FROM_EMAIL = env("VIERLIEF_FROM_EMAIL", f"VAYLIDE <{CONTACT_EMAIL}>")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 # --- Betalingen --------------------------------------------------------------
@@ -329,8 +329,8 @@ LOGGING = {
 # Leeg VIERLIEF_ERROR_EMAIL = het adres van VIERLIEF_OWNER_EMAIL; "uit" = geen foutmails.
 ERROR_EMAIL = env("VIERLIEF_ERROR_EMAIL", OWNER_NOTIFY_EMAIL)
 if EMAIL_MODE == "smtp" and not DEBUG and ERROR_EMAIL and ERROR_EMAIL.lower() != "uit":
-    ADMINS = [("Vaylide", ERROR_EMAIL)]
-    EMAIL_SUBJECT_PREFIX = "[Vaylide] "
+    ADMINS = [("VAYLIDE", ERROR_EMAIL)]
+    EMAIL_SUBJECT_PREFIX = "[VAYLIDE] "
     LOGGING["handlers"]["mail_admins"] = {"class": "django.utils.log.AdminEmailHandler", "level": "ERROR"}
     LOGGING["loggers"]["django.request"] = {"handlers": ["console", "mail_admins"], "level": "ERROR", "propagate": False}
 

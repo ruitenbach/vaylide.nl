@@ -24,13 +24,13 @@ class PreviewPasswordTests(VaylideTestCase):
             response = Client().get(url)
             self.assertEqual(response.status_code, 401, url)
             self.assertTrue(response["WWW-Authenticate"].startswith("Basic "), url)
-            self.assertNotIn("Vaylide", response.content.decode(), url)
+            self.assertNotIn("VAYLIDE", response.content.decode(), url)
         self.assertEqual(Client().get("/", **basic("voorbeeld", "fout")).status_code, 401)
         self.assertEqual(Client().get("/", **basic("iemand", "lang-en-geheim-wachtwoord")).status_code, 401)
         self.assertEqual(Client().get("/", HTTP_AUTHORIZATION="Basic !!geen-base64!!").status_code, 401)
         ok = Client().get("/", **basic("voorbeeld", "lang-en-geheim-wachtwoord"))
         self.assertEqual(ok.status_code, 200)
-        self.assertContains(ok, "Vaylide")
+        self.assertContains(ok, "VAYLIDE")
 
     @override_settings(PREVIEW_PASSWORD="lang-en-geheim-wachtwoord")
     def test_health_check_and_cron_stay_reachable(self):

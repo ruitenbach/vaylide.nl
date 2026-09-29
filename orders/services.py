@@ -56,7 +56,7 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
         if invitation.owner_id != user.id:
             raise CheckoutError("Log in met het e-mailadres waarmee je dit ontwerp hebt bewaard.")
         if invitation_is_paid(invitation):
-            raise CheckoutError("Deze uitnodiging is al betaald. Je vindt hem in Mijn Vaylide.")
+            raise CheckoutError("Deze uitnodiging is al betaald. Je vindt hem in Mijn VAYLIDE.")
         blocking = [i for i in publish_issues(invitation.draft_content, invitation.occasion, first_publication=True) if i.blocking]
         if blocking:
             raise CheckoutError("Je uitnodiging is nog niet compleet: " + " ".join(i.message for i in blocking))
@@ -129,7 +129,7 @@ def create_payment(order: Order) -> Payment:
     return_url = f"{settings.BASE_URL}{reverse('orders:status', args=[order.uid])}"
     webhook_url = f"{settings.BASE_URL}{reverse('orders:webhook', args=[provider.code])}"
     try:
-        ref, checkout_url = provider.create(payment, description=f"Vaylide {order.number}", return_url=return_url, webhook_url=webhook_url)
+        ref, checkout_url = provider.create(payment, description=f"VAYLIDE {order.number}", return_url=return_url, webhook_url=webhook_url)
     except ProviderError as exc:
         payment.status = Payment.Status.FAILED
         payment.save(update_fields=["status", "updated_at"])

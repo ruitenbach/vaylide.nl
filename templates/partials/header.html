@@ -1,7 +1,7 @@
 {% load vl %}{% with n=request.resolver_match.url_name %}
 <header class="site-header">
   <div class="container site-header__inner">
-    <a class="logo" href="{% url 'core:home' %}" aria-label="Vaylide, naar de homepage">{% include "partials/logo.html" %}</a>
+    <a class="logo" href="{% url 'core:home' %}" aria-label="VAYLIDE, naar de homepage">{% include "partials/logo.html" %}</a>
     <nav class="site-nav" aria-label="Hoofdmenu">
       <ul class="site-nav__list">
         <li><a href="{% url 'core:home' %}"{% if n == 'home' %} aria-current="page"{% endif %}>Home</a></li>
@@ -15,7 +15,7 @@
     <div class="site-header__actions">
       {% if user.is_staff %}<a class="link-quiet" href="{% url 'beheer:dashboard' %}">Beheer</a>{% endif %}
       <a class="icon-link" href="{% url 'core:search' %}" aria-label="Zoeken" title="Zoeken">{% icon "zoeken" %}</a>
-      <a class="site-header__account" href="{% if user.is_authenticated %}{% url 'portal:home' %}{% else %}{% url 'accounts:login' %}{% endif %}">{% icon "tas" %}<span>{% if user.is_authenticated %}Mijn Vaylide{% else %}Inloggen{% endif %}</span></a>
+      <a class="site-header__account" href="{% if user.is_authenticated %}{% url 'portal:home' %}{% else %}{% url 'accounts:login' %}{% endif %}">{% icon "tas" %}<span>{% if user.is_authenticated %}Mijn VAYLIDE{% else %}Inloggen{% endif %}</span></a>
       <a class="btn btn--primary btn--sm site-header__cta" href="{% url 'studio:start' %}">Start nu</a>
     </div>
     <details class="mobile-nav">
@@ -31,7 +31,7 @@
           <li><a href="{% url 'core:faq' %}"{% if n == 'faq' %} aria-current="page"{% endif %}>Vragen</a></li>
           <li><a href="{% url 'core:contact' %}"{% if n == 'contact' %} aria-current="page"{% endif %}>Contact</a></li>
           <li><a href="{% url 'core:search' %}"{% if n == 'search' %} aria-current="page"{% endif %}>Zoeken</a></li>
-          {% if user.is_authenticated %}<li><a href="{% url 'portal:home' %}">Mijn Vaylide</a></li>{% else %}<li><a href="{% url 'accounts:login' %}">Inloggen</a></li>{% endif %}
+          {% if user.is_authenticated %}<li><a href="{% url 'portal:home' %}">Mijn VAYLIDE</a></li>{% else %}<li><a href="{% url 'accounts:login' %}">Inloggen</a></li>{% endif %}
           {% if user.is_staff %}<li><a href="{% url 'beheer:dashboard' %}">Beheer</a></li>{% endif %}
         </ul>
         <a class="btn btn--primary btn--block" href="{% url 'studio:start' %}">Maak jouw uitnodiging</a>

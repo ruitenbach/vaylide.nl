@@ -1,6 +1,6 @@
 Hallo,
 
-Je ontwerp{% if invitation.title %} voor {{ invitation.title }}{% endif %} is bewaard in Mijn Vaylide.
+Je ontwerp{% if invitation.title %} voor {{ invitation.title }}{% endif %} is bewaard in Mijn VAYLIDE.
 
 Verder gaan waar je gebleven was:
 {{ link }}
@@ -8,4 +8,4 @@ Verder gaan waar je gebleven was:
 Je logt in met je e-mailadres; je krijgt dan een code toegestuurd.
 
 Hartelijke groet,
-Vaylide
+VAYLIDE

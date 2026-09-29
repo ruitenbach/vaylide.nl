@@ -114,7 +114,7 @@ def _after_failure(job: Job) -> None:
             fulfilment_status=Order.Fulfilment.ATTENTION if job.status == Job.Status.DEAD else Order.Fulfilment.PROCESSING,
             fulfilment_note="Publiceren is nog niet gelukt; we proberen het automatisch opnieuw."
             if job.status != Job.Status.DEAD
-            else "Publiceren is meerdere keren mislukt. Het Vaylide-team is ingeschakeld.",
+            else "Publiceren is meerdere keren mislukt. Het VAYLIDE-team is ingeschakeld.",
         )
 
 

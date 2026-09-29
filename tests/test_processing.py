@@ -66,7 +66,7 @@ class FailedPublicationTests(VaylideTestCase):
         self.assertEqual(job.status, Job.Status.DEAD)
         self.assertEqual(payment.order.fulfilment_status, Order.Fulfilment.ATTENTION)
         self.assertTrue(OutboundEmail.objects.filter(kind="owner_failure").exists())
-        self.assertContains(self.c.get(f"/bestelling/{payment.order.uid}/"), "het Vaylide-team is ingeschakeld")
+        self.assertContains(self.c.get(f"/bestelling/{payment.order.uid}/"), "het VAYLIDE-team is ingeschakeld")
         # Eigenaar ziet het in het beheer en start handmatig opnieuw.
         set_fault("publish", 0)
         staff = self.make_staff()

@@ -8,4 +8,4 @@ Je aanvraag volgen of iets toevoegen:
 {{ link }}
 
 Hartelijke groet,
-Vaylide
+VAYLIDE

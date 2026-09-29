@@ -6,8 +6,8 @@ Bestelnummer: {{ order.number }}
 {% for line in lines %}- {{ line.description }}: {{ line.total_display }}
 {% endfor %}Totaal: {{ order.total_display }}
 
-Je {{ doc_kind }} wordt automatisch gepubliceerd. Zodra dat is gebeurd, ontvang je een aparte e-mail met je link en QR-code. Je vindt alles ook in Mijn Vaylide:
+Je {{ doc_kind }} wordt automatisch gepubliceerd. Zodra dat is gebeurd, ontvang je een aparte e-mail met je link en QR-code. Je vindt alles ook in Mijn VAYLIDE:
 {{ portal }}
 
 Hartelijke groet,
-Vaylide
+VAYLIDE
