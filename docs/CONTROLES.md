@@ -831,3 +831,23 @@ Lokaal, branch `claude/privacyverklaring`, testmodus, met fictieve testgegevens.
   afgebroken: **niet opnieuw uitgevoerd**.
 - `manage.py rsvp_vragen_rapport` lokaal: 70 uitnodigingen, 0 oude eigen vragen, 0 eigen toelichtingsvragen. **Op
   Render niet uitgevoerd.**
+
+## Automatische orderverwerking (30 september 2026)
+
+Lokaal, testmodus, nagebootste betaling en e-mail. Verslag: `docs/AUTOMATISERING.md`.
+
+- `manage.py test tests`: 421 tests, alle geslaagd (nieuw: `tests/test_automatisering.py`, 10 tests). Getest:
+  - een gewone bestelling zonder handeling in het beheer;
+  - een late webhook nadat de klant het venster sloot (einddatum vanaf de betaling);
+  - open en pending betalingen publiceren niet;
+  - bij terugkeer vraagt de server de status zelf op;
+  - een onderbreking na de betaling wordt later opgepakt zonder verschoven einddatum;
+  - opnieuw uitvoeren verandert niets;
+  - Compleet met "Langer online" is 24 maanden;
+  - na de einddatum direct offline;
+  - de mail met link en QR-bijlage;
+  - een e-mail kan twee keer worden verstuurd als het vastleggen na het versturen mislukt.
+- **Testsite (Render)** van buitenaf:
+  - `/healthz` 200;
+  - statische bestanden gelijk aan commit `c24a888`.
+  - **Niet geverifieerd:** Render-dashboard, geplande taak, SMTP en webhookmeldingen.
