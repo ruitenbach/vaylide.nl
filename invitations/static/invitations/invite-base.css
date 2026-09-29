@@ -177,6 +177,11 @@ fieldset.field { border: 0; padding: 0; margin: 0; display: grid; gap: .45rem; }
   font-family: var(--inv-font-ui, system-ui, sans-serif); font-size: .85rem; color: var(--inv-muted, #6b5b57);
 }
 .inv-colophon a { color: inherit; }
+/* Merkteken: de V van Vaylide, klein en ingetogen tussen twee lijntjes, zoals een keurmerk. */
+.inv-merk { display: flex; align-items: center; justify-content: center; gap: .9rem; margin: 0 auto .7rem; }
+.inv-merk::before, .inv-merk::after { content: ""; width: 2.6rem; height: 1px; background: currentColor; opacity: .3; }
+.inv-merk img { width: auto; height: 34px; opacity: .85; }
+.inv-colophon p { margin: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

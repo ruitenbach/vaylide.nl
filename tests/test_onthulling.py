@@ -43,3 +43,31 @@ class RevealTests(VaylideTestCase):
         for line in css.splitlines():
             if "animation:" in line:
                 self.assertIn(".is-spelen", line, line)
+
+
+class BrandMarkAndFlipTests(VaylideTestCase):
+    def test_every_invitation_carries_the_v_monogram(self):
+        from django.template.loader import render_to_string
+
+        from catalog.models import Template
+        from invitations.demo import demo_content
+        from invitations.render import RenderOptions, build_view
+
+        for slug in ("liefde-op-papier", "middernacht", "winterlicht", "ballonfeest"):
+            t = Template.objects.get(slug=slug)
+            occasion = t.current_version.manifest["occasions"][0]
+            view = build_view(occasion=occasion, content=demo_content(slug, occasion), overrides={}, template_version=t.current_version,
+                              options=RenderOptions(mode="demo"))
+            html = render_to_string(t.current_version.template_path, {"v": view, "rsvp_form": {"client_token": "x", "form_ts": ""}})
+            self.assertIn("img/merk/vaylide-v.webp", html, slug)
+        self.assertTrue((settings.BASE_DIR / "static/img/merk/vaylide-v.webp").is_file())
+
+    def test_celebration_card_flips_instead_of_an_envelope(self):
+        customer = self.make_customer()
+        inv = self.published(owner=customer)
+        client = Client()
+        client.force_login(customer)
+        page = client.get(f"/bestelling/{Order.objects.get(invitation=inv).uid}/").content.decode()
+        self.assertIn("onthulling__draai", page)
+        self.assertIn("img/merk/vaylide-logo.webp", page)  # het hele logo op de achterkant
+        self.assertNotIn("onthulling__klep", page)

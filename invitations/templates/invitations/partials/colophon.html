@@ -1,3 +1,5 @@
-<footer class="inv-colophon">
+{% load static %}<footer class="inv-colophon">
+  {# Het merkteken van Vaylide: de V uit het logo (uitzondering op de logoregel, met akkoord van de eigenaar). #}
+  <span class="inv-merk" aria-hidden="true"><img src="{% static 'img/merk/vaylide-v.webp' %}" alt="" width="38" height="34" loading="lazy" decoding="async"></span>
   <p>Digitale {{ v.doc_kind|default:'uitnodiging' }} gemaakt met <a href="{% url 'core:home' %}"{% if v.embed %} target="_top"{% endif %}>Vaylide</a></p>
 </footer>

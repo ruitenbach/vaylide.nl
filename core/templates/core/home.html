@@ -26,7 +26,7 @@
   <div class="hero__media">
     <img class="hero__foto" src="{% static 'img/site/hero.webp' %}" srcset="{% static 'img/site/hero-900.webp' %} 900w, {% static 'img/site/hero.webp' %} 1800w" sizes="(max-width: 860px) 100vw, 60vw" alt="" width="1800" height="1100" fetchpriority="high" decoding="async">
     <div class="card-stage">
-      {# Een gouden kaart met reliëf, schuin achter de envelop. #}
+      {# Een gouden kaart met reliëf, schuin achter de voorbeeldkaart. #}
       <div class="goudkaart" aria-hidden="true">
         <span class="goudkaart__rand"></span>
         <span class="goudkaart__kop">Save the date</span>
@@ -35,16 +35,21 @@
         <span class="goudkaart__datum">12 · 06 · 2027</span>
         <span class="goudkaart__glans"></span>
       </div>
-      {# Gesloten envelop met het Vaylide-logo; bij een tik (of hover op de computer) opent hij en komt de uitnodiging eruit. #}
-      <div class="envelop" data-envelop>
-        <span class="envelop__achter" aria-hidden="true"></span>
-        <div class="envelop__kaart" id="envelop-kaart">
-          <img src="{% static 'img/site/kaart-voorbeeld.webp' %}" alt="Voorbeelduitnodiging: de bruiloft van Sanne en Daan (fictief)" width="500" height="800" decoding="async">
-          <a class="envelop__link" href="{% url 'invitations:demo' 'liefde-op-papier' %}?gelegenheid=bruiloft&amp;kleur=salie">{% icon "afspelen" %}<span>Bekijk het voorbeeld</span></a>
+      {# Een kaart met het Vaylide-logo op de achterkant; bij een tik (of hover op de computer) draait hij soepel om naar de uitnodiging. #}
+      <div class="flipkaart" data-flipkaart>
+        <div class="flipkaart__binnen">
+          <div class="flipkaart__achter" aria-hidden="true">
+            <span class="flipkaart__rand"></span>
+            <img class="flipkaart__logo" src="{% static 'img/merk/vaylide-logo.webp' %}" alt="" width="350" height="240" decoding="async">
+            <span class="flipkaart__hint">Tik om te onthullen</span>
+          </div>
+          <div class="flipkaart__voor" id="flipkaart-voor">
+            <img src="{% static 'img/site/kaart-voorbeeld.webp' %}" alt="Voorbeelduitnodiging: de bruiloft van Sanne en Daan (fictief)" width="500" height="800" decoding="async">
+            <span class="flipkaart__glans" aria-hidden="true"></span>
+            <a class="flipkaart__link" href="{% url 'invitations:demo' 'liefde-op-papier' %}?gelegenheid=bruiloft&amp;kleur=salie">{% icon "afspelen" %}<span>Bekijk het voorbeeld</span></a>
+          </div>
         </div>
-        <span class="envelop__voor" aria-hidden="true"><img class="envelop__logo" src="{% static 'img/merk/vaylide-logo.webp' %}" alt="" width="350" height="240" decoding="async"></span>
-        <span class="envelop__klep" aria-hidden="true"><span class="envelop__klep-voor"></span><span class="envelop__klep-achter"></span></span>
-        <button type="button" class="envelop__knop" aria-expanded="false" aria-controls="envelop-kaart"><span class="envelop__hint">Tik om te openen</span><span class="visually-hidden">Open de envelop met een voorbeelduitnodiging</span></button>
+        <button type="button" class="flipkaart__knop" aria-expanded="false" aria-controls="flipkaart-voor"><span class="visually-hidden">Draai de kaart om en bekijk een voorbeelduitnodiging</span></button>
       </div>
       <span class="card-stage__shadow" aria-hidden="true"></span>
     </div>

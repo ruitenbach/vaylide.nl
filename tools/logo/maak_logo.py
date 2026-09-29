@@ -124,10 +124,16 @@ def main() -> None:
         tegel(v, maat, bg, vulling=0.86, hoek=0.22).save(IMG / f"favicon-{maat}.png", optimize=True)
     tegel(v, 192, bg, vulling=0.72, hoek=0.22).save(IMG / "icon-192.png", optimize=True)
 
+    # 2b. De V als monogram onderaan elke uitnodiging ("merkteken", zoals LV). Uitzondering op de logoregel,
+    # met uitdrukkelijk akkoord van de eigenaar (29 september 2026). Dezelfde V, niet hertekend.
+    monogram = op_hoogte(bijsnijden(v, marge=2), 160)
+    monogram.save(MERK / f"{NAAM}-v.png", optimize=True)
+    monogram.save(MERK / f"{NAAM}-v.webp", quality=90, method=6)
+
     # 3. App-icoon (iPhone/iPad): het hele logo op de crèmekleur, zonder doorzichtigheid.
     tegel(heel, 180, bg, vulling=0.84, hoek=0).convert("RGB").save(IMG / "apple-touch-icon.png", optimize=True)
 
-    for pad in sorted([*MERK.glob(f"{NAAM}-logo.*"), *IMG.glob("favicon-*.png"), IMG / "icon-192.png", IMG / "apple-touch-icon.png"]):
+    for pad in sorted([*MERK.glob(f"{NAAM}-logo.*"), *MERK.glob(f"{NAAM}-v.*"), *IMG.glob("favicon-*.png"), IMG / "icon-192.png", IMG / "apple-touch-icon.png"]):
         with Image.open(pad) as i:
             print(f"{pad.relative_to(ROOT)}  {i.width}x{i.height}  {pad.stat().st_size} bytes")
     print("achtergrond van het origineel:", "#%02X%02X%02X" % bg)

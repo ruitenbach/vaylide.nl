@@ -1,4 +1,4 @@
-{% load static vl %}{% comment %}De onthulling na een geslaagde betaling: envelop open, kaart omhoog, confetti en vuurwerk (static/js/onthulling.js).
+{% load static vl %}{% comment %}De onthulling na een geslaagde betaling: de kaart komt op, draait om naar je ontwerp, confetti en vuurwerk (static/js/onthulling.js).
    Zonder JavaScript en bij 'minder beweging' staat alles meteen in de eindstand.{% endcomment %}
 {% with inv=order.invitation %}
 <section class="onthulling" data-onthulling aria-labelledby="onthulling-titel">
@@ -7,10 +7,10 @@
   <div class="container onthulling__inner">
     <div class="onthulling__podium" aria-hidden="true">
       <span class="onthulling__gloed"></span>
-      <span class="onthulling__env-achter"></span>
-      <img class="onthulling__kaart" src="{% if inv %}{% design_image inv.template_version.template.slug %}{% endif %}" alt="" width="400" height="500" decoding="async">
-      <span class="onthulling__env-voor"></span>
-      <span class="onthulling__klep"><span class="onthulling__zegel"></span></span>
+      <span class="onthulling__draai">
+        <span class="onthulling__achter"><span class="onthulling__rand"></span><img src="{% static 'img/merk/vaylide-logo.webp' %}" alt="" width="350" height="240" decoding="async"></span>
+        <span class="onthulling__voor"><img class="onthulling__kaart" src="{% if inv %}{% design_image inv.template_version.template.slug %}{% endif %}" alt="" width="400" height="500" decoding="async"><span class="onthulling__glans"></span></span>
+      </span>
     </div>
     <div class="onthulling__tekst">
       <p class="onthulling__kicker"><span class="onthulling__vink" aria-hidden="true"></span>Betaald · bestelling {{ order.number }}</p>

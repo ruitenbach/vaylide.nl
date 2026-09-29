@@ -628,3 +628,16 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
   - daarna de titel en de knoppen;
   - geen fouten in de console en geen horizontaal scrollen.
 - Nog niet op Render: niet gepusht op verzoek van de eigenaar (die testte toen de Mollie-betalingen).
+
+## V-monogram en de kaart die omdraait (29 september 2026)
+
+- `manage.py test tests`: 340 tests, alle geslaagd.
+  - Het V-monogram staat onderaan Liefde op papier, Middernacht, Winterlicht en Ballonfeest.
+  - Het "Gefeliciteerd"-scherm gebruikt de draaiende kaart met het hele logo op de achterkant, zonder envelop.
+- In Chromium (lokaal):
+  - Het monogram bekeken op Middernacht (donker, 390 pixels).
+  - Homepage op 1280 pixels: de kaart draait om van de logo-achterkant naar de uitnodiging, zonder uitsteeksels.
+  - "Gefeliciteerd": de kaart komt op met de achterkant en draait om naar het ontwerp.
+- Niet gedaan:
+  - vloeiendheid gemeten op een echte telefoon;
+  - de toegankelijkheidscontrole met axe op de homepage.

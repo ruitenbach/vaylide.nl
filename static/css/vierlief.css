@@ -227,71 +227,52 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
   transform: translate(calc(var(--hx, 0) * -10px), calc(var(--hy, 0) * -8px)) scale(1.04); transition: transform .6s ease-out;
 }
 
-/* De kaart in de kop: een envelop met het logo, en een gouden kaart erachter. */
+/* De kaart in de kop: een voorbeeldkaart die omdraait, en een gouden kaart erachter. */
 .card-stage {
   --rx: 0deg; --ry: 0deg; --gx: 30%; --gy: 20%; --px: 0; --py: 0; --w: clamp(15rem, 21vw, 19rem);
   position: absolute; z-index: 3; top: 58%; right: clamp(3rem, 10vw, 10rem); width: var(--w); translate: 0 -50%; perspective: 1200px;
 }
-.envelop {
-  position: relative; width: 100%; aspect-ratio: 10 / 7; transform-style: preserve-3d;
+/* De voorbeeldkaart: achterkant met het logo op ivoor karton, bij een tik (of aanwijzen) draait hij in één soepele
+   beweging om naar de uitnodiging. Eén transform, geen klep of uitsnede: vloeiend, ook op een telefoon. */
+.flipkaart {
+  position: relative; width: 80%; margin-left: auto; aspect-ratio: 5 / 7; transform-style: preserve-3d;
   transform: rotate(-3deg) rotateX(var(--rx)) rotateY(var(--ry)); transition: transform .5s cubic-bezier(.2, .8, .2, 1);
 }
-.card-stage.is-actief .envelop, .card-stage.is-actief .goudkaart { transition-duration: .12s; transition-timing-function: linear; }
-.envelop__achter { position: absolute; inset: 0; z-index: 0; border-radius: 6px; background: linear-gradient(180deg, #EFE3CF, #E5D5BC); box-shadow: 0 30px 50px -26px rgba(60, 40, 18, .55); }
-/* Het kaartvak: loopt ver naar boven door, maar laat in gesloten stand alleen het envelopdeel zien (clip-path). */
-.envelop__kaart {
-  position: absolute; z-index: 1; left: 14%; right: 14%; bottom: 5%; aspect-ratio: 5 / 7; border-radius: 8px; overflow: hidden; background: var(--paper);
-  box-shadow: 0 14px 30px -16px rgba(60, 40, 18, .5);
-  clip-path: inset(52% 0 0 0 round 8px); transition: transform .9s cubic-bezier(.2, .8, .2, 1), clip-path 0s linear .55s;
-}
-.envelop__kaart img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
-.envelop__link {
-  position: absolute; left: 50%; top: 34%; translate: -50% 0; display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap;
+.card-stage.is-actief .flipkaart, .card-stage.is-actief .goudkaart { transition-duration: .12s; transition-timing-function: linear; }
+.flipkaart__binnen { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 1s cubic-bezier(.3, .9, .25, 1); }
+.flipkaart__achter, .flipkaart__voor { position: absolute; inset: 0; border-radius: 12px; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  box-shadow: 0 30px 50px -26px rgba(60, 40, 18, .6), 0 0 0 1px rgba(122, 90, 46, .18); }
+.flipkaart__achter { display: grid; place-items: center; align-content: center; gap: 1.2rem;
+  background: radial-gradient(120% 90% at 30% 20%, #FFFDF8 0%, #F6ECDC 55%, #EADCC3 100%); }
+.flipkaart__rand { position: absolute; inset: 9px; border: 1px solid rgba(201, 164, 92, .7); border-radius: 8px; box-shadow: inset 0 0 0 4px rgba(255, 255, 255, .5), inset 0 0 0 5px rgba(201, 164, 92, .35); }
+.flipkaart__logo { position: relative; width: 62%; height: auto; }
+.flipkaart__hint { position: relative; font-size: .68rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-text); }
+.flipkaart__voor { transform: rotateY(180deg); background: var(--paper); }
+.flipkaart__voor img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.flipkaart__glans { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, .6) 48%, transparent 62%);
+  transform: translateX(-120%); }
+.flipkaart__link {
+  position: absolute; left: 50%; bottom: 8%; translate: -50% 0; display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap;
   padding: .5rem .9rem .5rem .6rem; border-radius: 999px; background: var(--accent); color: #fff; font-size: .82rem; font-weight: 600; text-decoration: none;
-  box-shadow: 0 10px 20px -10px rgba(60, 40, 15, .7); opacity: 0; transition: opacity .3s ease;
+  box-shadow: 0 10px 20px -10px rgba(60, 40, 15, .7);
 }
-.envelop__link .icon { width: 1.15rem; height: 1.15rem; }
-.envelop__link:hover { background: var(--accent-2); color: #fff; }
-.envelop__link:focus-visible { outline: 3px solid var(--gold-deep); outline-offset: 3px; }
-/* Voorkant met de insteek (V-vorm) en het logo. */
-.envelop__voor {
-  position: absolute; inset: 0; z-index: 3; border-radius: 6px; display: grid; place-items: end center; padding-bottom: 12%;
-  background:
-    linear-gradient(155deg, rgba(255, 255, 255, .35), transparent 40%),
-    linear-gradient(180deg, #F8EFE1, #EFE2CC);
-  clip-path: polygon(0 28%, 50% 60%, 100% 28%, 100% 100%, 0 100%);
-  box-shadow: inset 0 -2px 0 rgba(120, 90, 40, .12);
-}
-.envelop__logo { width: 42%; height: auto; }
-.envelop__klep { position: absolute; left: 0; right: 0; top: 0; height: 64%; z-index: 4; transform-origin: 50% 0; transform-style: preserve-3d; transition: transform .6s cubic-bezier(.4, 0, .2, 1), z-index 0s linear .3s; }
-.envelop__klep-voor, .envelop__klep-achter { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; clip-path: polygon(0 0, 100% 0, 50% 100%); }
-.envelop__klep-voor { background: linear-gradient(180deg, #F3E7D4, #E8D8BF); filter: drop-shadow(0 3px 3px rgba(80, 55, 20, .2)); }
-.envelop__klep-achter { transform: rotateX(180deg); background: repeating-linear-gradient(45deg, rgba(255, 255, 255, .18) 0 6px, transparent 6px 12px), linear-gradient(180deg, #C9A45C, #A9823E); }
-/* Lakzegel op de punt van de klep (zonder letters: het logo staat op de envelop zelf). */
-.envelop__klep-voor::after { content: ""; }
-.envelop__knop {
-  position: absolute; inset: 0; z-index: 5; display: grid; place-items: end center; padding: 0 0 3%; border: 0; background: transparent; cursor: pointer; border-radius: 6px;
-  -webkit-tap-highlight-color: transparent;
-}
-.envelop__knop:focus-visible { outline: 3px solid var(--gold-deep); outline-offset: 6px; }
-.envelop__hint { font-size: .7rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--accent-text); transition: opacity .3s; }
-/* Open: de klep draait naar achteren, de kaart komt omhoog uit de envelop. */
-.envelop.is-open .envelop__klep { transform: rotateX(180deg); z-index: 0; }
-.envelop.is-open .envelop__kaart { transform: translateY(-30%); clip-path: inset(-20% 0 0 0 round 8px); }
-.envelop.is-open .envelop__link { opacity: 1; transition-delay: .8s; }
-.envelop.is-open .envelop__hint { opacity: 0; }
-.envelop.is-open .envelop__knop { inset: 42% 0 0 0; }
-/* Zonder JavaScript opent de envelop ook als de knop focus krijgt (tikken op de telefoon). */
-html:not(.js) .envelop:focus-within .envelop__klep, .envelop:has(.envelop__link:focus-visible) .envelop__klep { transform: rotateX(180deg); z-index: 0; }
-html:not(.js) .envelop:focus-within .envelop__kaart, .envelop:has(.envelop__link:focus-visible) .envelop__kaart { transform: translateY(-30%); clip-path: inset(-20% 0 0 0 round 8px); }
-html:not(.js) .envelop:focus-within .envelop__link, .envelop:has(.envelop__link:focus-visible) .envelop__link { opacity: 1; }
-html:not(.js) .envelop:focus-within .envelop__knop, .envelop:has(.envelop__link:focus-visible) .envelop__knop { inset: 42% 0 0 0; }
+.flipkaart__link .icon { width: 1.15rem; height: 1.15rem; }
+.flipkaart__link:hover { background: var(--accent-2); color: #fff; }
+.flipkaart__link:focus-visible { outline: 3px solid var(--gold-deep); outline-offset: 3px; }
+.flipkaart__knop { position: absolute; inset: 0; z-index: 2; border: 0; background: transparent; cursor: pointer; border-radius: 12px; -webkit-tap-highlight-color: transparent; }
+.flipkaart__knop:focus-visible { outline: 3px solid var(--gold-deep); outline-offset: 6px; }
+/* Omgedraaid: de knop laat de onderkant vrij voor 'Bekijk het voorbeeld'. */
+.flipkaart.is-open .flipkaart__binnen { transform: rotateY(180deg); }
+.flipkaart.is-open .flipkaart__knop { inset: 0 0 24% 0; }
+@media (prefers-reduced-motion: no-preference) { .flipkaart.is-open .flipkaart__glans { animation: flip-glans 1.1s .55s ease-out both; } }
+@keyframes flip-glans { from { transform: translateX(-120%); } to { transform: translateX(120%); } }
+/* Zonder JavaScript draait de kaart om als de knop of de link focus krijgt. */
+html:not(.js) .flipkaart:focus-within .flipkaart__binnen, .flipkaart:has(.flipkaart__link:focus-visible) .flipkaart__binnen { transform: rotateY(180deg); }
+html:not(.js) .flipkaart:focus-within .flipkaart__knop, .flipkaart:has(.flipkaart__link:focus-visible) .flipkaart__knop { inset: 0 0 24% 0; }
 @media (hover: hover) and (pointer: fine) {
-  .envelop:hover .envelop__klep { transform: rotateX(180deg); z-index: 0; }
-  .envelop:hover .envelop__kaart { transform: translateY(-30%); clip-path: inset(-20% 0 0 0 round 8px); }
-  .envelop:hover .envelop__link { opacity: 1; transition-delay: .8s; }
-  .envelop:hover .envelop__hint { opacity: 0; }
-  .envelop:hover .envelop__knop { inset: 42% 0 0 0; }
+  .flipkaart:hover .flipkaart__binnen { transform: rotateY(180deg); }
+  .flipkaart:hover .flipkaart__knop { inset: 0 0 24% 0; }
+  .flipkaart:hover .flipkaart__glans { animation: flip-glans 1.1s .55s ease-out both; }
 }
 .card-stage__shadow { position: absolute; left: 8%; right: 8%; bottom: -12%; height: 10%; border-radius: 50%; background: radial-gradient(closest-side, rgba(60, 40, 18, .32), transparent); filter: blur(5px); z-index: -2; }
 
@@ -329,7 +310,7 @@ html:not(.js) .envelop:focus-within .envelop__knop, .envelop:has(.envelop__link:
 @keyframes licht-drijf { from { transform: translate(0, 0) scale(1); } to { transform: translate(6vw, 3vw) scale(1.12); } }
 @keyframes goud-glans { 0%, 62% { transform: translateX(-60%); } 100% { transform: translateX(60%); } }
 @media (prefers-reduced-motion: reduce) {
-  .envelop, .envelop__kaart, .envelop__klep, .goudkaart { transition-duration: .01s !important; }
+  .flipkaart, .flipkaart__binnen, .goudkaart { transition-duration: .01s !important; }
 }
 @media (max-width: 860px) {
   .hero__br { display: none; }

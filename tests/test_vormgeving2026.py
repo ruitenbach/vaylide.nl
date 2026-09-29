@@ -25,14 +25,14 @@ def _render(slug, palette, features):
 class HomeTests(VaylideTestCase):
     def test_envelope_opens_with_a_button_and_links_to_the_demo(self):
         html = Client().get("/").content.decode()
-        self.assertIn('class="envelop" data-envelop', html)
-        self.assertIn('class="envelop__knop" aria-expanded="false" aria-controls="envelop-kaart"', html)
-        self.assertIn('id="envelop-kaart"', html)
-        self.assertIn("img/merk/vaylide-logo.webp", html)  # het hele logo op de envelop
+        self.assertIn('class="flipkaart" data-flipkaart', html)
+        self.assertIn('class="flipkaart__knop" aria-expanded="false" aria-controls="flipkaart-voor"', html)
+        self.assertIn('id="flipkaart-voor"', html)
+        self.assertIn("img/merk/vaylide-logo.webp", html)  # het hele logo op de achterkant van de kaart
         self.assertIn('class="goudkaart"', html)
         js = (settings.BASE_DIR / "static/js/hero3d.js").read_text(encoding="utf-8")
         # Openen werkt ook bij 'minder beweging': de knop wordt gekoppeld voordat het script stopt.
-        self.assertLess(js.index("[data-envelop]"), js.index("if (reduce) return;"))
+        self.assertLess(js.index("[data-flipkaart]"), js.index("if (reduce) return;"))
         self.assertIn('setAttribute("aria-expanded"', js)
 
     def test_no_dark_example_cards_on_home(self):
