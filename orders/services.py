@@ -17,6 +17,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from catalog.models import Package
+from core.voorwaarden import CURRENT as TERMS_VERSION, DELIVERY_CONSENT
 from invitations.content import publish_issues
 from invitations.models import Invitation, Source
 from invitations.services import snapshot
@@ -47,7 +48,8 @@ def _create_order(**fields) -> Order:
     raise CheckoutError("De bestelling kon niet worden aangemaakt. Probeer het opnieuw.")
 
 
-def start_checkout(invitation: Invitation, *, user, package_code: str, optional_codes: list[str], terms_accepted: bool) -> Payment:
+def start_checkout(invitation: Invitation, *, user, package_code: str, optional_codes: list[str], terms_accepted: bool,
+                   delivery_consent: bool = False) -> Payment:
     if not terms_accepted:
         raise CheckoutError("Ga akkoord met de voorwaarden om te bestellen.")
     with transaction.atomic():
@@ -82,6 +84,9 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
             availability_months=quote.availability_months,
             total_cents=quote.total_cents,
             terms_accepted_at=timezone.now(),
+            terms_version=TERMS_VERSION,
+            delivery_consent_at=timezone.now() if delivery_consent else None,
+            delivery_consent_text=DELIVERY_CONSENT if delivery_consent else "",
             test_mode=settings.TEST_MODE,
         )
         for line in quote.lines:

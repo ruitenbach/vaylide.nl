@@ -1,0 +1,12 @@
+Er is een herroeping binnengekomen via de site.
+
+Ontvangen: {{ w.created_at|date:"j F Y H:i" }}
+Naam: {{ w.name }}
+E-mail: {{ w.email }}
+Bestelnummer: {{ w.order_number|default:"-" }}{% if w.order %} (gevonden in de bestellingen){% else %} (niet gekoppeld aan een bestelling){% endif %}
+Product of dienst: {{ w.product|default:"-" }}
+Besteldatum: {{ w.order_date|default:"-" }}
+Toelichting: {{ w.note|default:"-" }}
+
+Beoordeel het verzoek en betaal zo nodig binnen 14 dagen terug in Mollie (de site betaalt niet automatisch terug).
+{{ link }}

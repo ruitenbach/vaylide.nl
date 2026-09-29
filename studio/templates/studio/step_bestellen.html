@@ -73,7 +73,8 @@
       <tbody>{% for line in quote.lines %}<tr><td>{{ line.description }}{% if line.reason %}<span class="bon__reden">{{ line.reason }}</span>{% endif %}</td><td class="num">{{ line.total_display }}</td></tr>{% endfor %}</tbody>
       <tfoot><tr><th>Totaal <span class="bon__btw">incl. btw</span></th><th class="num">{{ quote.total_display }}</th></tr></tfoot>
     </table>
-    <p class="small muted">Je uitnodiging blijft {{ quote.availability_months }} maanden online vanaf publicatie. Het bedrag wordt aan de serverzijde berekend.</p>
+    <p class="small muted">Je uitnodiging blijft {{ quote.availability_months }} maanden online vanaf de aankoopdatum: de dag waarop je betaling is bevestigd.{% if looptijd %} Betaal je vandaag, dan staat hij online tot en met {{ looptijd.end|date:"j F Y" }}.{% endif %} Er is geen automatische verlenging.</p>
+    {% if looptijd.before_event %}<p class="notice notice--warning"><strong>Let op</strong>Je evenement is op {{ looptijd.event|date:"j F Y" }}, na het einde van de online periode ({{ looptijd.end|date:"j F Y" }}). Je kunt later bestellen, of kiezen voor een langere looptijd.</p>{% endif %}
   </section>
   {% endif %}
   <section class="studio-block" aria-labelledby="account-titel">
@@ -89,8 +90,12 @@
   </section>
   {% if test_payments %}<p class="notice notice--test"><strong>Testbetaling</strong>In deze testomgeving is betalen gesimuleerd: er wordt niets afgeschreven.</p>{% elif TEST_MODE %}<p class="notice notice--test"><strong>Testbetaling via Mollie</strong>Je gaat naar de testpagina van Mollie en kiest daar zelf de uitkomst. Er wordt niets afgeschreven.</p>{% endif %}
   {% with methods=PAYMENT_METHODS %}{% if methods %}<p class="betaal-uitleg">Je betaalt op de beveiligde betaalpagina van Mollie met <span class="betaalmiddelen betaalmiddelen--inline">{% for m in methods %}<span class="betaalmiddel betaalmiddel--{{ m.id }}{% if m.logo %} betaalmiddel--logo{% endif %}">{% if m.logo %}<img src="{% static m.logo %}" alt="{{ m.label }}" width="{{ m.width }}" height="{{ m.height }}" decoding="async">{% else %}{{ m.label }}{% endif %}</span>{% endfor %}</span></p>{% endif %}{% endwith %}
-  <label class="check terms-check">{{ form.terms }}<span>Ik ga akkoord met de <a href="{% url 'core:terms' %}" target="_blank" rel="noopener">voorwaarden</a> en wil dat mijn uitnodiging direct na betaling wordt gepubliceerd.</span></label>
-  {% for e in form.terms.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+  <div class="akkoord">
+    <label class="check terms-check">{{ form.terms }}<span>Ik ga akkoord met de <a href="{% url 'core:terms' %}" target="_blank" rel="noopener">algemene voorwaarden</a> ({{ voorwaarden.status|lower }}, versie {{ voorwaarden.date|date:"j F Y" }}). <a href="{% url 'core:terms_download' voorwaarden.version %}" download>Download de voorwaarden</a> om te bewaren.</span></label>
+    {% for e in form.terms.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+    <label class="check terms-check"><input type="checkbox" name="direct_leveren" value="on"{% if form.direct_leveren.value %} checked{% endif %}><span>{{ levering_tekst }} <span class="hint">Zie artikel 9 van de voorwaarden. Voor de online beschikbaarheid (een dienst) gelden aparte regels.</span></span></label>
+    {% for e in form.direct_leveren.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+  </div>
   {% if not user.newsletter %}<label class="check nieuwsbrief-check"><input type="checkbox" name="nieuwsbrief" value="on"{% if form.nieuwsbrief.value %} checked{% endif %}><span>{{ nieuwsbrief_tekst }} <span class="hint">Niet verplicht voor je bestelling.</span></span></label>{% endif %}
   <div class="step-actions">
     <a class="btn btn--ghost" href="{% url 'studio:step' inv.uid 'voorbeeld' %}">&larr; Terug naar voorbeeld</a>

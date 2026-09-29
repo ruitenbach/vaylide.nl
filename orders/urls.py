@@ -10,4 +10,6 @@ urlpatterns = [
     path("bestelling/<uuid:uid>/opnieuw-betalen/", views.retry_payment, name="retry"),
     path("betalen/test/<str:ref>/", views.test_checkout, name="test_checkout"),
     path("webhooks/betaling/<str:provider>/", views.webhook, name="webhook"),
+    path("herroepen/", views.withdraw, name="withdraw"),
+    path("herroepen/ontvangen/<uuid:uid>/", views.withdraw_done, name="withdraw_done"),
 ]

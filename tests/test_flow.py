@@ -56,7 +56,7 @@ class FullJourneyTests(VaylideTestCase):
         self.assertEqual(preview["X-Frame-Options"], "SAMEORIGIN")
 
         # Account/verificatie is nodig om te betalen.
-        response = c.post(f"/maken/{uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on"})
+        response = c.post(f"/maken/{uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on"})
         self.assertContains(response, "Bevestig eerst je e-mailadres")
         self.assertFalse(Order.objects.exists())
 
@@ -68,7 +68,7 @@ class FullJourneyTests(VaylideTestCase):
         self.assertEqual(inv.owner.email, "sanne@example.com")
 
         # 8-9. Controleren en (test)betalen: het bedrag komt van de server.
-        response = c.post(f"/maken/{uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "total": "1"})
+        response = c.post(f"/maken/{uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on", "total": "1"})
         self.assertEqual(response.status_code, 302)
         order = Order.objects.get()
         self.assertEqual(order.total_cents, 3900)
@@ -235,13 +235,13 @@ class InvalidInputTests(VaylideTestCase):
         self.inv.owner = customer
         self.inv.save()
         self.c.force_login(customer)
-        response = self.c.post(f"/maken/{self.inv.uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on"})
+        response = self.c.post(f"/maken/{self.inv.uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on"})
         self.assertContains(response, "nog niet compleet")
         self.assertFalse(Order.objects.exists())
         complete = self.make_invitation(owner=customer)
-        response = self.c.post(f"/maken/{complete.uid}/bestellen/", {"actie": "betalen", "package": "gratis-alles", "terms": "on"})
+        response = self.c.post(f"/maken/{complete.uid}/bestellen/", {"actie": "betalen", "package": "gratis-alles", "terms": "on", "direct_leveren": "on"})
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Order.objects.exists())
         response = self.c.post(f"/maken/{complete.uid}/bestellen/", {"actie": "betalen", "package": "essentieel"})
-        self.assertContains(response, "akkoord met de voorwaarden")
+        self.assertContains(response, "akkoord met de algemene voorwaarden")
         self.assertFalse(Order.objects.exists())

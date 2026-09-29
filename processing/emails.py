@@ -54,7 +54,7 @@ def absolute(path: str) -> str:
 
 def queue_email(*, to: str, subject: str, template: str, context: dict | None = None, unique_key: str | None = None,
                 kind: str = "", user=None, order=None, invitation=None, custom_request=None, attach_qr_for=None,
-                max_attempts: int = 6, owner_alert: bool = False) -> OutboundEmail:
+                max_attempts: int = 6, owner_alert: bool = False, attach_terms_version: str = "") -> OutboundEmail:
     if unique_key:
         existing = OutboundEmail.objects.filter(unique_key=unique_key).first()
         if existing:
@@ -76,6 +76,7 @@ def queue_email(*, to: str, subject: str, template: str, context: dict | None = 
         invitation=invitation,
         custom_request=custom_request,
         attach_qr_for=attach_qr_for,
+        attach_terms_version=attach_terms_version,
     )
     enqueue(
         "send_email",
@@ -111,6 +112,8 @@ def handle_send_email(job) -> None:
                 from invitations.qr import qr_png
 
                 message.attach("qr-code-uitnodiging.png", qr_png(email.attach_qr_for.public_url), "image/png")
+            if email.attach_terms_version:
+                message.attach(*terms_attachment(email.attach_terms_version))
             message.send(fail_silently=False)
             email.status = OutboundEmail.Status.SENT
         email.sent_at = timezone.now()
@@ -156,16 +159,35 @@ def _kind(invitation) -> dict:
 
 
 def send_order_confirmation(order) -> OutboundEmail:
+    """De bewaarbare bestelbevestiging: bedrijfsgegevens, pakket, prijs, aankoop- en einddatum, de toestemming voor
+    directe levering en de algemene voorwaarden (versie van de bestelling) als bijlage."""
+    from core.voorwaarden import CURRENT, version_info
+
+    version = order.terms_version or CURRENT
     return queue_email(
         to=order.customer.email,
         subject=f"Bevestiging van je bestelling {order.number}",
         template="order_confirmation",
-        context={"order": order, "lines": list(order.lines.all()), "portal": absolute(reverse("portal:home")), **_kind(order.invitation)},
+        context={"order": order, "lines": list(order.lines.all()), "portal": absolute(reverse("portal:home")), **_kind(order.invitation),
+                 "company": _company_text(), "terms": version_info(version),
+                 "terms_url": absolute(reverse("core:terms_version", args=[version])),
+                 "withdraw_url": absolute(reverse("orders:withdraw"))},
         unique_key=f"order-confirmation:{order.pk}",
         user=order.customer,
         order=order,
         invitation=order.invitation,
+        attach_terms_version=version,
     )
+
+
+def terms_attachment(version: str) -> tuple[str, str, str]:
+    """(bestandsnaam, inhoud, type) van de algemene voorwaarden als bijlage."""
+    from django.template.loader import render_to_string
+
+    from core.views import _terms_context
+    from core.voorwaarden import filename
+
+    return filename(version), render_to_string("core/terms_download.html", _terms_context(version)), "text/html"
 
 
 def send_invitation_live(order) -> OutboundEmail:
@@ -280,3 +302,32 @@ def notify_owner_order_attention(order, reason: str) -> OutboundEmail:
         order=order,
         owner_alert=True,
     )
+
+
+def send_withdrawal_receipt(w) -> OutboundEmail:
+    """Ontvangstbevestiging van een herroeping, met inhoud en datum en tijd (bewaarbaar)."""
+    return queue_email(
+        to=w.email,
+        subject="Ontvangstbevestiging van je herroeping",
+        template="herroeping_ontvangen",
+        context={"w": w, "company": _company_text()},
+        unique_key=f"withdrawal-receipt:{w.pk}",
+        order=w.order,
+    )
+
+
+def notify_owner_withdrawal(w) -> OutboundEmail:
+    return queue_email(
+        to=settings.OWNER_NOTIFY_EMAIL,
+        subject=f"Herroeping ontvangen: {w.order_number or w.email}",
+        template="owner_herroeping",
+        context={"w": w, "link": absolute(reverse("beheer:withdrawals"))},
+        unique_key=f"owner-withdrawal:{w.pk}",
+        owner_alert=True,
+    )
+
+
+def _company_text() -> str:
+    from core.company import as_text
+
+    return as_text()

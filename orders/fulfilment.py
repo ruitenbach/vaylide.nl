@@ -48,6 +48,12 @@ def handle_fulfil_order(job) -> None:
 
     if order.fulfilment_status == Order.Fulfilment.NONE:
         Order.objects.filter(pk=order.pk).update(fulfilment_status=Order.Fulfilment.PROCESSING, fulfilment_note="")
+    if order.ends_at is None:
+        # De einddatum één keer vastleggen: vanaf de bevestigde betaling (herhaalde meldingen veranderen niets).
+        from invitations.availability import order_end
+
+        Order.objects.filter(pk=order.pk, ends_at__isnull=True).update(ends_at=order_end(order, invitation))
+        order.refresh_from_db()
     send_order_confirmation(order)
 
     if consume_fault("publish"):
@@ -61,12 +67,11 @@ def handle_fulfil_order(job) -> None:
         now = timezone.now()
         inv.features = sorted(set(inv.features or []) | set(locked.features or []))
         inv.max_gallery_photos = max(inv.max_gallery_photos, locked.max_gallery_photos)
-        start = inv.available_until if inv.available_until and inv.available_until > now else now
         inv.save(update_fields=["features", "max_gallery_photos", "updated_at"])
         version = locked.version_to_publish
         if version is None:
             version = snapshot(inv, source=Source.SYSTEM, note="Gepubliceerd na betaling")
-        publish_version(inv, version, available_until=availability_end(locked.availability_months, start))
+        publish_version(inv, version, available_until=locked.ends_at or availability_end(locked.availability_months, now))
         locked.fulfilment_status = Order.Fulfilment.DONE
         locked.fulfilment_note = ""
         locked.save(update_fields=["fulfilment_status", "fulfilment_note", "updated_at"])

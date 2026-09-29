@@ -39,6 +39,7 @@
     <li><a href="{% url 'beheer:templates' %}"{% if n == 'templates' or n == 'template_edit' %} aria-current="page"{% endif %}>Ontwerpen</a></li>
     <li><a href="{% url 'beheer:pricing' %}"{% if 'pricing' in n or 'package' in n or 'addon' in n %} aria-current="page"{% endif %}>Prijzen</a></li>
     <li><a href="{% url 'beheer:contact_messages' %}"{% if n == 'contact_messages' %} aria-current="page"{% endif %}>Contact{% if nav_counts.contact %} <span class="count">{{ nav_counts.contact }}</span>{% endif %}</a></li>
+    <li><a href="{% url 'beheer:withdrawals' %}"{% if n == 'withdrawals' %} aria-current="page"{% endif %}>Herroepingen</a></li>
     <li><a href="{% url 'beheer:settings' %}"{% if n == 'settings' %} aria-current="page"{% endif %}>Instellingen</a></li>
   </ul></div>
 </nav>

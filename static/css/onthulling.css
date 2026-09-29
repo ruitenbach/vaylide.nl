@@ -117,3 +117,4 @@
 .bestel-bon__regels tfoot th { border-bottom: 0; padding-top: .8rem; font-size: 1.2rem; font-family: var(--font-display); font-weight: 400; }
 .bestel-bon__regels tfoot th span { font-family: var(--font-body); font-size: .78rem; color: var(--muted); }
 .bestel-bon__link { display: inline-block; margin-top: .9rem; font-size: .9rem; font-weight: 600; color: var(--accent-text, #7A5A2E); }
+.bestel-bon__klein { margin: .6rem 0 0; font-size: .82rem; color: var(--muted); }

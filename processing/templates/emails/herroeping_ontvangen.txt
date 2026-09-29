@@ -1,0 +1,20 @@
+Hallo {{ w.name }},
+
+We hebben je herroeping ontvangen op {{ w.created_at|date:"j F Y" }} om {{ w.created_at|date:"H:i" }} uur.
+
+Wat je ons stuurde:
+- Naam: {{ w.name }}
+- E-mailadres: {{ w.email }}{% if w.order_number %}
+- Bestelnummer: {{ w.order_number }}{% endif %}{% if w.product %}
+- Product of dienst: {{ w.product }}{% endif %}{% if w.order_date %}
+- Besteldatum: {{ w.order_date }}{% endif %}{% if w.note %}
+- Toelichting: {{ w.note }}{% endif %}
+
+We beoordelen je verzoek en nemen contact met je op over de afhandeling en een eventuele terugbetaling, zoals beschreven in artikel 10 van de algemene voorwaarden.
+
+Bewaar deze e-mail als bewijs van je herroeping.
+
+{{ company }}
+
+Hartelijke groet,
+VAYLIDE

@@ -1053,3 +1053,22 @@ html:not(.js) .zenv:focus-within .zenv__knop { inset: 50% 0 0 0; }
 @media (prefers-reduced-motion: reduce) {
   .zenv__kaart, .zenv__klep, .zenv__klep svg, .zenv__zegel, .zenv__link { transition-duration: .01s !important; transition-delay: 0s !important; }
 }
+
+/* ---------- Algemene voorwaarden en bedrijfsgegevens ---------- */
+mark.invulveld { background: var(--warning-bg); color: var(--warning); padding: 0 .3em; border-radius: 4px; font-weight: 600; }
+.voorwaarden-acties { margin-top: 1rem; }
+.voorwaarden h3 { font-size: 1.05rem; margin: 1.3rem 0 .4rem; }
+.voorwaarden .modelformulier { list-style: none; padding-left: 0; }
+.voorwaarden .modelformulier li { padding: .35rem 0; border-bottom: 1px dashed var(--line-strong); }
+.bedrijfsgegevens { margin-top: 1.4rem; padding: 1.1rem 1.2rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+.bedrijfsgegevens__titel { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; margin: 0 0 .6rem; }
+.bedrijfsgegevens dl { margin: 0 0 .6rem; display: grid; gap: .35rem; }
+.bedrijfsgegevens dl div { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr); gap: .6rem; font-size: .93rem; }
+.bedrijfsgegevens dt { color: var(--muted); }
+.bedrijfsgegevens dd { margin: 0; overflow-wrap: anywhere; }
+.akkoord { display: grid; gap: .5rem; margin: .5rem 0 1rem; }
+.herroepen { max-width: 36rem; }
+@media print {
+  .site-header, .site-footer, .voorwaarden-acties, .notice, .test-banner, .skip-link { display: none !important; }
+  .voorwaarden { max-width: none; }
+}

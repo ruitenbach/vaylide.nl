@@ -1,28 +1,19 @@
-{% extends "base.html" %}
-{% block title %}Voorwaarden{% endblock %}
-{% block description %}De voorwaarden van VAYLIDE voor digitale uitnodigingen.{% endblock %}
+{% extends "base.html" %}{% load vl %}
+{% block title %}Algemene voorwaarden{% endblock %}
+{% block description %}De algemene voorwaarden van VAYLIDE voor digitale uitnodigingen, wenskaarten en online diensten.{% endblock %}
 {% block content %}
 <section class="page-head"><div class="container container--mid">
-  <h1>Voorwaarden</h1>
-  <p class="notice notice--warning"><strong>Concept</strong>Deze voorwaarden zijn een concept en nog niet juridisch gecontroleerd. Ze worden definitief gemaakt vóór livegang.</p>
+  <p class="eyebrow">{{ terms.status }} · versie {{ terms.date|date:"j F Y" }}</p>
+  <h1>Algemene voorwaarden</h1>
+  {% if terms.status == "Concept" %}<p class="notice notice--warning"><strong>Concept</strong>Deze voorwaarden zijn een concept dat nog op de feitelijke dienstverlening wordt gecontroleerd. Ze zijn nog niet juridisch beoordeeld.</p>{% endif %}
+  {% if b.ontbreekt %}<p class="notice notice--test"><strong>Invulvelden</strong>Nog niet ingevuld: {{ b.ontbreekt|join:", " }}. Deze versie is alleen bedoeld voor de afgeschermde testomgeving.</p>{% endif %}
+  {% if not is_current %}<p class="notice"><strong>Oudere versie</strong>Dit is de versie van {{ terms.date|date:"j F Y" }}. Die blijft gelden voor bestellingen die met deze versie zijn gesloten. <a href="{% url 'core:terms' %}">Bekijk de actuele versie</a>.</p>{% endif %}
+  <div class="btn-row voorwaarden-acties">
+    <a class="btn btn--secondary btn--sm" href="{% url 'core:terms_download' terms.version %}" download>Voorwaarden downloaden</a>
+    <button type="button" class="btn btn--ghost btn--sm" data-print hidden>Afdrukken of opslaan als pdf</button>
+  </div>
 </div></section>
-<section class="section section--flush"><div class="container container--mid prose">
-  <p>Deze voorwaarden gelden voor VAYLIDE{% if KVK %} (KvK-nummer {{ KVK }}{% if BTW %}, btw-id {{ BTW }}{% endif %}){% endif %}. Contact: <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>.</p>
-  <h2>1. De dienst</h2>
-  <p>VAYLIDE levert digitale uitnodigingen op basis van een gekozen ontwerp en de gegevens die de klant zelf invult. De uitnodiging is bereikbaar via een eigen link gedurende de beschikbaarheidsperiode van het gekozen pakket.</p>
-  <h2>2. Bestellen en betalen</h2>
-  <p>De prijs wordt vóór het betalen getoond. Na een door de betaalprovider bevestigde betaling wordt de uitnodiging automatisch gepubliceerd. Door je uitnodiging vóór de betaling te controleren en direct na betaling te laten publiceren, vraag je ons uitdrukkelijk om direct te leveren.</p>
-  <h2>3. Levering</h2>
-  <p>Na de bevestigde betaling staat je uitnodiging online op een eigen link. Die link en een QR-code vind je in Mijn VAYLIDE; je krijgt ze ook per e-mail.</p>
-  <h2>4. Afbreken en verwijderen</h2>
-  <p>Breek je de betaling af op de betaalpagina, dan wordt er niets afgeschreven en blijft je ontwerp bewaard. Een gepubliceerde uitnodiging kun je zelf verwijderen in Mijn VAYLIDE; de link werkt daarna niet meer.</p>
-  <h2>5. Inhoud van de klant</h2>
-  <p>Je bent zelf verantwoordelijk voor de teksten, foto's en muziek op je uitnodiging, en je verklaart dat je die mag gebruiken. We kunnen inhoud offline halen die in strijd is met de wet of de rechten van anderen.</p>
-  <h2>6. Wijzigingen</h2>
-  <p>Je kunt je uitnodiging tijdens de beschikbaarheidsperiode wijzigen en opnieuw publiceren op dezelfde link. Functies die niet in je pakket zitten, zijn daarbij niet automatisch inbegrepen.</p>
-  <h2>7. Maatwerk</h2>
-  <p>Voor bijzondere wensen ontvang je eerst een voorstel. We beginnen pas na je akkoord en, als dat is afgesproken, na betaling.</p>
-  <h2>8. Beschikbaarheid</h2>
-  <p>We doen ons best om uitnodigingen altijd bereikbaar te houden, maar kunnen onderbrekingen door onderhoud of storingen niet volledig uitsluiten.</p>
+<section class="section section--flush"><div class="container container--mid prose voorwaarden">
+  {% include terms.template %}
 </div></section>
 {% endblock %}

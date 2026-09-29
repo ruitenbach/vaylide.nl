@@ -3,6 +3,8 @@ from django.utils import timezone
 
 from orders.methods import available_methods
 
+from .company import company
+
 
 def social_links() -> list[dict]:
     """Instagram en TikTok uit de instellingen (Beheer → Instellingen); alleen wat is ingevuld."""
@@ -29,6 +31,7 @@ def vierlief(request):
         "SOCIAL_LINKS": social_links,
         "CONTACT_EMAIL": settings.CONTACT_EMAIL,
         "KVK": settings.COMPANY_KVK,
+        "BEDRIJF": company,
         "BTW": settings.COMPANY_VAT,
         "BASE_URL": settings.BASE_URL,
         "CURRENT_YEAR": timezone.localdate().year,

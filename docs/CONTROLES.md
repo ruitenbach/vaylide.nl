@@ -720,3 +720,45 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
 - Betaalmethoden op de testsite: daar stonden Klarna, Riverty en Pay by Bank nog, uit een bewaarde lijst van vóór de
   update. De bewaarde lijst wordt nu ook gefilterd, en de sleutel is vernieuwd (`v2`). Creditcard heeft nu het aangeleverde
   Mastercard-logo. Test in `tests/test_voettekst.py`.
+
+## Algemene voorwaarden, looptijd, bevestiging en herroepingsfunctie (30 september 2026)
+
+Lokaal op de branch `claude/algemene-voorwaarden`; niet online gezet.
+
+- `manage.py test tests`: 376 tests, alle geslaagd (nieuw: `tests/test_voorwaarden.py`, 22 tests). Getest:
+  - **Kalendermaanden:** 29 september + 6 = 29 maart; 31 januari + 1 = 28 februari (2027) of 29 februari (2028);
+    31 augustus + 6 = 29 februari 2028.
+  - **Einddatum:** tot het einde van de dag in Nederlandse tijd, ook als de betaling in UTC nog op de vorige dag valt.
+  - **Vastleggen:** de einddatum komt van de bevestigde betaling en wordt één keer vastgelegd. Herhaalde betaalmeldingen
+    en later publiceren verschuiven hem niet; een eerder beloofde datum blijft staan.
+  - **Bestellen:**
+    - twee losse vinkjes, beide standaard uit;
+    - zonder toestemming voor directe levering geen bestelling;
+    - de versie van de voorwaarden en de toestemming worden vastgelegd;
+    - een waarschuwing als de online periode vóór het evenement eindigt.
+  - **Bestelbevestiging:** pakket, aankoopdatum, einddatum, toestemming, versie, KvK-nummer, e-mailadres en de link om te
+    herroepen, met de voorwaarden als bijlage. De bedankpagina toont de einddatum en de versie.
+  - **Voorwaarden:**
+    - de invulvelden zijn zichtbaar zolang de gegevens ontbreken;
+    - ingevulde gegevens verschijnen op de voorwaarden en de contactpagina;
+    - downloaden werkt, oude versies zijn te openen, een onbekende versie geeft 404.
+  - **Contact & bedrijfsgegevens:** bereikbaar via de footer, zonder telefoonnummer.
+  - **Live-modus:** de site weigert te starten zonder juridische naam en adres.
+  - **Herroepingsfunctie:**
+    - de juiste knopteksten;
+    - registratie met koppeling via bestelnummer en e-mailadres;
+    - een ontvangstbevestiging met tijdstip en een melding aan de eigenaar;
+    - geen financiële wijziging;
+    - een verkeerd e-mailadres wordt niet gekoppeld;
+    - bots worden geweerd;
+    - afhandelen in het beheer;
+    - vooraf ingevuld vanuit een bestelling.
+- **Klantreis in Chromium** (`e2e/klantreis.cjs`, bijgewerkt voor het tweede vinkje): 39/39 op 390 en 1366 pixels.
+- **Toegankelijkheid** (axe-core, WCAG 2.0/2.1 A en AA): 0 overtredingen, onder meer op `/voorwaarden/`,
+  `/voorwaarden/versie/2026-09-29/`, `/herroepen/` en `/contact/`, op 390 en 1366 pixels.
+- **In de browser bekeken** (390 pixels, geen horizontaal scrollen): de voorwaarden met invulvelden en de knoppen downloaden
+  en afdrukken, "Contact & bedrijfsgegevens", en de herroepingspagina.
+- **Niet gedaan:**
+  - een echte e-mail met de bijlage (de testomgeving gebruikt alleen de outbox);
+  - afdrukken of opslaan als pdf in echte browsers;
+  - een juridische toetsing.

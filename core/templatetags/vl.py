@@ -54,3 +54,13 @@ def icon(name, size=24, css_class=""):
         'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">{}</svg>',
         classes, size, size, mark_safe(paths),
     )
+
+
+@register.filter
+def invul(value, placeholder):
+    """De waarde, of een herkenbaar invulveld als die ontbreekt (alleen de testversie; live start niet zonder)."""
+    from django.utils.html import format_html
+
+    if value:
+        return value
+    return format_html('<mark class="invulveld">{}</mark>', placeholder)

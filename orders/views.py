@@ -83,6 +83,52 @@ def status(request, uid):
     return render(request, "orders/status.html", {"order": order, "state": state, "payment": payment, "doc_kind": kind, "method_label": method_label})
 
 
+@require_http_methods(["GET", "POST"])
+def withdraw(request):
+    """De herroepingsfunctie (art. 6:230oa BW): 'Hier de overeenkomst ontbinden' -> gegevens -> 'Ontbinding bevestigen'.
+    Registreert het verzoek en stuurt direct een ontvangstbevestiging; terugbetalen blijft handwerk."""
+    from core.utils import form_age_seconds, ip_fingerprint, rate_limit, signed_timestamp
+
+    from .forms import WithdrawalForm
+    from .models import Withdrawal
+
+    if request.method == "POST":
+        form = WithdrawalForm(request.POST)
+        age = form_age_seconds(request.POST.get("form_ts", ""))
+        if request.POST.get("website") or age is None or age < 2:
+            form.add_error(None, "Je verzoek kon niet worden verwerkt. Vernieuw de pagina en probeer het opnieuw.")
+        elif not rate_limit(f"herroepen:{ip_fingerprint(request)}", 10, 3600):
+            form.add_error(None, "Je hebt al een aantal verzoeken gestuurd. Probeer het later opnieuw of mail ons.")
+        if form.is_valid():
+            d = form.cleaned_data
+            number = d["order_number"].strip().upper()
+            order = Order.objects.filter(number__iexact=number, customer__email__iexact=d["email"]).first() if number else None
+            w = Withdrawal.objects.create(order=order, name=d["name"], email=d["email"], order_number=number,
+                                          product=d["product"], order_date=d["order_date"], note=d["note"])
+            from processing.emails import notify_owner_withdrawal, send_withdrawal_receipt
+
+            send_withdrawal_receipt(w)
+            notify_owner_withdrawal(w)
+            return redirect("orders:withdraw_done", uid=w.uid)
+    else:
+        initial = {}
+        if request.user.is_authenticated:
+            initial = {"name": request.user.name, "email": request.user.email}
+            order = Order.objects.filter(uid=request.GET.get("bestelling") or None, customer=request.user).first() if request.GET.get("bestelling") else None
+            if order:
+                initial.update({"order_number": order.number, "product": order.package_name or order.invitation_title,
+                                "order_date": timezone.localtime(order.paid_at or order.created_at).strftime("%d-%m-%Y")})
+        form = WithdrawalForm(initial=initial)
+    return render(request, "orders/withdraw.html", {"form": form, "form_ts": signed_timestamp()})
+
+
+def withdraw_done(request, uid):
+    from .models import Withdrawal
+
+    w = get_object_or_404(Withdrawal, uid=uid)
+    return render(request, "orders/withdraw_done.html", {"w": w})
+
+
 @login_required
 def status_json(request, uid):
     order = _own_order(request, uid)

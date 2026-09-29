@@ -217,8 +217,39 @@ def privacy(request):
     return render(request, "core/privacy.html", {"config": SiteConfig.get()})
 
 
+def _terms_context(version: str) -> dict:
+    from django.conf import settings as dj_settings
+    from django.urls import reverse
+
+    from .company import company
+    from .voorwaarden import CURRENT, VERSIONS, version_info
+
+    if version not in VERSIONS:
+        raise Http404()
+    base = dj_settings.BASE_URL.rstrip("/")
+    links = {"contact": base + reverse("core:contact"), "privacy": base + reverse("core:privacy"),
+             "herroepen": base + reverse("orders:withdraw"), "terms": base + reverse("core:terms_version", args=[version])}
+    return {"terms": version_info(version), "is_current": version == CURRENT, "b": company(), "links": links, "config": SiteConfig.get()}
+
+
 def terms(request):
-    return render(request, "core/terms.html", {"config": SiteConfig.get()})
+    from .voorwaarden import CURRENT
+
+    return render(request, "core/terms.html", _terms_context(CURRENT))
+
+
+def terms_version(request, version):
+    return render(request, "core/terms.html", _terms_context(version))
+
+
+def terms_download(request, version):
+    from django.template.loader import render_to_string
+
+    from .voorwaarden import filename
+
+    response = HttpResponse(render_to_string("core/terms_download.html", _terms_context(version)), content_type="text/html; charset=utf-8")
+    response["Content-Disposition"] = f'attachment; filename="{filename(version)}"'
+    return response
 
 
 def robots_txt(request):

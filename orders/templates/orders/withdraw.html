@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Hier de overeenkomst ontbinden{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="page-head"><div class="container container--mid">
+  <p class="eyebrow">Herroepingsfunctie</p>
+  <h1>Hier de overeenkomst ontbinden</h1>
+  <p class="lead">Wil je je bestelling binnen de bedenktijd herroepen (de overeenkomst ontbinden)? Vul hieronder je gegevens in en bevestig. Je krijgt direct een ontvangstbevestiging per e-mail.</p>
+  <p class="small muted">Lees ook artikel 9 en 10 van de <a href="{% url 'core:terms' %}#artikel-9">algemene voorwaarden</a> over de bedenktijd en het terugbetalen. Je mag ook mailen naar <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>.</p>
+</div></section>
+<section class="section section--flush"><div class="container container--mid">
+  <form method="post" class="form herroepen" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="form_ts" value="{{ form_ts }}">
+    <div class="hp-field" aria-hidden="true"><label>Laat dit veld leeg <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors.0 }}</div>{% endif %}
+    {% for field in form %}
+    <div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<p class="field__hint">{{ field.help_text }}</p>{% endif %}{% for e in field.errors %}<p class="field__error">{{ e }}</p>{% endfor %}</div>
+    {% endfor %}
+    <p class="small muted">We gebruiken deze gegevens alleen om je herroeping af te handelen. Zie de <a href="{% url 'core:privacy' %}">privacyverklaring</a>.</p>
+    <button class="btn btn--primary" type="submit">Ontbinding bevestigen</button>
+  </form>
+</div></section>
+{% endblock %}

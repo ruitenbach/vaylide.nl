@@ -76,6 +76,8 @@ class OutboundEmail(models.Model):
     attach_qr_for = models.ForeignKey(
         "invitations.Invitation", null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
+    # Versie van de algemene voorwaarden die als bijlage meegaat (bestelbevestiging), zie core/voorwaarden.py.
+    attach_terms_version = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.QUEUED)
     attempts = models.PositiveSmallIntegerField(default=0)
     last_error = models.TextField(blank=True)

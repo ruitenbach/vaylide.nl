@@ -80,10 +80,17 @@ CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
 
 # Publieke basis-URL voor links in e-mails en QR-codes (zonder slash aan het eind).
 BASE_URL = env("VIERLIEF_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
-CONTACT_EMAIL = env("VIERLIEF_CONTACT_EMAIL", "hallo@vaylide.test")
+# Voorlopig contactadres (aangeleverd door de eigenaar, september 2026); in Render te overschrijven.
+CONTACT_EMAIL = env("VIERLIEF_CONTACT_EMAIL", "info@vantorstudio.nl")
 # Bedrijfsgegevens op de site (aangeleverd door de eigenaar, september 2026). Bewust zonder adres.
 COMPANY_KVK = env("VIERLIEF_KVK", "94261423")
 COMPANY_VAT = env("VIERLIEF_BTW", "NL212227221B02")
+# Nog in te vullen door de eigenaar (alleen via Render, niet in Git): juridische naam met rechtsvorm en het
+# vestigingsadres (regels scheiden met |). Een telefoonnummer is optioneel. Leeg = herkenbaar invulveld op de
+# afgeschermde testversie; in live-modus weigert de site dan te starten (zie onderaan).
+COMPANY_LEGAL_NAME = env("VIERLIEF_JURIDISCHE_NAAM")
+COMPANY_ADDRESS = env("VIERLIEF_ADRES")
+COMPANY_PHONE = env("VIERLIEF_TELEFOON")
 OWNER_NOTIFY_EMAIL = env("VIERLIEF_OWNER_EMAIL", CONTACT_EMAIL)
 # Optioneel één wachtwoord voor de hele site (inlogvenster van de browser), bijvoorbeeld zolang een
 # testversie online staat. Leeg = uit. Zie core.middleware.PreviewPasswordMiddleware.
@@ -355,3 +362,6 @@ if not TEST_MODE:
         raise RuntimeError("Live-modus vereist SMTP-instellingen (SMTP_HOST, SMTP_USER, SMTP_PASS).")
     if BASE_URL.startswith("http://"):
         raise RuntimeError("Live-modus vereist een https-adres in VIERLIEF_BASE_URL.")
+    if not (COMPANY_LEGAL_NAME and COMPANY_ADDRESS):
+        raise RuntimeError("Live-modus vereist de bedrijfsgegevens voor de voorwaarden en de contactpagina "
+                           "(VIERLIEF_JURIDISCHE_NAAM en VIERLIEF_ADRES).")

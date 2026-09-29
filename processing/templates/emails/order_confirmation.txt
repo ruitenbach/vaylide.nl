@@ -1,13 +1,28 @@
 Hallo,
 
-Bedankt voor je bestelling. Je betaling is ontvangen.
+Bedankt voor je bestelling. Je betaling is bevestigd. Bewaar deze e-mail: dit is je bestelbevestiging.
 
-Bestelnummer: {{ order.number }}
+Bestelnummer: {{ order.number }}{% if order.package_name %}
+Pakket: {{ order.package_name }}{% endif %}
 {% for line in lines %}- {{ line.description }}: {{ line.total_display }}
-{% endfor %}Totaal: {{ order.total_display }}
+{% endfor %}Totaal (incl. btw): {{ order.total_display }}
+Aankoopdatum: {{ order.paid_at|default:order.created_at|date:"j F Y" }}{% if order.ends_at %}
+Online tot en met: {{ order.ends_at|date:"j F Y" }}{% if order.availability_months %} ({{ order.availability_months }} maanden vanaf de aankoopdatum){% endif %}{% endif %}
 
 Je {{ doc_kind }} wordt automatisch gepubliceerd. Zodra dat is gebeurd, ontvang je een aparte e-mail met je link en QR-code. Je vindt alles ook in Mijn VAYLIDE:
 {{ portal }}
+
+Later publiceren, aanpassen of je evenement verplaatsen verschuift de einddatum niet. Er is geen automatische verlenging.
+{% if order.delivery_consent_at %}
+Je toestemming voor directe levering ({{ order.delivery_consent_at|date:"j F Y H:i" }}):
+"{{ order.delivery_consent_text }}"
+{% endif %}
+Algemene voorwaarden: {{ terms.status|lower }}, versie {{ terms.date|date:"j F Y" }}. Die versie geldt voor deze bestelling en zit als bijlage bij deze e-mail. Je kunt hem ook bekijken op:
+{{ terms_url }}
+
+Herroepen (binnen de bedenktijd, zie artikel 9 en 10): {{ withdraw_url }}
+
+{{ company }}
 
 Hartelijke groet,
 VAYLIDE

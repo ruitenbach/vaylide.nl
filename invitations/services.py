@@ -225,8 +225,10 @@ def restore_version(invitation: Invitation, version: InvitationVersion, *, user,
 
 
 def availability_end(months: int, start=None):
-    start = start or timezone.now()
-    return start + timedelta(days=round(months * 30.44))
+    """Einde van de online periode in kalendermaanden (zie invitations/availability.py)."""
+    from .availability import end_of_availability
+
+    return end_of_availability(start or timezone.now(), months)
 
 
 def referenced_by_any_version(invitation: Invitation) -> set[str]:

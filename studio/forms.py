@@ -600,6 +600,7 @@ class CheckoutForm(forms.Form):
     extras = forms.MultipleChoiceField(label="Extra opties", required=False, widget=forms.CheckboxSelectMultiple)
     terms = forms.BooleanField(label="Ik ga akkoord met de voorwaarden", required=False)
     nieuwsbrief = forms.BooleanField(required=False)  # los van de voorwaarden, standaard uit
+    direct_leveren = forms.BooleanField(required=False)  # afzonderlijke toestemming (voorwaarden, artikel 9.2)
 
     def __init__(self, *args, packages, optional, **kwargs):
         super().__init__(*args, **kwargs)
@@ -608,7 +609,12 @@ class CheckoutForm(forms.Form):
 
     def clean_terms(self):
         if not self.cleaned_data.get("terms"):
-            raise forms.ValidationError("Ga akkoord met de voorwaarden om te kunnen bestellen.")
+            raise forms.ValidationError("Ga akkoord met de algemene voorwaarden om te kunnen bestellen.")
+        return True
+
+    def clean_direct_leveren(self):
+        if not self.cleaned_data.get("direct_leveren"):
+            raise forms.ValidationError("Geef aan dat we direct na je betaling mogen leveren; anders kunnen we je kaart niet direct publiceren.")
         return True
 
 

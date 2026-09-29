@@ -577,3 +577,18 @@ def site_settings(request):
         ("Database", settings.DATABASES["default"]["ENGINE"].rsplit(".", 1)[-1], False),
     ]
     return render(request, "beheer/settings.html", {"form": form, "integrations": integrations})
+
+
+@staff_required
+def withdrawals(request):
+    """Herroepingen via de site: beoordelen en afgehandeld zetten. Terugbetalen gebeurt in Mollie."""
+    from orders.models import Withdrawal
+
+    if request.method == "POST":
+        w = get_object_or_404(Withdrawal, pk=request.POST.get("id"))
+        w.handled_at = None if w.handled_at else timezone.now()
+        w.handled_note = (request.POST.get("notitie") or w.handled_note or "")[:2000]
+        w.save(update_fields=["handled_at", "handled_note"])
+        return redirect("beheer:withdrawals")
+    items = Withdrawal.objects.select_related("order").order_by("handled_at", "-created_at")[:200]
+    return render(request, "beheer/withdrawals.html", {"items": items})

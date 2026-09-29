@@ -72,7 +72,7 @@
         <tbody>{% for a in addons %}<tr><td>{{ a.name }}</td><td>{{ a.description }}</td><td class="num">{{ a.price_display }}</td></tr>{% endfor %}</tbody>
       </table>
     </div>
-    <p class="small muted table-note">Alle prijzen zijn inclusief btw. Vaste prijzen; alleen maatwerk is op aanvraag.</p>
+    <p class="small muted table-note">Alle prijzen zijn inclusief btw. Vaste prijzen; alleen maatwerk is op aanvraag. De online periode (6 of 12 maanden) telt vanaf de aankoopdatum: de dag waarop je betaling is bevestigd. Er is geen automatische verlenging. Zie de <a href="{% url 'core:terms' %}#artikel-6">algemene voorwaarden</a>.</p>
   </div>
 </section>
 {% endblock %}

@@ -33,6 +33,7 @@ async function login(context, email) {
 async function pay(p, uid, outcome, name) {
   await p.goto(`${base}/maken/${uid}/bestellen/?package=essentieel`);
   await p.check("input[name=terms]");
+  await p.check("input[name=direct_leveren]");
   await Promise.all([p.waitForURL("**/betalen/test/**"), p.click("button[name=actie][value=betalen]")]);
   await shot(p, `${name}-betaalpagina`);
   await p.check(`input[name=uitkomst][value=${outcome}]`, { force: true });

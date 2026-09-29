@@ -28,5 +28,6 @@ urlpatterns = [
     path("verwerking/", views.processing, name="processing"),
     path("verwerking/email/<int:pk>/", views.email_detail, name="email"),
     path("contact/", views.contact_messages, name="contact_messages"),
+    path("herroepingen/", views.withdrawals, name="withdrawals"),
     path("instellingen/", views.site_settings, name="settings"),
 ]

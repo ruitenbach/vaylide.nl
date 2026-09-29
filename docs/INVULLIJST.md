@@ -14,6 +14,11 @@ beoordelen" (⚖).
 - [ ] Telefoonnummer (⚖ laten beoordelen of dit verplicht op de site moet)
 - Waar het komt: voettekst of contactpagina, privacyverklaring ("Wie zijn wij") en voorwaarden.
 
+- [ ] **Juridische naam en rechtsvorm**: zet `VIERLIEF_JURIDISCHE_NAAM` in Render. Nodig voor de voorwaarden, de contactpagina en de bevestiging; zonder deze gegevens start live-modus niet.
+- [ ] **Vestigingsadres**: zet `VIERLIEF_ADRES` in Render, regels scheiden met `|`. Dit is je woonadres; ⚖ laat beoordelen wat verplicht zichtbaar moet zijn.
+- [ ] **Contactadres op Render**: `VIERLIEF_CONTACT_EMAIL` = info@vantorstudio.nl (voorlopig). Dat pas je zelf aan in Render.
+- [ ] **Telefoonnummer**: bewust weggelaten. ⚖ Laat beoordelen of dat mag.
+
 ## Prijzen en betalen
 
 - [ ] Bevestig de prijzen: Essentieel € 39 (6 maanden online), Compleet € 69 (12 maanden online), extra opties
@@ -27,15 +32,15 @@ beoordelen" (⚖).
 
 ## ⚖ Juridisch beoordelen
 
-1. **Voorwaarden, artikel 2**: "Door je uitnodiging vóór de betaling te controleren en direct na betaling te
+1. **Voorwaarden, artikel 3**: "Door je uitnodiging vóór de betaling te controleren en direct na betaling te
    laten publiceren, vraag je ons uitdrukkelijk om direct te leveren." Plus het vinkje bij bestellen: "Ik ga
    akkoord met de voorwaarden en wil dat mijn uitnodiging direct na betaling wordt gepubliceerd." Is dit
    genoeg voor het vervallen van de bedenktijd bij digitale inhoud, of moet de klant uitdrukkelijk verklaren
    dat hij daarmee zijn herroepingsrecht verliest (en moet dat in de bevestigingsmail staan)?
-2. **Voorwaarden, artikelen 3 en 4 (nieuw, feitelijk)**: levering (link en QR-code in Mijn Vaylide en per
+2. **Voorwaarden, artikelen 4 en 5 (feitelijk)**: levering (link en QR-code in Mijn Vaylide en per
    e-mail) en afbreken (niets afgeschreven, ontwerp bewaard; zelf verwijderen in Mijn Vaylide). Er staat
    bewust niets over terugbetalen: dat is een keuze van de eigenaar.
-3. **Voorwaarden, artikel 8 (Beschikbaarheid)** en een eventuele beperking van aansprakelijkheid.
+3. **Voorwaarden, artikel 9 (Beschikbaarheid)** en een eventuele beperking van aansprakelijkheid.
 4. **Privacyverklaring**: verwerkingsverantwoordelijke (bedrijfsgegevens), grondslagen per doel, recht om
    te klagen bij de Autoriteit Persoonsgegevens, de lijst van verwerkers (hosting Render in Frankfurt,
    betalingen Mollie, de e-mailprovider, en Anthropic als de AI-hulp aanstaat: doorgifte buiten de EU?), en

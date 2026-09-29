@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Herroeping ontvangen{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="page-head"><div class="container container--mid">
+  <p class="eyebrow">Herroepingsfunctie</p>
+  <h1>We hebben je herroeping ontvangen</h1>
+  <p class="lead">Ontvangen op {{ w.created_at|date:"j F Y" }} om {{ w.created_at|date:"H:i" }} uur. {% if TEST_MODE %}In deze testomgeving wordt de bevestiging niet echt verstuurd; hij staat in de e-mail-outbox.{% else %}Een bevestiging met deze gegevens is per e-mail verstuurd naar {{ w.email }}.{% endif %}</p>
+</div></section>
+<section class="section section--flush"><div class="container container--mid">
+  <dl class="kv">
+    <dt>Naam</dt><dd>{{ w.name }}</dd>
+    <dt>E-mailadres</dt><dd>{{ w.email }}</dd>
+    {% if w.order_number %}<dt>Bestelnummer</dt><dd>{{ w.order_number }}</dd>{% endif %}
+    {% if w.product %}<dt>Product of dienst</dt><dd>{{ w.product }}</dd>{% endif %}
+    {% if w.order_date %}<dt>Besteldatum</dt><dd>{{ w.order_date }}</dd>{% endif %}
+    {% if w.note %}<dt>Toelichting</dt><dd>{{ w.note|linebreaksbr }}</dd>{% endif %}
+  </dl>
+  <p>We beoordelen je verzoek en nemen contact met je op over de afhandeling en een eventuele terugbetaling, zoals beschreven in artikel 10 van de <a href="{% url 'core:terms' %}#artikel-10">algemene voorwaarden</a>.</p>
+</div></section>
+{% endblock %}

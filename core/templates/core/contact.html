@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Contact{% endblock %}
+{% load vl %}{% block title %}Contact & bedrijfsgegevens{% endblock %}
 {% block description %}Neem contact op met VAYLIDE voor vragen, bijzondere wensen of hulp bij je uitnodiging.{% endblock %}
 {% block content %}
 <section class="page-head">
   <div class="container container--mid">
-    <p class="eyebrow">Contact</p>
+    <p class="eyebrow">Contact &amp; bedrijfsgegevens</p>
     <h1>Neem contact op</h1>
     <p class="lead">Stel je vraag of vertel je bijzondere wens.{% if config.support_response_text %} {{ config.support_response_text }}{% endif %}</p>
   </div>
@@ -29,7 +29,21 @@
     <aside class="contact-aside">
       <p><strong>Al een uitnodiging?</strong><br>Gebruik <a href="{% url 'portal:wish_new' %}">Extra wensen of hulp</a> in Mijn VAYLIDE. Dan zien we meteen om welke uitnodiging het gaat.</p>
       <p><strong>E-mail</strong><br><a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a></p>
-      {% if KVK or BTW %}<p><strong>Bedrijfsgegevens</strong><br>{% if KVK %}KvK-nummer {{ KVK }}{% endif %}{% if KVK and BTW %}<br>{% endif %}{% if BTW %}Btw-id {{ BTW }}{% endif %}</p>{% endif %}
+      {% with b=BEDRIJF %}
+      <div class="bedrijfsgegevens" id="bedrijfsgegevens">
+        <h2 class="bedrijfsgegevens__titel">Bedrijfsgegevens</h2>
+        <dl>
+          <div><dt>Handelsnaam</dt><dd>{{ b.handelsnaam }}</dd></div>
+          <div><dt>Juridische naam</dt><dd>{{ b.juridische_naam|invul:"[juridische naam onderneming en rechtsvorm]" }}</dd></div>
+          <div><dt>Vestigingsadres</dt><dd>{% if b.adres %}{% for regel in b.adres %}{{ regel }}{% if not forloop.last %}<br>{% endif %}{% endfor %}{% else %}<mark class="invulveld">[vestigingsadres]</mark>{% endif %}</dd></div>
+          <div><dt>KvK-nummer</dt><dd>{{ b.kvk|invul:"[KvK-nummer]" }}</dd></div>
+          {% if b.btw %}<div><dt>Btw-id</dt><dd>{{ b.btw }}</dd></div>{% endif %}
+          <div><dt>E-mail</dt><dd><a href="mailto:{{ b.email }}">{{ b.email }}</a></dd></div>
+          {% if b.telefoon %}<div><dt>Telefoon</dt><dd>{{ b.telefoon }}</dd></div>{% endif %}
+        </dl>
+        <p class="small"><a href="{% url 'core:terms' %}">Algemene voorwaarden</a> · <a href="{% url 'orders:withdraw' %}">Hier de overeenkomst ontbinden</a></p>
+      </div>
+      {% endwith %}
     </aside>
   </div>
 </section>

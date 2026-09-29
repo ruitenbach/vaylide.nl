@@ -63,6 +63,13 @@ class Order(models.Model):
     )
     fulfilment_note = models.TextField(blank=True)
     terms_accepted_at = models.DateTimeField(null=True, blank=True)
+    # Bij het bestellen vastgelegd (algemene voorwaarden, artikelen 6 en 9): welke versie van de voorwaarden, en de
+    # afzonderlijke toestemming voor directe levering met de erkenning over het herroepingsrecht (letterlijke tekst).
+    terms_version = models.CharField("versie voorwaarden", max_length=20, blank=True)
+    delivery_consent_at = models.DateTimeField("toestemming directe levering", null=True, blank=True)
+    delivery_consent_text = models.TextField("tekst toestemming", blank=True)
+    # Online tot en met (einde van die dag). Eén keer vastgelegd bij de eerste bevestigde betaling.
+    ends_at = models.DateTimeField("online tot en met", null=True, blank=True)
     test_mode = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -116,6 +123,31 @@ class OrderLine(models.Model):
     @property
     def total_display(self) -> str:
         return format_euro(self.total_cents)
+
+
+class Withdrawal(models.Model):
+    """Een herroeping via de herroepingsfunctie op de site (voorwaarden, artikel 10). Alleen registratie en
+    ontvangstbevestiging: terugbetalen gebeurt handmatig in Mollie, na beoordeling door de eigenaar."""
+
+    uid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    order = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL, related_name="withdrawals")
+    name = models.CharField("naam", max_length=120)
+    email = models.EmailField("e-mailadres")
+    order_number = models.CharField("bestelnummer", max_length=40, blank=True)
+    product = models.CharField("product of dienst", max_length=200, blank=True)
+    order_date = models.CharField("besteldatum", max_length=40, blank=True)
+    note = models.TextField("toelichting", blank=True)
+    created_at = models.DateTimeField("ontvangen op", auto_now_add=True)
+    handled_at = models.DateTimeField("afgehandeld op", null=True, blank=True)
+    handled_note = models.TextField("notitie afhandeling", blank=True)
+
+    class Meta:
+        verbose_name = "herroeping"
+        verbose_name_plural = "herroepingen"
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Herroeping {self.order_number or self.email}"
 
 
 class Payment(models.Model):

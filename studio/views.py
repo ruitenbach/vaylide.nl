@@ -9,6 +9,7 @@ from django.db import transaction
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_http_methods, require_POST
 
@@ -271,6 +272,35 @@ def step(request, uid, step):
             live_update_url=reverse("studio:live_update", args=[inv.uid, step]),
         ),
     )
+
+
+def _terms_info() -> dict:
+    from core.voorwaarden import version_info
+
+    return version_info()
+
+
+def _delivery_text() -> str:
+    from core.voorwaarden import DELIVERY_CONSENT
+
+    return DELIVERY_CONSENT
+
+
+def _availability_hint(content: dict, quote) -> dict | None:
+    """Tot wanneer de kaart online staat als je vandaag betaalt, en of dat vóór de evenementdatum eindigt."""
+    if not quote:
+        return None
+    from datetime import date as date_cls
+
+    from invitations.availability import end_of_availability
+
+    end = end_of_availability(timezone.now(), quote.availability_months)
+    event = None
+    try:
+        event = date_cls.fromisoformat(str(content.get("date") or "")[:10])
+    except ValueError:
+        event = None
+    return {"end": end, "event": event, "before_event": bool(event and end.date() < event)}
 
 
 def _newsletter_text() -> str:
@@ -689,7 +719,8 @@ def checkout_step(request, inv: Invitation):
                 subscribe(request.user)
             try:
                 payment = start_checkout(inv, user=request.user, package_code=form.cleaned_data["package"],
-                                         optional_codes=form.cleaned_data.get("extras") or [], terms_accepted=True)
+                                         optional_codes=form.cleaned_data.get("extras") or [], terms_accepted=True,
+                                         delivery_consent=True)
             except (CheckoutError, PricingError) as exc:
                 error = str(exc)
             else:
@@ -699,6 +730,7 @@ def checkout_step(request, inv: Invitation):
         "studio/step_bestellen.html",
         _context(request, inv, "bestellen", form=form, quotes=quotes, quote=quote, best=best, optional=optional,
                  selected_extras=selected_extras, issues=issues, error=error, test_payments=settings.PAYMENT_PROVIDER == "test",
-                 upgrade=upgrade, downgrade=downgrade, nieuwsbrief_tekst=_newsletter_text(), losse_extras=pakket.extras_for(quote.package, quote) if quote else [],
+                 upgrade=upgrade, downgrade=downgrade, nieuwsbrief_tekst=_newsletter_text(),
+                 voorwaarden=_terms_info(), levering_tekst=_delivery_text(), looptijd=_availability_hint(content, quote), losse_extras=pakket.extras_for(quote.package, quote) if quote else [],
                  login_url=f"{reverse('accounts:login')}?doel=bewaren&next={reverse('studio:step', args=[inv.uid, 'bestellen'])}"),
     )

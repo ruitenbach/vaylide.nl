@@ -101,7 +101,9 @@ FAQ = [
      "Zodra de betaalprovider je betaling heeft bevestigd, wordt je uitnodiging automatisch gepubliceerd. "
      "Je ziet de link direct in Mijn VAYLIDE en ontvangt hem ook per e-mail."),
     ("Hoe lang blijft mijn uitnodiging online?",
-     "Dat hangt af van je pakket. De einddatum zie je bij je uitnodiging in Mijn VAYLIDE. Langer online is als extra optie mogelijk."),
+     "Essentieel 6 maanden en Compleet 12 maanden, gerekend vanaf de aankoopdatum: de dag waarop je betaling is bevestigd. "
+     "Later publiceren of je evenement verplaatsen verschuift die einddatum niet. De einddatum staat in je bestelbevestiging en "
+     "bij je uitnodiging in Mijn VAYLIDE. Er is geen automatische verlenging; langer online is als extra optie mogelijk."),
     ("Ik heb een bijzondere wens. Kan dat?",
      "Gebruik 'Extra wensen of hulp nodig?' tijdens het samenstellen of in Mijn VAYLIDE. We bekijken je vraag persoonlijk. "
      "Kost het iets extra, dan krijg je eerst een voorstel; we beginnen pas na jouw akkoord."),

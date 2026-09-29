@@ -17,12 +17,14 @@
         <div><dt>Bestelnummer</dt><dd>{{ order.number }}</dd></div>
         <div><dt>Datum</dt><dd>{{ order.paid_at|default:order.created_at|date:"j F Y" }}</dd></div>
         {% if method_label %}<div><dt>Betaald met</dt><dd>{{ method_label }}</dd></div>{% endif %}
+        {% if order.ends_at %}<div><dt>Online tot en met</dt><dd>{{ order.ends_at|date:"j F Y" }}</dd></div>{% endif %}
       </dl>
       <table class="bestel-bon__regels">
         <tbody>{% for line in order.lines.all %}<tr><td>{{ line.description }}</td><td class="num">{{ line.total_display }}</td></tr>{% endfor %}</tbody>
         <tfoot><tr><th>Totaal <span>incl. btw</span></th><th class="num">{{ order.total_display }}</th></tr></tfoot>
       </table>
       <a class="bestel-bon__link" href="{% url 'portal:home' %}">Alle bestellingen in Mijn VAYLIDE</a>
+      {% if order.terms_version %}<p class="bestel-bon__klein">Algemene voorwaarden: <a href="{% url 'core:terms_version' order.terms_version %}">versie van je bestelling</a> · <a href="{% url 'orders:withdraw' %}?bestelling={{ order.uid }}">herroepen</a></p>{% endif %}
     </aside>
   </div>
 </section>
