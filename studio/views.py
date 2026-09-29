@@ -14,6 +14,7 @@ from django.views.decorators.http import require_http_methods, require_POST
 
 from catalog.models import Package, Template
 from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, occasion_config
+from catalog.specials import is_special, special_addon
 from core.ai import AIUnavailable, suggest_text
 from core.utils import ip_fingerprint, rate_limit, wants_json
 from invitations.access import get_accessible_invitation, remember_draft, session_drafts
@@ -526,10 +527,12 @@ def checkout_step(request, inv: Invitation):
     selected_extras = request.POST.getlist("extras") if request.method == "POST" else request.GET.getlist("extras")
     selected_extras = [code for code in selected_extras if code in {a.code for a in optional}]
     try:
-        quotes = compare_packages(content, selected_extras)
+        quotes = compare_packages(content, selected_extras, template_version=inv.template_version)
     except PricingError as exc:
         quotes = []
         messages.error(request, str(exc))
+    if is_special(inv.template_version) and special_addon(inv.template_version.template) is None:
+        messages.warning(request, f"{inv.template_version.template.name} is een special en is nog niet te bestellen: de prijs wordt nog vastgesteld. Je ontwerp blijft bewaard.")
     best = recommended(quotes)
     chosen = request.POST.get("package") or request.GET.get("package") or (best.package.code if best else "")
     quote = next((q for q in quotes if q.package.code == chosen), best)

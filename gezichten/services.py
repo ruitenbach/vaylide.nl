@@ -114,7 +114,20 @@ def _scene_bytes(renderer: str) -> bytes:
         return buffer.getvalue()
 
 
-def start_generation(invitation: Invitation) -> FaceRequest:
+HAARKLEUREN = ("zwart", "bruin", "blond")
+
+
+def _hair_choice(invitation: Invitation, hair: dict | None) -> tuple[str, str]:
+    """Gekozen haarkleur (man, vrouw): uit het formulier, anders de bewaarde keuze, anders de standaard."""
+    man, vrouw = paar.selection(invitation.template_version, invitation.draft_content)
+    saved = ((invitation.draft_content.get("style") or {}).get("haar")) or {}
+    hair = hair or {}
+    man = hair.get("man") if hair.get("man") in HAARKLEUREN else (saved.get("man") if saved.get("man") in HAARKLEUREN else man)
+    vrouw = hair.get("vrouw") if hair.get("vrouw") in HAARKLEUREN else (saved.get("vrouw") if saved.get("vrouw") in HAARKLEUREN else vrouw)
+    return man, vrouw
+
+
+def start_generation(invitation: Invitation, hair: dict | None = None) -> FaceRequest:
     if not feature_available(invitation):
         raise FaceError("Eigen gezichten zijn op dit moment niet beschikbaar.")
     if is_locked(invitation):
@@ -129,6 +142,7 @@ def start_generation(invitation: Invitation) -> FaceRequest:
             return req
         if req.attempts_left <= 0:
             raise FaceError("Je hebt alle pogingen gebruikt. Neem contact met ons op als je nog een poging wilt.")
+        req.hair_man, req.hair_woman = _hair_choice(invitation, hair)
         req.attempts_used += 1
         req.runs += 1
         req.status = FaceRequest.Status.BUSY
@@ -172,7 +186,8 @@ def handle_generate(job) -> None:
         return
     try:
         provider = get_provider()
-        image = provider.generate(_scene_bytes(req.invitation.template_version.renderer), _read(req.photo_bride), _read(req.photo_groom))
+        image = provider.generate(_scene_bytes(req.invitation.template_version.renderer), _read(req.photo_bride), _read(req.photo_groom),
+                                  hair={"man": req.hair_man, "vrouw": req.hair_woman})
     except FaceProviderError as exc:
         final = not exc.retryable or job.attempts + 1 >= job.max_attempts
         if not final:
@@ -234,7 +249,9 @@ def approve(invitation: Invitation, user) -> FaceRequest:
     asset.save()
     content = dict(invitation.draft_content)
     old = (content.get("style") or {}).get("paar_eigen")
-    content["style"] = dict(content.get("style") or {}, paar_eigen=str(asset.uid))
+    # De haarkleur van het goedgekeurde beeld wordt ook de bewaarde keuze: keuze en beeld horen altijd samen.
+    haar = {"man": req.hair_man, "vrouw": req.hair_woman} if req.hair_man and req.hair_woman else (content.get("style") or {}).get("haar")
+    content["style"] = dict(content.get("style") or {}, paar_eigen=str(asset.uid), haar=haar)
     save_draft(invitation, expected_rev=invitation.draft_rev, content=content, user=user)
     _delete_unused_scene(invitation, old)
     req.approved_asset = asset

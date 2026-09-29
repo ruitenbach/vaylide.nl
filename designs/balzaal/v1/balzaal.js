@@ -22,3 +22,38 @@
   });
   hero.addEventListener("pointerleave", function () { x = 0; y = 0; if (!frame) frame = window.requestAnimationFrame(apply); });
 })();
+
+/* De dans: speelt na het openen (niet bij 'minder beweging' of stilgezette beweging), met een knop om te pauzeren.
+   Zonder videobestand of zonder JavaScript blijft de stilstaande scène staan. */
+(function () {
+  "use strict";
+  var box = document.querySelector("[data-bz-dans]");
+  var knop = document.querySelector("[data-bz-dans-knop]");
+  if (!box || !knop) return;
+  var video = box.querySelector("video");
+  var label = knop.querySelector("[data-bz-dans-label]");
+  var html = document.documentElement;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  knop.hidden = false;
+  function show(playing) {
+    knop.setAttribute("aria-pressed", playing ? "true" : "false");
+    label.textContent = playing ? "Dans pauzeren" : "Dans afspelen";
+  }
+  function play() {
+    video.preload = "auto";
+    var p = video.play();
+    if (p && p.catch) p.catch(function () { show(false); });
+  }
+  video.addEventListener("play", function () { show(true); });
+  video.addEventListener("pause", function () { show(false); });
+  knop.addEventListener("click", function () { if (video.paused) play(); else video.pause(); });
+  function autostart() {
+    if (reduce || html.classList.contains("fx-paused")) return;
+    window.setTimeout(play, 600);
+  }
+  if (html.classList.contains("is-open") || !html.classList.contains("has-cover")) autostart();
+  else document.addEventListener("invite:opening", function () { window.setTimeout(autostart, 1800); }, { once: true });
+  // Beweging stilgezet met de knop 'Beweging': de dans pauzeert ook.
+  new MutationObserver(function () { if (html.classList.contains("fx-paused") && !video.paused) video.pause(); })
+    .observe(html, { attributes: true, attributeFilter: ["class"] });
+})();

@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from catalog.features import feature_label
+from catalog.specials import is_special, special_addon
 from catalog.models import AddOn, Package, format_euro
 from invitations.content import required_features
 
@@ -61,7 +62,7 @@ def optional_addons() -> list[AddOn]:
     return list(AddOn.objects.filter(is_active=True, extra_months__gt=0).order_by("sort_order"))
 
 
-def build_quote(content: dict, package: Package, optional_codes: list[str] | None = None) -> Quote:
+def build_quote(content: dict, package: Package, optional_codes: list[str] | None = None, template_version=None) -> Quote:
     if not package.is_active:
         raise PricingError("Dit pakket is niet meer beschikbaar.")
     quote = Quote(
@@ -72,8 +73,16 @@ def build_quote(content: dict, package: Package, optional_codes: list[str] | Non
     )
     quote.lines.append(QuoteLine(code=f"pakket:{package.code}", description=f"Pakket {package.name}", unit_price_cents=package.price_cents))
     needed = required_features(content)
+    if template_version is not None and is_special(template_version):
+        needed.add("special")
     for feature in sorted(needed - quote.features):
-        addon = AddOn.objects.filter(is_active=True, feature=feature).order_by("price_cents").first()
+        if feature == "special":
+            # Elke special heeft een eigen meerprijs (code special-<ontwerp>); zonder die optie is hij niet te bestellen.
+            addon = special_addon(template_version.template)
+            if addon is None:
+                raise PricingError(f"{template_version.template.name} is een special en is nog niet te bestellen: de prijs wordt nog vastgesteld.")
+        else:
+            addon = AddOn.objects.filter(is_active=True, feature=feature).order_by("price_cents").first()
         if addon is None:
             raise PricingError(f"'{feature_label(feature)}' is op dit moment niet beschikbaar. Zet dit onderdeel uit of kies een ander pakket.")
         quote.lines.append(
@@ -99,11 +108,11 @@ def build_quote(content: dict, package: Package, optional_codes: list[str] | Non
     return quote
 
 
-def compare_packages(content: dict, optional_codes: list[str] | None = None) -> list[Quote]:
+def compare_packages(content: dict, optional_codes: list[str] | None = None, template_version=None) -> list[Quote]:
     quotes = []
     for package in Package.objects.filter(is_active=True).order_by("sort_order", "price_cents"):
         try:
-            quotes.append(build_quote(content, package, optional_codes))
+            quotes.append(build_quote(content, package, optional_codes, template_version=template_version))
         except PricingError:
             continue
     return quotes

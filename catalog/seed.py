@@ -147,6 +147,7 @@ def sync_designs(update_existing_manifest: bool = False) -> list[str]:
                 "style_notes": data.get("style_notes", ""),
                 "occasions": data.get("occasions", []),
                 "sort_order": data.get("sort_order", 100),
+                "special": bool(data.get("special")),
             },
         )
         if created:

@@ -32,6 +32,12 @@ Werking in het kort:
 - **Verwijderen:** de klant kan de foto's en voorbeelden altijd verwijderen. Vóór betaling verdwijnt dan ook de eigen
   versie van de kaart. Na betaling ruimt de nachtelijke taak de losse foto's zelf op; de goedgekeurde versie blijft
   op de kaart.
+- **Haarkleur:** de klant kiest op de pagina de haarkleur van man en vrouw; die gaat mee in de opdracht aan de API. Het
+  goedgekeurde beeld en de bewaarde keuze horen altijd bij elkaar, en het resultaat toont de gekozen haarkleur.
+- **Bewaartermijn:** foto's van onbetaalde uitnodigingen gaan na 30 dagen zonder activiteit weg; na betaling de nacht
+  erna (de goedgekeurde versie blijft op de kaart).
+- **Testomgeving:** met `VIERLIEF_FACES_PROVIDER=test` staat er duidelijk "Demo in de afgeschermde testomgeving"; er
+  wordt dan niets echt bewerkt.
 - **Eén of twee foto's:** er zijn nu altijd twee foto's nodig (`ALLOW_SINGLE = False`). Met één foto de andere persoon
   laten staan kan pas nadat met de echte API is getest dat dat betrouwbaar gaat.
 

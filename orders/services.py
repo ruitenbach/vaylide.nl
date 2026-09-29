@@ -63,7 +63,7 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
         package = Package.objects.filter(code=package_code, is_active=True).first()
         if package is None:
             raise CheckoutError("Kies een pakket.")
-        quote = build_quote(invitation.draft_content, package, optional_codes)
+        quote = build_quote(invitation.draft_content, package, optional_codes, template_version=invitation.template_version)
         # Eerdere, onbetaalde bestellingen voor deze uitnodiging vervallen.
         Order.objects.filter(invitation=invitation, kind=Order.Kind.INVITATION, status__in=[Order.Status.PENDING, Order.Status.FAILED]).update(
             status=Order.Status.CANCELLED

@@ -114,6 +114,12 @@ def apply_retention(now=None) -> dict:
         req.delete_files()
         req.save()
         cleaned += 1
+    # Onbetaald en 30 dagen niet gebruikt: de foto's en voorbeelden weg (de klant kan opnieuw uploaden).
+    stale = FaceRequest.objects.exclude(invitation_id__in=paid_invitations).filter(updated_at__lt=now - timedelta(days=30))
+    for req in stale.exclude(photo_bride="", photo_groom="", result=""):
+        req.delete_files()
+        req.save()
+        cleaned += 1
     report["opgeschoonde_gezichtfotos"] = cleaned
 
     report["verwijderde_inlogcodes"] = LoginCode.objects.filter(created_at__lt=now - timedelta(days=2)).delete()[0]

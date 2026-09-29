@@ -519,3 +519,22 @@ bruidspaar: een blonde bruid in een witte jurk met sluier en een bruidegom in ee
 - De losse ronde stalen zijn vervangen door knoppen met drie kleurbolletjes en de naam van de kleurvariant; de gekozen variant heeft een donkere rand.
 - `manage.py test tests`: 289 tests, alle geslaagd.
 - In Chromium op 1366, 390 en 360 pixels (Middernacht, Winterlicht, Eerste dans): een andere kleur kiezen werkt zonder herladen en de knop wordt gemarkeerd; geen horizontaal scrollen en geen fouten.
+
+## Balzaal als special, dans en haarkleur (29 september 2026)
+
+- `manage.py test tests`: 306 tests, alle geslaagd (nieuw: `tests/test_specials.py`, `tests/test_balzaal_dans.py`).
+  - **Specials:** apart op de collectiepagina; zonder eigen meerprijs niet te bestellen (ook niet via een optie met
+    een andere code); met meerprijs een zichtbare regel in de bestelling.
+  - **Dans:** zonder videobestand geen dans en geen knop. Met een video (nagebootst): een videolaag met poster, zonder
+    autoplay in de HTML, en een knop die pas met JavaScript verschijnt.
+  - **Haarkleurvariant:** gebruikt zijn eigen scène en video. Eigen gezichten tonen geen dans van het voorbeeldpaar.
+  - **Veo-koppeling (nagebootst):** 9:16, sleutel alleen in de header, taak afwachten en video downloaden.
+  - **Haarkleur bij eigen gezichten:** gaat mee in de opdracht en wordt bewaard bij goedkeuring; een ongeldige
+    waarde valt terug op de standaard.
+  - **Bewaartermijn:** 30 dagen voor onbetaalde foto's.
+- In Chromium: de collectiepagina met Specials op 1366 en 390 pixels, zonder horizontaal scrollen en zonder fouten.
+- Klantreis met Balzaal en een lokale testmeerprijs (daarna weer verwijderd): 39/39 op 390 pixels.
+- Niet gedaan (vraagt een sleutel en akkoord op de kosten):
+  - de echte dansvideo (proefscène);
+  - de acht haarkleurscènes;
+  - de echte Gemini-bewerking van eigen gezichten.

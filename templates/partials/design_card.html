@@ -1,7 +1,7 @@
 <article class="design-card">
   <a class="design-card__link" href="{{ card.detail_url }}">
     <span class="design-card__visual"><img src="{{ card.image }}" alt="" width="800" height="1000" loading="lazy" decoding="async">{% if card.template.slug == "confetti" %}<span class="design-card__confetti" aria-hidden="true"><i style="--c:0;--k:#E8A0A8"></i><i style="--c:1;--k:#C4A574"></i><i style="--c:2;--k:#9CC3B4"></i><i style="--c:3;--k:#F2C66D"></i><i style="--c:4;--k:#B9A3D6"></i><i style="--c:5;--k:#E8A0A8"></i><i style="--c:6;--k:#C4A574"></i><i style="--c:7;--k:#9CC3B4"></i><i style="--c:8;--k:#F2C66D"></i><i style="--c:9;--k:#B9A3D6"></i><i style="--c:10;--k:#E8A0A8"></i><i style="--c:11;--k:#F2C66D"></i></span>{% endif %}</span>
-    <span class="design-card__name">{{ card.template.name }}</span>
+    <span class="design-card__name">{% if card.template.special %}<span class="design-card__special">Special</span> {% endif %}{{ card.template.name }}</span>
     <span class="design-card__meta">{{ card.opening_label }}{% if card.effect_label %} · {{ card.effect_label }}{% endif %}</span>
   </a>
 </article>

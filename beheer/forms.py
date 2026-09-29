@@ -71,7 +71,7 @@ class TemplateForm(forms.ModelForm):
 
     class Meta:
         model = Template
-        fields = ["name", "tagline", "description", "style_notes", "occasions", "is_active", "sort_order", "current_version"]
+        fields = ["name", "tagline", "description", "style_notes", "occasions", "is_active", "special", "sort_order", "current_version"]
         widgets = {"description": forms.Textarea(attrs={"rows": 4})}
 
     def __init__(self, *args, **kwargs):

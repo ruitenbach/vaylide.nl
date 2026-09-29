@@ -37,6 +37,20 @@ WHO = {
 }
 
 
+HAIR_EN = {"zwart": "black", "bruin": "brown", "blond": "blonde"}
+
+
+def hair_sentence(hair: dict | None) -> str:
+    """De gekozen haarkleuren in de opdracht (alleen kleur; lengte en stijl blijven natuurlijk)."""
+    hair = hair or {}
+    parts = []
+    if hair.get("vrouw") in HAIR_EN:
+        parts.append(f"the bride has long {HAIR_EN[hair['vrouw']]} hair in loose waves")
+    if hair.get("man") in HAIR_EN:
+        parts.append(f"the groom has short {HAIR_EN[hair['man']]} hair")
+    return (" In the result, " + " and ".join(parts) + ".") if parts else ""
+
+
 class FaceProviderError(RuntimeError):
     """Fout met een begrijpelijke melding voor de klant. retryable: later opnieuw proberen kan helpen."""
 
@@ -89,13 +103,15 @@ class GeminiProvider:
         if not self.api_key:
             raise FaceProviderError("De beeldbewerking is niet ingesteld.")
 
-    def generate(self, scene: bytes, bride: bytes | None, groom: bytes | None) -> bytes:
+    def generate(self, scene: bytes, bride: bytes | None, groom: bytes | None, hair: dict | None = None) -> bytes:
         who = tuple(k for k, v in (("bride", bride), ("groom", groom)) if v)
-        parts = [{"type": "text", "text": PROMPT.format(who=WHO[who])},
-                 {"type": "image", "mime_type": "image/jpeg", "data": base64.b64encode(_jpeg(scene, 1672)).decode()}]
-        for photo in (bride, groom):
-            if photo:
-                parts.append({"type": "image", "mime_type": "image/jpeg", "data": base64.b64encode(_jpeg(photo, 1280)).decode()})
+        return self.edit(PROMPT.format(who=WHO[who] + hair_sentence(hair)), [scene] + [p for p in (bride, groom) if p])
+
+    def edit(self, prompt: str, images: list[bytes]) -> bytes:
+        """Algemene beeldbewerking: tekstopdracht plus beelden (het eerste is de scène) → één nieuwe afbeelding."""
+        parts = [{"type": "text", "text": prompt}]
+        for i, image in enumerate(images):
+            parts.append({"type": "image", "mime_type": "image/jpeg", "data": base64.b64encode(_jpeg(image, 1672 if i == 0 else 1280)).decode()})
         body = {
             "model": self.model,
             "input": parts,
@@ -134,7 +150,7 @@ class TestProvider:
         if not settings.TEST_MODE:
             raise FaceProviderError("De testbewerking is alleen beschikbaar in testmodus.")
 
-    def generate(self, scene: bytes, bride: bytes | None, groom: bytes | None) -> bytes:
+    def generate(self, scene: bytes, bride: bytes | None, groom: bytes | None, hair: dict | None = None) -> bytes:
         with Image.open(io.BytesIO(scene)) as img:
             img = img.convert("RGB")
             draw = ImageDraw.Draw(img)

@@ -4,6 +4,7 @@ Alleen voor de ingelogde eigenaar van de uitnodiging (en het Vaylide-team). Ande
 """
 from __future__ import annotations
 
+from django.conf import settings
 from django.contrib import messages
 from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import redirect, render
@@ -44,7 +45,7 @@ def page(request, uid):
                                      consent=request.POST.get("toestemming") == "ja")
                 messages.success(request, "Foto's opgeslagen.")
             elif action == "maken":
-                services.start_generation(inv)
+                services.start_generation(inv, hair={"man": request.POST.get("haar_man"), "vrouw": request.POST.get("haar_vrouw")})
             elif action == "goedkeuren":
                 services.approve(inv, request.user)
                 messages.success(request, "Goedgekeurd. Deze versie staat nu op je uitnodiging.")
@@ -58,8 +59,16 @@ def page(request, uid):
         return redirect("gezichten:page", uid=inv.uid)
     return render(request, "gezichten/gezichten.html", _context(
         request, inv, "stijl", req=req, available=available, locked=services.is_locked(inv),
-        consent_text=services.CONSENT_TEXT, allow_single=services.ALLOW_SINGLE,
+        consent_text=services.CONSENT_TEXT, allow_single=services.ALLOW_SINGLE, demo=settings.FACES_PROVIDER == "test",
+        haarkleuren=[(k, k.capitalize()) for k in services.HAARKLEUREN], haar_gekozen=_gekozen_haar(inv, req),
     ))
+
+
+def _gekozen_haar(inv, req) -> dict:
+    if req is not None and req.hair_man and req.hair_woman:
+        return {"man": req.hair_man, "vrouw": req.hair_woman}
+    man, vrouw = services._hair_choice(inv, None)
+    return {"man": man, "vrouw": vrouw}
 
 
 @require_GET

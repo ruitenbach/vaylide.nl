@@ -35,9 +35,14 @@
 
 {% block content %}
 <header class="bz-hero" data-bz-diepte>
-  {% if v.paar.scene %}{# Eigen versie uit gezichten/: zaal en paar samen in één afbeelding. #}
+  {% if v.paar.video %}{# De dans: een echte videoscène (tools/balzaal/maak_dansvideo.py); de scène is de poster. #}
+  <div class="bz-laag bz-laag--zaal bz-laag--video" data-bz-dans>
+    <video class="bz-zaal bz-dans" muted playsinline loop preload="none" poster="{{ v.paar.poster }}" data-paar="{{ v.paar.man }}-{{ v.paar.vrouw }}" width="941" height="1672" aria-label="{{ v.paar.alt }} die samen dansen"><source src="{{ v.paar.video }}" type="video/mp4"></video>
+  </div>
+  <button type="button" class="bz-dans__knop" data-bz-dans-knop aria-pressed="false" hidden><span data-bz-dans-label>Dans afspelen</span></button>
+  {% elif v.paar.scene %}{# Eigen versie of haarkleurvariant: zaal en paar samen in één afbeelding. #}
   <div class="bz-laag bz-laag--zaal bz-laag--eigen">
-    <img class="bz-zaal" src="{{ v.paar.scene_small }}" srcset="{{ v.paar.scene_small }} 1000w, {{ v.paar.scene }} 2000w" sizes="(min-width: 600px) 560px, 100vw" alt="{{ v.paar.alt_eigen|default:'Het bruidspaar in een balzaal' }}" width="941" height="1672" fetchpriority="high" decoding="async" data-paar="eigen">
+    <img class="bz-zaal" src="{{ v.paar.scene_small }}" srcset="{{ v.paar.scene_small }} 1000w, {{ v.paar.scene }} 2000w" sizes="(min-width: 600px) 560px, 100vw" alt="{{ v.paar.alt_eigen|default:'Het bruidspaar in een balzaal' }}" width="941" height="1672" fetchpriority="high" decoding="async" data-paar="{% if v.paar.eigen %}eigen{% else %}{{ v.paar.man }}-{{ v.paar.vrouw }}{% endif %}">
   </div>
   {% else %}
   <div class="bz-laag bz-laag--zaal" aria-hidden="true">
@@ -53,7 +58,7 @@
     {% if v.has_event and v.date %}<p class="bz-hero__date fx-intro" style="--fx-d:5"><span>{{ v.weekday }}</span><span class="bz-hero__num">{{ v.date_numeric }}</span>{% if v.time_display %}<span>{{ v.time_display }}</span>{% endif %}</p>
     {% if v.venue %}<p class="bz-hero__venue fx-intro" style="--fx-d:6">{{ v.venue }}</p>{% endif %}{% endif %}
   </div>
-  {% if v.paar and not v.paar.scene %}<div class="bz-laag bz-laag--paar"><img class="bz-paar" src="{{ v.paar.src_small }}" srcset="{{ v.paar.src_small }} 560w, {{ v.paar.src }} 900w" sizes="(min-width: 600px) 440px, 82vw" alt="{{ v.paar.alt }}" width="900" height="1217" decoding="async" data-paar="{{ v.paar.man }}-{{ v.paar.vrouw }}"></div>{% endif %}
+  {% if v.paar and not v.paar.scene and not v.paar.video %}<div class="bz-laag bz-laag--paar"><img class="bz-paar" src="{{ v.paar.src_small }}" srcset="{{ v.paar.src_small }} 560w, {{ v.paar.src }} 900w" sizes="(min-width: 600px) 440px, 82vw" alt="{{ v.paar.alt }}" width="900" height="1217" decoding="async" data-paar="{{ v.paar.man }}-{{ v.paar.vrouw }}"></div>{% endif %}
   <div class="bz-laag bz-laag--bloemen" aria-hidden="true">
     <img class="bz-bloemen" src="{% static 'designs/balzaal/v1/img/bloemen-600.webp' %}" srcset="{% static 'designs/balzaal/v1/img/bloemen-600.webp' %} 600w, {% static 'designs/balzaal/v1/img/bloemen.webp' %} 941w" sizes="(min-width: 600px) 560px, 100vw" alt="" width="941" height="1672" decoding="async">
   </div>

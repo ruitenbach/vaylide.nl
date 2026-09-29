@@ -56,6 +56,8 @@ beoordelen" (⚖).
 - [ ] **AI-hulp**: aanzetten (Anthropic-sleutel, kosten per gebruik, vermelding in de privacyverklaring) of uit laten.
 - [ ] **Domein**: wanneer omzetten, en staat er nu iets op de hosting bij Vimexx dat moet blijven? Zie `docs/DOMEIN.md`.
 - [ ] **Eigen gezichten (Balzaal)**: beslis over de beeld-API (voorstel: Google Gemini 3 Pro Image, ca. € 0,13 per generatie), de verkoopprijs (voorstel € 12,50–14,95), en laat de privacytekst en verwerkersovereenkomst met Google beoordelen (⚖). Zie `docs/GEZICHTEN.md`.
-- [ ] **Haarkleuren Balzaal**: acht beelden laten maken (zie `docs/BALZAAL.md`).
+- [ ] **Balzaal als special**: kies de meerprijs (extra optie `special-balzaal`, functie `special`). Tot dan is Balzaal niet te bestellen.
+- [ ] **Dans (Balzaal)**: akkoord op Google Veo 3.1 en het budget voor de proefscène (ca. $0,80 per poging met Fast, $3,20 met Standaard). Zie `docs/BALZAAL.md`.
+- [ ] **Haarkleuren Balzaal**: akkoord op het laten maken van acht scènes met de beeld-API (ca. $1,12 plus pogingen).
 - [ ] **TikTok**: link naar het account (Instagram staat er al: `https://www.instagram.com/vaylidenl/`).
 - [ ] **Render-abonnement**: welke back-ups van de database krijg je bij het gekozen abonnement (dagelijks, herstel naar een tijdstip)?

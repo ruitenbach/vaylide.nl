@@ -201,7 +201,10 @@ def _paar_met_eigen(template_version, content: dict, resolver) -> dict | None:
     view = paar_view(template_version, content)
     eigen = ((content.get("style") or {}).get("paar_eigen")) or ""
     if view is not None and eigen and resolver is not None and resolver.meta(eigen) is not None:
-        view = dict(view, scene=resolver.url(eigen, "groot"), scene_small=resolver.url(eigen, "middel"))
+        # Met eigen gezichten: de goedgekeurde afbeelding; de dans van het voorbeeldpaar past daar niet bij.
+        view = dict(view, scene=resolver.url(eigen, "groot"), scene_small=resolver.url(eigen, "middel"), eigen=True)
+        view.pop("video", None)
+        view.pop("poster", None)
     return view
 
 

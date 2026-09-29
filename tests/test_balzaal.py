@@ -104,9 +104,13 @@ class BalzaalDesignTests(VaylideTestCase):
         js = (settings.BASE_DIR / "designs/balzaal/v1/balzaal.js").read_text(encoding="utf-8")
         self.assertIn("prefers-reduced-motion: reduce", js)
 
-    def test_in_the_collection(self):
-        slugs = [c["template"].slug for c in Client().get("/ontwerpen/?gelegenheid=bruiloft").context["cards"]]
-        self.assertIn("balzaal", slugs)
+    def test_in_the_collection_under_specials(self):
+        response = Client().get("/ontwerpen/?gelegenheid=bruiloft")
+        self.assertNotIn("balzaal", [c["template"].slug for c in response.context["cards"]])  # niet tussen de gewone kaarten
+        self.assertIn("balzaal", [c["template"].slug for c in response.context["special_cards"]])
+        specials = Client().get("/ontwerpen/?categorie=specials")
+        self.assertEqual(specials.context["cards"], [])
+        self.assertContains(specials, 'class="design-card__special"')
         self.assertContains(Client().get("/ontwerpen/balzaal/"), "Envelop met lakzegel")
 
 
@@ -145,7 +149,7 @@ class HairColourTests(VaylideTestCase):
             self.assertEqual(inv.draft_content["style"]["haar"], {"man": "zwart", "vrouw": "bruin"})
             view, html = _render(inv.draft_content)
             self.assertIn('data-paar="zwart-bruin"', html)
-            self.assertIn("paar-zwart-bruin-560.webp", html)
+            self.assertIn("scene-zwart-bruin-600.webp", html)
         # Zonder de beelden valt het ontwerp terug op het standaardpaar; de keuze blijft wel bewaard.
         view, html = _render(inv.draft_content)
         self.assertIn('data-paar="bruin-blond"', html)

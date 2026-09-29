@@ -14,6 +14,8 @@ FEATURES = {
     "zegel": "Persoonlijk zegel",
     # Eigen gezichten op het bruidspaar (Balzaal, gezichten/). Alleen als extra optie; de prijs zet de eigenaar.
     "gezichten": "Eigen gezichten op het bruidspaar",
+    # Special-ontwerp (catalog/specials.py): meerprijs per special, in te stellen door de eigenaar.
+    "special": "Special-ontwerp",
 }
 
 # Welke sectie of instelling hoort bij welke functie.

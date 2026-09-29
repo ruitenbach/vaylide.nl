@@ -39,6 +39,9 @@ class FaceRequest(models.Model):
     runs = models.PositiveIntegerField(default=0)
     extra_attempts = models.PositiveSmallIntegerField(default=0, help_text="Extra pogingen, alleen door het beheer toe te kennen.")
     result = models.FileField(upload_to=private_path, max_length=255, blank=True)
+    # Haarkleur waarmee het voorbeeld is gemaakt (zwart, bruin of blond); het goedgekeurde beeld hoort bij deze keuze.
+    hair_man = models.CharField(max_length=10, blank=True)
+    hair_woman = models.CharField(max_length=10, blank=True)
     result_attempt = models.PositiveSmallIntegerField(default=0)
     approved_asset = models.ForeignKey("invitations.MediaAsset", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     error = models.CharField(max_length=300, blank=True)

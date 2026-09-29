@@ -19,6 +19,7 @@
   <p class="hint">Je foto's worden verwerkt door een externe beeldbewerkingsdienst en staan daarna alleen voor jou (en het Vaylide-team) in je account. Je kunt ze altijd verwijderen. Zie de <a href="{% url 'core:privacy' %}">privacyverklaring</a>.</p>
 </section>
 
+{% if demo %}<p class="notice notice--warning"><strong>Demo in de afgeschermde testomgeving</strong>Er wordt hier niets echt bewerkt: het voorbeeld is het standaardpaar met een testbalk. Zo is de hele stroom te testen zonder kosten.</p>{% endif %}
 {% if locked %}
 <p class="notice notice--warning">Deze uitnodiging is betaald. Het bruidspaar ligt vast; er worden geen nieuwe voorbeelden gemaakt.</p>
 {% elif available %}
@@ -50,11 +51,16 @@
   <p class="gz-status" aria-live="polite"><strong>{{ req.get_status_display }}</strong>{% if req.status == "bezig" %} · dit duurt meestal minder dan een minuut; deze pagina ververst vanzelf{% endif %}</p>
   {% if req.error %}<p class="notice notice--error" role="alert">{{ req.error }}</p>{% endif %}
   <p class="small muted">Nog {{ req.attempts_left }} van {{ req.attempts_allowed }} pogingen over.</p>
-  {% if req.result %}<figure class="gz-resultaat"><img src="{% url 'gezichten:image' inv.uid 'voorbeeld' %}" alt="Voorbeeld van jullie persoonlijke bruidspaar" width="470" height="836"><figcaption class="small muted">Alleen jij ziet dit voorbeeld tot je het goedkeurt.</figcaption></figure>{% endif %}
+  {% if req.result %}<figure class="gz-resultaat"><img src="{% url 'gezichten:image' inv.uid 'voorbeeld' %}" alt="Voorbeeld van jullie persoonlijke bruidspaar" width="470" height="836"><figcaption class="small muted">Haarkleur: man {{ req.hair_man }}, vrouw {{ req.hair_woman }}. Alleen jij ziet dit voorbeeld tot je het goedkeurt.</figcaption></figure>{% endif %}
   {% if not locked and available %}
   <div class="btn-row">
     {% if req.status == "klaar" %}<form method="post" data-once>{% csrf_token %}<input type="hidden" name="actie" value="goedkeuren"><button class="btn btn--primary" type="submit">Dit voorbeeld goedkeuren</button></form>{% endif %}
-    {% if req.status != "bezig" and req.consent_at and req.attempts_left %}<form method="post" data-once>{% csrf_token %}<input type="hidden" name="actie" value="maken"><button class="btn btn--secondary" type="submit">{% if req.result %}Nieuwe poging{% else %}Maak ons voorbeeld{% endif %}</button></form>{% endif %}
+    {% if req.status != "bezig" and req.consent_at and req.attempts_left %}<form method="post" class="gz-maken" data-once>{% csrf_token %}<input type="hidden" name="actie" value="maken">
+      <fieldset class="gz-haar"><legend>Haarkleur op de kaart</legend>
+        <label>Man <select name="haar_man">{% for k, label in haarkleuren %}<option value="{{ k }}"{% if haar_gekozen.man == k %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+        <label>Vrouw <select name="haar_vrouw">{% for k, label in haarkleuren %}<option value="{{ k }}"{% if haar_gekozen.vrouw == k %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+      </fieldset>
+      <button class="btn btn--secondary" type="submit">{% if req.result %}Nieuwe poging{% else %}Maak ons voorbeeld{% endif %}</button></form>{% endif %}
   </div>
   {% endif %}
   <form method="post" class="gz-verwijder" data-once data-confirm="Je foto's en voorbeelden verwijderen?">{% csrf_token %}<input type="hidden" name="actie" value="verwijderen"><button class="btn btn--ghost btn--sm" type="submit">Foto's en voorbeelden verwijderen</button></form>

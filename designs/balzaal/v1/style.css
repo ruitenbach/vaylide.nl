@@ -241,6 +241,17 @@ html:not(.inv-embed) body:has(.inv-banner) .bz-hero { height: calc(100svh - var(
 .inv-balzaal .music__toggle { background: linear-gradient(180deg, #FFF6E2, #E4C88E); }
 
 
+/* De dans (videolaag): zelfde uitsnede als de zaal; knop om af te spelen of te pauzeren (alleen met JavaScript). */
+.bz-dans { background: var(--bz-page); }
+.bz-dans__knop {
+  position: absolute; right: .9rem; bottom: 3.4rem; z-index: 7; display: inline-flex; align-items: center; gap: .45rem; min-height: 44px;
+  padding: .45rem 1rem; border: 0; border-radius: 999px; cursor: pointer; background: rgba(255, 253, 248, .88); color: var(--bz-ink);
+  font: 600 .8rem var(--bz-ui); box-shadow: 0 8px 20px -10px rgba(40, 30, 20, .5);
+}
+.bz-dans__knop::before { content: ""; width: 0; height: 0; border-style: solid; border-width: 6px 0 6px 10px; border-color: transparent transparent transparent currentColor; }
+.bz-dans__knop[aria-pressed="true"]::before { width: 10px; height: 12px; border: 0; background: linear-gradient(90deg, currentColor 0 35%, transparent 35% 65%, currentColor 65%); }
+.bz-dans__knop:focus-visible { outline: 2px solid var(--bz-accent); outline-offset: 3px; }
+
 /* Lage schermen (liggende telefoon, kaartbeeld): namen op één regel, zodat paar en namen allebei in beeld blijven. */
 @media (max-height: 640px) {
   .bz-hero { min-height: 480px; }

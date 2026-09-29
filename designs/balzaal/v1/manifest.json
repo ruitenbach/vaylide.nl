@@ -10,6 +10,7 @@
     "verloving"
   ],
   "sort_order": 7,
+  "special": true,
   "opening": "envelop",
   "opening_label": "Envelop met lakzegel",
   "demo_melody": "canon",

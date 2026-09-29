@@ -58,6 +58,7 @@ class FacesFlowTests(VaylideTestCase):
     def setUp(self):
         # Alleen een testbedrag; de echte prijs bepaalt de eigenaar.
         AddOn.objects.create(code="gezichten", name="Eigen gezichten", description="", price_cents=100, feature="gezichten")
+        AddOn.objects.create(code="special-balzaal", name="Special Balzaal", description="", price_cents=100, feature="special")
         self.customer = self.make_customer()
         self.inv = self.make_invitation(owner=self.customer, template="balzaal")
         self.client = Client()
@@ -119,7 +120,7 @@ class FacesFlowTests(VaylideTestCase):
         self.assertIn('data-paar="eigen"', preview)
         self.assertNotIn("paar-bruin-blond-560.webp", preview)
         # Bij het afrekenen telt de extra optie mee.
-        quote = build_quote(self.inv.draft_content, Package.objects.get(code="essentieel"), [])
+        quote = build_quote(self.inv.draft_content, Package.objects.get(code="essentieel"), [], template_version=self.inv.template_version)
         self.assertIn("gezichten", quote.features)
         self.assertIn("optie:gezichten", [line.code for line in quote.lines])
         # Betalen en publiceren: precies deze goedgekeurde versie, zonder opnieuw te genereren.

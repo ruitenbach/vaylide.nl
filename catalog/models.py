@@ -28,6 +28,11 @@ class Template(models.Model):
     occasions = models.JSONField("gelegenheden", default=list)
     is_active = models.BooleanField("zichtbaar en bestelbaar", default=True)
     sort_order = models.PositiveIntegerField("volgorde", default=0)
+    special = models.BooleanField(
+        "special", default=False,
+        help_text="Bijzonder ontwerp: staat onder Specials, niet tussen de gewone kaarten, en heeft een eigen meerprijs "
+                  "(extra optie met functie 'special' en code special-<code>). Zonder die optie is het niet te bestellen.",
+    )
     current_version = models.ForeignKey(
         "TemplateVersion",
         verbose_name="versie voor nieuwe uitnodigingen",

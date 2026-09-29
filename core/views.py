@@ -76,12 +76,17 @@ def designs(request):
     occasion = request.GET.get("gelegenheid", "")
     if occasion not in OCCASION_LABELS:
         occasion = ""
-    all_designs = _designs()
-    shown = by_occasion([d for d in all_designs if not occasion or occasion in d.occasions], occasion)
+    only_specials = request.GET.get("categorie") == "specials"
+    all_designs = [d for d in _designs() if not occasion or occasion in d.occasions]
+    # Specials staan apart: nooit tussen de gewone kaarten, wel in een eigen blok en onder de keuze Specials.
+    specials = by_occasion([d for d in all_designs if d.special], occasion)
+    shown = [] if only_specials else by_occasion([d for d in all_designs if not d.special], occasion)
     return render(
         request,
         "core/designs.html",
         {
+            "only_specials": only_specials,
+            "special_cards": _design_cards(specials, occasion),
             "cards": _design_cards(shown, occasion),
             "occasions": OCCASION_CHOICES,
             "occasion": occasion,
