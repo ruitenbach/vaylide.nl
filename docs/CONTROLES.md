@@ -876,3 +876,39 @@ Aanleiding: testbestelling VL26-00005 op Render met SMTP via Vimexx. Lokaal gete
   - de kaart is passend verkleind.
 - Opgemerkt: na veel klantreizen achter elkaar grijpt de limiet van 12 inlogcodes per uur per IP-adres in. Dat is
   bedoeld; lokaal de cache geleegd.
+
+## Testsite op Render na deploy van 259aa65 (30 september 2026, avond)
+
+**Deploy:**
+- fast-forward `c24a888..259aa65` naar `claude/kerstkaarten-website-design-51mn9k`;
+- vooraf een verse back-up `vaylide-20260930-201056.tar.gz` (189 records, 9 uploads), gecontroleerd door de eigenaar;
+- terugzetten lokaal geoefend;
+- GitHub-deployment "success"; statische bestanden gelijk aan `259aa65`; `/healthz` 200.
+
+Getest in Chrome (koppeling met de browser van de eigenaar), testmodus met Mollie-testsleutel en SMTP via Vimexx.
+Fictieve bestellingen; e-mails alleen naar het eigen adres van de eigenaar.
+
+- **Beheer → Instellingen:** Testmodus, "Mollie (testsleutel, geen echt geld)", "SMTP via mail.zxcs.nl". De testbalk
+  zegt "e-mails worden echt verstuurd".
+- **Inlogpagina:** geen code meer op het scherm; de code komt per mail.
+- **VL26-00006** (Compleet, iDEAL, Betaald, normale terugkeer):
+  - de bedankpagina toont de echte kaart "Zoë d'Artagnan & Émile O'Neill … 12 juni 2027", zonder voorbeeldnamen;
+  - online tot en met 30 september 2027;
+  - de QR-code (lokaal ontcijferd) en de link openen de juiste uitnodiging;
+  - vaste aanmeldvragen en twee keer de uitleg bij vrije velden;
+  - meldingen: `webhook · paid` ("Betaald; verwerking gestart."), daarna `terugkeer · paid` ("Al verwerkt als betaald;
+    melding genegeerd.");
+  - leveringsmail: "voor Zoë d'Artagnan & Émile O'Neill", zonder `&amp;`.
+- **VL26-00007** (Essentieel, afgebroken):
+  - "Geannuleerd" op de testpagina van Mollie brengt de klant terug naar de keuze van de betaalmethode;
+  - via "Vorige pagina" terug naar de winkel: de betaling blijft "open" bij Mollie en de bestelling "wacht op betaling";
+  - de uitnodiging blijft een concept met "Afrekenen"; niets gepubliceerd.
+  - De wachtpagina vraagt Mollie elke ~3 s om de status (een regel per keer); er is geen knop "opnieuw betalen".
+- **VL26-00008** (Essentieel, Betaald, zonder terugkeer):
+  - de klant is uitgelogd vóór het betalen; de terugkeer eindigde op de inlogpagina;
+  - precies één melding: `webhook · paid` om 22:48:36 met "Betaald; verwerking gestart.", geen `terugkeer`;
+  - publiceren, leveren en beide mails: klaar na 1 poging, verzonden;
+  - 1 versie, gepubliceerd om 22:48, online tot en met 30 maart 2027;
+  - bevestigingsmail met einddatum, toestemming en voorwaardenversie. De bedrijfsgegevens tonen nog invulvelden.
+- **Niet door mij te zien:** de HTML-weergave en de bijlagen (QR-code, voorwaarden) in de ontvangen mail. Die
+  controleert de eigenaar in de eigen mailbox.
