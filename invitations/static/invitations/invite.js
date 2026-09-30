@@ -596,7 +596,7 @@
     var main = document.getElementById("uitnodiging");
     if (!cover || !main) return;
     var key = "vierlief-open:" + location.pathname;
-    var skip = /^#(aanmelden|aanmelden-formulier|uitnodiging)/.test(location.hash) || (html.hasAttribute("data-live") && html.getAttribute("data-live") !== "stijl");  // bij Stijl: de envelop laten zien
+    var skip = /^#(aanmelden|aanmelden-formulier|uitnodiging)/.test(location.hash) || (html.hasAttribute("data-live") && html.getAttribute("data-live") !== "stijl") || html.hasAttribute("data-direct-open");  // bij Stijl: de envelop laten zien
     // De live kaart in de editor onthoudt niets: bij Stijl altijd de dichte envelop.
     if (!html.hasAttribute("data-live")) { try { if (sessionStorage.getItem(key)) skip = true; } catch (e) { /* privémodus */ } }
     if (skip) { finish(true); return; }
@@ -633,7 +633,8 @@
       html.classList.add("is-open");
       cover.hidden = true;
       main.inert = false;
-      try { sessionStorage.setItem(key, "1"); } catch (e) { /* privémodus */ }
+      // De kleine kaart op de bedankpagina (inv-embed) telt niet als 'al geopend' voor het echte bezoek.
+      if (!html.classList.contains("inv-embed")) { try { sessionStorage.setItem(key, "1"); } catch (e) { /* privémodus */ } }
       if (!instant) {
         window.scrollTo(0, 0);
         var heading = main.querySelector("h1");

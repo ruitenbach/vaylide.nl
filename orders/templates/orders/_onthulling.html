@@ -7,8 +7,10 @@
   <div class="container onthulling__inner">
     <div class="onthulling__podium" aria-hidden="true">
       <span class="onthulling__gloed"></span>
-      {% if inv %}{% design_image inv.template_version.template.slug as kaart_src %}{% endif %}
-      <div class="onthulling__envelop">{% include "partials/envelop.html" with id="onthulling" kaart=kaart_src kaart_alt="" kaart_w=400 kaart_h=500 open=True %}</div>
+      {% comment %}De echte, gepubliceerde kaart met de gegevens van deze bestelling (geen voorbeeld met andere namen).{% endcomment %}
+      {% if inv and state.public_url %}{% with kaart_url=inv.public_path|add:"?embed=1&open=1" %}
+      <div class="onthulling__envelop">{% include "partials/envelop.html" with id="onthulling" kaart_frame=kaart_url kaart_alt="Je kaart" open=True %}</div>
+      {% endwith %}{% endif %}
     </div>
     <div class="onthulling__tekst">
       <p class="onthulling__kicker"><span class="onthulling__vink" aria-hidden="true"></span>Betaald · bestelling {{ order.number }}</p>

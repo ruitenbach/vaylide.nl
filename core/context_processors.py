@@ -27,6 +27,8 @@ def vierlief(request):
     return {
         "TEST_MODE": settings.TEST_MODE,
         "TEST_BANNER": test_banner(),
+        # Of e-mails alleen worden bewaard (testmodus zonder SMTP); teksten over verzenden hangen hiervan af.
+        "EMAIL_OUTBOX": settings.EMAIL_MODE == "outbox",
         # Pas uitgerekend als een template ze gebruikt (voettekst, bestelstap).
         "PAYMENT_METHODS": available_methods,
         "SOCIAL_LINKS": social_links,

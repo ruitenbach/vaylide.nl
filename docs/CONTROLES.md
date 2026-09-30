@@ -851,3 +851,28 @@ Lokaal, testmodus, nagebootste betaling en e-mail. Verslag: `docs/AUTOMATISERING
   - `/healthz` 200;
   - statische bestanden gelijk aan commit `c24a888`.
   - **Niet geverifieerd:** Render-dashboard, geplande taak, SMTP en webhookmeldingen.
+
+## Weergave na de Render-test: testmelding, escaping en echte kaart (30 september 2026)
+
+Aanleiding: testbestelling VL26-00005 op Render met SMTP via Vimexx. Lokaal getest, testmodus.
+
+- `manage.py test tests`: 431 tests, alle geslaagd (nieuw: `tests/test_weergave_mail_bedankpagina.py`, 10 tests).
+  - De e-mailtests en de bedankpaginatest falen op de oude code en slagen op de nieuwe (gecontroleerd).
+  - Getest:
+    - `&`, apostroffen en accenten staan letterlijk in de platte tekst en precies één keer geëscapet in de HTML;
+    - HTML in namen blijft onschadelijk;
+    - bestelmails met echte namen;
+    - de testmelding in de mail volgt de e-mailmodus (outbox of SMTP);
+    - de inlogcode staat alleen op het scherm bij outbox;
+    - de herroepingspagina volgt de e-mailmodus;
+    - de bedankpagina toont de echte kaart (kader naar `/u/<slug>/?embed=1&open=1`), geen voorbeeldbeeld en geen andere
+      namen;
+    - het kader mag alleen door de eigen site worden getoond (`SAMEORIGIN`, `frame-ancestors 'self'`); gewone
+      uitnodigingen blijven `DENY`.
+- **Klantreis in Chromium:** 51/51 op 390 en 1366 pixels, met het bruidspaar "Zoë d'Artagnan & Klantreis". Nieuw
+  gecontroleerd op de bedankpagina:
+  - echte kaart met deze namen, geen "Sanne" of "Daan";
+  - de pagina springt niet (scrollY 0);
+  - de kaart is passend verkleind.
+- Opgemerkt: na veel klantreizen achter elkaar grijpt de limiet van 12 inlogcodes per uur per IP-adres in. Dat is
+  bedoeld; lokaal de cache geleegd.

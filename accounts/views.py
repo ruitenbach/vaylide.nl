@@ -21,6 +21,12 @@ SESSION_NEXT = "vierlief_login_next"
 SESSION_TEST_CODE = "vierlief_test_code"
 
 
+def _code_on_screen() -> bool:
+    """Alleen als e-mails in de testomgeving echt niet worden verstuurd (outbox), staat de code op het scherm. Met SMTP
+    komt de code in de mailbox, net als straks live; dan tonen we hem niet (ook niet aan wie het adres niet bezit)."""
+    return settings.TEST_MODE and settings.EMAIL_MODE == "outbox"
+
+
 def _after_login(request, user):
     from invitations.models import Invitation
 
@@ -51,7 +57,7 @@ def login_view(request):
             send_login_code(email, code, reverse("accounts:link", args=[token]), purpose="verify" if purpose == "bewaren" else "login")
             request.session[SESSION_EMAIL] = email
             request.session[SESSION_NEXT] = next_url
-            if settings.TEST_MODE:
+            if _code_on_screen():
                 request.session[SESSION_TEST_CODE] = {"code": code, "link": reverse("accounts:link", args=[token])}
             return redirect("accounts:code")
     return render(request, "accounts/login.html", {"form": form, "next": next_url, "purpose": purpose})
@@ -78,7 +84,7 @@ def code_view(request):
                 request.session.pop(SESSION_TEST_CODE, None)
                 _after_login(request, user)
                 return redirect(safe_next(request, next_url, reverse("portal:home")))
-    test_code = request.session.get(SESSION_TEST_CODE) if settings.TEST_MODE else None
+    test_code = request.session.get(SESSION_TEST_CODE) if _code_on_screen() else None
     return render(request, "accounts/code.html", {"form": form, "email": email, "test_code": test_code})
 
 

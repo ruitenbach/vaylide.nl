@@ -97,7 +97,7 @@ def _capacity(content: dict) -> int | None:
         return None
 
 
-def live_view(request, invitation: Invitation, *, existing=None) -> dict:
+def live_view(request, invitation: Invitation, *, existing=None, embed: bool = False, direct_open: bool = False) -> dict:
     version = invitation.published_version
     content = version.content
     capacity = _capacity(content)
@@ -111,6 +111,8 @@ def live_view(request, invitation: Invitation, *, existing=None) -> dict:
         rsvp_action=reverse("invitations:rsvp", args=[invitation.slug]),
         responses_count_persons=attending_persons(invitation) if capacity else 0,
         existing_response=existing,
+        embed=embed,
+        direct_open=direct_open,
     )
     view = build_view(
         occasion=invitation.occasion,
@@ -143,12 +145,18 @@ def public_invitation(request, slug):
     if not invitation.is_publicly_visible:
         return _unavailable(request)
     existing, token = _existing_response(request, invitation)
-    view = live_view(request, invitation, existing=existing)
+    # ?embed=1: de echte kaart klein in een kader op onze eigen site (de bedankpagina na betaling). Alleen dan mag
+    # framen, en alleen door dezelfde site (X-Frame-Options SAMEORIGIN, CSP frame-ancestors 'self').
+    embed = request.GET.get("embed") == "1"
+    view = live_view(request, invitation, existing=existing, embed=embed, direct_open=embed and request.GET.get("open") == "1")
     rsvp_form = _fresh_rsvp_form()
     if existing:
         rsvp_form["existing_edit_url"] = reverse("invitations:rsvp_edit", args=[slug, token])
     template = invitation.published_version.template_version.template_path
-    return render(request, template, {"v": view, "rsvp_form": rsvp_form})
+    response = render(request, template, {"v": view, "rsvp_form": rsvp_form})
+    if embed:
+        response["X-Frame-Options"] = "SAMEORIGIN"
+    return response
 
 
 def _set_rsvp_cookie(response, invitation, token):

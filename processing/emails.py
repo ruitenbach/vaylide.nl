@@ -52,6 +52,15 @@ def absolute(path: str) -> str:
     return f"{settings.BASE_URL}{path}"
 
 
+def render_text(template: str, context: dict) -> str:
+    """Platte tekst zonder HTML-escaping: een tekstmail is geen HTML, dus 'Glen & Lisa' blijft 'Glen & Lisa'. De
+    HTML-versie escapet deze tekst daarna precies één keer (emails/base.html), zodat HTML-invoer daar onschadelijk blijft."""
+    from django.template import Context
+    from django.template.loader import get_template
+
+    return get_template(template).template.render(Context(context, autoescape=False))
+
+
 def queue_email(*, to: str, subject: str, template: str, context: dict | None = None, unique_key: str | None = None,
                 kind: str = "", user=None, order=None, invitation=None, custom_request=None, attach_qr_for=None,
                 max_attempts: int = 6, owner_alert: bool = False, attach_terms_version: str = "") -> OutboundEmail:
@@ -59,8 +68,10 @@ def queue_email(*, to: str, subject: str, template: str, context: dict | None = 
         existing = OutboundEmail.objects.filter(unique_key=unique_key).first()
         if existing:
             return existing
-    ctx = {"base_url": settings.BASE_URL, "test_mode": settings.TEST_MODE, **(context or {})}
-    body_text = render_to_string(f"emails/{template}.txt", ctx).strip() + "\n"
+    # De testmelding hangt af van de echte e-mailmodus: met SMTP in testmodus wordt de mail wél verstuurd.
+    ctx = {"base_url": settings.BASE_URL, "test_mode": settings.TEST_MODE, "email_outbox": settings.EMAIL_MODE == "outbox",
+           **(context or {})}
+    body_text = render_text(f"emails/{template}.txt", ctx).strip() + "\n"
     body_html = render_to_string("emails/base.html", {**ctx, "body_text": body_text, "subject": subject})
     if settings.TEST_MODE and not subject.startswith("[TEST]"):
         subject = f"[TEST] {subject}"

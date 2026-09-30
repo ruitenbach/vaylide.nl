@@ -1015,6 +1015,11 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .zenv__kaart { position: absolute; left: 13%; right: 13%; top: 6%; aspect-ratio: 5 / 7; border-radius: 6px; overflow: hidden; background: var(--paper);
   box-shadow: 0 10px 26px -12px rgba(60, 40, 18, .55); transform: translateY(0); transition: transform .8s cubic-bezier(.5, 0, .3, 1) 0s; }
 .zenv__kaart img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+/* De echte kaart (bedankpagina): zonder JavaScript gewoon kaartbreed; met JavaScript op telefoonbreedte getekend en
+   verkleind (--kaart-s uit onthulling.js), zodat hij eruitziet zoals gasten hem op hun telefoon zien. Niet klikbaar. */
+.zenv__frame { display: block; width: 100%; height: 100%; border: 0; background: var(--paper); pointer-events: none; }
+.zenv__kaart.is-geschaald .zenv__frame { position: absolute; top: 0; left: 0; width: 390px; height: 546px; transform-origin: 0 0;
+  transform: scale(var(--kaart-s, .5)); }
 .zenv__link { position: absolute; z-index: 6; left: 50%; bottom: -3.4rem; translate: -50% 0; pointer-events: none; display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap;
   padding: .5rem .9rem .5rem .6rem; border-radius: 999px; background: var(--accent); color: #fff; font-size: .82rem; font-weight: 600; text-decoration: none;
   box-shadow: 0 10px 20px -10px rgba(60, 40, 15, .7); opacity: 0; transition: opacity .3s ease; }

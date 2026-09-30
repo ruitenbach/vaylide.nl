@@ -1,11 +1,13 @@
 {% load static vl %}{% comment %}De zachte envelop (homepage en de onthulling na betaling): ronde klep en opening als vectorvormen, de klep vouwt
-   soepel open (2D, geen 3D-randen) en de kaart glijdt omhoog. Parameters: id, kaart (afbeelding), kaart_alt, kaart_w, kaart_h,
+   soepel open (2D, geen 3D-randen) en de kaart glijdt omhoog. Parameters: id, kaart (afbeelding) of kaart_frame (adres van de
+   echte kaart, klein getoond in een kader), kaart_alt, kaart_w, kaart_h,
    link_url en link_label (optioneel), knop (een knop om te openen), open (begint open, bijv. de eindstand zonder JavaScript).{% endcomment %}
 <div class="zenv{% if open %} is-open{% endif %}" data-envelop>
   <span class="zenv__achter" aria-hidden="true"></span>
   <span class="zenv__vak">
     <span class="zenv__kaart" id="{{ id }}-kaart">
-      <img src="{{ kaart }}" alt="{{ kaart_alt }}" width="{{ kaart_w|default:500 }}" height="{{ kaart_h|default:700 }}" decoding="async">
+      {% if kaart_frame %}<iframe class="zenv__frame" src="{{ kaart_frame }}" title="{{ kaart_alt }}" tabindex="-1" aria-hidden="true" inert scrolling="no" data-kaart-frame></iframe>
+      {% elif kaart %}<img src="{{ kaart }}" alt="{{ kaart_alt }}" width="{{ kaart_w|default:500 }}" height="{{ kaart_h|default:700 }}" decoding="async">{% endif %}
     </span>
   </span>
   <svg class="zenv__voor" viewBox="0 0 200 140" preserveAspectRatio="none" aria-hidden="true" focusable="false">

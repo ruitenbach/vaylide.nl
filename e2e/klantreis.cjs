@@ -103,6 +103,16 @@ async function pay(p, uid, outcome, name, pkg = "essentieel") {
 
   const phase = await pay(pa, data.paid, "betaald", "betaald", "compleet");
   await shot(pa, "status-betaald");
+  // Bedankpagina: de echte kaart (met de namen van deze bestelling) in de envelop, geen voorbeeld met andere namen.
+  await pa.waitForTimeout(4000);
+  const kaartFrame = await pa.$("iframe[data-kaart-frame]");
+  const kaartTekst = kaartFrame ? await (await kaartFrame.contentFrame()).textContent("body").catch(() => "") : "";
+  const bedankTekst = await pa.textContent("main");
+  check("Bedankpagina toont de echte kaart", /Zoë d'Artagnan/.test(kaartTekst || "") && bedankTekst.includes("Zoë d'Artagnan & Klantreis") && !/Sanne|Daan/.test((kaartTekst || "") + bedankTekst), (kaartTekst || "geen kaart").replace(/\s+/g, " ").slice(0, 60));
+  const schaal = kaartFrame ? await kaartFrame.evaluate((f) => getComputedStyle(f.parentNode).getPropertyValue("--kaart-s")) : "";
+  check("Bedankpagina springt niet door de kaart", (await pa.evaluate(() => window.scrollY)) === 0, `scrollY ${await pa.evaluate(() => window.scrollY)}`);
+  check("Kaart is passend verkleind", parseFloat(schaal) > 0.2 && parseFloat(schaal) < 1.5, `schaal ${schaal}`);
+  await pa.screenshot({ path: path.join(out, `${width}-bedankpagina.png`) });
   check("Geslaagde betaling: bestelling online", phase === "live", `fase ${phase}`);
   const publicUrl = await pa.getAttribute("a[href*='/u/']", "href").catch(() => null);
   check("Link naar de uitnodiging op de statuspagina", !!publicUrl, publicUrl || "geen link");

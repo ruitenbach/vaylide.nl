@@ -5,7 +5,7 @@
 <section class="page-head"><div class="container container--mid">
   <p class="eyebrow">Herroepingsfunctie</p>
   <h1>We hebben je herroeping ontvangen</h1>
-  <p class="lead">Ontvangen op {{ w.created_at|date:"j F Y" }} om {{ w.created_at|date:"H:i" }} uur. {% if TEST_MODE %}In deze testomgeving wordt de bevestiging niet echt verstuurd; hij staat in de e-mail-outbox.{% else %}Een bevestiging met deze gegevens is per e-mail verstuurd naar {{ w.email }}.{% endif %}</p>
+  <p class="lead">Ontvangen op {{ w.created_at|date:"j F Y" }} om {{ w.created_at|date:"H:i" }} uur. {% if EMAIL_OUTBOX %}In deze testomgeving wordt de bevestiging niet echt verstuurd; hij staat in de e-mail-outbox.{% else %}Een bevestiging met deze gegevens is per e-mail verstuurd naar {{ w.email }}.{% endif %}</p>
 </div></section>
 <section class="section section--flush"><div class="container container--mid">
   <dl class="kv">

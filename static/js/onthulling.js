@@ -21,6 +21,19 @@
     input.addEventListener("focus", function () { input.select(); });
   });
 
+  /* De echte kaart in de envelop: een telefoonbreed kader (390 px) verkleind tot de maat van de kaart. */
+  stage.querySelectorAll("[data-kaart-frame]").forEach(function (frame) {
+    var box = frame.parentNode;
+    function fit() {
+      var w = box.clientWidth;
+      if (w) box.style.setProperty("--kaart-s", (w / 390).toFixed(4));
+    }
+    box.classList.add("is-geschaald");
+    fit();
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(box);
+    else window.addEventListener("resize", fit);
+  });
+
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduce) return;
 

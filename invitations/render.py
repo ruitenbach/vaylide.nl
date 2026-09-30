@@ -183,6 +183,7 @@ class RenderOptions:
     existing_response: object | None = None
     music_synth: bool = False
     embed: bool = False
+    direct_open: bool = False  # meteen de kaart zelf, zonder openingsscherm (de kleine kaart op de bedankpagina)
     kader: bool = False  # in een kader in de editor (stap Voorbeeld): geen scrollbalk, wel de testbalk
     live: str = ""  # de live kaart in de editor: welk deel extra aandacht krijgt (bijv. 'fotos')
 
@@ -493,6 +494,7 @@ def build_view(
         "is_preview": options.mode == "preview",
         "is_demo": options.mode == "demo",
         "embed": options.embed,
+        "direct_open": options.direct_open,
         "live": options.live,
         "kader": options.kader,
         "formal": formal,
