@@ -262,6 +262,18 @@ def terms_download(request, version):
     return response
 
 
+def terms_pdf(request, version):
+    """De voorwaarden als pdf om te lezen en op te slaan (in de browser geopend; opslaan via de pdf-lezer)."""
+    from .voorwaarden import VERSIONS, pdf_filename
+    from .voorwaarden_pdf import render_pdf
+
+    if version not in VERSIONS:
+        raise Http404()
+    response = HttpResponse(render_pdf(version), content_type="application/pdf")
+    response["Content-Disposition"] = f'inline; filename="{pdf_filename(version)}"'
+    return response
+
+
 def robots_txt(request):
     lines = [
         "User-agent: *",

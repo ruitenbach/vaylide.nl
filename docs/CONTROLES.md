@@ -912,3 +912,38 @@ Fictieve bestellingen; e-mails alleen naar het eigen adres van de eigenaar.
   - bevestigingsmail met einddatum, toestemming en voorwaardenversie. De bedrijfsgegevens tonen nog invulvelden.
 - **Niet door mij te zien:** de HTML-weergave en de bijlagen (QR-code, voorwaarden) in de ontvangen mail. Die
   controleert de eigenaar in de eigen mailbox.
+
+## Mails als "show", voorwaarden-pdf en betaalwachtscherm (1 oktober 2026)
+
+Lokaal getest, testmodus. Niet gepusht of gedeployd.
+
+- `manage.py test tests`: 452 tests, alle geslaagd (nieuw: `tests/test_mails_en_wachtscherm.py`, 21 tests). Getest:
+  - **Opbouw van de mails:**
+    - leveringsmail = alternative[tekst, related[html, QR-png inline met Content-ID]], zonder losse bijlage;
+    - bestelbevestiging = mixed[alternative, voorwaarden-pdf];
+    - inhoud, links, 16 px tekst, geen JavaScript;
+    - accountadressen alleen achter knoppen;
+    - klantinvoer precies één keer geëscapet;
+    - QR-download alleen voor de ingelogde eigenaar.
+  - **PDF:**
+    - opent inline;
+    - bevat de hele versie en het bestelnummer;
+    - een bestelling houdt haar eigen versie, ook als er een nieuwere is;
+    - gasten zien geen voorwaarden, bestel- of accountlinks.
+  - **Wachtscherm:**
+    - geen regel in het beheer bij een ongewijzigde status (wel bij wijzigingen en bij webhooks);
+    - de server vraagt de provider hoogstens eens per 10 s;
+    - na 60 s de knop "Betaling hervatten", die naar dezelfde open betaling gaat;
+    - een late betaling wordt gevonden;
+    - bij "bank verwerkt" geen tweede betaling;
+    - geannuleerd, verlopen en mislukt hebben elk een eigen scherm en pas dan een nieuwe poging;
+    - een nieuwe bestelling controleert eerst de open betaling;
+    - de webhook na hervatten publiceert één keer.
+- **`e2e/wachtscherm.cjs`:** 10/10 op 390 en 1366 px: open betaling, hervatten (zelfde betaling), afgebroken, opnieuw,
+  verlopen, opnieuw, betaald en online. 9 statusverzoeken per minuut (was 31).
+- **Klantreis:** 51/51 op 390 en 1366 px.
+- **Mailvoorbeelden** (Chromium, 390 en 900 px): geen horizontaal scrollen; ook zonder afbeeldingen leesbaar (effen
+  donkere achtergrond, alt-teksten).
+- **Voorwaarden-pdf** opent in Chrome (pdf-lezer).
+- **Niet gecontroleerd:** de echte weergave in Outlook en Gmail. Daarvoor is versturen vanaf de testsite nodig, na een
+  deploy.

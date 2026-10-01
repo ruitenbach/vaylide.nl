@@ -6,6 +6,7 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -20,6 +21,11 @@ from .providers import ProviderError
 from .services import CheckoutError, create_payment, sync_payment
 
 log = logging.getLogger(__name__)
+
+# Wachtscherm: hoe vaak de server de status bij de provider opvraagt (hoogstens eens per SYNC_SECONDS per betaling) en
+# na hoeveel seconden een nog openstaande betaling een knop 'Betaling hervatten' krijgt.
+SYNC_SECONDS = 10
+RESUME_AFTER_SECONDS = 60
 
 
 def _own_order(request, uid) -> Order:
@@ -37,14 +43,18 @@ def _state(order: Order) -> dict:
     email_state = {e.kind: e.status for e in emails}
     if order.status == Order.Status.PAID:
         phase = "live" if live else ("attention" if order.fulfilment_status == Order.Fulfilment.ATTENTION else "processing")
-    elif payment and payment.status in (Payment.Status.FAILED, Payment.Status.EXPIRED):
-        phase = "failed"
-    elif payment and payment.status == Payment.Status.CANCELED:
-        phase = "cancelled"
     elif order.status == Order.Status.CANCELLED:
         phase = "superseded"
+    elif payment and payment.status == Payment.Status.FAILED:
+        phase = "failed"
+    elif payment and payment.status == Payment.Status.EXPIRED:
+        phase = "expired"
+    elif payment and payment.status == Payment.Status.CANCELED:
+        phase = "cancelled"
     else:
         phase = "waiting"
+    age = int((timezone.now() - payment.created_at).total_seconds()) if payment else 0
+    open_payment = bool(payment and payment.status == Payment.Status.OPEN and payment.checkout_url)
     return {
         "phase": phase,
         "order_status": order.status,
@@ -53,15 +63,20 @@ def _state(order: Order) -> dict:
         "public_url": invitation.public_url if live else "",
         "confirmation_email": email_state.get("order_confirmation", ""),
         "live_email": email_state.get("invitation_live", ""),
+        # Wachten: 'open' = de klant heeft de betaalpagina (nog) niet afgerond; 'pending' = de bank verwerkt nog.
+        "bank_pending": phase == "waiting" and bool(payment and payment.status == Payment.Status.PENDING),
+        "can_resume": phase == "waiting" and open_payment and age >= RESUME_AFTER_SECONDS,
+        "resume_after": max(0, RESUME_AFTER_SECONDS - age) if phase == "waiting" and open_payment else -1,
     }
 
 
 def _maybe_sync(order: Order) -> None:
-    """Bij terugkeer van de betaalpagina de status serverzijdig bij de provider nagaan."""
+    """Bij terugkeer van de betaalpagina de status serverzijdig bij de provider nagaan: hoogstens eens per SYNC_SECONDS
+    per betaling (het wachtscherm vraagt vaker), en niet meer zodra de betaling afgerond is."""
     payment = order.latest_payment
     if payment is None or payment.status in Payment.FINAL or order.status == Order.Status.PAID:
         return
-    if (timezone.now() - payment.updated_at).total_seconds() < 3 and payment.status != Payment.Status.OPEN:
+    if not cache.add(f"betaalcheck:{payment.pk}", 1, SYNC_SECONDS):
         return
     try:
         sync_payment(payment, source="terugkeer")
@@ -140,10 +155,31 @@ def status_json(request, uid):
 @login_required
 @require_POST
 def retry_payment(request, uid):
+    """Betaling hervatten of opnieuw proberen, veilig: eerst de actuele status bij de provider. Staat de betaling nog
+    open, dan terug naar dezelfde betaalpagina (geen tweede actieve betaling); verwerkt de bank nog, dan niets nieuws;
+    alleen na mislukt, geannuleerd of verlopen een nieuwe betaalpoging."""
     order = _own_order(request, uid)
+    if order.status == Order.Status.PAID:
+        return redirect("orders:status", uid=order.uid)
     if order.status not in (Order.Status.PENDING, Order.Status.FAILED, Order.Status.EXPIRED):
         messages.error(request, "Deze bestelling kan niet opnieuw worden betaald.")
         return redirect("orders:status", uid=order.uid)
+    payment = order.latest_payment
+    if payment is not None and payment.status not in Payment.FINAL:
+        try:
+            payment = sync_payment(payment, source="hervatten")
+        except ProviderError as exc:
+            log.warning("Status ophalen vóór hervatten mislukt voor %s: %s", order.number, exc)
+            messages.error(request, "De betaalomgeving is even niet bereikbaar. Probeer het zo opnieuw; je ontwerp is bewaard.")
+            return redirect("orders:status", uid=order.uid)
+        order.refresh_from_db()
+        if order.status == Order.Status.PAID or payment.status == Payment.Status.PAID:
+            return redirect("orders:status", uid=order.uid)
+        if payment.status == Payment.Status.OPEN and payment.checkout_url:
+            return redirect(payment.checkout_url)
+        if payment.status == Payment.Status.PENDING:
+            messages.info(request, "Je bank verwerkt de betaling nog. Je hoeft niet opnieuw te betalen; dit scherm werkt zichzelf bij.")
+            return redirect("orders:status", uid=order.uid)
     try:
         payment = create_payment(order)
     except CheckoutError as exc:

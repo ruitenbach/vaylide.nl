@@ -1,0 +1,44 @@
+{% comment %}Gedeelde opmaak van de VAYLIDE-mails: warm ivoor, champagnegoud, donkere leesbare tekst, het bestaande logo.
+   E-mailgeschikt: tabellen en inline stijlen, geen JavaScript, geen externe letters. Ook zonder geladen afbeeldingen
+   begrijpelijk (alt-teksten, alle inhoud als tekst). Blokken: voorkop (preheader), inhoud.{% endcomment %}<!doctype html>
+<html lang="nl" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>{{ subject }}</title>
+<style>
+  /* Alleen verfijningen; alles werkt ook zonder deze stijlen (sommige programma's negeren ze). */
+  @media only screen and (max-width: 600px) {
+    .vl-kaart { border-radius: 0 !important; }
+    .vl-pad { padding-left: 22px !important; padding-right: 22px !important; }
+    .vl-titel { font-size: 27px !important; line-height: 34px !important; }
+    .vl-knop a { display: block !important; }
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#FBF8F2;-webkit-text-size-adjust:100%;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#FBF8F2;font-size:1px;line-height:1px;">{% block voorkop %}{% endblock %}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FBF8F2;">
+<tr><td align="center" style="padding:28px 12px 36px;">
+  <table role="presentation" class="vl-kaart" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#FFFDF9;border:1px solid #E9E0D2;border-radius:18px;">
+    <tr><td align="center" class="vl-pad" style="padding:34px 40px 8px;">
+      <img src="{{ logo_url }}" width="150" height="103" alt="VAYLIDE" style="display:block;border:0;outline:none;width:150px;height:103px;margin:0 auto;font-family:Georgia,'Times New Roman',serif;font-size:28px;letter-spacing:4px;color:#7A5A2E;">
+    </td></tr>
+    {% if test_mode %}<tr><td align="center" class="vl-pad" style="padding:6px 40px 0;">
+      <p style="margin:0;display:inline-block;padding:6px 12px;background:#F5EEE6;border-radius:999px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:18px;color:#5F4524;">{% if email_outbox %}Testomgeving: deze e-mail is niet echt verzonden.{% else %}Testversie van VAYLIDE · testbetaling, er is niets afgeschreven.{% endif %}</p>
+    </td></tr>{% endif %}
+    {% block inhoud %}{% endblock %}
+    <tr><td class="vl-pad" style="padding:8px 40px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-top:1px solid #E9E0D2;font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>
+    <tr><td align="center" class="vl-pad" style="padding:20px 40px 32px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#6B625A;">
+      <p style="margin:0 0 6px;">Vragen? Mail ons via <a href="mailto:{{ contact_email }}" style="color:#7A5A2E;text-decoration:underline;">{{ contact_email }}</a>.</p>
+      <p style="margin:0 0 14px;"><a href="{{ privacy_url }}" style="color:#7A5A2E;text-decoration:underline;">Privacyverklaring</a> · <a href="{{ terms_page_url }}" style="color:#7A5A2E;text-decoration:underline;">Algemene voorwaarden</a></p>
+      <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:15px;color:#7A5A2E;">Elk bijzonder moment begint met een uitnodiging.</p>
+    </td></tr>
+  </table>
+</td></tr>
+</table>
+</body>
+</html>

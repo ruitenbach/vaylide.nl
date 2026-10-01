@@ -175,5 +175,6 @@ class AutomationTests(VaylideTestCase):
         self.assertEqual(len(live), 1)
         body = live[0].body
         self.assertIn(f"/account/uitnodiging/{self.inv.uid}/", body)
-        self.assertIn("qr-code-uitnodiging.png", [a[0] for a in live[0].attachments])
+        self.assertEqual(live[0].attachments, [])  # geen losse bijlage meer: de QR-code staat in de HTML
+        self.assertIn("qr-code-uitnodiging.png", live[0].message().as_string())
         self.assertEqual(live[0].to, [self.customer.email])

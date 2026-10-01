@@ -103,7 +103,7 @@ class CheckoutConsentTests(VaylideTestCase):
             box = html[html.index(name) - 80:html.index(name) + 60]
             self.assertNotIn("checked", box, name)
         self.assertIn("versie 29 september 2026", html)
-        self.assertIn("/voorwaarden/download/2026-09-29/", html)
+        self.assertIn("/voorwaarden/pdf/2026-09-29/", html)
 
     def test_immediate_delivery_needs_its_own_consent(self):
         inv = self.make_invitation(owner=self.customer)
@@ -144,8 +144,11 @@ class ConfirmationTests(VaylideTestCase):
         from processing.emails import terms_attachment
 
         name, content, mime = terms_attachment("2026-09-29")
-        self.assertEqual((name, mime), ("algemene-voorwaarden-vaylide-2026-09-29.html", "text/html"))
-        self.assertIn("Beschikbaarheidsduur", content)
+        self.assertEqual((name, mime), ("algemene-voorwaarden-vaylide-2026-09-29.pdf", "application/pdf"))
+        self.assertTrue(content.startswith(b"%PDF-"))
+        from core.voorwaarden_pdf import render_pdf
+
+        self.assertIn(b"Beschikbaarheidsduur", render_pdf("2026-09-29", compress=False))
         # de bedankpagina toont de einddatum en de versie van de voorwaarden
         client = Client()
         client.force_login(customer)

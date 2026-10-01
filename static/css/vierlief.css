@@ -1085,3 +1085,4 @@ mark.invulveld { background: var(--warning-bg); color: var(--warning); padding: 
   .site-header, .site-footer, .voorwaarden-acties, .notice, .test-banner, .skip-link { display: none !important; }
   .voorwaarden { max-width: none; }
 }
+.order-status__hervatten p { margin: .3rem 0 .8rem; }

@@ -13,6 +13,8 @@ numpy==2.4.6
 anthropic==1.8.0
 pydantic==2.13.5
 tzdata==2026.4
+# De algemene voorwaarden als pdf-bijlage bij de bestelbevestiging (core/voorwaarden_pdf.py). BSD-licentie.
+reportlab==4.4.4
 # Tweede back-uplocatie (optioneel): versleutelen en uploaden naar S3-compatibele opslag.
 boto3==1.43.104
 cryptography==50.0.1

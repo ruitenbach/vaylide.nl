@@ -7,7 +7,7 @@
 {% if state.phase == "live" %}{% include "orders/_onthulling.html" %}{% include "orders/_besteloverzicht.html" %}{% else %}
 <section class="section--tight">
   <div class="container container--narrow">
-    <div class="card order-status" data-order-status="{% url 'orders:status_json' order.uid %}" data-phase="{{ state.phase }}">
+    <div class="card order-status" data-order-status="{% url 'orders:status_json' order.uid %}" data-phase="{{ state.phase }}" data-resume-after="{{ state.resume_after }}" data-bank-pending="{% if state.bank_pending %}1{% else %}0{% endif %}">
       <p class="eyebrow">Bestelling {{ order.number }}</p>
       {% if state.phase == "live" %}
         <h2 class="h-small">Zo is je bestelling verwerkt</h2>
@@ -20,15 +20,32 @@
       {% elif state.phase == "failed" %}
         <h1>Betaling niet gelukt</h1>
         <p class="lead">Er is niets afgeschreven. Je ontwerp is bewaard; je kunt het opnieuw proberen.</p>
+      {% elif state.phase == "expired" %}
+        <h1>Betaling verlopen</h1>
+        <p class="lead">De betaalpagina is verlopen voordat de betaling klaar was. Er is niets afgeschreven. Je ontwerp is bewaard; je kunt opnieuw betalen.</p>
       {% elif state.phase == "cancelled" %}
         <h1>Betaling afgebroken</h1>
         <p class="lead">Je hebt de betaling afgebroken. Je ontwerp is bewaard; je kunt het opnieuw proberen wanneer je wilt.</p>
       {% elif state.phase == "superseded" %}
         <h1>Deze bestelling is vervangen</h1>
         <p class="lead">Je bent opnieuw begonnen met afrekenen. Bekijk je {{ doc_kind }} in Mijn VAYLIDE.</p>
+      {% elif state.bank_pending %}
+        <h1>Je bank verwerkt de betaling</h1>
+        <p class="lead">Dat kan soms even duren. Je hoeft niet opnieuw te betalen. Dit scherm werkt zichzelf bij; je vindt je bestelling ook in Mijn VAYLIDE.</p>
       {% else %}
         <h1>We wachten op de bevestiging van je betaling</h1>
-        <p class="lead">Dit duurt meestal een paar seconden. Dit scherm werkt zichzelf bij; je kunt het ook later terugvinden in Mijn VAYLIDE.</p>
+        <p class="lead">Meestal duurt dit een paar seconden. Dit scherm werkt zichzelf bij; je vindt je bestelling ook in Mijn VAYLIDE.</p>
+      {% endif %}
+      {% if state.phase == "waiting" and state.resume_after >= 0 %}
+      <div class="notice order-status__hervatten" data-resume{% if not state.can_resume %} hidden{% endif %}>
+        <strong>Nog niet betaald?</strong>
+        <p>Heb je de betaalpagina gesloten of ben je teruggegaan? Dan is de betaling nog niet afgerond. Je kunt hem hervatten; we controleren eerst of er al betaald is, zodat je niet dubbel betaalt.</p>
+        <form method="post" action="{% url 'orders:retry' order.uid %}" class="btn-row">
+          {% csrf_token %}
+          <button type="submit" class="btn btn--primary">Betaling hervatten</button>
+          {% if order.invitation %}<a class="btn btn--ghost" href="{% url 'studio:step' order.invitation.uid 'bestellen' %}">Bestelling aanpassen</a>{% endif %}
+        </form>
+      </div>
       {% endif %}
 
       <ol class="progress-list" aria-label="Voortgang">
@@ -38,7 +55,7 @@
         <li class="{% if state.live_email == 'sent' or state.live_email == 'test' %}is-done{% elif state.phase == 'live' %}is-active{% endif %}">Link en QR-code per e-mail{% if state.live_email == 'test' %} <span class="badge badge--test">testmodus</span>{% elif state.live_email == 'failed' %} <span class="badge badge--warning">wordt opnieuw geprobeerd; je link staat hierboven</span>{% endif %}</li>
       </ol>
 
-      {% if state.phase == "failed" or state.phase == "cancelled" %}
+      {% if state.phase == "failed" or state.phase == "cancelled" or state.phase == "expired" %}
       <form method="post" action="{% url 'orders:retry' order.uid %}" class="btn-row">
         {% csrf_token %}
         <button type="submit" class="btn btn--primary">Opnieuw betalen</button>

@@ -19,6 +19,7 @@ urlpatterns = [
     path("voorwaarden/", views.terms, name="terms"),
     path("voorwaarden/versie/<str:version>/", views.terms_version, name="terms_version"),
     path("voorwaarden/download/<str:version>/", views.terms_download, name="terms_download"),
+    path("voorwaarden/pdf/<str:version>/", views.terms_pdf, name="terms_pdf"),
     path("robots.txt", views.robots_txt, name="robots"),
     path("sitemap.xml", views.sitemap_xml, name="sitemap"),
     path("healthz", views.healthz, name="healthz"),

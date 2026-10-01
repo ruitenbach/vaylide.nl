@@ -5,7 +5,8 @@ Goed nieuws: je {{ doc_kind }}{% if invitation.title %} {{ title_prep }} {{ invi
 Je persoonlijke link:
 {{ invitation.public_url }}
 
-Deel de link via WhatsApp, e-mail of sms. In de bijlage vind je de QR-code, bijvoorbeeld voor een gedrukte kaart.
+Deel de link via WhatsApp, e-mail of sms. De QR-code staat in de opgemaakte versie van deze e-mail. Downloaden kan in Mijn VAYLIDE, bijvoorbeeld voor een gedrukte kaart:
+{{ qr_download_url }}
 
 In Mijn VAYLIDE zie je de aanmeldingen, pas je gegevens aan en publiceer je wijzigingen op dezelfde link:
 {{ portal }}

@@ -2,7 +2,8 @@ Hallo,
 
 Bedankt voor je bestelling. Je betaling is bevestigd. Bewaar deze e-mail: dit is je bestelbevestiging.
 
-Bestelnummer: {{ order.number }}{% if order.package_name %}
+Bestelnummer: {{ order.number }}{% if design %}
+Ontwerp: {{ design }}{% endif %}{% if order.package_name %}
 Pakket: {{ order.package_name }}{% endif %}
 {% for line in lines %}- {{ line.description }}: {{ line.total_display }}
 {% endfor %}Totaal (incl. btw): {{ order.total_display }}
@@ -17,7 +18,7 @@ Later publiceren, aanpassen of je evenement verplaatsen verschuift de einddatum 
 Je toestemming voor directe levering ({{ order.delivery_consent_at|date:"j F Y H:i" }}):
 "{{ order.delivery_consent_text }}"
 {% endif %}
-Algemene voorwaarden: {{ terms.status|lower }}, versie {{ terms.date|date:"j F Y" }}. Die versie geldt voor deze bestelling en zit als bijlage bij deze e-mail. Je kunt hem ook bekijken op:
+Algemene voorwaarden: {{ terms.status|lower }}, versie {{ terms.date|date:"j F Y" }}. Die versie geldt voor deze bestelling en zit als pdf-bijlage bij deze e-mail. Je kunt hem ook bekijken op:
 {{ terms_url }}
 
 Herroepen (binnen de bedenktijd, zie artikel 9 en 10): {{ withdraw_url }}

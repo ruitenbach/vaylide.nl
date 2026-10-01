@@ -1,0 +1,50 @@
+{% extends "emails/layout.html" %}{% comment %}De bewaarbare bestelbevestiging, in dezelfde opmaak als de leveringsmail. Alle noodzakelijke informatie blijft:
+   bedrijfsgegevens, pakket en prijs, aankoop- en einddatum, de toestemming voor directe levering, de versie van de
+   voorwaarden (als pdf-bijlage) en de herroepingsfunctie.{% endcomment %}
+{% block voorkop %}Je betaling is bevestigd. Bewaar deze e-mail: dit is je bestelbevestiging voor {{ order.number }}.{% endblock %}
+{% block inhoud %}
+    <tr><td align="center" class="vl-pad" style="padding:22px 40px 0;">
+      <p aria-hidden="true" style="margin:0 0 6px;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:20px;letter-spacing:6px;color:#C4A574;">&#10022; &#10022; &#10022;</p>
+      <p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:18px;letter-spacing:2px;text-transform:uppercase;color:#7A5A2E;">Bestelbevestiging</p>
+      <h1 class="vl-titel" style="margin:0;font-family:Georgia,'Times New Roman',serif;font-weight:normal;font-size:32px;line-height:40px;color:#26211D;">Bedankt voor je bestelling</h1>
+      {% if order.invitation_title %}<p style="margin:12px 0 0;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:22px;line-height:30px;color:#7A5A2E;word-break:break-word;">{{ order.invitation_title }}</p>{% endif %}
+    </td></tr>
+    <tr><td class="vl-pad" style="padding:18px 40px 6px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:26px;color:#26211D;text-align:center;">
+      <p style="margin:0 0 8px;">Wat leuk dat je voor VAYLIDE kiest! Je betaling is bevestigd en we zetten je {{ doc_kind }} nu voor je klaar.</p>
+      <p style="margin:0;color:#3F3833;">Bewaar deze e-mail: dit is je bestelbevestiging.</p>
+    </td></tr>
+
+    <tr><td class="vl-pad" style="padding:22px 40px 6px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FBF8F2;border:1px solid #EADFC9;border-radius:14px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:24px;color:#26211D;">
+        {% for label, waarde in overzicht %}<tr>
+          <td style="padding:{% if forloop.first %}18px{% else %}9px{% endif %} 10px 9px 20px;color:#6B625A;width:44%;vertical-align:top;">{{ label }}</td>
+          <td style="padding:{% if forloop.first %}18px{% else %}9px{% endif %} 20px 9px 10px;text-align:right;vertical-align:top;word-break:break-word;">{{ waarde }}</td>
+        </tr>{% endfor %}
+        {% for line in lines %}<tr>
+          <td style="padding:9px 10px 9px 20px;color:#6B625A;vertical-align:top;{% if forloop.first %}border-top:1px solid #EADFC9;{% endif %}">{{ line.description }}</td>
+          <td style="padding:9px 20px 9px 10px;text-align:right;vertical-align:top;{% if forloop.first %}border-top:1px solid #EADFC9;{% endif %}">{{ line.total_display }}</td>
+        </tr>{% endfor %}
+        <tr>
+          <td style="padding:12px 10px 18px 20px;border-top:1px solid #D6C8B4;font-weight:bold;">Totaal <span style="font-weight:normal;color:#6B625A;font-size:14px;">incl. btw</span></td>
+          <td style="padding:12px 20px 18px 10px;border-top:1px solid #D6C8B4;text-align:right;font-weight:bold;font-size:18px;">{{ order.total_display }}</td>
+        </tr>
+      </table>
+    </td></tr>
+
+    <tr><td class="vl-pad" style="padding:20px 40px 4px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:26px;color:#26211D;">
+      <p style="margin:0 0 12px;">Je {{ doc_kind }} wordt automatisch gepubliceerd. Zodra dat is gebeurd, ontvang je een aparte e-mail met je link en QR-code.</p>
+      <p style="margin:0 0 18px;color:#3F3833;">Later publiceren, aanpassen of je evenement verplaatsen verschuift de einddatum niet. Er is geen automatische verlenging.</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" class="vl-knop"><tr><td align="center" style="border:1px solid #8E6A3B;border-radius:999px;">
+        <a href="{{ portal }}" style="display:inline-block;padding:13px 30px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:22px;font-weight:bold;color:#5F4524;text-decoration:none;border-radius:999px;">Naar Mijn VAYLIDE</a>
+      </td></tr></table>
+    </td></tr>
+
+    <tr><td class="vl-pad" style="padding:26px 40px 6px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#3F3833;">
+      <h2 style="margin:0 0 8px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;font-size:20px;line-height:28px;color:#26211D;">Levering en voorwaarden</h2>
+      {% if order.delivery_consent_at %}<p style="margin:0 0 12px;">Je toestemming voor directe levering ({{ order.delivery_consent_at|date:"j F Y H:i" }}):<br><em style="color:#26211D;">"{{ order.delivery_consent_text }}"</em></p>{% endif %}
+      <p style="margin:0 0 12px;">Algemene voorwaarden: {{ terms.status|lower }}, versie {{ terms.date|date:"j F Y" }}. Die versie geldt voor deze bestelling en zit als pdf-bijlage bij deze e-mail. <a href="{{ terms_url }}" style="color:#7A5A2E;text-decoration:underline;">Bekijk deze versie online</a>.</p>
+      <p style="margin:0 0 12px;">Herroepen kan binnen de bedenktijd (zie artikel 9 en 10): <a href="{{ withdraw_url }}" style="color:#7A5A2E;text-decoration:underline;">Hier de overeenkomst ontbinden</a>.</p>
+      <p style="margin:0;color:#6B625A;font-size:14px;line-height:22px;">{{ company|linebreaksbr }}</p>
+    </td></tr>
+    <tr><td style="padding:0 0 20px;font-size:0;line-height:0;">&nbsp;</td></tr>
+{% endblock %}

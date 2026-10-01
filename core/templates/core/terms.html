@@ -9,7 +9,8 @@
   {% if b.ontbreekt %}<p class="notice notice--test"><strong>Invulvelden</strong>Nog niet ingevuld: {{ b.ontbreekt|join:", " }}. Deze versie is alleen bedoeld voor de afgeschermde testomgeving.</p>{% endif %}
   {% if not is_current %}<p class="notice"><strong>Oudere versie</strong>Dit is de versie van {{ terms.date|date:"j F Y" }}. Die blijft gelden voor bestellingen die met deze versie zijn gesloten. <a href="{% url 'core:terms' %}">Bekijk de actuele versie</a>.</p>{% endif %}
   <div class="btn-row voorwaarden-acties">
-    <a class="btn btn--secondary btn--sm" href="{% url 'core:terms_download' terms.version %}" download>Voorwaarden downloaden</a>
+    <a class="btn btn--secondary btn--sm" href="{% url 'core:terms_pdf' terms.version %}" target="_blank" rel="noopener">Voorwaarden als pdf</a>
+    <a class="btn btn--ghost btn--sm" href="{% url 'core:terms_download' terms.version %}" download>Als webpagina downloaden</a>
     <button type="button" class="btn btn--ghost btn--sm" data-print hidden>Afdrukken of opslaan als pdf</button>
   </div>
 </div></section>

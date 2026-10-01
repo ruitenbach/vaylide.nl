@@ -48,10 +48,25 @@ def _create_order(**fields) -> Order:
     raise CheckoutError("De bestelling kon niet worden aangemaakt. Probeer het opnieuw.")
 
 
+def refresh_open_payments(invitation: Invitation, limit: int = 3) -> None:
+    """Vóór een nieuwe betaalpoging: de actuele status van nog openstaande betalingen bij de provider nagaan. Blijkt er
+    al een betaald, dan volgt de gewone verwerking en weigert start_checkout een tweede bestelling."""
+    open_payments = Payment.objects.filter(
+        order__invitation=invitation, order__kind=Order.Kind.INVITATION, order__status=Order.Status.PENDING,
+        status__in=[Payment.Status.OPEN, Payment.Status.PENDING],
+    ).order_by("-created_at")[:limit]
+    for payment in open_payments:
+        try:
+            sync_payment(payment, source="nieuwe poging")
+        except ProviderError as exc:
+            log.warning("Status van open betaling %s niet op te halen: %s", payment.pk, exc)
+
+
 def start_checkout(invitation: Invitation, *, user, package_code: str, optional_codes: list[str], terms_accepted: bool,
                    delivery_consent: bool = False) -> Payment:
     if not terms_accepted:
         raise CheckoutError("Ga akkoord met de voorwaarden om te bestellen.")
+    refresh_open_payments(invitation)
     with transaction.atomic():
         # Altijd de actuele, vergrendelde stand gebruiken (nooit een verouderd object).
         invitation = Invitation.objects.select_for_update().get(pk=invitation.pk)
@@ -160,6 +175,10 @@ def apply_remote_status(payment: Payment, remote: RemoteStatus, *, source: str) 
     with transaction.atomic():
         p = Payment.objects.select_for_update().get(pk=payment.pk)
         order = Order.objects.select_for_update().get(pk=p.order_id)
+        if source != "webhook" and remote.status == p.status:
+            # Eigen statuscontrole (terugkeer, hervatten) zonder verandering: geen nieuwe regel in het beheer.
+            # Meldingen van de provider zelf blijven altijd zichtbaar, ook herhaalde.
+            return p
         event = PaymentEvent(payment=p, provider=p.provider, provider_ref=p.provider_ref, source=source, remote_status=remote.status)
         if p.status == Payment.Status.PAID:
             event.outcome = "Al verwerkt als betaald; melding genegeerd."

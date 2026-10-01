@@ -1,13 +1,4 @@
-{% load static %}<!doctype html>
-<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ subject }}</title></head>
-<body style="margin:0;padding:0;background:#FBF8F2;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FBF8F2;padding:24px 12px;">
-<tr><td align="center">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFDF9;border:1px solid #E3D6C3;border-radius:14px;">
-<tr><td style="padding:24px 28px 6px;"><img src="{{ base_url }}{% static 'img/merk/vaylide-logo.png' %}" width="131" height="90" alt="VAYLIDE" style="display:block;border:0;outline:none;width:131px;height:90px;font-family:Georgia,'Times New Roman',serif;font-size:26px;color:#26211D;"></td></tr>
-{% if test_mode %}<tr><td style="padding:0 28px;"><p style="margin:8px 0;padding:8px 12px;background:#F3EEE3;border-radius:8px;font-family:Arial,sans-serif;font-size:13px;color:#5F4524;">{% if email_outbox %}Testomgeving: deze e-mail is niet echt verzonden.{% else %}Testomgeving: dit bericht komt uit de testversie van VAYLIDE. Betalingen zijn testbetalingen; er is niets afgeschreven.{% endif %}</p></td></tr>{% endif %}
-<tr><td style="padding:8px 28px 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#26211D;">{{ body_text|urlize|linebreaks }}</td></tr>
-<tr><td style="padding:16px 28px 24px;border-top:1px solid #E3D6C3;font-family:Georgia,serif;font-style:italic;font-size:14px;color:#7A5A2E;">Elk bijzonder moment begint met een uitnodiging.</td></tr>
-</table>
-</td></tr></table>
-</body></html>
+{% extends "emails/layout.html" %}{% comment %}Algemene mail zonder eigen HTML-sjabloon: de platte tekst in de VAYLIDE-opmaak (precies één keer geëscapet).{% endcomment %}
+{% block inhoud %}
+    <tr><td class="vl-pad" style="padding:22px 40px 26px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:26px;color:#26211D;word-break:break-word;">{{ body_text|urlize|linebreaks }}</td></tr>
+{% endblock %}

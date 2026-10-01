@@ -11,7 +11,10 @@ import logging
 from django.conf import settings
 from django.core.cache import cache
 from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
+from django.core.mail.message import SafeMIMEMultipart
+from django.template import TemplateDoesNotExist
+from django.template.loader import get_template
+from django.templatetags.static import static
 from django.urls import reverse
 from django.utils import timezone
 
@@ -21,6 +24,42 @@ from .jobs import enqueue
 from .models import OutboundEmail
 
 log = logging.getLogger(__name__)
+
+QR_CID = "qr-uitnodiging"
+
+
+class VaylideEmail(EmailMultiAlternatives):
+    """E-mail met afbeeldingen ín de HTML-versie (multipart/related, Content-ID). Opbouw:
+    alternative[ tekst, related[ html, afbeelding(en) ] ], en alleen bij echte bijlagen (de voorwaarden-pdf) daaromheen
+    multipart/mixed. Zo staat de QR-code in de mail zelf in plaats van als losse bijlage, die Outlook bovenaan toont."""
+
+    def __init__(self, *args, related=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.related = list(related or [])  # [(content_id, bytes, subtype, bestandsnaam)]
+
+    def _create_alternatives(self, msg):
+        if not self.related:
+            return super()._create_alternatives(msg)
+        from email.mime.image import MIMEImage
+
+        encoding = self.encoding or settings.DEFAULT_CHARSET
+        body_msg = msg
+        alt = SafeMIMEMultipart(_subtype="alternative", encoding=encoding)
+        if self.body:
+            alt.attach(body_msg)
+        for alternative in self.alternatives:
+            part = self._create_mime_attachment(alternative.content, alternative.mimetype)
+            if alternative.mimetype == "text/html":
+                related = SafeMIMEMultipart(_subtype="related", encoding=encoding)
+                related.attach(part)
+                for cid, data, subtype, name in self.related:
+                    image = MIMEImage(data, _subtype=subtype)
+                    image.add_header("Content-ID", f"<{cid}>")
+                    image.add_header("Content-Disposition", "inline", filename=name)
+                    related.attach(image)
+                part = related
+            alt.attach(part)
+        return alt
 
 
 class SimulatedFailure(RuntimeError):
@@ -70,9 +109,16 @@ def queue_email(*, to: str, subject: str, template: str, context: dict | None = 
             return existing
     # De testmelding hangt af van de echte e-mailmodus: met SMTP in testmodus wordt de mail wél verstuurd.
     ctx = {"base_url": settings.BASE_URL, "test_mode": settings.TEST_MODE, "email_outbox": settings.EMAIL_MODE == "outbox",
+           "logo_url": absolute(static("img/merk/vaylide-logo.png")), "contact_email": settings.CONTACT_EMAIL,
+           "privacy_url": absolute(reverse("core:privacy")), "terms_page_url": absolute(reverse("core:terms")), "qr_cid": QR_CID,
            **(context or {})}
     body_text = render_text(f"emails/{template}.txt", ctx).strip() + "\n"
-    body_html = render_to_string("emails/base.html", {**ctx, "body_text": body_text, "subject": subject})
+    # Eigen opgemaakte HTML als die er is (emails/<sjabloon>.html), anders de platte tekst in de VAYLIDE-opmaak.
+    try:
+        html_template = get_template(f"emails/{template}.html")
+    except TemplateDoesNotExist:
+        html_template = get_template("emails/base.html")
+    body_html = html_template.render({**ctx, "body_text": body_text, "subject": subject})
     if settings.TEST_MODE and not subject.startswith("[TEST]"):
         subject = f"[TEST] {subject}"
     email = OutboundEmail.objects.create(
@@ -100,6 +146,28 @@ def queue_email(*, to: str, subject: str, template: str, context: dict | None = 
     return email
 
 
+def build_message(email: OutboundEmail) -> VaylideEmail:
+    """Het echte bericht: tekst en HTML, de QR-code ín de HTML (bij de leveringsmail) en de voorwaarden als pdf-bijlage
+    (alleen bij de bestelbevestiging). Apart, zodat de opbouw zonder versturen te controleren is."""
+    related = []
+    if email.attach_qr_for_id and email.attach_qr_for.public_url:
+        from invitations.qr import qr_png
+
+        related.append((QR_CID, qr_png(email.attach_qr_for.public_url), "png", "qr-code-uitnodiging.png"))
+    message = VaylideEmail(
+        subject=email.subject,
+        body=email.body_text,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[email.to],
+        reply_to=[settings.CONTACT_EMAIL],
+        related=related,
+    )
+    message.attach_alternative(email.body_html, "text/html")
+    if email.attach_terms_version:
+        message.attach(*terms_attachment(email.attach_terms_version, order_number=email.order.number if email.order_id else ""))
+    return message
+
+
 def handle_send_email(job) -> None:
     email = OutboundEmail.objects.get(pk=job.payload["email_id"])
     if email.delivered:
@@ -111,20 +179,7 @@ def handle_send_email(job) -> None:
         if settings.EMAIL_MODE == "outbox":
             email.status = OutboundEmail.Status.TEST
         else:
-            message = EmailMultiAlternatives(
-                subject=email.subject,
-                body=email.body_text,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[email.to],
-                reply_to=[settings.CONTACT_EMAIL],
-            )
-            message.attach_alternative(email.body_html, "text/html")
-            if email.attach_qr_for_id and email.attach_qr_for.public_url:
-                from invitations.qr import qr_png
-
-                message.attach("qr-code-uitnodiging.png", qr_png(email.attach_qr_for.public_url), "image/png")
-            if email.attach_terms_version:
-                message.attach(*terms_attachment(email.attach_terms_version))
+            message = build_message(email)
             message.send(fail_silently=False)
             email.status = OutboundEmail.Status.SENT
         email.sent_at = timezone.now()
@@ -175,11 +230,13 @@ def send_order_confirmation(order) -> OutboundEmail:
     from core.voorwaarden import CURRENT, version_info
 
     version = order.terms_version or CURRENT
+    lines = list(order.lines.all())
     return queue_email(
         to=order.customer.email,
         subject=f"Bevestiging van je bestelling {order.number}",
         template="order_confirmation",
-        context={"order": order, "lines": list(order.lines.all()), "portal": absolute(reverse("portal:home")), **_kind(order.invitation),
+        context={"order": order, "lines": lines, "overzicht": _order_overview(order, lines), "design": _design_name(order),
+                 "portal": absolute(reverse("portal:home")), **_kind(order.invitation),
                  "company": _company_text(), "terms": version_info(version),
                  "terms_url": absolute(reverse("core:terms_version", args=[version])),
                  "withdraw_url": absolute(reverse("orders:withdraw"))},
@@ -191,14 +248,48 @@ def send_order_confirmation(order) -> OutboundEmail:
     )
 
 
-def terms_attachment(version: str) -> tuple[str, str, str]:
-    """(bestandsnaam, inhoud, type) van de algemene voorwaarden als bijlage."""
-    from django.template.loader import render_to_string
+def _design_name(order) -> str:
+    inv = order.invitation
+    return inv.template_version.template.name if inv and inv.template_version_id else ""
 
-    from core.views import _terms_context
-    from core.voorwaarden import filename
 
-    return filename(version), render_to_string("core/terms_download.html", _terms_context(version)), "text/html"
+def _order_overview(order, lines) -> list[tuple[str, str]]:
+    """Het overzicht bovenaan de bestelbevestiging (bedragen staan in de regels eronder)."""
+    from django.utils.formats import date_format
+
+    rows = [("Bestelnummer", order.number)]
+    if _design_name(order):
+        rows.append(("Ontwerp", _design_name(order)))
+    if order.package_name:
+        rows.append(("Pakket", order.package_name))
+    options = [line.description for line in lines if not line.code.startswith("pakket:")]
+    if order.package_name:
+        rows.append(("Extra opties", ", ".join(options) if options else "Geen"))
+    rows.append(("Aankoopdatum", date_format(timezone.localtime(order.paid_at or order.created_at), "j F Y")))
+    if order.ends_at:
+        rows.append(("Online tot en met", date_format(timezone.localtime(order.ends_at), "j F Y")))
+    return rows
+
+
+def terms_attachment(version: str, *, order_number: str = "") -> tuple[str, bytes, str]:
+    """(bestandsnaam, inhoud, type) van de algemene voorwaarden als pdf: altijd de versie van de bestelling zelf."""
+    from core.voorwaarden import pdf_filename
+    from core.voorwaarden_pdf import render_pdf
+
+    return pdf_filename(version), render_pdf(version, order_number=order_number), "application/pdf"
+
+
+def _event_summary(invitation) -> dict:
+    """Datum, tijd en locatie van de gepubliceerde uitnodiging, voor het kaartje in de leveringsmail (leeg als er geen
+    evenement is, zoals bij een wenskaart)."""
+    from invitations.content import parse_date
+    from invitations.render import nl_date
+
+    version = invitation.published_version
+    content = (version.content if version else invitation.draft_content) or {}
+    day = parse_date(content.get("date"))
+    return {"datum": nl_date(day) if day else "", "tijd": (content.get("start_time") or "").strip(),
+            "locatie": (content.get("venue_name") or "").strip()}
 
 
 def send_invitation_live(order) -> OutboundEmail:
@@ -212,6 +303,10 @@ def send_invitation_live(order) -> OutboundEmail:
             "order": order,
             "invitation": invitation,
             "portal": absolute(reverse("portal:invitation", args=[invitation.uid])),
+            # Downloaden via Mijn VAYLIDE (na inloggen, alleen de eigenaar): de bestaande beveiliging blijft.
+            "qr_download_url": absolute(reverse("portal:qr", args=[invitation.uid, "png"]) + "?download=1"),
+            "event": _event_summary(invitation),
+            "feest_url": absolute(static("img/mail/feest-achtergrond.jpg")),
             **kind,
         },
         unique_key=f"invitation-live:{order.pk}",

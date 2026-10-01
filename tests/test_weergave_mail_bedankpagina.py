@@ -58,7 +58,7 @@ class TestNoticeTests(VaylideTestCase):
     def test_smtp_in_test_mode_does_not_claim_it_was_not_sent(self):
         html = self.notice_for(EMAIL_MODE="smtp")
         self.assertNotIn("niet echt verzonden", html)
-        self.assertIn("testversie van VAYLIDE", html)
+        self.assertIn("Testversie van VAYLIDE", html)
 
     def test_login_page_shows_code_only_when_mails_are_not_sent(self):
         for mode, zichtbaar in (("outbox", True), ("smtp", False)):

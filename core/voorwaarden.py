@@ -29,3 +29,7 @@ def version_info(version: str | None = None) -> dict:
 
 def filename(version: str | None = None) -> str:
     return f"algemene-voorwaarden-vaylide-{version or CURRENT}.html"
+
+
+def pdf_filename(version: str | None = None) -> str:
+    return f"algemene-voorwaarden-vaylide-{version or CURRENT}.pdf"

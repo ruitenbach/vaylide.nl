@@ -126,4 +126,4 @@ class FailedEmailTests(VaylideTestCase):
 
             sent = [m for m in mail.outbox if m.subject.endswith("Je uitnodiging staat online")]
             self.assertEqual(len(sent), 1)
-            self.assertEqual(sent[0].attachments[0][0], "qr-code-uitnodiging.png")
+            self.assertIn("cid:qr-uitnodiging", sent[0].alternatives[0][0])  # QR-code staat in de mail zelf
