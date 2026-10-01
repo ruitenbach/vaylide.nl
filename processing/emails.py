@@ -170,7 +170,7 @@ def build_message(email: OutboundEmail) -> VaylideEmail:
 
 def handle_send_email(job) -> None:
     email = OutboundEmail.objects.get(pk=job.payload["email_id"])
-    if email.delivered:
+    if email.delivered or not email.to:  # zonder adres: inhoud al verwijderd na de bewaartermijn
         return
     email.attempts += 1
     try:
@@ -407,6 +407,21 @@ def notify_owner_order_attention(order, reason: str) -> OutboundEmail:
         unique_key=f"owner-order-attention:{order.pk}:{hashlib.sha1(reason.encode()).hexdigest()[:10]}",
         order=order,
         owner_alert=True,
+    )
+
+
+def send_account_cleanup_warning(user, *, unique_key: str) -> OutboundEmail:
+    """Bewaartermijn accounts (B2): 30 dagen voordat een ongebruikt account zonder kaarten wordt geanonimiseerd."""
+    from core.privacy import ACCOUNT_WARNING_DAYS
+
+    return queue_email(
+        to=user.email,
+        subject="Je VAYLIDE-account wordt binnenkort verwijderd",
+        template="account_opruimen",
+        context={"days": ACCOUNT_WARNING_DAYS, "link": absolute(reverse("accounts:login"))},
+        unique_key=unique_key,
+        kind="account_opruimen",
+        user=user,
     )
 
 

@@ -1,5 +1,20 @@
 # Beslislijst privacy (1 oktober 2026)
 
+## Stand na je besluit van 1 oktober 2026
+
+Je nam de voorstellen over, met één aanpassing: **de noodzakelijke financiële administratie staat apart** van bijlagen en
+correspondentie. Bestelling, bestelregels en betalingen blijven 7 jaar; wensen met hun berichten en bijlagen gaan na 12
+maanden weg, ook als er een bestelling uit voortkwam (B4).
+
+- **Verwerkt:** A1, A2 (teksten in de privacyverklaring), A4 en D2 (in `docs/VERWERKERSOVEREENKOMST.md`), B1 tot en met B6
+  (nachtelijke opruimtaken in `core/privacy.py`, tests in `tests/test_bewaartermijnen.py`), C1 (Vimexx als standaard), C2
+  en C4 (ongewijzigd).
+- **Nog open:** B7 (bewaartermijn logs bij Render, blokkeert live), A3 (verwerkersvoorwaarden als bijlage bij het
+  bestellen: pas inbouwen na de juridische toets), C3 (optioneel), D1 en D3.
+- **Juridische toets** blijft aanbevolen voor A1, A2, A3, A4, B5 en D1.
+
+De tabellen hieronder zijn het oorspronkelijke voorstel.
+
 Alleen de vragen die nog open staan, met per vraag mijn voorstel en wat jij beslist. Al besloten en niet meer in deze lijst:
 - **Aanmelden zonder gevoelige gegevens** (optie A, 30 september): alleen vaste, neutrale extra vragen. Optie B
   (dieet/allergie) staat geparkeerd.
@@ -21,7 +36,7 @@ de punten met **(blokkeert live)**: zolang die open staan, weigert de site in li
 | A3 | **Verwerkersafspraken met organisatoren** | Een vaste bijlage "Verwerkersvoorwaarden" bij de algemene voorwaarden, voor alle klanten, geaccepteerd bij het bestellen. Voor zakelijke klanten op verzoek ook een ondertekende versie. Concept: `docs/VERWERKERSOVEREENKOMST.md`. | | **Ja**: mag dit via de algemene voorwaarden, ook voor consumenten? |
 | A4 | **Meldtermijn datalek aan de organisator** (in de verwerkersvoorwaarden) | Zonder onredelijke vertraging, en uiterlijk binnen 48 uur nadat VAYLIDE het lek ontdekt | | **Ja** |
 
-## B. Bewaartermijnen (alle zes blokkeren live)
+## B. Bewaartermijnen (alle zeven blokkeerden live)
 
 Nu al automatisch, en dus geen besluit meer nodig:
 - inlogcodes: na 2 dagen weg;
@@ -35,7 +50,7 @@ Nu al automatisch, en dus geen besluit meer nodig:
 | B1 | Gekochte kaarten, foto's en muziek na de looptijd | 90 dagen na het einde van de looptijd verwijderen (zelfde moment als de aanmeldingen). De bestelling zelf blijft voor de administratie. | | Nee |
 | B2 | Accounts | Account zonder kaarten en zonder activiteit na 24 maanden anonimiseren, met 30 dagen vooraf een e-mail | | Nee |
 | B3 | Contactberichten | 12 maanden na het laatste bericht | | Nee |
-| B4 | Extra wensen (maatwerk) en bijlagen | 12 maanden na afronden als er niet besteld is; anders bewaren zoals bestelgegevens (7 jaar) | | Nee |
+| B4 | Extra wensen (maatwerk) en bijlagen | 12 maanden na afronden als er niet besteld is; anders bewaren zoals bestelgegevens (7 jaar) | **Anders:** 12 maanden na afronden, altijd; alleen de bestel- en betaalgegevens blijven 7 jaar | Nee |
 | B5 | Herroepingen | Bewaren zolang de bijbehorende bestelgegevens (7 jaar) | | **Ja**: kan korter? |
 | B6 | Kopie van verstuurde e-mails (in Beheer) | 90 dagen | | Nee |
 | B7 | Logbestanden bij Render | De termijn van Render overnemen. **Eerst nakijken:** Render → vaylide → Logs, welke bewaartermijn je abonnement heeft. Geef die termijn hier door. | | Nee |
@@ -62,7 +77,7 @@ zonder dat jij hebt besloten.
 
 ## Wat je daarnaast nog nodig hebt voor de privacyverklaring
 
-- **Juridische naam en vestigingsadres:** te zetten in Render als `VIERLIEF_JURIDISCHE_NAAM` en `VIERLIEF_ADRES`. Die
-  staan niet in deze lijst, omdat ik ze niet mag invullen.
+- **Juridische naam met rechtsvorm:** te zetten in Render als `VIERLIEF_JURIDISCHE_NAAM`. Het vestigingsadres is verwerkt
+  (Handellaan 73, 8031 EG Zwolle), alleen op Contact & bedrijfsgegevens en in de voorwaarden.
 - **Na je besluiten:** ik verwerk ze lokaal, laat alle tests draaien en stuur je de bijgewerkte verklaring. Publiceren
   gebeurt pas na je akkoord.

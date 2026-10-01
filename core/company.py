@@ -32,7 +32,8 @@ def as_text(data: dict | None = None) -> str:
     """Voor e-mails: de bedrijfsgegevens als platte tekst (met invulvelden als iets ontbreekt)."""
     data = data or company()
     lines = [f"{TRADE_NAME} is een handelsnaam van {data['juridische_naam'] or '[juridische naam onderneming en rechtsvorm]'}"]
-    lines.append("Vestigingsadres: " + (", ".join(data["adres"]) if data["adres"] else "[vestigingsadres]"))
+    # Het adres staat bewust niet in mails: alleen op "Contact & bedrijfsgegevens" en in de voorwaarden (ook de pdf-bijlage).
+    lines.append("Vestigingsadres: zie Contact & bedrijfsgegevens op de website en de algemene voorwaarden")
     lines.append(f"KvK-nummer: {data['kvk'] or '[KvK-nummer]'}")
     if data["btw"]:
         lines.append(f"Btw-id: {data['btw']}")

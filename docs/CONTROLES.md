@@ -947,3 +947,22 @@ Lokaal getest, testmodus. Niet gepusht of gedeployd.
 - **Voorwaarden-pdf** opent in Chrome (pdf-lezer).
 - **Niet gecontroleerd:** de echte weergave in Outlook en Gmail. Daarvoor is versturen vanaf de testsite nodig, na een
   deploy.
+
+## Vestigingsadres en bewaartermijnen (1 oktober 2026)
+
+Lokaal, branch `claude/privacyverklaring`, testmodus, met fictieve testgegevens.
+
+- `manage.py test tests`: 464 tests, alle geslaagd (nieuw: `tests/test_bewaartermijnen.py`, 12 tests). Getest:
+  - het adres Handellaan 73, 8031 EG Zwolle staat op `/contact/`, in het modelformulier van `/voorwaarden/` en in de
+    voorwaarden-pdf; niet op de homepage, niet op een gepubliceerde uitnodiging en niet in de bestelbevestiging of de
+    leveringsmail (die verwijzen naar Contact & bedrijfsgegevens; de pdf-bijlage bevat het adres);
+  - B1: een kaart die 60 dagen offline is blijft, na 91 dagen is hij weg; de bestelling blijft betaald, met regels en
+    betalingen; een live kaart blijft staan;
+  - B2: eerst één waarschuwingsmail (niet dubbel), 30 dagen later anonimiseren; inloggen na de waarschuwing houdt het
+    account; accounts met een kaart of een open wens en beheerders blijven ongemoeid;
+  - B3, B4, B5: contactberichten na 12 maanden, afgeronde wensen met berichten en bijlage (ook het bestand) na 12 maanden,
+    herroepingen na 7 jaar; een open wens en een recente herroeping blijven;
+  - B6: e-mailkopieën ouder dan 90 dagen verliezen adres, onderwerp en inhoud (soort, status en sleutel blijven); een mail
+    in de wachtrij en een recente mail blijven; een opgeschoonde mail wordt niet meer verstuurd.
+- `open_points()` met SMTP aan: nog alleen "bewaartermijn logbestanden bij de hostingpartij" en "juridische naam en
+  rechtsvorm".

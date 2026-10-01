@@ -17,21 +17,34 @@ VERSION = date(2026, 9, 30)
 # Door de eigenaar vast te stellen. None = nog open (invulveld op de testversie, blokkeert live).
 # Voorstellen met onderbouwing: docs/PRIVACY.md, onder "Besluiten".
 BESLUITEN: dict[str, str | None] = {
-    # Rol en grondslag bij gastgegevens (onderdeel 4), apart voor particuliere en zakelijke organisatoren.
-    "rol_gasten": None,
-    # Grondslag voor gegevens van anderen in de kaartinhoud (namen, foto's, contactpersoon).
-    "grondslag_kaartinhoud": None,
+    # Besloten door de eigenaar op 01-10-2026 (beslislijst A1, voorstel overgenomen; juridische toets staat nog open).
+    "rol_gasten": "De organisator bepaalt of gasten zich kunnen aanmelden, welke vragen uit onze vaste lijst worden gesteld "
+                  "en wat er met de antwoorden gebeurt. Wij bewaren en tonen de antwoorden alleen voor de organisator en "
+                  "gebruiken ze niet voor eigen doelen. Daarvoor werken wij als verwerker voor de organisator. Organiseert "
+                  "iemand een feest in de privésfeer, dan geldt de AVG vaak niet voor die organisator zelf, maar wel voor "
+                  "ons; wij houden ons dan aan dezelfde verplichtingen. Voor onze eigen doelen, zoals het beveiligen van de "
+                  "site en het tegengaan van misbruik, zijn wij zelf verantwoordelijk.",
+    # A2 (01-10-2026).
+    "grondslag_kaartinhoud": "Wij verwerken deze inhoud als verwerker voor jou, zoals bij aanmeldingen (onderdeel 4). Jij "
+                             "zorgt dat je de gegevens en foto's van anderen op je kaart mag gebruiken (artikel 12 van de "
+                             "algemene voorwaarden).",
     # Besloten door de eigenaar op 30-09-2026 (optie A): alleen vaste, neutrale extra vragen (invitations/vragen.py).
     "gevoelige_vragen": "Extra vragen kiest de organisator uit onze vaste lijst met neutrale vragen, zoals over vervoer of "
                         "overnachten. Via VAYLIDE wordt niet gevraagd naar gezondheid, allergieën, geloof of andere "
                         "gevoelige gegevens, en bij open tekstvelden staat dat je die daar ook niet moet invullen.",
-    # Bewaartermijnen die de code nog niet uitvoert.
-    "bewaar_account": None,
-    "bewaar_gekochte_kaarten": None,
-    "bewaar_contact": None,
-    "bewaar_herroepingen": None,
-    "bewaar_wensen": None,
-    "bewaar_emails": None,
+    # Bewaartermijnen B1 tot en met B6 (01-10-2026), uitgevoerd door apply_retention in core/privacy.py. De financiële
+    # administratie (bestelling, regels, betalingen) blijft 7 jaar; inhoud, bijlagen en correspondentie niet.
+    "bewaar_account": "Gebruik je je account 24 maanden niet en heb je geen kaarten meer bij ons, dan verwijderen wij je "
+                      "naam en e-mailadres. Je krijgt 30 dagen van tevoren een e-mail; log je in, dan blijft je account "
+                      "bestaan (automatisch).",
+    "bewaar_gekochte_kaarten": "90 dagen nadat de kaart offline ging verwijderd, met foto's, muziek en andere inhoud "
+                               "(automatisch). De bestelling zelf blijft bewaard voor de administratie.",
+    "bewaar_contact": "12 maanden na ontvangst verwijderd (automatisch)",
+    "bewaar_herroepingen": "7 jaar, net als de bestelgegevens waar ze bij horen; daarna verwijderd (automatisch)",
+    "bewaar_wensen": "12 maanden na afronden verwijderd, met berichten en bijlagen (automatisch). Leidde de wens tot een "
+                     "betaling, dan blijven alleen de bestel- en betaalgegevens 7 jaar bewaard.",
+    "bewaar_emails": "90 dagen; daarna verwijderen wij de inhoud en het adres van de kopie (automatisch)",
+    # B7: de termijn van Render, na te kijken door de eigenaar in het Render-dashboard (niet zelf in te vullen).
     "bewaar_logs": None,
 }
 

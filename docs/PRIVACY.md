@@ -177,8 +177,8 @@ standaardbewaartermijn van 90 dagen.
 
 **Wat dit betekent:**
 - Een voorstel voor verwerkersvoorwaarden voor alle organisatoren staat in `docs/VERWERKERSOVEREENKOMST.md`.
-- In de privacyverklaring staat de rol als "[Voorstel, juridisch te beoordelen]". Het besluit `rol_gasten` blijft open,
-  dus live starten wordt geweigerd tot het is ingevuld.
+- Besloten op 1 oktober 2026 (beslislijst A1): het voorstel staat nu als vaste tekst in onderdeel 4 (`rol_gasten`). De
+  juridische toets (verwerker of gezamenlijk verantwoordelijk) blijft aanbevolen.
 
 ## Procedure bij onverwachte gevoelige gegevens
 
@@ -273,18 +273,21 @@ afhankelijkheid tussen werkgever en werknemer: toestemming is daar zelden vrij.
 verdedigen: een klant kan een jaar vooruit werken aan een bruiloftskaart. Kies je korter, pas dan de waarde aan in Beheer
 → Instellingen.
 
-**Voorstellen** (niet ingevoerd; besluit per sleutel in `BESLUITEN`):
+**Besloten op 1 oktober 2026** (beslislijst B1 tot en met B6), uitgevoerd door `apply_retention` in `core/privacy.py`
+(elke nacht, met tests in `tests/test_bewaartermijnen.py`). De **financiële administratie staat apart**: bestelling,
+bestelregels en betalingen blijven 7 jaar, ook als de kaart, de wens of de correspondentie al weg is (koppelingen
+`SET_NULL`).
 
-| Sleutel | Voorstel | Waarom |
-|---|---|---|
-| `bewaar_gekochte_kaarten` | Inhoud en foto's 90 dagen na het einde van de looptijd verwijderen; de bestelling blijft | Zelfde moment als de aanmeldingen. Er blijft ruimte voor "Langer online" en voor een export door de klant. |
-| `bewaar_account` | Account zonder ontwerpen en zonder activiteit na 24 maanden anonimiseren, met een e-mail vooraf | Voorkomt accounts die nergens meer voor nodig zijn; de bestelgegevens blijven voor de administratie. |
-| `bewaar_contact` | 12 maanden na het laatste bericht | Genoeg om terugkerende vragen te volgen |
-| `bewaar_wensen` | 12 maanden na afronden als er niet besteld is; anders als bestelgegevens | Idem |
-| `bewaar_herroepingen` | Zolang de bijbehorende bestelgegevens (7 jaar), of korter na juridisch advies | Het is bewijs van de afhandeling |
-| `bewaar_emails` | 90 dagen | Om bezorgproblemen te onderzoeken. De bestelbevestiging heeft de klant zelf. |
-| `bewaar_logs` | De termijn van Render overnemen (na te kijken in het Render-dashboard) | Niet zelf in te stellen |
-| Tweede back-uplocatie | 30 dagen via een bewaarregel bij de aanbieder (staat al in `docs/BACKUP.md`) | Alleen als die locatie wordt gebruikt |
+| Sleutel | Wat de site doet |
+|---|---|
+| `bewaar_gekochte_kaarten` | Kaart met inhoud, foto's, muziek en versies weg 90 dagen nadat hij offline ging (zelfde moment als de aanmeldingen). De bestelling blijft. |
+| `bewaar_account` | Account zonder kaarten en zonder open extra wens, 700 dagen niet gebruikt: e-mail (`account_opruimen`). 30 dagen later, nog steeds niet gebruikt (24 maanden): anonimiseren met `anonymize_user`. Inloggen houdt het account. Beheerders vallen erbuiten. |
+| `bewaar_contact` | Contactberichten 12 maanden na ontvangst weg. |
+| `bewaar_wensen` | Afgeronde of gesloten wensen 12 maanden na de laatste wijziging weg, met berichten en bijlagen (correspondentie). Een betaalde bestelling bij de wens blijft. |
+| `bewaar_herroepingen` | 7 jaar, daarna weg (juridische toets: kan korter?). |
+| `bewaar_emails` | Na 90 dagen houdt de kopie alleen soort, status en tijdstip; adres, onderwerp en inhoud worden gewist. Zo blijven de statuscontroles werken. Een opgeschoonde mail wordt nooit meer verstuurd. |
+| `bewaar_logs` | **Nog open:** de termijn van Render, na te kijken in het Render-dashboard. Blokkeert live. |
+| Tweede back-uplocatie | 30 dagen via een bewaarregel bij de aanbieder (staat al in `docs/BACKUP.md`), alleen als die locatie wordt gebruikt |
 
 Ook voor de nieuwsbrief: het bewijs van de toestemming blijft bewaard tot het afmelden. Voorstel: daarna de tekst nog 1 jaar
 als bewijs bewaren en dan wissen. Nu wist `anonymize_user` het alleen bij het verwijderen van het account.
@@ -314,10 +317,11 @@ als bewijs bewaren en dan wissen. Nu wist `anonymize_user` het alleen bij het ve
 
 ## Nog nodig van de eigenaar
 
-1. **Juridische naam en vestigingsadres** (al nodig voor de voorwaarden).
-2. **Besluiten in `core/privacyverklaring.py` → `BESLUITEN`:** vul per sleutel de definitieve zin in, na juridisch advies.
-3. **E-maildienst:** kies er een, bij voorkeur in de EER, en zet `VIERLIEF_EMAIL_AANBIEDER`, bijvoorbeeld
-   `Naam B.V. (Nederland)`. Staat hij buiten de EER, vul dan onderdeel 8 aan.
+1. **Juridische naam met rechtsvorm** (`VIERLIEF_JURIDISCHE_NAAM` in Render). Het vestigingsadres (Handellaan 73, 8031 EG
+   Zwolle) is verwerkt als standaard in `config/settings.py` en staat alleen op Contact & bedrijfsgegevens en in de
+   voorwaarden (en de pdf).
+2. **Besluiten in `core/privacyverklaring.py` → `BESLUITEN`:** alles ingevuld op 1 oktober 2026, behalve `bewaar_logs`.
+3. **E-maildienst:** Vimexx (standaard `Vimexx B.V. (Nederland)`; met `VIERLIEF_EMAIL_AANBIEDER` te overschrijven).
 4. **Tweede back-uplocatie:** gebruik je die, zet dan `VIERLIEF_BACKUP_AANBIEDER`.
 5. **AI:** wil je tekstvoorstellen via Anthropic, controleer en teken dan de verwerkersovereenkomst en zet
    `VIERLIEF_AI_AFSPRAKEN` (de doorgifte-afspraken in één zin). Anders geen `ANTHROPIC_API_KEY` op Render.

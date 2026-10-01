@@ -5,6 +5,7 @@
   uitnodiging vervalt en het account wordt geanonimiseerd.
 - Foto's, muziek, bijlagen, aanmeldingen, versies, bewaarde e-mails, inlogcodes
   en contactberichten van de klant worden echt verwijderd.
+- De nachtelijke bewaartermijnen staan in apply_retention (zie docs/PRIVACY.md).
 """
 from __future__ import annotations
 
@@ -71,6 +72,66 @@ def anonymize_user(user) -> None:
         user.save()
 
 
+# Bewaartermijnen uit de beslislijst (B1 tot en met B6, besloten 1 oktober 2026). De financiële administratie
+# (Order, OrderLine, Payment) valt hier bewust buiten: die blijft 7 jaar, los van inhoud, bijlagen en correspondentie.
+ACCOUNT_INACTIVE_DAYS = 730  # B2: 24 maanden niet gebruikt
+ACCOUNT_WARNING_DAYS = 30  # B2: zoveel dagen vooraf een e-mail
+CONTACT_RETENTION_DAYS = 365  # B3
+WISH_RETENTION_DAYS = 365  # B4: na afronden
+WITHDRAWAL_RETENTION_DAYS = 7 * 365 + 2  # B5: 7 jaar, zoals de bestelgegevens
+EMAIL_RETENTION_DAYS = 90  # B6
+ACCOUNT_WARNING_KEY = "account-opruimen"
+
+
+def _inactive_accounts():
+    """Accounts zonder kaarten en zonder open extra wens; beheerders en verwijderde accounts tellen niet mee."""
+    from django.db.models import Exists, OuterRef
+
+    from accounts.models import User
+    from invitations.models import Invitation
+    from wishes.models import CustomRequest
+
+    return (User.objects.filter(is_active=True, is_staff=False, is_superuser=False, anonymized_at__isnull=True)
+            .exclude(Exists(Invitation.objects.filter(owner=OuterRef("pk"))))
+            .exclude(Exists(CustomRequest.objects.filter(customer=OuterRef("pk"), status__in=CustomRequest.OPEN_STATUSES))))
+
+
+def _last_activity(user):
+    return max(filter(None, [user.last_login, user.date_joined]))
+
+
+def _clean_accounts(now) -> tuple[int, int]:
+    """B2: na 23 maanden zonder gebruik een e-mail, 30 dagen later (nog steeds niet gebruikt) anonimiseren."""
+    from processing.emails import send_account_cleanup_warning
+    from processing.models import OutboundEmail
+
+    warned = anonymized = 0
+    warn_before = now - timedelta(days=ACCOUNT_INACTIVE_DAYS - ACCOUNT_WARNING_DAYS)
+    for user in _inactive_accounts():
+        last = _last_activity(user)
+        if last >= warn_before:
+            continue
+        # Per periode zonder gebruik één waarschuwing: logt iemand daarna in, dan begint een nieuwe periode.
+        key = f"{ACCOUNT_WARNING_KEY}:{user.pk}:{last:%Y%m%d%H%M%S}"
+        warning = OutboundEmail.objects.filter(unique_key=key).first()
+        if warning is None:
+            send_account_cleanup_warning(user, unique_key=key)
+            warned += 1
+        elif warning.created_at <= now - timedelta(days=ACCOUNT_WARNING_DAYS) and last < now - timedelta(days=ACCOUNT_INACTIVE_DAYS):
+            anonymize_user(user)
+            anonymized += 1
+    return warned, anonymized
+
+
+def _blank_old_emails(now) -> int:
+    """B6: de kopie van een verstuurde e-mail houdt na 90 dagen alleen soort, status en tijdstip (geen inhoud of adres)."""
+    from processing.models import OutboundEmail
+
+    return (OutboundEmail.objects.filter(created_at__lt=now - timedelta(days=EMAIL_RETENTION_DAYS))
+            .exclude(status=OutboundEmail.Status.QUEUED).exclude(to="")
+            .update(to="", subject="(inhoud verwijderd na de bewaartermijn)", body_text="", body_html="", last_error=""))
+
+
 def _delete_expired_cache(now) -> int:
     from django.conf import settings
     from django.db import connection
@@ -107,6 +168,15 @@ def apply_retention(now=None) -> dict:
     report["verwijderde_aanmeldingen"] = old_guests.count()
     old_guests.delete()
 
+    # B1: de kaart zelf (inhoud, foto's, muziek, versies) op hetzelfde moment als de aanmeldingen. De bestelling blijft
+    # (koppeling SET_NULL), met bedrag, regels en betalingen voor de administratie.
+    old_cards = Invitation.objects.filter(
+        status__in=[Invitation.Status.EXPIRED, Invitation.Status.OFFLINE], available_until__lt=guest_cutoff,
+    )
+    report["verwijderde_kaarten"] = old_cards.count()
+    for invitation in old_cards:
+        delete_invitation(invitation)
+
     anon_cutoff = now - timedelta(days=config.anonymous_draft_retention_days)
     anon = Invitation.objects.filter(owner__isnull=True, status=Invitation.Status.DRAFT, updated_at__lt=anon_cutoff)
     report["verwijderde_anonieme_concepten"] = anon.count()
@@ -136,6 +206,24 @@ def apply_retention(now=None) -> dict:
         req.save()
         cleaned += 1
     report["opgeschoonde_gezichtfotos"] = cleaned
+
+    # B3 tot en met B6.
+    from orders.models import Withdrawal
+    from wishes.models import CustomRequest
+
+    from .models import ContactMessage
+
+    report["verwijderde_contactberichten"] = ContactMessage.objects.filter(
+        created_at__lt=now - timedelta(days=CONTACT_RETENTION_DAYS)).delete()[0]
+    done = CustomRequest.objects.filter(status__in=[CustomRequest.Status.DONE, CustomRequest.Status.CLOSED],
+                                        updated_at__lt=now - timedelta(days=WISH_RETENTION_DAYS))
+    report["verwijderde_wensen"] = done.count()
+    for req in done:
+        delete_custom_request(req)
+    report["verwijderde_herroepingen"] = Withdrawal.objects.filter(
+        created_at__lt=now - timedelta(days=WITHDRAWAL_RETENTION_DAYS)).delete()[0]
+    report["account_waarschuwingen"], report["geanonimiseerde_accounts"] = _clean_accounts(now)
+    report["opgeschoonde_emails"] = _blank_old_emails(now)
 
     report["verwijderde_inlogcodes"] = LoginCode.objects.filter(created_at__lt=now - timedelta(days=2)).delete()[0]
 

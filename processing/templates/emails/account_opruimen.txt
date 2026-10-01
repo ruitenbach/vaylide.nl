@@ -1,0 +1,11 @@
+Hallo,
+
+Je hebt je account bij VAYLIDE bijna twee jaar niet gebruikt en er staan geen kaarten meer in. Daarom verwijderen wij over {{ days }} dagen je naam en e-mailadres.
+
+Wil je je account houden? Log dan één keer in:
+{{ link }}
+
+Doe je niets, dan hoef je verder niets te regelen. Gegevens van eerdere bestellingen bewaren wij alleen voor de administratie, zonder je naam of e-mailadres.
+
+Hartelijke groet,
+VAYLIDE

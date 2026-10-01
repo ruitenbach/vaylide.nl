@@ -1,7 +1,7 @@
 # Concept: verwerkersovereenkomst voor zakelijke klanten
 
-**Concept, nog niet juridisch beoordeeld en nergens op de site ingebouwd.** Tekst tussen [vierkante haken] vul je zelf in
-of besluit je (zie `docs/BESLISLIJST-PRIVACY.md`, A3 en A4). De privacyverklaring vervangt deze overeenkomst niet.
+**Concept, nog niet juridisch beoordeeld en nergens op de site ingebouwd.** De besluiten van 1 oktober 2026 (A3, A4, B1,
+D2) zijn verwerkt; tekst tussen [vierkante haken] is nog open (juridische naam, en keuzes voor de jurist). De privacyverklaring vervangt deze overeenkomst niet.
 
 ## Waarom
 
@@ -22,7 +22,7 @@ de gegevens van haar gasten, en VAYLIDE verwerker. Daarvoor schrijft art. 28 lid
 
 1. **De klant**: [naam organisatie], gevestigd te [adres], KvK [nummer], hierna "de organisator"
    (verwerkingsverantwoordelijke);
-2. **VAYLIDE**: een handelsnaam van [juridische naam onderneming en rechtsvorm], gevestigd te [vestigingsadres],
+2. **VAYLIDE**: een handelsnaam van [juridische naam onderneming en rechtsvorm], gevestigd te Handellaan 73, 8031 EG Zwolle,
    KvK 94261423, hierna "VAYLIDE" (verwerker).
 
 **Artikel 1. Onderwerp en duur**
@@ -74,7 +74,7 @@ Alleen maatregelen die echt bestaan; de actuele lijst staat in onderdeel 11 van 
 | Subverwerker | Waarvoor | Locatie |
 |---|---|---|
 | Render Services, Inc. | Hosting van website, database, opslag en back-ups | Server en database in Frankfurt (Duitsland); Amerikaans bedrijf, doorgifte volgens de verwerkersovereenkomst van Render (EU-standaardcontractbepalingen en/of het EU-VS Data Privacy Framework) |
-| [Vimexx B.V., exacte naam te controleren] | E-mail aan de organisator (bevestiging, levering). Die mails kunnen de titel van de uitnodiging bevatten; aanmeldingen gaan niet per e-mail. | Nederland (volgens Vimexx) |
+| Vimexx B.V. | E-mail aan de organisator (bevestiging, levering). Die mails kunnen de titel van de uitnodiging bevatten; aanmeldingen gaan niet per e-mail. | Nederland (volgens Vimexx) |
 | [Tweede back-uplocatie, alleen als gekozen] | Versleutelde kopie van de back-up | [EU] |
 
 2. VAYLIDE meldt een nieuwe of vervangende subverwerker vooraf, minstens [30] dagen van tevoren. De organisator mag
@@ -89,8 +89,8 @@ Alleen maatregelen die echt bestaan; de actuele lijst staat in onderdeel 11 van 
    vertraging door en helpt VAYLIDE waar nodig.
 
 **Artikel 9. Datalekken**
-1. VAYLIDE meldt een inbreuk in verband met persoonsgegevens aan de organisator [zonder onredelijke vertraging en uiterlijk
-   binnen 48 uur nadat VAYLIDE de inbreuk heeft ontdekt].
+1. VAYLIDE meldt een inbreuk in verband met persoonsgegevens aan de organisator zonder onredelijke vertraging en uiterlijk
+   binnen 48 uur nadat VAYLIDE de inbreuk heeft ontdekt.
 2. De melding bevat wat op dat moment bekend is: de aard, de betrokken gegevens en betrokkenen, de waarschijnlijke
    gevolgen en de genomen maatregelen.
 3. De organisator beslist over melding aan de toezichthouder en aan betrokkenen.
@@ -99,7 +99,7 @@ Alleen maatregelen die echt bestaan; de actuele lijst staat in onderdeel 11 van 
 1. Na de looptijd verwijdert VAYLIDE de aanmeldingen [90] dagen nadat de uitnodiging offline is gegaan. Verwijderde
    gegevens kunnen nog tot [14] dagen in back-ups staan, tot die worden vervangen.
 2. De organisator kan aanmeldingen eerder zelf verwijderen en kan ze vooraf downloaden.
-3. Kaartinhoud en foto's verwijdert VAYLIDE [volgens beslislijst B1].
+3. Kaartinhoud en foto's verwijdert VAYLIDE 90 dagen nadat de uitnodiging offline is gegaan.
 
 **Artikel 11. Informatie en audit**
 1. VAYLIDE geeft op verzoek de informatie die nodig is om naleving aan te tonen.
@@ -122,7 +122,7 @@ Een samenvatting van `docs/PRIVACY.md`:
 - de organisator wordt geïnformeerd zonder de inhoud te herhalen;
 - verwijderen gebeurt op instructie van de organisator, of direct bij gevaar of een beveiligingsincident;
 - vastleggen zonder de inhoud;
-- reactie binnen [termijn, beslislijst D2].
+- reactie binnen 5 werkdagen; uitvoeren binnen de wettelijke maand.
 
 ---
 

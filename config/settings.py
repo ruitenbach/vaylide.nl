@@ -89,7 +89,9 @@ COMPANY_VAT = env("VIERLIEF_BTW", "NL212227221B02")
 # vestigingsadres (regels scheiden met |). Een telefoonnummer is optioneel. Leeg = herkenbaar invulveld op de
 # afgeschermde testversie; in live-modus weigert de site dan te starten (zie onderaan).
 COMPANY_LEGAL_NAME = env("VIERLIEF_JURIDISCHE_NAAM")
-COMPANY_ADDRESS = env("VIERLIEF_ADRES")
+# Vestigingsadres (aangeleverd door de eigenaar, 1 oktober 2026). Alleen tonen op "Contact & bedrijfsgegevens" en in de
+# algemene voorwaarden (en de pdf daarvan); niet op de homepage, uitnodigingen of in de leveringsmail.
+COMPANY_ADDRESS = env("VIERLIEF_ADRES", "Handellaan 73|8031 EG Zwolle")
 COMPANY_PHONE = env("VIERLIEF_TELEFOON")
 OWNER_NOTIFY_EMAIL = env("VIERLIEF_OWNER_EMAIL", CONTACT_EMAIL)
 # Optioneel één wachtwoord voor de hele site (inlogvenster van de browser), bijvoorbeeld zolang een
@@ -305,7 +307,8 @@ AI_ENABLED = env_bool("VIERLIEF_AI_ENABLED", True)
 # --- Privacyverklaring (zie core/privacyverklaring.py en docs/PRIVACY.md) ------
 # Namen van aanbieders die de verklaring pas kan noemen als ze gekozen zijn. Leeg terwijl de koppeling actief is =
 # invulveld op de testversie; in live-modus weigert `manage.py check` dan.
-PRIVACY_EMAIL_PROVIDER = env("VIERLIEF_EMAIL_AANBIEDER")  # bijv. "Naam B.V. (Nederland)"
+# Besluit eigenaar (beslislijst C1, 1 oktober 2026): Vimexx verstuurt de e-mail (SMTP via mail.zxcs.nl).
+PRIVACY_EMAIL_PROVIDER = env("VIERLIEF_EMAIL_AANBIEDER", "Vimexx B.V. (Nederland)")
 PRIVACY_BACKUP_PROVIDER = env("VIERLIEF_BACKUP_AANBIEDER")
 PRIVACY_AI_AFSPRAKEN = env("VIERLIEF_AI_AFSPRAKEN")  # doorgifte-afspraken met Anthropic, na eigen controle
 
