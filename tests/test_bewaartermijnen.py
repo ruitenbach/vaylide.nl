@@ -18,17 +18,18 @@ from wishes.models import CustomRequest, RequestAttachment, RequestMessage
 
 from .helpers import VaylideTestCase
 
-ADRES = "Handellaan 73"
+ADRES = "Händellaan 73"
 
 
 class AddressTests(VaylideTestCase):
     def test_address_on_contact_page_and_in_the_terms_and_pdf(self):
-        self.assertIn("Handellaan 73<br>8031 EG Zwolle", Client().get("/contact/").content.decode())
+        self.assertIn("Händellaan 73<br>8031 EG Zwolle", Client().get("/contact/").content.decode())
         terms = Client().get("/voorwaarden/").content.decode()
-        self.assertIn("Handellaan 73, 8031 EG Zwolle", terms.split('id="modelformulier"', 1)[1])
+        self.assertIn("Händellaan 73, 8031 EG Zwolle", terms.split('id="modelformulier"', 1)[1])
         from core.voorwaarden_pdf import render_pdf
 
-        self.assertIn(b"Handellaan 73, 8031 EG Zwolle", render_pdf("2026-09-29", compress=False))
+        # De ä staat in de pdf als WinAnsi-teken (octaal 344).
+        self.assertIn(rb"H\344ndellaan 73, 8031 EG Zwolle", render_pdf("2026-09-29", compress=False))
 
     def test_not_on_the_homepage_invitation_or_in_mails(self):
         self.assertNotIn(ADRES, Client().get("/").content.decode())
@@ -41,6 +42,18 @@ class AddressTests(VaylideTestCase):
         confirmation = mails.get(kind="order_confirmation")
         self.assertIn("Vestigingsadres: zie Contact & bedrijfsgegevens", confirmation.body_text)
         self.assertTrue(confirmation.attach_terms_version)  # het adres staat in de pdf-bijlage met de voorwaarden
+
+
+class OpenPointsTests(VaylideTestCase):
+    def test_nothing_open_with_legal_name_and_smtp(self):
+        from django.test import override_settings
+
+        from core.privacyverklaring import open_points
+
+        with override_settings(COMPANY_LEGAL_NAME="G.M.Bootsman Consultancy (eenmanszaak)", EMAIL_MODE="smtp"):
+            self.assertEqual(open_points(), [])
+        html = Client().get("/privacy/").content.decode()
+        self.assertIn("7 dagen", html)
 
 
 class CardRetentionTests(VaylideTestCase):

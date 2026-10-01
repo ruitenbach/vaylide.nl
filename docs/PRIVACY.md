@@ -286,7 +286,7 @@ bestelregels en betalingen blijven 7 jaar, ook als de kaart, de wens of de corre
 | `bewaar_wensen` | Afgeronde of gesloten wensen 12 maanden na de laatste wijziging weg, met berichten en bijlagen (correspondentie). Een betaalde bestelling bij de wens blijft. |
 | `bewaar_herroepingen` | 7 jaar, daarna weg (juridische toets: kan korter?). |
 | `bewaar_emails` | Na 90 dagen houdt de kopie alleen soort, status en tijdstip; adres, onderwerp en inhoud worden gewist. Zo blijven de statuscontroles werken. Een opgeschoonde mail wordt nooit meer verstuurd. |
-| `bewaar_logs` | **Nog open:** de termijn van Render, na te kijken in het Render-dashboard. Blokkeert live. |
+| `bewaar_logs` | 7 dagen: Render bewaart logs 7 dagen bij het Hobby-abonnement van de werkruimte (render.com/docs/logging; Pro 14, Scale/Enterprise 30 dagen). Ander abonnement: termijn aanpassen. |
 | Tweede back-uplocatie | 30 dagen via een bewaarregel bij de aanbieder (staat al in `docs/BACKUP.md`), alleen als die locatie wordt gebruikt |
 
 Ook voor de nieuwsbrief: het bewijs van de toestemming blijft bewaard tot het afmelden. Voorstel: daarna de tekst nog 1 jaar
@@ -317,10 +317,10 @@ als bewijs bewaren en dan wissen. Nu wist `anonymize_user` het alleen bij het ve
 
 ## Nog nodig van de eigenaar
 
-1. **Juridische naam met rechtsvorm** (`VIERLIEF_JURIDISCHE_NAAM` in Render). Het vestigingsadres (Handellaan 73, 8031 EG
-   Zwolle) is verwerkt als standaard in `config/settings.py` en staat alleen op Contact & bedrijfsgegevens en in de
-   voorwaarden (en de pdf).
-2. **Besluiten in `core/privacyverklaring.py` → `BESLUITEN`:** alles ingevuld op 1 oktober 2026, behalve `bewaar_logs`.
+1. **Juridische naam en adres:** G.M.Bootsman Consultancy (eenmanszaak), schrijfwijze volgens het KvK-register (KvK
+   94261423), staat in Render als `VIERLIEF_JURIDISCHE_NAAM`. Vestigingsadres volgens KvK: Händellaan 73, 8031 EG Zwolle
+   (standaard in `config/settings.py`), alleen op Contact & bedrijfsgegevens en in de voorwaarden (en de pdf).
+2. **Besluiten in `core/privacyverklaring.py` → `BESLUITEN`:** alles ingevuld op 1 oktober 2026.
 3. **E-maildienst:** Vimexx (standaard `Vimexx B.V. (Nederland)`; met `VIERLIEF_EMAIL_AANBIEDER` te overschrijven).
 4. **Tweede back-uplocatie:** gebruik je die, zet dan `VIERLIEF_BACKUP_AANBIEDER`.
 5. **AI:** wil je tekstvoorstellen via Anthropic, controleer en teken dan de verwerkersovereenkomst en zet

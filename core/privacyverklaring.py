@@ -44,8 +44,9 @@ BESLUITEN: dict[str, str | None] = {
     "bewaar_wensen": "12 maanden na afronden verwijderd, met berichten en bijlagen (automatisch). Leidde de wens tot een "
                      "betaling, dan blijven alleen de bestel- en betaalgegevens 7 jaar bewaard.",
     "bewaar_emails": "90 dagen; daarna verwijderen wij de inhoud en het adres van de kopie (automatisch)",
-    # B7: de termijn van Render, na te kijken door de eigenaar in het Render-dashboard (niet zelf in te vullen).
-    "bewaar_logs": None,
+    # B7 (01-10-2026): Render bewaart logs 7 dagen bij het Hobby-abonnement van de werkruimte (render.com/docs/logging:
+    # Hobby 7, Pro 14, Scale/Enterprise 30 dagen). Ander abonnement? Pas deze termijn dan aan.
+    "bewaar_logs": "7 dagen bij onze hostingpartij Render; daarna verwijdert Render ze automatisch",
 }
 
 LABELS = {

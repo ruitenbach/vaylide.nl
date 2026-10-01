@@ -91,7 +91,7 @@ COMPANY_VAT = env("VIERLIEF_BTW", "NL212227221B02")
 COMPANY_LEGAL_NAME = env("VIERLIEF_JURIDISCHE_NAAM")
 # Vestigingsadres (aangeleverd door de eigenaar, 1 oktober 2026). Alleen tonen op "Contact & bedrijfsgegevens" en in de
 # algemene voorwaarden (en de pdf daarvan); niet op de homepage, uitnodigingen of in de leveringsmail.
-COMPANY_ADDRESS = env("VIERLIEF_ADRES", "Handellaan 73|8031 EG Zwolle")
+COMPANY_ADDRESS = env("VIERLIEF_ADRES", "Händellaan 73|8031 EG Zwolle")
 COMPANY_PHONE = env("VIERLIEF_TELEFOON")
 OWNER_NOTIFY_EMAIL = env("VIERLIEF_OWNER_EMAIL", CONTACT_EMAIL)
 # Optioneel één wachtwoord voor de hele site (inlogvenster van de browser), bijvoorbeeld zolang een

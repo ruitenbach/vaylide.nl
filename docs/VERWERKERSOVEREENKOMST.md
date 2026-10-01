@@ -1,7 +1,7 @@
 # Concept: verwerkersovereenkomst voor zakelijke klanten
 
 **Concept, nog niet juridisch beoordeeld en nergens op de site ingebouwd.** De besluiten van 1 oktober 2026 (A3, A4, B1,
-D2) zijn verwerkt; tekst tussen [vierkante haken] is nog open (juridische naam, en keuzes voor de jurist). De privacyverklaring vervangt deze overeenkomst niet.
+D2) zijn verwerkt; tekst tussen [vierkante haken] is nog open (keuzes voor de jurist). De privacyverklaring vervangt deze overeenkomst niet.
 
 ## Waarom
 
@@ -22,7 +22,7 @@ de gegevens van haar gasten, en VAYLIDE verwerker. Daarvoor schrijft art. 28 lid
 
 1. **De klant**: [naam organisatie], gevestigd te [adres], KvK [nummer], hierna "de organisator"
    (verwerkingsverantwoordelijke);
-2. **VAYLIDE**: een handelsnaam van [juridische naam onderneming en rechtsvorm], gevestigd te Handellaan 73, 8031 EG Zwolle,
+2. **VAYLIDE**: een handelsnaam van G.M.Bootsman Consultancy (eenmanszaak), gevestigd te Händellaan 73, 8031 EG Zwolle,
    KvK 94261423, hierna "VAYLIDE" (verwerker).
 
 **Artikel 1. Onderwerp en duur**

@@ -9,7 +9,8 @@ maanden weg, ook als er een bestelling uit voortkwam (B4).
 - **Verwerkt:** A1, A2 (teksten in de privacyverklaring), A4 en D2 (in `docs/VERWERKERSOVEREENKOMST.md`), B1 tot en met B6
   (nachtelijke opruimtaken in `core/privacy.py`, tests in `tests/test_bewaartermijnen.py`), C1 (Vimexx als standaard), C2
   en C4 (ongewijzigd).
-- **Nog open:** B7 (bewaartermijn logs bij Render, blokkeert live), A3 (verwerkersvoorwaarden als bijlage bij het
+- **B7 ook verwerkt:** 7 dagen (Hobby-abonnement bij Render, volgens render.com/docs/logging).
+- **Nog open:** A3 (verwerkersvoorwaarden als bijlage bij het
   bestellen: pas inbouwen na de juridische toets), C3 (optioneel), D1 en D3.
 - **Juridische toets** blijft aanbevolen voor A1, A2, A3, A4, B5 en D1.
 
@@ -77,7 +78,7 @@ zonder dat jij hebt besloten.
 
 ## Wat je daarnaast nog nodig hebt voor de privacyverklaring
 
-- **Juridische naam met rechtsvorm:** te zetten in Render als `VIERLIEF_JURIDISCHE_NAAM`. Het vestigingsadres is verwerkt
-  (Handellaan 73, 8031 EG Zwolle), alleen op Contact & bedrijfsgegevens en in de voorwaarden.
+- **Juridische naam:** G.M.Bootsman Consultancy (eenmanszaak), volgens KvK, staat in Render (`VIERLIEF_JURIDISCHE_NAAM`).
+  Het vestigingsadres (Händellaan 73, 8031 EG Zwolle) staat alleen op Contact & bedrijfsgegevens en in de voorwaarden.
 - **Na je besluiten:** ik verwerk ze lokaal, laat alle tests draaien en stuur je de bijgewerkte verklaring. Publiceren
   gebeurt pas na je akkoord.

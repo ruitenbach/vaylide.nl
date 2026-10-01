@@ -970,3 +970,15 @@ Lokaal, branch `claude/privacyverklaring`, testmodus, met fictieve testgegevens.
   8031 EG Zwolle; het modelformulier in `/voorwaarden/` toont het adres; de voorwaarden-pdf geeft 200 (application/pdf);
   `/`, `/ontwerpen/`, `/privacy/` en `/voorbeeld/aan-tafel/` bevatten het adres niet. De privacyverklaring heeft nog twee
   invulvelden: juridische naam en de logtermijn van Render; de bewaartermijnen B1 tot en met B6 en Vimexx staan erin.
+
+## Domein, juridische naam en logtermijn (1 oktober 2026, middag)
+
+- **Domein:** vaylide.nl en www.vaylide.nl in Render "Verified"; certificaten van Google Trust Services (geldig tot 30
+  december 2026). `https://www.vaylide.nl/contact/` geeft 301 naar `https://vaylide.nl/contact/`; http geeft 301 naar
+  https; `https://vaylide.nl/healthz` geeft 200, de rest vraagt het previewwachtwoord. Vertraging kwam door een oude
+  cache in de nameservers van Vimexx (antwoorden op DNSSEC-vragen), door Vimexx rond 14:38 geleegd.
+- **KvK-register** (kvk.nl, nummer 94261423): "G.M.Bootsman Consultancy", eenmanszaak, Händellaan 73, 8031EG Zwolle.
+  Juridische naam in Render gezet; op de testsite (/contact/) zichtbaar na de herstart. Adres in de code verbeterd naar
+  Händellaan (nog niet gedeployd bij deze controle).
+- **Logtermijn:** Render-werkruimte op het Hobby-abonnement (Billing); volgens render.com/docs/logging 7 dagen.
+- `manage.py test tests`: 465 tests, alle geslaagd.
