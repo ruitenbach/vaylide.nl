@@ -247,3 +247,8 @@ class InvalidInputTests(VaylideTestCase):
         response = self.c.post(f"/maken/{complete.uid}/bestellen/", {"actie": "betalen", "package": "essentieel"})
         self.assertContains(response, "akkoord met de algemene voorwaarden")
         self.assertFalse(Order.objects.exists())
+        # Het vinkje noemt de versie van de voorwaarden, zonder het woord "concept".
+        page = self.c.get(f"/maken/{complete.uid}/bestellen/").content.decode()
+        label = page.split('class="check terms-check"', 1)[1].split("</label>", 1)[0]
+        self.assertIn("(versie 29 september 2026)", label)
+        self.assertNotIn("concept", label.lower())

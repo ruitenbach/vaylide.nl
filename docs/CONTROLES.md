@@ -999,3 +999,11 @@ Lokaal, branch `claude/privacyverklaring`, testmodus, met fictieve testgegevens.
 - HEAD-verzoeken (1 oktober): de preview-afscherming liet HEAD op de open pagina's al door (/, /prijzen/, /voorwaarden/
   200), maar de contactpagina en het herroepformulier gaven 405 omdat ze alleen GET/POST toestonden. Nu ook HEAD
   (zonder inhoud); afgeschermde pagina's blijven 401, ook voor HEAD, PUT, PATCH en DELETE (getest).
+
+## Live-test en vinkje voorwaarden (1 oktober 2026, avond)
+
+- Live end-to-end test met VL26-00002 (Essentieel tijdelijk € 0,01, daarna direct terug op € 39): webhook ontvangen,
+  betaling en bestelling betaald, kaart gepubliceerd, bestelbevestiging met voorwaarden-pdf en leveringsmail met QR
+  verstuurd, aanmelding van een testgast opgeslagen en zichtbaar in Mijn VAYLIDE. VL26-00001 (€ 39) door Mollie verlopen.
+- Het vinkje bij bestellen noemt nu "(versie 29 september 2026)" zonder het woord "concept" (test in
+  `tests/test_flow.py`); de pagina met voorwaarden en de pdf tonen de status nog. `manage.py test tests`: 467 geslaagd.
