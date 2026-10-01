@@ -982,3 +982,13 @@ Lokaal, branch `claude/privacyverklaring`, testmodus, met fictieve testgegevens.
   Händellaan (nog niet gedeployd bij deze controle).
 - **Logtermijn:** Render-werkruimte op het Hobby-abonnement (Billing); volgens render.com/docs/logging 7 dagen.
 - `manage.py test tests`: 465 tests, alle geslaagd.
+
+## Informatiepagina's open voor de Mollie-controle (1 oktober 2026, middag)
+
+- Nieuw: `VIERLIEF_PREVIEW_OPEN_PUBLIC` (`core/middleware.py`). Met het previewwachtwoord aan zijn alleen de
+  informatiepagina's zonder wachtwoord te bekijken (GET/HEAD). Op een afgeschermde testversie krijgt alles noindex en
+  geeft `robots.txt` "Disallow: /". `robots.txt` noemt het pad van het systeembeheer niet meer.
+- `manage.py test tests`: 467 tests, alle geslaagd (nieuw in `tests/test_preview.py`: welke pagina's open zijn, dat
+  inloggen, maken, Mijn VAYLIDE, `/u/`, bestelling, testbetaling, beheer, systeembeheer en POST-verzoeken 401 geven,
+  geen beheerlinks of testcodes op open pagina's, en robots.txt zonder het beheerpad).
+- Back-up op Render vóór de deploy: `vaylide-20261001-132944.tar.gz` (482 kB).

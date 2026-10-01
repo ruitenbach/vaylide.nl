@@ -109,6 +109,7 @@ VIERLIEF_TRUSTED_PROXY_HOPS=1 # bij de meeste hostingplatforms
 VIERLIEF_DJANGO_ADMIN_PATH=   # een pad dat niet makkelijk te raden is, eindigend op /
 VIERLIEF_PREVIEW_USER=voorbeeld
 VIERLIEF_PREVIEW_PASSWORD=    # lang en willekeurig; alleen delen met mensen die meekijken
+VIERLIEF_PREVIEW_OPEN_PUBLIC= # true = alleen de informatiepagina's zonder wachtwoord (voor de Mollie-controle)
 ```
 
 Voor live komen daar de waarden voor Mollie en e-mail bij en wordt `VIERLIEF_MODE=live` (zie

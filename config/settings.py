@@ -98,6 +98,9 @@ OWNER_NOTIFY_EMAIL = env("VIERLIEF_OWNER_EMAIL", CONTACT_EMAIL)
 # testversie online staat. Leeg = uit. Zie core.middleware.PreviewPasswordMiddleware.
 PREVIEW_PASSWORD = env("VIERLIEF_PREVIEW_PASSWORD", "")
 PREVIEW_USER = env("VIERLIEF_PREVIEW_USER", "voorbeeld")
+# Tijdelijk alleen de informatiepagina's (home, ontwerpen, prijzen, voorwaarden, privacy, contact, voorbeelden) zonder
+# wachtwoord, bijvoorbeeld voor de websitecontrole door Mollie. De rest blijft achter het previewwachtwoord.
+PREVIEW_OPEN_PUBLIC = env_bool("VIERLIEF_PREVIEW_OPEN_PUBLIC", False)
 
 # --- Applicaties -------------------------------------------------------------
 INSTALLED_APPS = [

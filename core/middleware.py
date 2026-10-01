@@ -66,7 +66,9 @@ class SecurityHeadersMiddleware:
             "Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), browsing-topics=()"
         )
         path = request.path
-        if path.startswith(PRIVATE_PREFIXES):
+        # Een afgeschermde testversie (previewwachtwoord) hoort nergens in zoekmachines, ook niet als de
+        # informatiepagina's tijdelijk open staan.
+        if path.startswith(PRIVATE_PREFIXES) or settings.PREVIEW_PASSWORD:
             response["X-Robots-Tag"] = "noindex, nofollow, noarchive"
         if path.startswith(NO_STORE_PREFIXES):
             response["Cache-Control"] = "private, no-store"
@@ -124,13 +126,27 @@ class PreviewPasswordMiddleware:
     """
 
     EXEMPT = ("/healthz", "/static/", "/intern/taken/", "/webhooks/")
+    # Met VIERLIEF_PREVIEW_OPEN_PUBLIC (bijvoorbeeld voor de websitecontrole door Mollie) zijn alleen deze
+    # informatiepagina's zonder wachtwoord te bekijken, en alleen lezen (GET/HEAD). Formulieren versturen, inloggen,
+    # een kaart maken of bestellen, Mijn VAYLIDE, uitnodigingen (/u/), beheer en het systeembeheer blijven afgeschermd.
+    PUBLIC_PAGES = {"/", "/ontwerpen/", "/zo-werkt-het/", "/prijzen/", "/veelgestelde-vragen/", "/inspiratie/",
+                    "/over-ons/", "/zoeken/", "/contact/", "/privacy/", "/voorwaarden/", "/herroepen/", "/robots.txt",
+                    "/sitemap.xml", "/favicon.ico"}
+    PUBLIC_PREFIXES = ("/ontwerpen/", "/voorwaarden/", "/voorbeeld/")
 
     def __init__(self, get_response):
         self.get_response = get_response
 
+    def _public(self, request) -> bool:
+        if not settings.PREVIEW_OPEN_PUBLIC or request.method not in ("GET", "HEAD"):
+            return False
+        path = request.path
+        return path in self.PUBLIC_PAGES or path.startswith(self.PUBLIC_PREFIXES)
+
     def __call__(self, request):
         password = settings.PREVIEW_PASSWORD
-        if not password or request.path.startswith(self.EXEMPT) or self._authorized(request, password):
+        if (not password or request.path.startswith(self.EXEMPT) or self._public(request)
+                or self._authorized(request, password)):
             return self.get_response(request)
         if not rate_limit(f"preview:{ip_fingerprint(request)}", 30, 300):
             return HttpResponse("Te veel pogingen. Probeer het over een paar minuten opnieuw.", status=429,

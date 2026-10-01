@@ -275,6 +275,10 @@ def terms_pdf(request, version):
 
 
 def robots_txt(request):
+    # Het pad van het systeembeheer staat hier bewust niet: dat moet moeilijk te raden blijven (het krijgt wel noindex).
+    if settings.PREVIEW_PASSWORD:
+        # Afgeschermde testversie: niets indexeren, ook niet als de informatiepagina's tijdelijk open staan.
+        return HttpResponse("User-agent: *\nDisallow: /\n", content_type="text/plain; charset=utf-8")
     lines = [
         "User-agent: *",
         "Disallow: /u/",
@@ -285,7 +289,6 @@ def robots_txt(request):
         "Disallow: /bestelling/",
         "Disallow: /betalen/",
         "Disallow: /inloggen/",
-        f"Disallow: /{settings.ADMIN_URL}",
         "",
         f"Sitemap: {settings.BASE_URL}/sitemap.xml",
     ]
