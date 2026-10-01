@@ -992,3 +992,7 @@ Lokaal, branch `claude/privacyverklaring`, testmodus, met fictieve testgegevens.
   inloggen, maken, Mijn VAYLIDE, `/u/`, bestelling, testbetaling, beheer, systeembeheer en POST-verzoeken 401 geven,
   geen beheerlinks of testcodes op open pagina's, en robots.txt zonder het beheerpad).
 - Back-up op Render vóór de deploy: `vaylide-20261001-132944.tar.gz` (482 kB).
+- Na het aanzetten (Render, 1 oktober): anonieme controle van https://vaylide.nl met 27 punten, alle goed (10
+  informatiepagina's 200 met noindex en testbalk, zonder beheerlinks of testcodes; 11 afgeschermde paden en 5
+  POST-verzoeken 401; robots.txt alleen "Disallow: /"). In de logs vroeg een controlerobot pagina's zonder slot-slash op
+  (/prijzen) en kreeg 401; nu verbeterd: zonder slash volgt een doorverwijzing naar de open pagina (getest).

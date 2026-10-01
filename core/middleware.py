@@ -141,6 +141,9 @@ class PreviewPasswordMiddleware:
         if not settings.PREVIEW_OPEN_PUBLIC or request.method not in ("GET", "HEAD"):
             return False
         path = request.path
+        # Zonder slot-slash (/prijzen) stuurt Django daarna zelf door naar /prijzen/; die moet dan ook open zijn.
+        if not path.endswith("/") and "." not in path.rsplit("/", 1)[-1]:
+            path += "/"
         return path in self.PUBLIC_PAGES or path.startswith(self.PUBLIC_PREFIXES)
 
     def __call__(self, request):

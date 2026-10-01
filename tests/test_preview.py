@@ -64,6 +64,13 @@ class PreviewPasswordTests(VaylideTestCase):
             self.assertEqual(Client().post(url, {"name": "x"}).status_code, 401, url)
         robots = Client().get("/robots.txt").content.decode()
         self.assertEqual(robots, "User-agent: *\nDisallow: /\n")
+        # Zonder slot-slash: doorsturen naar de open pagina (zoals een controlerobot ze opvraagt), niet 401.
+        for url in ("/prijzen", "/ontwerpen", "/zo-werkt-het", "/inspiratie"):
+            response = Client().get(url)
+            self.assertEqual(response.status_code, 301, url)
+            self.assertEqual(response["Location"], url + "/", url)
+        for url in ("/maken", "/account", "/beheer", "/inloggen"):
+            self.assertEqual(Client().get(url).status_code, 401, url)
 
     def test_robots_does_not_reveal_the_admin_path(self):
         from django.conf import settings
