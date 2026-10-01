@@ -966,3 +966,7 @@ Lokaal, branch `claude/privacyverklaring`, testmodus, met fictieve testgegevens.
     in de wachtrij en een recente mail blijven; een opgeschoonde mail wordt niet meer verstuurd.
 - `open_points()` met SMTP aan: nog alleen "bewaartermijn logbestanden bij de hostingpartij" en "juridische naam en
   rechtsvorm".
+- **Testsite na deploy van 8be9b49** (Render-status `success`, bekeken in Chrome): `/contact/` toont Handellaan 73 /
+  8031 EG Zwolle; het modelformulier in `/voorwaarden/` toont het adres; de voorwaarden-pdf geeft 200 (application/pdf);
+  `/`, `/ontwerpen/`, `/privacy/` en `/voorbeeld/aan-tafel/` bevatten het adres niet. De privacyverklaring heeft nog twee
+  invulvelden: juridische naam en de logtermijn van Render; de bewaartermijnen B1 tot en met B6 en Vimexx staan erin.
