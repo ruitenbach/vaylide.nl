@@ -98,7 +98,7 @@ def status(request, uid):
     return render(request, "orders/status.html", {"order": order, "state": state, "payment": payment, "doc_kind": kind, "method_label": method_label})
 
 
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET", "HEAD", "POST"])  # HEAD: controlerobots (zoals die van Mollie) vragen soms alleen de kop op
 def withdraw(request):
     """De herroepingsfunctie (art. 6:230oa BW): 'Hier de overeenkomst ontbinden' -> gegevens -> 'Ontbinding bevestigen'.
     Registreert het verzoek en stuurt direct een ontvangstbevestiging; terugbetalen blijft handwerk."""

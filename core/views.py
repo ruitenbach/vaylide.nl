@@ -184,7 +184,7 @@ def search(request):
     return render(request, "core/search.html", {"query": query, "results": search_site(query) if query else []})
 
 
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET", "HEAD", "POST"])  # HEAD: controlerobots (zoals die van Mollie) vragen soms alleen de kop op
 def contact(request):
     config = SiteConfig.get()
     if request.method == "POST":

@@ -996,3 +996,6 @@ Lokaal, branch `claude/privacyverklaring`, testmodus, met fictieve testgegevens.
   informatiepagina's 200 met noindex en testbalk, zonder beheerlinks of testcodes; 11 afgeschermde paden en 5
   POST-verzoeken 401; robots.txt alleen "Disallow: /"). In de logs vroeg een controlerobot pagina's zonder slot-slash op
   (/prijzen) en kreeg 401; nu verbeterd: zonder slash volgt een doorverwijzing naar de open pagina (getest).
+- HEAD-verzoeken (1 oktober): de preview-afscherming liet HEAD op de open pagina's al door (/, /prijzen/, /voorwaarden/
+  200), maar de contactpagina en het herroepformulier gaven 405 omdat ze alleen GET/POST toestonden. Nu ook HEAD
+  (zonder inhoud); afgeschermde pagina's blijven 401, ook voor HEAD, PUT, PATCH en DELETE (getest).

@@ -71,6 +71,15 @@ class PreviewPasswordTests(VaylideTestCase):
             self.assertEqual(response["Location"], url + "/", url)
         for url in ("/maken", "/account", "/beheer", "/inloggen"):
             self.assertEqual(Client().get(url).status_code, 401, url)
+        # HEAD (alleen de kop) krijgt dezelfde toegang als GET, zonder inhoud.
+        for url in ("/", "/prijzen/", "/contact/", "/voorwaarden/", "/herroepen/", "/privacy/", "/ontwerpen/"):
+            response = Client().head(url)
+            self.assertEqual(response.status_code, 200, url)
+            self.assertEqual(response.content, b"", url)
+        for url in ("/maken/", "/inloggen/", "/account/", "/beheer/", f"/u/{invitation.slug}/"):
+            self.assertEqual(Client().head(url).status_code, 401, url)
+        for method in ("put", "delete", "patch"):
+            self.assertEqual(getattr(Client(), method)("/contact/").status_code, 401, method)
 
     def test_robots_does_not_reveal_the_admin_path(self):
         from django.conf import settings
