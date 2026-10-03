@@ -4,7 +4,7 @@ from django.test import Client
 from catalog.models import Template
 from invitations.models import Invitation
 
-from .helpers import VaylideTestCase
+from .helpers import VaylideTestCase, toon_verborgen_ontwerpen
 
 KERST = ["aan-tafel", "middernacht", "gloria", "winterlicht", "kerstman", "sneeuwpop"]
 
@@ -29,6 +29,7 @@ class DesignPageColourTests(VaylideTestCase):
         self.assertNotContains(response, "<script>&")
 
     def test_every_colour_renders_in_the_example(self):
+        toon_verborgen_ontwerpen()
         for slug in KERST:
             for palette in Template.objects.get(slug=slug).current_version.palettes:
                 html = Client().get(f"/voorbeeld/{slug}/", {"kleur": palette["key"]}).content.decode()

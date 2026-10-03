@@ -13,6 +13,7 @@
   "sort_order": 170,
   "opening": "polaroid",
   "opening_label": "Polaroid",
+  "envelope_mode": "built_in",
   "atelier": {
     "opening": "polaroid",
     "hero": "polaroid",

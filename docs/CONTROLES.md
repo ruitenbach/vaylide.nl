@@ -1122,3 +1122,21 @@ Opdracht van de eigenaar: "Envelop te groot, de layout is aardig leeg. Kan dit m
 - **Framesnelheid** (headless Chromium zonder GPU, per fase: zegel en envelop, portaal, onthulling, rust). Mobiel 390 px (pixelverhouding 3): 60 / 55 tot 59 / 58 tot 60 / 60 voor alle vier. Desktop 1366 px: 55 tot 57 / 22 tot 27 / 40 tot 41 / 51 tot 57. De eerste versie van de omlijsting kostte op desktop ±10 fps in de rust (de draaiende lichtwaaier) en liet het portaal op 11 tot 18 fps zakken; daarom staan de waaiers nu stil (in de kop alleen de bovenste helft), blijft de camera bij het portaal tot 3× inzoomen en verdwijnt de versiering sneller. Waarden schommelen een paar beelden per seconde tussen metingen.
 - **Niet gecontroleerd**: axe, Safari, Firefox, echte telefoons, schermlezer, de lichte varianten op 360, 768 en 1024 px en met `prefers-reduced-motion` na deze wijziging (alleen de testsuite), de sectie Momenten met meer dan vier foto's.
 
+## De officiële collectie: A/B/C samengesteld (4 oktober 2026)
+
+Branch `claude/vaylide-master-collectie`, gebouwd op `claude/aurora-nocturne`. Zie `docs/COLLECTIE.md`.
+
+- **Tests**: 587 tests geslaagd in één volledige run (14 nieuwe in `tests/test_collectie.py`, 6 bestaande testverwachtingen bewust aangepast aan de
+  indeling, 14 ontwerptests laten verborgen ontwerpen tijdelijk zichtbaar zijn). `manage.py check` zonder meldingen, `makemigrations --check`: geen wijzigingen.
+- **Platform**: vergeleken met `claude/aurora-nocturne` is er geen enkel bestand in studio, orders, processing, accounts, portal, wishes, beheer,
+  invitations, templates, config, de Envelope Collection, `catalog/models.py`, `catalog/specials.py` of `catalog/effects.py` gewijzigd. Wel
+  gewijzigd: `catalog/seed.py` (2 regels: C-ontwerpen starten op niet zichtbaar), `catalog/collectie.py` en migratie 0006 (nieuw) en `core/content.py`
+  (kerstpodium op de homepage).
+- **Migratie op een bestaande database** (de ontwikkeldatabase, 46 ontwerpen, aangemaakt vóór deze ronde): 9 ontwerpen verborgen, 5 specials,
+  volgorde van 46 ontwerpen zonder dubbele nummers, niets verwijderd.
+- **Gezien in Chromium** (1100 px breed): collectiepagina Specials met de vijf kaartbeelden in de goede volgorde (alle vijf laden), de
+  bruiloftsfilter (A vóór B), de homepage met het kerstpodium met drie kaarten. Geen horizontale overflow, geen consolefouten.
+- **Bestaande uitnodiging op een verborgen ontwerp**: werkt (status 200), terwijl `/ontwerpen/<code>/` voor bezoekers 404 geeft (test).
+- **Niet gecontroleerd**: de kaartbeelden van de drie nieuwe specials op telefoonformaat in de collectie, Studio en bestellen per ontwerp na deze
+  wijziging (alleen via de bestaande tests), Safari en Firefox, echte telefoons.
+

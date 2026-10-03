@@ -11,6 +11,7 @@
   "sort_order": 45,
   "opening": "cadeau",
   "opening_label": "Cadeau om uit te pakken",
+  "envelope_mode": "built_in",
   "atelier": {
     "opening": "cadeau",
     "hero": "klassiek",

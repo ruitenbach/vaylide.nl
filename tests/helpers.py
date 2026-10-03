@@ -47,6 +47,14 @@ def jpeg_file(width=1200, height=900, name="foto.jpg", exif_gps=False, fmt="JPEG
     return buffer
 
 
+def toon_verborgen_ontwerpen():
+    """De collectie verbergt de C-ontwerpen (catalog/collectie.py). Tests van de ontwerpen zelf zetten ze tijdelijk aan
+    (binnen de testtransactie; de volgende test ziet weer de echte indeling)."""
+    from catalog.models import Template
+
+    Template.objects.filter(is_active=False).update(is_active=True)
+
+
 class VaylideTestCase(TestCase):
     """Basis: aparte uploadmap, testmodus en hulpfuncties."""
 

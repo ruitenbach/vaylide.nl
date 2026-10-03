@@ -11,6 +11,7 @@
   "sort_order": 46,
   "opening": "vouwkaart",
   "opening_label": "Vouwkaart",
+  "envelope_mode": "built_in",
   "atelier": {
     "opening": "vouwkaart",
     "hero": "kader",

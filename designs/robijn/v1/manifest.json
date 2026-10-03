@@ -13,6 +13,7 @@
   "sort_order": 300,
   "opening": "lint",
   "opening_label": "Cadeaulint",
+  "envelope_mode": "built_in",
   "atelier": {
     "opening": "lint",
     "hero": "klassiek",

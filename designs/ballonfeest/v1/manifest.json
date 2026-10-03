@@ -12,6 +12,7 @@
   "sort_order": 230,
   "opening": "ballonnen",
   "opening_label": "Ballonnen",
+  "envelope_mode": "built_in",
   "atelier": {
     "opening": "ballonnen",
     "hero": "klassiek",

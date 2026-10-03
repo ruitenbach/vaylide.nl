@@ -5,7 +5,7 @@ from invitations.content import card_kind, event_expected, publish_issues
 from invitations.demo import demo_content
 from invitations.models import Invitation
 
-from .helpers import VaylideTestCase, future_date
+from .helpers import VaylideTestCase, future_date, toon_verborgen_ontwerpen
 
 KERST = ["aan-tafel", "middernacht", "gloria", "winterlicht", "kerstman", "sneeuwpop"]
 
@@ -81,6 +81,7 @@ class StudioChoiceTests(VaylideTestCase):
 
 class DesignPageAndDemoTests(VaylideTestCase):
     def test_toggle_on_christmas_designs_only(self):
+        toon_verborgen_ontwerpen()
         for slug in KERST:
             html = Client().get(f"/ontwerpen/{slug}/", {"soort": "wenskaart"}).content.decode()
             self.assertIn('data-soort="wenskaart" aria-current="true"', html, slug)
@@ -89,6 +90,7 @@ class DesignPageAndDemoTests(VaylideTestCase):
         self.assertNotContains(Client().get("/ontwerpen/liefde-op-papier/"), "data-soort-link")
 
     def test_demo_as_greeting_card(self):
+        toon_verborgen_ontwerpen()
         for slug in KERST:
             html = Client().get(f"/voorbeeld/{slug}/", {"soort": "wenskaart"}).content.decode()
             self.assertNotIn('id="aanmelden"', html, slug)

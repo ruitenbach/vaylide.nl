@@ -83,6 +83,7 @@ def manifest(spec: dict) -> dict:
         "slug": spec["slug"], "version": 1, "name": spec["name"], "tagline": spec["tagline"], "description": spec["description"],
         "style_notes": spec["style_notes"], "occasions": spec["occasions"], "sort_order": spec["sort_order"],
         "opening": spec["atelier"]["opening"], "opening_label": OPENING_LABELS[spec["atelier"]["opening"]],
+        "envelope_mode": spec.get("envelope_mode", "built_in"),   # optional: de klant mag een envelop uit de Envelope Collection kiezen
         "atelier": spec["atelier"], "palettes": palettes, "sections": SECTIONS, "changelog": "Eerste versie.",
     }
     if effects:

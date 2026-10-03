@@ -13,6 +13,7 @@
   "sort_order": 130,
   "opening": "envelop",
   "opening_label": "Envelop met zegel",
+  "envelope_mode": "optional",
   "atelier": {
     "opening": "envelop",
     "hero": "klassiek",

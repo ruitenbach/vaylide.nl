@@ -17,7 +17,7 @@ from invitations.render import RenderOptions, build_view
 from invitations.services import save_draft
 from orders.pricing import build_quote, compare_packages, recommended
 
-from .helpers import VaylideTestCase, jpeg_file
+from .helpers import VaylideTestCase, jpeg_file, toon_verborgen_ontwerpen
 
 
 class UploadTests(VaylideTestCase):
@@ -141,6 +141,7 @@ class RenderTests(VaylideTestCase):
         self.assertGreater(t.end, t.start)
 
     def test_all_demos_render_for_all_occasions(self):
+        toon_verborgen_ontwerpen()
         for template in Template.objects.all():
             for occasion, _ in OCCASION_CHOICES:
                 response = Client().get(f"/voorbeeld/{template.slug}/?gelegenheid={occasion}")

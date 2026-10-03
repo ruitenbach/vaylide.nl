@@ -130,6 +130,7 @@ def design_manifests() -> list[tuple[Path, dict]]:
 
 @transaction.atomic
 def sync_designs(update_existing_manifest: bool = False) -> list[str]:
+    from .collectie import zichtbaar
     from .models import Template, TemplateVersion
 
     messages = []
@@ -147,6 +148,7 @@ def sync_designs(update_existing_manifest: bool = False) -> list[str]:
                 "occasions": data.get("occasions", []),
                 "sort_order": data.get("sort_order", 100),
                 "special": bool(data.get("special")),
+                "is_active": zichtbaar(slug),    # C-ontwerpen (catalog/collectie.py) staan voorlopig niet in de collectie
             },
         )
         if created:

@@ -13,6 +13,7 @@
   "sort_order": 190,
   "opening": "sluier",
   "opening_label": "Zachte sluier",
+  "envelope_mode": "optional",
   "atelier": {
     "opening": "sluier",
     "hero": "klassiek",

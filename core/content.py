@@ -18,7 +18,7 @@ HERO_CHECKS = ["Snel en eenvoudig", "Stijlvolle ontwerpen", "Automatisch online"
 HOME_DESIGNS = ["winterlicht", "liefde-op-papier", "confetti"]
 
 # Homepage, kerstpodium: lichte kerstontwerpen die in 3D zweven (kaartbeelden uit static/img/designs/).
-HOME_KERST = ["winterlicht", "gloria", "kerstman", "sneeuwpop"]
+HOME_KERST = ["winterlicht", "gloria", "golden-noel"]    # Ho ho ho en Sneeuwpret zijn C (catalog/collectie.py) en staan voorlopig niet in de collectie
 
 # Donker paneel op de homepage: onderdelen die elke uitnodiging kan hebben.
 HOME_FEATURES = [

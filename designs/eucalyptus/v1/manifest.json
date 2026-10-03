@@ -13,6 +13,7 @@
   "sort_order": 110,
   "opening": "vouwkaart",
   "opening_label": "Vouwkaart",
+  "envelope_mode": "optional",
   "atelier": {
     "opening": "vouwkaart",
     "hero": "klassiek",

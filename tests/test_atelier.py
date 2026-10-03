@@ -15,7 +15,7 @@ from invitations.render import RenderOptions, build_view
 
 from invitations.models import Invitation
 
-from .helpers import VaylideTestCase, future_date
+from .helpers import VaylideTestCase, future_date, toon_verborgen_ontwerpen
 
 LONG_NAMES = {
     "bruiloft": {"partner_1": "Maximiliaan-Alexander van den Boogaard", "partner_2": "Ernestina"},
@@ -37,6 +37,7 @@ def atelier_manifests():
 
 class AtelierCollectionTests(VaylideTestCase):
     def test_thirty_designs_five_per_occasion(self):
+        toon_verborgen_ontwerpen()
         manifests = [data for _, data in atelier_manifests()]
         self.assertEqual(len(manifests), 32)
         primary = Counter(data["occasions"][0] for data in manifests)
@@ -73,6 +74,7 @@ class AtelierCollectionTests(VaylideTestCase):
 
 class AtelierRenderTests(VaylideTestCase):
     def test_every_design_renders_for_each_occasion_and_colour(self):
+        toon_verborgen_ontwerpen()
         for template in Template.objects.filter(current_version__manifest__has_key="atelier"):
             atelier = template.current_version.manifest["atelier"]
             for occasion in template.occasions:
@@ -113,6 +115,7 @@ class AtelierRenderTests(VaylideTestCase):
         self.assertIn("a-names a-names--xlong", html)
 
     def test_number_design_shows_age_or_years(self):
+        toon_verborgen_ontwerpen()
         cases = [("confetti", "verjaardag", "30"), ("lauwerkrans", "jubileum", "40"), ("mijlpaal", "zakelijk", "10")]
         for slug, occasion, number in cases:
             response = Client().get(f"/voorbeeld/{slug}/", {"gelegenheid": occasion})

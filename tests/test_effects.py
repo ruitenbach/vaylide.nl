@@ -11,6 +11,7 @@ from django.test import Client, TestCase
 from catalog.atelier import contrast
 from catalog.effects import EFFECT_OPTIONS, effect_card_label, effect_summary, effect_view, effects_errors, shine_color
 from catalog.models import Template
+from .helpers import toon_verborgen_ontwerpen
 from catalog.seed import DesignError, validate_manifest
 from invitations.demo import demo_content
 from invitations.render import RenderOptions, build_view
@@ -77,6 +78,7 @@ class EffectRenderTests(TestCase):
             self.assertEqual(len(re.findall(r"<script>", html)), 1, slug)
 
     def test_every_design_renders_with_its_effects(self):
+        toon_verborgen_ontwerpen()
         for template in Template.objects.all():
             response = self.render(template.slug)
             self.assertEqual(response.status_code, 200, template.slug)
@@ -160,6 +162,7 @@ class CadeauTests(TestCase):
     """De cadeau-opening (Stipjes, Glitter & goud, Regenboog) en het effect 'cadeautjes'."""
 
     def test_gift_designs_render_the_gift_opening(self):
+        toon_verborgen_ontwerpen()
         for slug in ("stipjes", "glitter", "regenboog"):
             template = Template.objects.get(slug=slug)
             html = Client().get(f"/voorbeeld/{slug}/", {"gelegenheid": template.occasions[0]}).content.decode()
@@ -183,5 +186,6 @@ class CadeauTests(TestCase):
         self.assertEqual(manifests()["ballonfeest"]["effects"]["viering"], "cadeautjes")
 
     def test_collection_card_shows_the_gift(self):
+        toon_verborgen_ontwerpen()
         response = Client().get("/ontwerpen/")
         self.assertContains(response, "Cadeau om uit te pakken · cadeautjes")

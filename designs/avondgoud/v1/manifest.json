@@ -9,6 +9,7 @@
   "sort_order": 20,
   "opening": "dubbele-deur",
   "opening_label": "Gouden dubbele deur",
+  "envelope_mode": "built_in",
   "palettes": [
     {"key": "nachtblauw", "name": "Nachtblauw & goud", "swatch": ["#0D1422", "#141C2D", "#D7B878"],
      "vars": {"--ag-bg": "#0D1422", "--ag-bg-2": "#141C2D", "--ag-ink": "#F4EDE0", "--ag-muted": "#C8BFAF", "--ag-gold": "#D7B878", "--ag-gold-2": "#F1DFB0", "--ag-glow": "rgba(215, 184, 120, 0.16)"}},

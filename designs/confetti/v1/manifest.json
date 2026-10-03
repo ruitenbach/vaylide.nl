@@ -13,6 +13,7 @@
   "sort_order": 210,
   "opening": "confetti",
   "opening_label": "Confetti",
+  "envelope_mode": "built_in",
   "atelier": {
     "opening": "confetti",
     "hero": "getal",

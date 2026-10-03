@@ -6,9 +6,10 @@
   "description": "Een glazen kerstbal met jullie monogram in goud hangt aan een fluwelen lint en schommelt zacht in het licht. Na een tik zwaait hij, gloeit hij op en duik je erin. Daarbinnen een art-decokader met hangende kerstballen, jullie namen in goudfolie, een toegangskaart voor de datum, het programma als menukaart en champagnebubbels. In het voorbeeld klinkt 'Carol of the Bells' met celesta, strijkers en een kerkklok.",
   "style_notes": "Zwart, smaragd, bordeaux of ivoor met goud, glas, art deco, avond",
   "occasions": ["kerst"],
-  "sort_order": 38,
+  "sort_order": 102,
   "opening": "kerstbal",
   "opening_label": "Glazen kerstbal",
+  "envelope_mode": "built_in",
   "demo_melody": "carol-of-the-bells",
   "kaartbeeld": "open",
   "palettes": [

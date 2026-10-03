@@ -6,7 +6,7 @@ Gebruikt door tools/atelier/ontwerpen.py. Kleuren worden bij het schrijven op co
 DESIGNS = [
     # ---------------------------------------------------------------- Bruiloft
     {
-        "slug": "eucalyptus", "name": "Eucalyptus", "sort_order": 110,
+        "slug": "eucalyptus", "name": "Eucalyptus", "sort_order": 110, "envelope_mode": "optional",
         "tagline": "Botanisch en licht, met eucalyptustakjes",
         "description": "Een vouwkaart met eucalyptustakjes. Na een tik vouwt de kaart open. Sierlijke namen, een foto in boogvorm en rustige lijnen.",
         "style_notes": "Salie, zacht papier, sierlijke letters",
@@ -45,7 +45,7 @@ DESIGNS = [
 
 DESIGNS += [
     {
-        "slug": "rozentuin", "name": "Rozentuin", "sort_order": 130,
+        "slug": "rozentuin", "name": "Rozentuin", "sort_order": 130, "envelope_mode": "optional",
         "tagline": "Romantisch, met rozen en sierlijk schrift",
         "description": "Een envelop met zegel opent zich en de kaart schuift naar buiten. Bloemen, een ronde foto en elke sectie op een eigen kaartje.",
         "style_notes": "Zacht roze, bloemen, sierlijk handschrift",
@@ -63,7 +63,7 @@ DESIGNS += [
         ],
     },
     {
-        "slug": "lijnenspel", "name": "Lijnenspel", "sort_order": 140,
+        "slug": "lijnenspel", "name": "Lijnenspel", "sort_order": 140, "envelope_mode": "optional",
         "tagline": "Minimalistisch en redactioneel",
         "description": "Een zachte sluier trekt op. Grote, strakke letters links uitgelijnd, de feiten in kolommen en veel witruimte.",
         "style_notes": "Zwart-wit, grote letters, veel witruimte",
@@ -154,7 +154,7 @@ DESIGNS += [
         ],
     },
     {
-        "slug": "pampas", "name": "Pampas", "sort_order": 190,
+        "slug": "pampas", "name": "Pampas", "sort_order": 190, "envelope_mode": "optional",
         "tagline": "Boho en naturel, met pampasgras",
         "description": "Een zachte sluier trekt op. Pampasgras, een hoge foto in boogvorm, hoofdletters met veel ruimte en linnen tinten.",
         "style_notes": "Zand, pampasgras, linnen",
@@ -172,7 +172,7 @@ DESIGNS += [
         ],
     },
     {
-        "slug": "monogram", "name": "Monogram", "sort_order": 200,
+        "slug": "monogram", "name": "Monogram", "sort_order": 200, "envelope_mode": "optional",
         "tagline": "Klassiek en strak, met een gekleurde band",
         "description": "Een paneel schuift opzij. Bovenaan een gekleurde band met jullie namen onder elkaar, genummerde onderdelen en de datum in een cirkel.",
         "style_notes": "Marine, strak, genummerd",
@@ -282,7 +282,7 @@ DESIGNS += [
     },
     # ---------------------------------------------------------------- Jubileum
     {
-        "slug": "lauwerkrans", "name": "Lauwerkrans", "sort_order": 260,
+        "slug": "lauwerkrans", "name": "Lauwerkrans", "sort_order": 260, "envelope_mode": "optional",
         "tagline": "Feestelijk en klassiek, met een lauwerkrans",
         "description": "Een envelop met zegel opent zich. Het aantal jaren staat in een lauwerkrans, met klassieke letters en papier.",
         "style_notes": "Goud en ivoor, lauwerkrans, klassiek",
@@ -428,7 +428,7 @@ DESIGNS += [
         ],
     },
     {
-        "slug": "lentebloesem", "name": "Lentebloesem", "sort_order": 340,
+        "slug": "lentebloesem", "name": "Lentebloesem", "sort_order": 340, "envelope_mode": "optional",
         "tagline": "Lieflijk, met bloesem in een kader",
         "description": "Een envelop met zegel opent zich. Een kader met bloemen, sierlijk handschrift en elk onderdeel op een kaartje.",
         "style_notes": "Bloesem, kader, handschrift",
@@ -465,7 +465,7 @@ DESIGNS += [
     },
     # ---------------------------------------------------------------- Zakelijk
     {
-        "slug": "strak", "name": "Strak zakelijk", "sort_order": 360,
+        "slug": "strak", "name": "Strak zakelijk", "sort_order": 360, "envelope_mode": "optional",
         "tagline": "Helder en professioneel",
         "description": "Een paneel schuift opzij. Grote, strakke letters, de feiten in kolommen, genummerde onderdelen en een kalenderblaadje.",
         "style_notes": "Marine, strak, professioneel",
@@ -501,7 +501,7 @@ DESIGNS += [
         ],
     },
     {
-        "slug": "congres", "name": "Congres", "sort_order": 380,
+        "slug": "congres", "name": "Congres", "sort_order": 380, "envelope_mode": "optional",
         "tagline": "Overzichtelijk, met het programma centraal",
         "description": "Een paneel schuift opzij. Een gekleurde band met de titel, een tijdlijn voor het programma en een lichte ruitstructuur.",
         "style_notes": "Blauw, tijdlijn, overzichtelijk",
@@ -519,7 +519,7 @@ DESIGNS += [
         ],
     },
     {
-        "slug": "borrel", "name": "Borrel", "sort_order": 390,
+        "slug": "borrel", "name": "Borrel", "sort_order": 390, "envelope_mode": "optional",
         "tagline": "Ontspannen en modern, met golven",
         "description": "Een vouwkaart opent zich. Stevige letters, golvende lijnen, een ronde foto naast de tekst en de datum in een cirkel.",
         "style_notes": "Koraal, golven, ontspannen",

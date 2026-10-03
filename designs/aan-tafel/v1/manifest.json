@@ -6,9 +6,10 @@
   "description": "Een plaatskaartje met een strik van touw en een takje hulst staat op een houten tafel, tussen twee brandende kaarsen en warme lichtjes. Na een tik klapt het kaartje open en word je aan tafel uitgenodigd. Daarbinnen een gedekte tafel met kaarsen en een dennenslinger, jullie namen in warm schrift, de datum op een plaatskaartje, het menu op een kaart met een strik en de tafelschikking. In het voorbeeld klinkt 'We Wish You a Merry Christmas' als gezellige wals, met piano, contrabas en arrensleebellen.",
   "style_notes": "Kaarslicht, hout, kerstrood, dennengroen, Schotse ruit, gezellig en warm",
   "occasions": ["kerst"],
-  "sort_order": 37,
+  "sort_order": 101,
   "opening": "plaatskaartje",
   "opening_label": "Plaatskaartje op tafel",
+  "envelope_mode": "built_in",
   "demo_melody": "we-wish-you",
   "kaartbeeld": "open",
   "palettes": [

@@ -75,4 +75,4 @@ class MiddernachtTests(VaylideTestCase):
 
     def test_listed_among_the_first_christmas_designs(self):
         response = Client().get("/ontwerpen/?gelegenheid=kerst")
-        self.assertIn("middernacht", [c["template"].slug for c in response.context["cards"][:2]])
+        self.assertIn("middernacht", [c["template"].slug for c in response.context["cards"][:4]])   # B: na de A-kerstkaarten Gloria en Winterlicht

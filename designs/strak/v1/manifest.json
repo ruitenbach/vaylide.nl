@@ -12,6 +12,7 @@
   "sort_order": 360,
   "opening": "schuif",
   "opening_label": "Schuifpaneel",
+  "envelope_mode": "optional",
   "atelier": {
     "opening": "schuif",
     "hero": "redactioneel",

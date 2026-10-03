@@ -9,6 +9,7 @@
   "sort_order": 30,
   "opening": "calque",
   "opening_label": "Doorschijnend vel",
+  "envelope_mode": "optional",
   "palettes": [
     {"key": "kalk", "name": "Kalk", "swatch": ["#F5F2EC", "#D6D1C7", "#5F6F5C"],
      "vars": {"--pm-bg": "#F5F2EC", "--pm-surface": "#FFFFFF", "--pm-ink": "#1E2320", "--pm-muted": "#5B605C", "--pm-accent": "#56664F", "--pm-line": "#D6D1C7", "--pm-vellum": "rgba(250, 248, 244, 0.72)"}},

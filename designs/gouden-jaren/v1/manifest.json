@@ -12,6 +12,7 @@
   "sort_order": 280,
   "opening": "vouwkaart",
   "opening_label": "Vouwkaart",
+  "envelope_mode": "built_in",
   "atelier": {
     "opening": "vouwkaart",
     "hero": "getal",

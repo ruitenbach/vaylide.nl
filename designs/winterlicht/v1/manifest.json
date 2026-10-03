@@ -9,6 +9,7 @@
   "sort_order": 40,
   "opening": "envelop",
   "opening_label": "Envelop met lakzegel",
+  "envelope_mode": "built_in",
   "demo_melody": "stille-nacht",
   "kaartbeeld": "open",
   "palettes": [

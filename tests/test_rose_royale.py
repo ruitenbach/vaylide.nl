@@ -19,7 +19,7 @@ class RoseRoyaleTests(VaylideTestCase):
     def test_is_een_trouwontwerp(self):
         template = Template.objects.get(slug="rose-royale")
         self.assertEqual(template.occasions, ["bruiloft", "verloving"])
-        self.assertFalse(template.special)
+        self.assertTrue(template.special)   # sinds de collectie (catalog/collectie.py) een special
 
     def test_tekstkleuren_hebben_genoeg_contrast(self):
         for palette in self.manifest()["palettes"]:

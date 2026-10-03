@@ -13,6 +13,7 @@
   "sort_order": 370,
   "opening": "gordijn",
   "opening_label": "Gordijn",
+  "envelope_mode": "built_in",
   "atelier": {
     "opening": "gordijn",
     "hero": "volbeeld",

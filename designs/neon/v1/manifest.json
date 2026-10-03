@@ -12,6 +12,7 @@
   "sort_order": 220,
   "opening": "sluier",
   "opening_label": "Zachte sluier",
+  "envelope_mode": "built_in",
   "atelier": {
     "opening": "sluier",
     "hero": "getal",

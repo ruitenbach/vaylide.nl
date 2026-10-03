@@ -12,6 +12,7 @@
   "sort_order": 390,
   "opening": "vouwkaart",
   "opening_label": "Vouwkaart",
+  "envelope_mode": "optional",
   "atelier": {
     "opening": "vouwkaart",
     "hero": "gesplitst",

@@ -9,6 +9,7 @@
   "sort_order": 39,
   "opening": "vleugels",
   "opening_label": "Engelenvleugels",
+  "envelope_mode": "built_in",
   "demo_melody": "gloria",
   "kaartbeeld": "open",
   "palettes": [

@@ -12,6 +12,7 @@
   "sort_order": 320,
   "opening": "sterren",
   "opening_label": "Sterrenhemel",
+  "envelope_mode": "built_in",
   "atelier": {
     "opening": "sterren",
     "hero": "klassiek",

@@ -9,10 +9,11 @@
     "bruiloft",
     "verloving"
   ],
-  "sort_order": 7,
+  "sort_order": 4,
   "special": true,
   "opening": "envelop",
   "opening_label": "Envelop met lakzegel",
+  "envelope_mode": "built_in",
   "demo_melody": "canon",
   "kaartbeeld": "open",
   "paar": {

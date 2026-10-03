@@ -13,6 +13,7 @@
   "sort_order": 5,
   "opening": "ringdoosje",
   "opening_label": "Ringdoosje",
+  "envelope_mode": "built_in",
   "demo_melody": "canon",
   "kaartbeeld": "open",
   "palettes": [

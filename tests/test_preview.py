@@ -4,7 +4,7 @@ import base64
 from django.core.cache import cache
 from django.test import Client, override_settings
 
-from .helpers import VaylideTestCase
+from .helpers import VaylideTestCase, toon_verborgen_ontwerpen
 
 
 def basic(user: str, password: str) -> dict:
@@ -40,6 +40,7 @@ class PreviewPasswordTests(VaylideTestCase):
 
     @override_settings(PREVIEW_PASSWORD="lang-en-geheim-wachtwoord", PREVIEW_OPEN_PUBLIC=True)
     def test_only_information_pages_open_for_a_website_review(self):
+        toon_verborgen_ontwerpen()
         from django.conf import settings
 
         public = ("/", "/ontwerpen/", "/ontwerpen/stipjes/", "/zo-werkt-het/", "/prijzen/", "/veelgestelde-vragen/",

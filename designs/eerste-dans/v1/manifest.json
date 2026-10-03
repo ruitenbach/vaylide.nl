@@ -9,9 +9,10 @@
     "bruiloft",
     "verloving"
   ],
-  "sort_order": 6,
+  "sort_order": 100,
   "opening": "paleisdeuren",
   "opening_label": "Paleisdeuren met lakzegel",
+  "envelope_mode": "built_in",
   "demo_melody": "canon",
   "kaartbeeld": "open",
   "palettes": [
