@@ -134,6 +134,10 @@ def effect_summary(config) -> str:
     """Eén zin voor de ontwerppagina, bijvoorbeeld: 'Dwarrelende bloemblaadjes en bij het openen een regen van bloemblaadjes.'"""
     if not isinstance(config, dict) or effects_errors(config):
         return ""
+    # Een ontwerp met een eigen filmische opening (zonder deeltjes) mag zelf zeggen wat je ziet: "samenvatting" in het effects-blok.
+    eigen = config.get("samenvatting")
+    if isinstance(eigen, str) and eigen.strip():
+        return eigen.strip()
     sfeer = SFEER_TEXT.get(config["sfeer"], "")
     knal = KNAL_TEXT.get(config["knal"], "")
     if sfeer and knal:
@@ -150,6 +154,8 @@ def effect_card_label(config, opening_label: str = "") -> str:
 
     Leeg als het hetzelfde zou zeggen als de naam van de opening ("Confetti · confetti").
     """
+    if isinstance(config, dict) and isinstance(config.get("kaartlabel"), str) and config["kaartlabel"].strip():
+        return config["kaartlabel"].strip().lower()   # eigen label, zie effect_summary
     if not isinstance(config, dict) or config.get("sfeer") in (None, "geen"):
         return ""
     label = EFFECT_LABELS.get(config["sfeer"], "").lower()

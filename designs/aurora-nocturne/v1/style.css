@@ -1,0 +1,420 @@
+/* Aurora Nocturne v1: een Special met een filmische opening. Vier kleurwerelden (palettes in het manifest): Nachtblauw & champagne (het origineel) en drie lichte ochtenden: Parelmoer, Rozenmorgen en Saliemist.
+   Een envelop, een lichtportaal, een glazen paviljoen. Alle kleuren komen uit variabelen van het gekozen palet (--an-…); de beelden uit img/<palet>/.
+   Deze opmaak bevat zelf geen animaties behalve de rustlus onderaan (alleen met beweging aan, en pas als de film klaar is):
+   alle beweging van de opening zit in aurora-nocturne.js (GSAP). Zonder GSAP, bij 'minder beweging' of stilgezette beweging
+   staat alles in de eindstand. Beelden: img/ (tools/aurora_nocturne/). Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Italiana"; src: url("../../../fonts/italiana-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Jost"; src: url("../../../fonts/jost-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Bodoni Moda"; src: url("../../../fonts/bodoni-moda-latin-wght-italic.woff2") format("woff2"); font-weight: 400 900; font-style: italic; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+
+body {
+  --an-display: "Italiana", "Cormorant Garamond", Georgia, serif;
+  --an-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --an-ui: "Jost", "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --an-it: "Bodoni Moda", "Cormorant Garamond", Georgia, serif;
+  /* Gedeelde onderdelen (formulier, knoppen, muziek) in de kleuren van dit ontwerp. */
+  --inv-bg: var(--an-nacht-2);
+  --inv-text: var(--an-ivoor);
+  --inv-muted: var(--an-muted);
+  --inv-accent: var(--an-goud);
+  --inv-accent-contrast: var(--an-goud-ink);
+  --inv-font-body: var(--an-serif);
+  --inv-font-ui: var(--an-ui);
+  --inv-focus: var(--an-goud-2);
+  --inv-radius: 4px;
+  --inv-error: var(--an-fout, #FFB4A8);
+  --inv-surface-2: var(--an-vlak2, #0b1730);
+  --inv-btn-border: color-mix(in srgb, var(--an-goud) 60%, transparent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--an-goud) 12%, transparent);
+  --inv-field-bg: var(--an-veld, #0a1429);
+  --inv-field-text: var(--an-ivoor);
+  --inv-field-border: color-mix(in srgb, var(--an-ivoor) 28%, transparent);
+  --inv-music-bg: var(--an-muziek, #D9C38C);
+  --inv-music-text: var(--an-muziek-tekst, #0A1226);
+  --inv-music-border: color-mix(in srgb, var(--an-goud) 50%, transparent);
+  --inv-photo-bg: var(--an-vlak2, #0b1730);
+  background: var(--an-nacht);
+  color: var(--an-ivoor);
+  font-family: var(--an-serif);
+  font-size: 1.12rem;
+  font-weight: 400;
+  color-scheme: var(--an-scheme, dark);
+}
+.inv-aurora-nocturne .music__toggle, .inv-aurora-nocturne .fx-toggle { box-shadow: 0 8px 22px -8px rgba(var(--an-sh, 0, 0, 0), calc(.7 * var(--an-sh-k, 1))), inset 0 1px 0 rgba(255, 255, 255, .35); }
+
+/* ================================================================ openingsscherm */
+.an-cover {
+  --w: clamp(104px, min(43vw, 29svh * .75), 220px);
+  --h: calc(var(--w) * 1.12);
+  --z: calc(var(--w) * .27);
+  background: transparent;
+}
+.an-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+/* Het gat in het donker (clip-path, gezet door het script) bevat de nacht en de envelop; alles erachter is de paviljoenscène. */
+.an-gat { position: absolute; inset: 0; overflow: hidden; }
+.an-nacht {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(60% 40% at 50% 50%, var(--an-dek-gloed, rgba(30, 58, 108, .26)), transparent 70%),
+    radial-gradient(120% 90% at 50% 44%, var(--an-dek-1, #060d1e) 0%, var(--an-dek-2, #02050e) 52%, var(--an-dek-3, #000104) 100%);
+}
+.an-stage { will-change: transform; position: absolute; left: 50%; top: 50%; width: var(--w); height: var(--h); margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2); }
+.an-env { position: absolute; inset: 0; }
+.an-env__schaduw { position: absolute; left: -4%; right: -4%; bottom: -3.5%; height: 8%; background: radial-gradient(50% 50% at 50% 50%, rgba(var(--an-sh, 0, 0, 0), calc(.85 * var(--an-sh-k, 1))), rgba(var(--an-sh, 0, 0, 0), 0) 72%); }
+.an-env__flapschaduw { position: absolute; left: 4%; right: 4%; top: -34%; height: 36%; opacity: 0; clip-path: polygon(0 100%, 100% 100%, 50% 0); background: linear-gradient(0deg, rgba(var(--an-sh, 0, 0, 0), calc(.55 * var(--an-sh-k, 1))), rgba(var(--an-sh, 0, 0, 0), 0)); }
+.an-env__body {
+  position: absolute; inset: 0; border-radius: 2px; overflow: hidden;
+  box-shadow: 0 0 0 1px var(--an-lijn-a, rgba(217, 195, 140, .5)), 0 30px 60px -22px rgba(var(--an-sh, 0, 0, 0), calc(.9 * var(--an-sh-k, 1))), 0 10px 22px -10px rgba(var(--an-sh, 0, 0, 0), calc(.8 * var(--an-sh-k, 1)));
+}
+.an-env__binnen {
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(45deg, var(--an-rooster, rgba(217, 195, 140, .075)) 0 1px, transparent 1px 11px),
+    repeating-linear-gradient(-45deg, var(--an-rooster, rgba(217, 195, 140, .075)) 0 1px, transparent 1px 11px),
+    linear-gradient(180deg, var(--an-bin-1, #0a2038), var(--an-bin-2, #071328));
+}
+.an-env__binnenlicht { position: absolute; inset: 0; opacity: 0; background: radial-gradient(52% 40% at 50% 17%, rgba(255, 232, 180, .46), rgba(214, 170, 100, .14) 55%, rgba(0, 0, 0, 0) 80%); }
+.an-env__open { position: absolute; left: 50%; top: 15%; width: 2px; height: 2px; }
+.an-env__voor, .an-flap__voor, .an-flap__achter {
+  background:
+    url("img/korrel.webp") 0 0 / 112px,
+    radial-gradient(90% 60% at 18% 6%, var(--an-pap-licht, rgba(112, 156, 232, .20)), transparent 62%),
+    linear-gradient(162deg, var(--an-pap-1, #10224a) 0%, var(--an-pap-2, #0a1733) 46%, var(--an-pap-3, #060e22) 100%);
+}
+.an-env__voor { position: absolute; inset: 0; clip-path: polygon(0 0, 50% 44%, 100% 0, 100% 100%, 0 100%); background:
+    url("img/korrel.webp") 0 0 / 112px,
+    linear-gradient(180deg, rgba(var(--an-sh, 0, 0, 0), 0) 38%, rgba(var(--an-sh, 0, 0, 0), calc(.34 * var(--an-sh-k, 1))) 100%),
+    radial-gradient(90% 40% at 50% 44%, var(--an-pap-licht2, rgba(120, 164, 240, .16)), transparent 70%),
+    linear-gradient(162deg, var(--an-voor-1, #0e1e42) 0%, var(--an-voor-2, #09152e) 50%, var(--an-voor-3, #050c1f) 100%); }
+.an-env__vschaduw { position: absolute; inset: 0; opacity: .6; clip-path: polygon(0 0, 50% 51%, 100% 0, 100% 8%, 50% 59%, 0 8%); background: linear-gradient(180deg, rgba(var(--an-sh, 0, 0, 0), calc(.55 * var(--an-sh-k, 1))), rgba(var(--an-sh, 0, 0, 0), 0)); }
+/* Een lichtbaan die over het papier glijdt (scène 1). */
+.an-env__glans { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.an-env__glans::before { content: ""; position: absolute; top: -10%; bottom: -10%; left: -60%; width: 46%; transform: translateX(var(--gx, 0%)) skewX(-18deg); background: linear-gradient(90deg, rgba(150, 190, 255, 0), rgba(175, 205, 255, .17) 46%, rgba(235, 244, 255, .26) 52%, rgba(150, 190, 255, 0)); }
+.an-env__lijnen { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.an-env__lijnen path, .an-flap svg path { fill: none; vector-effect: non-scaling-stroke; }
+.an-lijn-rand { stroke: var(--an-lijn-a, rgba(217, 195, 140, .62)); stroke-width: 1; }
+.an-lijn-v { stroke: var(--an-lijn-b, rgba(228, 206, 150, .8)); stroke-width: 1.15; }
+.an-lijn-flap { stroke: var(--an-lijn-b, rgba(228, 206, 150, .85)); stroke-width: 1.15; }
+.an-lijn-binnen { stroke: var(--an-lijn-c, rgba(217, 195, 140, .34)); stroke-width: .8; }
+
+/* De klep: scharniert aan de bovenrand; voorkant fluweel met rand, achterkant is de voering. Eén klep, met massa. */
+.an-flap { position: absolute; left: 0; top: 0; width: 100%; height: 44%; transform-origin: 50% 0; transform-style: preserve-3d; }
+.an-flap__voor, .an-flap__achter { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.an-flap__voor { clip-path: polygon(0 0, 100% 0, 50% 100%); }
+.an-flap__achter {
+  transform: rotateX(180deg); clip-path: polygon(0 100%, 100% 100%, 50% 0);
+  background:
+    repeating-linear-gradient(45deg, var(--an-rooster, rgba(217, 195, 140, .085)) 0 1px, transparent 1px 11px),
+    repeating-linear-gradient(-45deg, var(--an-rooster, rgba(217, 195, 140, .085)) 0 1px, transparent 1px 11px),
+    linear-gradient(0deg, var(--an-klep-1, #0e2a48), var(--an-klep-2, #08182f));
+}
+.an-flap svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.an-flap__tint { position: absolute; inset: 0; opacity: 0; background: linear-gradient(180deg, rgba(0, 0, 0, .0), rgba(0, 0, 0, .5)); }
+.an-flap__licht { position: absolute; inset: 0; opacity: 0; background: radial-gradient(60% 90% at 50% 100%, rgba(255, 232, 180, .5), rgba(222, 178, 108, .16) 55%, rgba(0, 0, 0, 0) 80%); }
+
+/* Het zegel (champagnegoud) in twee helften langs de breuk: de bovenste zit aan de klep, de onderste aan de envelop. */
+.an-zegel { position: absolute; left: 50%; top: 44%; width: var(--z); height: var(--z); margin: calc(var(--z) / -2) 0 0 calc(var(--z) / -2); pointer-events: none; }
+.an-zegel svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.an-flap .an-zegel--boven { top: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.an-zegel__tekst { font-family: var(--an-it); font-style: italic; font-weight: 600; font-size: 26px; letter-spacing: -.01em; }
+.an-zegel__tekst--2 { font-size: 22px; }
+.an-zegel__tekst--3 { font-size: 18px; }
+.an-zegel__tekst--4, .an-zegel__tekst--5, .an-zegel__tekst--6, .an-zegel__tekst--7 { font-size: 14px; }
+.an-zegel--onder { z-index: 1; }
+.an-flap { z-index: 2; }
+.an-hit { position: absolute; z-index: 6; left: 50%; top: 44%; width: calc(var(--z) * 1.5); height: calc(var(--z) * 1.5); margin: calc(var(--z) * -.75) 0 0 calc(var(--z) * -.75); border-radius: 50%; pointer-events: auto; -webkit-tap-highlight-color: transparent; }
+.an-chips { position: absolute; left: 50%; top: 44.6%; width: 0; height: 0; pointer-events: none; }
+.an-chips i { position: absolute; left: -2px; top: -2px; width: 4px; height: 3px; opacity: 0; background: linear-gradient(135deg, #FBF0CF, #B99C5A); clip-path: polygon(0 20%, 60% 0, 100% 70%, 30% 100%); }
+
+/* De lichtlijn langs de vouw (scène 2): een dun aurora-licht: ijs, groen en champagne. */
+.an-scheur { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 3; }
+.an-scheur path { fill: none; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; vector-effect: non-scaling-stroke; }
+.an-scheur__glans { stroke: var(--an-scheur-glans, rgba(130, 232, 200, .35)); stroke-width: 7; }
+.an-scheur__kern { stroke: var(--an-scheur-kern, #FFF6DC); stroke-width: 1.3; }
+
+/* De rand van het portaal: licht met een zachte gloed. */
+.an-rand { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; }
+.an-rand path { fill: none; stroke-linejoin: round; }
+.an-rand__zacht { stroke: var(--an-rand-zacht, rgba(140, 220, 205, .10)); stroke-width: 22; }
+.an-rand__mid { stroke: var(--an-rand-mid, rgba(235, 220, 170, .22)); stroke-width: 5; }
+.an-rand__kern { stroke: var(--an-rand-kern, #FFF8E3); stroke-width: 1.1; }
+
+.an-cover__acties { position: absolute; left: 0; right: 0; bottom: max(6svh, 34px); display: grid; justify-items: center; gap: .2rem; pointer-events: none; }
+.an-open {
+  pointer-events: auto; min-height: 44px; padding: .55rem 1.4rem; background: none; border: 0; cursor: pointer; color: var(--an-goud-2);
+  font: 300 .76rem/1 var(--an-ui); letter-spacing: .42em; text-transform: uppercase; text-indent: .42em; -webkit-tap-highlight-color: transparent;
+}
+.an-open span { border-bottom: 1px solid color-mix(in srgb, var(--an-goud) 45%, transparent); padding-bottom: .7em; }
+.an-open:hover span, .an-open:focus-visible span { border-bottom-color: var(--an-goud-2); }
+.an-open:focus-visible { outline: 1px solid var(--an-goud-2); outline-offset: 4px; }
+.an-open--muziek { font-size: .62rem; color: var(--an-muted); letter-spacing: .34em; text-indent: .34em; min-height: 36px; }
+.an-open--muziek span { border-bottom-color: transparent; padding-bottom: 0; }
+
+/* Eén stofcanvas: eerst op het openingsscherm, daarna in de kop (het script verplaatst hem). */
+.an-stof { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+.an-stofhaven .an-stof { position: absolute; top: auto; bottom: 0; height: 66%; }
+
+/* Zonder GSAP: de envelop vervaagt gewoon. Met GSAP zet het script de klasse an-gsap. */
+.is-opening:not(.an-gsap) .an-cover { opacity: 0; transition: opacity .6s ease; pointer-events: none; }
+.is-opening-reduced .an-cover { opacity: 0; transition: opacity .25s ease; }
+
+/* ================================================================ de kop: een scène in lagen */
+.inv-aurora-nocturne .inv-main { position: relative; z-index: 1; background: var(--an-nacht); }
+/* De voorbeeldbalk ligt over de kop, zodat de wereld achter het portaal tot bovenaan doorloopt. */
+.inv-aurora-nocturne .inv-banner { position: absolute; top: 0; left: 0; right: 0; z-index: 30; background: rgba(var(--an-banner, 2, 5, 13), .72); }
+.an-hero {
+  position: relative; overflow: hidden; isolation: isolate; container-type: size;
+  height: 100vh; height: 100svh; min-height: 560px; background: var(--an-nacht);
+  --pw: min(106cqw, calc(min(68cqh, var(--an-ph-max, 999px)) * 1080 / 1100));
+}
+.an-l, .an-p { position: absolute; inset: 0; pointer-events: none; }
+.an-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }
+.an-aurora { left: -4%; width: 108%; }   /* breder dan de kop: de langzame beweging mag nooit een rand laten zien */
+.an-aurora--a { opacity: .95; }
+.an-aurora--b { opacity: .8; }
+.an-pav { position: absolute; left: 50%; bottom: calc(var(--pw) * -0.0611); width: var(--pw); aspect-ratio: 1080 / 1100; margin-left: calc(var(--pw) / -2); }
+.an-pav img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.an-mist { position: absolute; left: -20%; width: 140%; object-fit: fill; }
+.an-mist--a { bottom: 20%; height: 22%; opacity: .7; }
+.an-mist--b { bottom: -2%; height: 24%; opacity: .55; }
+.an-voor { position: absolute; bottom: 0; height: 38%; width: auto; max-width: none; }
+.an-voor--l { left: 0; }
+.an-voor--r { right: 0; }
+.an-hero__licht { position: absolute; inset: 0; z-index: 4; opacity: 0; pointer-events: none; background: radial-gradient(70% 55% at 50% 52%, rgba(255, 240, 205, .92), rgba(226, 198, 146, .6) 38%, var(--an-gloed-rand, rgba(12, 28, 52, .7)) 100%); }
+.an-stofhaven { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+
+.an-hero__tekst {
+  position: absolute; left: 0; right: 0; top: clamp(4.6rem, 10.5%, 8rem); z-index: 6; text-align: center; padding: 0 5vw;
+  color: var(--an-ivoor); text-shadow: 0 0 22px rgba(var(--an-tekstschaduw, 2, 5, 13), .75), 0 0 2px rgba(var(--an-tekstschaduw, 2, 5, 13), .6);
+}
+.an-kicker { font: 300 clamp(.62rem, 2.5vw, .8rem)/1.4 var(--an-ui); letter-spacing: .46em; text-indent: .46em; text-transform: uppercase; color: var(--an-goud-2); margin: 0; }
+.an-namen { margin: clamp(.9rem, 2.4svh, 1.5rem) 0 0; font: 400 clamp(2.1rem, min(11.4vw, 6.4svh), 4.6rem)/1.08 var(--an-display); letter-spacing: .2em; text-indent: .2em; text-transform: uppercase; text-wrap: balance; }
+.an-namen--long { font-size: clamp(1.8rem, min(9.4vw, 5.4svh), 3.9rem); }
+.an-namen--xlong { font-size: clamp(1.5rem, min(7.6vw, 4.6svh), 3.2rem); letter-spacing: .14em; }
+.an-naam { display: block; }
+.an-naam__in { display: inline-block; }
+.an-amp { display: block; margin: .12em 0 .1em; font-family: var(--an-it); font-style: italic; font-size: .5em; letter-spacing: 0; text-indent: 0; text-transform: none; color: var(--an-goud); line-height: 1.1; }
+.an-amp__in { display: inline-block; }
+.an-sub { margin: .8rem 0 0; font: 300 .74rem/1.5 var(--an-ui); letter-spacing: .3em; text-transform: uppercase; color: var(--an-muted); }
+.an-datum { display: flex; align-items: center; justify-content: center; gap: 1.1rem; margin: clamp(1rem, 3svh, 1.8rem) 0 0; font: 300 clamp(.74rem, 3vw, .95rem)/1 var(--an-ui); letter-spacing: .4em; text-indent: .4em; text-transform: uppercase; color: var(--an-ivoor); }
+.an-datum i { display: block; width: clamp(26px, 9vw, 54px); height: 1px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--an-goud) 85%, transparent)); }
+.an-datum i:last-child { background: linear-gradient(270deg, transparent, color-mix(in srgb, var(--an-goud) 85%, transparent)); }
+.an-tagline { margin: 1rem auto 0; max-width: 24em; font: italic 400 clamp(.98rem, 3.6vw, 1.15rem)/1.45 var(--an-serif); color: var(--an-goud-2); }
+.an-scroll {
+  position: absolute; left: 50%; bottom: max(1rem, 2.4%); z-index: 7; translate: -50% 0; display: inline-flex; flex-direction: column; align-items: center;
+  padding: .3rem 1rem; color: var(--an-ivoor); text-decoration: none; font: 300 .64rem/1.6 var(--an-ui); letter-spacing: .4em; text-indent: .4em; text-transform: uppercase;
+}
+.an-scroll svg { opacity: .8; }
+
+/* Brede schermen: de namen op één regel, het paviljoen krijgt de ruimte eronder. */
+@media (min-aspect-ratio: 5/4) {
+  .an-hero__tekst { top: clamp(4rem, 9%, 6.5rem); }
+  .an-namen { display: flex; justify-content: center; align-items: baseline; gap: .55em; font-size: clamp(2.4rem, min(6.4vw, 8svh), 5rem); }
+  .an-naam, .an-amp { display: inline-block; margin: 0; }
+  .an-amp { font-size: .56em; }
+  .an-pav { --ph: min(78cqh, var(--an-ph-max, 999px)); --pw: min(84cqw, calc(var(--ph) * 1080 / 1100)); }
+}
+
+/* ================================================================ rustlus (alleen met beweging aan en na de film) */
+/* De bewegingen zijn zo traag dat ze in kleine stappen lopen (steps): het oog ziet geen verschil, maar de browser hoeft de grote lagen
+   maar een paar keer per seconde opnieuw samen te stellen in plaats van elk beeld. Dat scheelt veel op telefoons en computers zonder sterke GPU. */
+.fx-motion.an-rust .an-hero:not(.an-weg) .an-aurora--a { animation: an-drift-a 80s steps(200, end) infinite alternate; animation-play-state: var(--fx-play, running); }
+.fx-motion.an-rust .an-hero:not(.an-weg) .an-aurora--b { animation: an-drift-b 110s steps(260, end) infinite alternate; animation-play-state: var(--fx-play, running); }
+.fx-motion.an-rust .an-hero:not(.an-weg) .an-mist--a { animation: an-mist 140s steps(280, end) infinite alternate; animation-play-state: var(--fx-play, running); }
+.fx-motion.an-rust .an-hero:not(.an-weg) .an-mist--b { animation: an-mist 190s steps(380, end) -60s infinite alternate-reverse; animation-play-state: var(--fx-play, running); }
+.fx-motion.an-rust .an-hero:not(.an-weg) .an-licht--kaarsen { animation: an-kaars 7.3s steps(3, end) infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion.an-rust .an-hero:not(.an-weg) .an-licht--kroon { animation: an-adem 13s steps(26, end) infinite alternate; animation-play-state: var(--fx-play, running); }
+@keyframes an-drift-a { from { translate: -1.6% 0; opacity: .8; } to { translate: 1.6% -.6%; opacity: 1; } }
+@keyframes an-drift-b { from { translate: 1.8% 0; opacity: .6; } to { translate: -1.8% .5%; opacity: .95; } }
+@keyframes an-mist { from { translate: -3% 0; } to { translate: 3% 0; } }
+/* Kaarsvlammen: onregelmatig, nooit een flits (opacity blijft tussen .84 en 1). */
+@keyframes an-kaars { 0% { opacity: .96; } 9% { opacity: .88; } 17% { opacity: 1; } 31% { opacity: .9; } 38% { opacity: .85; } 52% { opacity: .98; } 63% { opacity: .91; } 77% { opacity: 1; } 88% { opacity: .87; } 100% { opacity: .96; } }
+@keyframes an-adem { from { opacity: .93; } to { opacity: 1; } }
+
+/* ================================================================ de rest van de uitnodiging: sober, nog niet uitgewerkt */
+.an-body { position: relative; overflow: hidden; background: var(--an-nacht-2); }
+.an-sec { position: relative; isolation: isolate; overflow: hidden; padding: clamp(3.4rem, 13vw, 5rem) clamp(1.25rem, 6.5vw, 2.4rem) clamp(3rem, 11vw, 4.4rem); text-align: center; border-top: 1px solid color-mix(in srgb, var(--an-goud) 18%, transparent); }
+.an-sec:first-child { border-top: 0; }
+.an-h2 { margin: 0 0 1.4rem; font: 400 clamp(1.4rem, 5.4vw, 1.9rem)/1.2 var(--an-display); letter-spacing: .24em; text-indent: .24em; text-transform: uppercase; color: var(--an-goud); }
+.an-tekst { max-width: 30em; margin: 0 auto 1em; font-size: 1.18rem; line-height: 1.65; }
+.an-tekst--slot { font-style: italic; }
+.an-grootdatum { margin: 0 0 1.4rem; font: 400 clamp(1.4rem, 6vw, 1.9rem)/1.4 var(--an-serif); }
+.an-grootdatum span { font-size: .8em; color: var(--an-muted); }
+/* Foto's: een boog als het paviljoen, een haarlijn champagne en een zachte schaduw naar de nacht toe */
+.an-foto { margin: 0 auto 1.8rem; max-width: 340px; }
+.an-foto .ph { aspect-ratio: 4 / 5; border-radius: 999px 999px 3px 3px; border: 1px solid color-mix(in srgb, var(--an-goud) 55%, transparent); box-shadow: 0 0 0 6px var(--an-nacht-2), 0 0 0 7px color-mix(in srgb, var(--an-goud) 24%, transparent), 0 26px 50px -22px rgba(var(--an-sh, 0, 0, 0), calc(.9 * var(--an-sh-k, 1))); }
+.an-foto .ph::after, .an-fotos .ph::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(var(--an-vervaag, 4, 9, 19), 0) 62%, rgba(var(--an-vervaag, 4, 9, 19), .5)); }
+.an-fotos .ph { aspect-ratio: 4 / 5; border: 1px solid color-mix(in srgb, var(--an-goud) 36%, transparent); border-radius: 2px; }
+.an-fotos .ph__img, .an-foto .ph__img { position: absolute; inset: 0; filter: saturate(.92) contrast(1.02) brightness(var(--an-foto-licht, .94)); }
+.an-programma { list-style: none; max-width: 28em; margin: 0 auto; padding: 0; display: grid; gap: 1.2rem; text-align: left; }
+.an-programma li { display: grid; grid-template-columns: 4.4rem 1fr; gap: 1rem; align-items: baseline; }
+.an-programma__tijd { font: 300 1rem/1.4 var(--an-ui); letter-spacing: .12em; color: var(--an-goud); }
+.an-programma__tekst strong { display: block; font-weight: 500; font-size: 1.15rem; }
+.an-programma__tekst span { display: block; color: var(--an-muted); }
+.an-locatie { margin: 0; font: 400 1.25rem/1.4 var(--an-display); letter-spacing: .16em; text-transform: uppercase; }
+.an-adres { margin: .5rem 0 0; font-style: normal; color: var(--an-muted); }
+.an-wanneer { margin: 1rem 0 1.4rem; font-style: italic; color: var(--an-muted); }
+.an-stalen { list-style: none; display: flex; justify-content: center; flex-wrap: wrap; gap: .8rem; margin: 0 0 1.2rem; padding: 0; }
+.an-stalen li { width: 34px; height: 34px; border-radius: 50%; background: var(--c); border: 1px solid color-mix(in srgb, var(--an-ivoor) 40%, transparent); }
+.an-fotos { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.1rem; max-width: 480px; margin: 0 auto; padding: 0; align-items: start; }
+.an-fotos li:nth-child(even) { margin-top: 2.2rem; }
+.an-fotos figcaption { margin-top: .5rem; font: italic 400 .98rem/1.35 var(--an-serif); color: var(--an-muted); }
+@media (min-width: 900px) { .an-fotos { max-width: 760px; grid-template-columns: repeat(4, minmax(0, 1fr)); } .an-fotos li:nth-child(even) { margin-top: 2.6rem; } .an-foto { max-width: 400px; } }
+.an-praktisch { display: grid; gap: 1.2rem; max-width: 30em; margin: 0 auto; }
+.an-praktisch dt { font: 300 .78rem/1.4 var(--an-ui); letter-spacing: .26em; text-transform: uppercase; color: var(--an-goud); }
+.an-praktisch dd { margin: .25rem 0 0; }
+.an-kaart { max-width: 440px; margin: 0 auto; padding: 1.6rem clamp(1.1rem, 5vw, 1.6rem); text-align: left; background: var(--an-vlak, #091227); border: 1px solid color-mix(in srgb, var(--an-goud) 40%, transparent); border-radius: 4px; }
+.an-kaart .rsvp { font-size: 1rem; }
+.an-contactnaam { margin: .4rem 0 0; font: italic 500 1.3rem var(--an-serif); }
+.an-contactlinks { margin: .3rem 0 0; font-family: var(--an-ui); font-size: .95rem; }
+.an-slot { padding-bottom: 5.5rem; }
+.an-body .cd__num { font: 400 clamp(2rem, 9vw, 2.8rem)/1.1 var(--an-display); color: var(--an-goud-2); }
+.an-body .cd__label { font: 300 .64rem var(--an-ui); letter-spacing: .3em; }
+
+@media (min-width: 600px) {
+  .inv-aurora-nocturne .inv-main { width: min(100%, 1366px); margin: 0 auto; }
+  .an-body { width: min(100%, 720px); margin: 0 auto; box-shadow: 0 0 0 1px color-mix(in srgb, var(--an-goud) 16%, transparent), 0 40px 120px -40px rgba(var(--an-sh, 0, 0, 0), calc(.8 * var(--an-sh-k, 1))); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .an-aurora, .an-mist, .an-licht { animation: none !important; }
+}
+@media print { .an-stof, .an-cover { display: none; } }
+
+
+/* ================================================================ openingsscherm: een rijke omlijsting rond de (kleinere) envelop */
+.an-decor { position: absolute; inset: 0; pointer-events: none; overflow: hidden; color: var(--an-goud); }
+.an-decor::before { content: ""; position: absolute; inset: 0; background: radial-gradient(46% 34% at 50% 50%, color-mix(in srgb, var(--an-goud) 24%, transparent), transparent 72%); }
+.an-stralen {
+  position: absolute; left: 50%; top: 50%; width: calc(var(--w) * 5.2); height: calc(var(--w) * 5.2); margin: calc(var(--w) * -2.6) 0 0 calc(var(--w) * -2.6); border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--an-goud) 11%, transparent) 0deg 1.1deg, transparent 1.1deg 7deg);
+  -webkit-mask-image: radial-gradient(circle, #000 4%, transparent 56%); mask-image: radial-gradient(circle, #000 4%, transparent 56%);
+}
+.an-bogen {
+  position: absolute; left: 50%; top: 50%; width: calc(var(--w) * 2.04); height: calc(var(--w) * 2.652); margin: calc(var(--w) * -1.08) 0 0 calc(var(--w) * -1.02); overflow: visible;
+  -webkit-mask-image: linear-gradient(180deg, #000 0 64%, transparent 97%); mask-image: linear-gradient(180deg, #000 0 64%, transparent 97%);
+}
+.an-bogen path { fill: none; stroke: currentColor; vector-effect: non-scaling-stroke; }
+.an-bogen__1 { stroke-width: 1.3; opacity: .85; }
+.an-bogen__2 { stroke-width: .9; opacity: .55; }
+.an-bogen__3 { stroke-width: .9; opacity: .34; }
+.an-bogen .an-ster { fill: var(--an-goud); stroke: none; opacity: .9; }
+.an-bogen .an-ster--ruit { fill: var(--an-goud); }
+.an-fonkel { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; opacity: .55; background: radial-gradient(circle, #fff 0 1.2px, rgba(var(--an-stof-2, 240, 222, 176), .85) 2.2px, rgba(var(--an-stof-2, 240, 222, 176), .25) 4.6px, transparent 7px); }
+.an-hoek { position: absolute; width: clamp(92px, 36vw, 340px); aspect-ratio: 1; }
+.an-hoek img { display: block; width: 100%; height: 100%; transform-origin: 0 0; }
+.an-hoek--lb { left: 0; top: 0; }
+.an-hoek--rb { right: 0; top: 0; transform: scaleX(-1); }
+.an-hoek--lo { left: 0; bottom: 0; transform: scaleY(-1); }
+.an-hoek--ro { right: 0; bottom: 0; transform: scale(-1, -1); }
+.an-uitn { position: absolute; left: 0; right: 0; top: clamp(3.6rem, 11.5svh, 7.6rem); margin: 0; display: grid; gap: .55rem; justify-items: center; text-align: center; padding: 0 1rem; }
+.an-uitn__klein { display: flex; align-items: center; gap: .9rem; font: 300 clamp(.5rem, 2.4vw, .72rem)/1.4 var(--an-ui); letter-spacing: .36em; text-indent: .36em; text-transform: uppercase; color: var(--an-goud-2); }
+@media (max-width: 640px) { .an-uitn__klein::before, .an-uitn__klein::after { display: none; } }
+.an-uitn__klein::before, .an-uitn__klein::after { content: ""; width: clamp(20px, 8vw, 54px); height: 1px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--an-goud) 85%, transparent)); }
+.an-uitn__klein::after { transform: scaleX(-1); }
+.an-uitn__groot { font: italic 400 clamp(1.15rem, 6.2vw, 2.1rem)/1.15 var(--an-serif); color: var(--an-ivoor); }
+.an-dag { position: absolute; left: 0; right: 0; top: calc(50% + var(--h) / 2 + clamp(1.3rem, 5svh, 3.2rem)); margin: 0; text-align: center; font: 400 clamp(.85rem, 4.6vw, 1.5rem)/1.2 var(--an-display); letter-spacing: .22em; text-indent: .22em; text-transform: uppercase; color: var(--an-ivoor); }
+.an-dag small { display: block; margin-bottom: .55rem; font: 300 .6rem/1 var(--an-ui); letter-spacing: .44em; text-indent: .44em; color: var(--an-goud); }
+/* Zachte schaduw van de envelop is kleiner bij de kleinere envelop; de knoppen staan lager tussen de bloemen. */
+.an-cover__acties { bottom: max(7svh, 36px); }
+
+/* ================================================================ de kop: bloemen in de bovenhoeken */
+.an-hoeken { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.an-hh { position: absolute; top: 0; width: clamp(74px, 27vw, 290px); aspect-ratio: 1; }
+.an-hh--l { left: 0; }
+.an-hh--r { right: 0; transform: scaleX(-1); }
+.an-hh img { display: block; width: 100%; height: 100%; transform-origin: 0 0; }
+.fx-motion.an-rust .an-hero:not(.an-weg) .an-hh img { animation: an-zwaai 11s steps(22, end) infinite alternate; animation-play-state: var(--fx-play, running); }
+@keyframes an-zwaai { from { rotate: -.9deg; } to { rotate: 1.2deg; } }
+
+/* ================================================================ de rest: bloemen, bogen en sierlijsten */
+.an-sier { display: block; width: min(220px, 62%); margin: 0 auto 1.1rem; overflow: visible; color: var(--an-goud); }
+.an-sier__lijn { fill: none; stroke: currentColor; stroke-width: 1; opacity: .6; }
+.an-sier__blad { fill: currentColor; opacity: .42; }
+.an-sier__ruit { fill: currentColor; }
+.an-sier__punt { fill: var(--an-goud-2); }
+.an-sec:nth-of-type(even)::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(72% 52% at 50% 0%, color-mix(in srgb, var(--an-goud) 10%, transparent), transparent 72%); }
+.an-sec:nth-of-type(odd)::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(60% 40% at 50% 100%, color-mix(in srgb, var(--an-goud) 7%, transparent), transparent 72%); }
+.an-h2 { font-size: clamp(1.5rem, 5.8vw, 2.05rem); }
+.an-hoeken-s { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.an-hs { position: absolute; top: 0; width: clamp(70px, 30vw, 220px); aspect-ratio: 1; opacity: .95; }
+.an-hs--l { left: 0; }
+.an-hs--r { right: 0; transform: scaleX(-1); }
+.an-hs--lo { left: 0; bottom: 0; top: auto; transform: scaleY(-1); }
+.an-hs--ro { right: 0; bottom: 0; top: auto; transform: scale(-1, -1); }
+.an-hs img { display: block; width: 100%; height: 100%; }
+.an-slinger { display: block; width: calc(100% + 2 * clamp(1.25rem, 6.5vw, 2.4rem)); max-width: none; height: auto; margin: -2.2rem calc(-1 * clamp(1.25rem, 6.5vw, 2.4rem)) 1.2rem; pointer-events: none; }
+.an-sec--welkom { padding-top: 2.4rem; }
+
+/* De datum: een boog met een groot getal */
+.an-datumboog {
+  position: relative; width: min(290px, 78%); margin: 1.4rem auto 1.8rem; padding: 3.1rem 1rem 2.1rem; display: grid; justify-items: center; gap: .2rem;
+  border-radius: 999px 999px 6px 6px; border: 1px solid color-mix(in srgb, var(--an-goud) 62%, transparent);
+  box-shadow: 0 0 0 7px var(--an-nacht-2), 0 0 0 8px color-mix(in srgb, var(--an-goud) 30%, transparent), 0 30px 60px -30px rgba(var(--an-sh, 0, 0, 0), calc(.85 * var(--an-sh-k, 1)));
+  background: radial-gradient(80% 56% at 50% 20%, color-mix(in srgb, var(--an-goud) 18%, transparent), transparent 72%), linear-gradient(180deg, color-mix(in srgb, var(--an-goud) 8%, transparent), transparent);
+}
+.an-dw { font: 300 .78rem/1 var(--an-ui); letter-spacing: .5em; text-indent: .5em; text-transform: uppercase; color: var(--an-goud); }
+.an-dd { display: block; padding: .04em 0; font: 400 clamp(5rem, 24vw, 7.2rem)/1 var(--an-display); color: var(--an-goud); }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .an-dd { background: linear-gradient(180deg, var(--an-goud-2), var(--an-goud)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+}
+.an-dm { font: 400 clamp(1.15rem, 4.8vw, 1.45rem)/1.2 var(--an-display); letter-spacing: .3em; text-indent: .3em; text-transform: uppercase; }
+.an-dj { font: 300 .86rem/1.4 var(--an-ui); letter-spacing: .5em; text-indent: .5em; color: var(--an-muted); }
+.an-dt { margin-top: .9rem; padding-top: .8rem; border-top: 1px solid color-mix(in srgb, var(--an-goud) 40%, transparent); font: italic 400 1.1rem/1.2 var(--an-serif); color: var(--an-muted); }
+
+/* Welkom en tekst */
+.an-tekst--welkom { font-size: 1.28rem; }
+.an-tekst--welkom p:first-child { font: italic 500 1.5rem/1.3 var(--an-serif); color: var(--an-goud); }
+.an-sec--welkom .an-sier { margin: 1.6rem auto 0; }
+.an-aanhaal { display: block; height: 2.4rem; margin: .4rem 0 0; font: 400 5.4rem/.9 var(--an-display); color: color-mix(in srgb, var(--an-goud) 55%, transparent); }
+.an-sec--verhaal .an-tekst { font-size: 1.22rem; }
+.an-tekst--slot { font-size: 1.5rem; line-height: 1.4; color: var(--an-goud); }
+
+/* Programma: een tijdlijn met een gouden draad */
+.an-programma { position: relative; max-width: 30em; margin: 1.4rem auto 0; gap: 0; }
+.an-programma::before { content: ""; position: absolute; left: 5rem; top: .6rem; bottom: .6rem; width: 1px; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--an-goud) 75%, transparent) 9%, color-mix(in srgb, var(--an-goud) 75%, transparent) 91%, transparent); }
+.an-programma li { position: relative; grid-template-columns: 4rem 1fr; gap: 2rem; padding: .85rem 0 1.05rem; }
+.an-programma li::after { content: ""; position: absolute; left: calc(5rem - 6px); top: 1.3rem; width: 11px; height: 11px; border-radius: 50%; background: var(--an-nacht-2); border: 1px solid var(--an-goud); box-shadow: 0 0 0 4px var(--an-nacht-2), 0 0 14px color-mix(in srgb, var(--an-goud) 45%, transparent); }
+.an-programma__tijd { font: 400 1.15rem/1.3 var(--an-display); letter-spacing: .1em; text-align: right; }
+.an-programma__tekst strong { font-family: var(--an-serif); font-size: 1.3rem; }
+
+/* Aftellen: kleine bogen */
+.an-body .cd { gap: .7rem; margin-top: .6rem; }
+.an-body .cd__unit { min-width: 4.5rem; padding: 1.2rem .3rem .8rem; border-radius: 999px 999px 4px 4px; border: 1px solid color-mix(in srgb, var(--an-goud) 50%, transparent); background: linear-gradient(180deg, color-mix(in srgb, var(--an-goud) 12%, transparent), transparent); box-shadow: 0 0 0 4px var(--an-nacht-2), 0 0 0 5px color-mix(in srgb, var(--an-goud) 22%, transparent); }
+.an-body .cd { padding: 0 .35rem; }
+
+/* Locatie */
+.an-paviljoen-icoon { display: block; width: 118px; height: auto; margin: 0 auto 1.1rem; color: var(--an-goud); fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.an-locatie { font-size: clamp(1.25rem, 5.2vw, 1.6rem); }
+.an-sec--locatie { background: linear-gradient(180deg, color-mix(in srgb, var(--an-goud) 7%, transparent), transparent 70%); }
+.an-sec--locatie .inv-btn--primary { margin-top: .4rem; }
+
+/* Dresscode en goed om te weten */
+.an-stalen { gap: 1.1rem; margin-bottom: 1.5rem; }
+.an-stalen li { width: 54px; height: 54px; box-shadow: 0 0 0 5px var(--an-nacht-2), 0 0 0 6px color-mix(in srgb, var(--an-goud) 50%, transparent), 0 10px 18px -8px rgba(var(--an-sh, 0, 0, 0), calc(.7 * var(--an-sh-k, 1))); }
+.an-praktisch { gap: 1.1rem; }
+.an-praktisch__item { padding: 1.1rem 1.2rem 1.2rem; border: 1px solid color-mix(in srgb, var(--an-goud) 32%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--an-goud) 6%, transparent); position: relative; }
+.an-praktisch__item::before { content: ""; position: absolute; left: 50%; top: -5px; width: 9px; height: 9px; margin-left: -4.5px; transform: rotate(45deg); background: var(--an-nacht-2); border: 1px solid var(--an-goud); }
+
+/* Aanmelden: de kaart hangt onder een slinger */
+.an-kaart-wrap { position: relative; max-width: 460px; margin: 3.6rem auto 0; }
+.an-slinger--kaart { position: absolute; left: 50%; top: -3.6rem; width: 116%; margin: 0; transform: translateX(-50%); z-index: 2; }
+.an-kaart { position: relative; padding-top: 2.6rem; box-shadow: 0 30px 60px -34px rgba(var(--an-sh, 0, 0, 0), calc(.85 * var(--an-sh-k, 1))); }
+.an-contactnaam { font-size: 1.5rem; }
+.an-slot { padding-top: clamp(5rem, 22vw, 8rem); padding-bottom: 7rem; }
+
+@media (min-width: 900px) {
+  .an-hh { width: clamp(180px, 20vw, 300px); }
+  .an-hs { width: 220px; }
+}
+
+
+/* De kop: een waaier van licht achter het paviljoen vult de lucht (draait traag, alleen met beweging aan) */
+.an-l--stralen { z-index: 0; }
+.an-stralen-h {
+  position: absolute; left: 50%; bottom: calc(var(--pw) * .5); width: calc(var(--pw) * 3); height: calc(var(--pw) * 1.5); margin-left: calc(var(--pw) * -1.5);
+  background: repeating-conic-gradient(from 0deg at 50% 100%, color-mix(in srgb, var(--an-goud-2) 15%, transparent) 0deg 1.2deg, transparent 1.2deg 7.5deg);
+  -webkit-mask-image: radial-gradient(circle at 50% 100%, #000 4%, transparent 70%); mask-image: radial-gradient(circle at 50% 100%, #000 4%, transparent 70%);
+}

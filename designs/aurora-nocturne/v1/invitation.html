@@ -1,0 +1,282 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Aurora Nocturne v1: een Special met een filmische opening, gebouwd met GSAP (static/vendor/gsap/). Alle beweging staat in aurora-nocturne.js; deze opmaak bevat zelf geen animaties. Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}{% with beelden='designs/aurora-nocturne/v1/img/'|add:v.palette_key|add:'/' %}<link rel="preload" href="{% static 'fonts/italiana-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/jost-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="{% static beelden|add:'lucht.webp' %}" fetchpriority="high">
+<script src="{% static 'vendor/gsap/gsap.min.js' %}" defer></script>
+<script src="{% static 'vendor/gsap/ScrollTrigger.min.js' %}" defer></script>
+<script src="{% static 'designs/aurora-nocturne/v1/aurora-nocturne.js' %}" defer></script>{% endwith %}{% endblock %}
+
+{% block cover %}{% with beelden='designs/aurora-nocturne/v1/img/'|add:v.palette_key|add:'/' %}
+{% comment %}Het openingsscherm is het begin van één GSAP-master-timeline (aurora-nocturne.js). Scène 1 (duisternis) speelt vanzelf en wacht dan op een tik.
+Daarna: het zegel (scène 2), de envelop (scène 3) en het lichtportaal (scène 4). Het portaal is een gat in het donker (clip-path) dat groeit, met de
+paviljoenscène erachter. Het scherm verdwijnt na ongeveer 3 s (data-duration); de rest van de film (camera, lampen, namen) loopt op de kaart zelf door.
+Zonder GSAP, bij 'minder beweging' of stilgezette beweging werkt alles gewoon: tik en de uitnodiging opent.{% endcomment %}
+<section class="cover an-cover" data-cover data-duration="3000" data-fx-delay="0" data-fx-intro="3000" aria-label="Openingsscherm">
+  <svg class="an-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="an-g-metaal" cx="36%" cy="28%" r="78%"><stop offset="0" stop-color="#FBF0CF"/><stop offset=".35" stop-color="#E4CF99"/><stop offset=".7" stop-color="#B99C5A"/><stop offset="1" stop-color="#7A6230"/></radialGradient>
+      <linearGradient id="an-g-rand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF6D6"/><stop offset=".5" stop-color="#C9AE6E"/><stop offset="1" stop-color="#6A5426"/></linearGradient>
+      <linearGradient id="an-g-rand2" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFF6D6"/><stop offset=".5" stop-color="#B89B5B"/><stop offset="1" stop-color="#5E4A22"/></linearGradient>
+      <radialGradient id="an-g-schijf" cx="62%" cy="68%" r="75%"><stop offset="0" stop-color="#EAD9A8"/><stop offset=".6" stop-color="#BE9F5E"/><stop offset="1" stop-color="#8B7137"/></radialGradient>
+      <linearGradient id="an-g-glint" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <clipPath id="an-c-boven"><polygon points="-10,-10 110,-10 110,53 105,53 83,57 70,51 58,57 47,52 35,58 22,51 12,56 -5,52 -10,52"/></clipPath>
+      <clipPath id="an-c-onder"><polygon points="-10,110 110,110 110,53 105,53 83,57 70,51 58,57 47,52 35,58 22,51 12,56 -5,52 -10,52"/></clipPath>
+      <clipPath id="an-c-vorm"><path d="M96.5 50.0C96.8 52.2 97.0 54.5 97.0 56.8C97.1 59.1 97.7 61.7 96.9 63.8C96.2 65.9 93.8 67.5 92.5 69.4C91.2 71.3 90.4 73.4 89.1 75.1C87.7 76.8 85.8 78.2 84.2 79.6C82.6 81.1 80.8 82.2 79.3 83.8C77.7 85.3 76.7 87.6 74.9 88.7C73.1 89.9 70.7 90.1 68.6 90.8C66.6 91.5 64.7 92.7 62.6 93.0C60.5 93.2 58.2 92.5 56.1 92.4C54.0 92.4 52.1 92.4 50.0 92.7C47.9 92.9 45.9 93.6 43.7 94.0C41.5 94.4 38.9 95.3 36.8 95.1C34.6 94.9 32.6 93.4 30.6 92.5C28.5 91.6 26.4 90.8 24.5 89.7C22.5 88.6 20.7 87.3 18.9 85.9C17.2 84.4 15.5 82.9 14.1 81.1C12.7 79.4 11.8 77.2 10.7 75.3C9.5 73.4 8.5 71.4 7.3 69.5C6.1 67.6 3.9 65.8 3.5 63.7C3.1 61.5 4.7 58.8 4.8 56.5C4.9 54.2 3.7 52.1 4.1 50.0C4.5 47.9 6.4 45.8 7.2 43.8C8.0 41.8 8.6 40.0 9.1 38.0C9.6 36.0 10.0 34.0 10.4 31.9C10.9 29.9 11.3 27.7 11.9 25.5C12.6 23.4 13.0 20.8 14.4 19.1C15.7 17.5 18.3 16.8 20.1 15.5C21.9 14.2 23.3 12.5 25.0 11.2C26.8 9.9 28.7 8.8 30.7 7.7C32.7 6.7 34.7 6.0 36.8 5.1C38.9 4.2 40.9 2.6 43.1 2.2C45.3 1.8 47.8 2.2 50.0 2.5C52.2 2.8 54.5 3.3 56.6 4.0C58.7 4.7 60.7 5.9 62.7 6.7C64.7 7.6 66.8 8.2 68.6 9.2C70.5 10.3 72.1 11.8 73.8 13.0C75.6 14.2 77.3 15.2 79.1 16.4C80.9 17.6 83.0 18.6 84.5 20.1C86.0 21.6 87.1 23.6 88.1 25.5C89.1 27.4 89.5 29.6 90.4 31.6C91.3 33.5 92.6 35.3 93.4 37.3C94.2 39.2 94.8 41.4 95.3 43.5C95.8 45.6 96.2 47.8 96.5 50.0Z"/></clipPath>
+      <g id="an-zegel-kunst">
+        <path d="M96.5 50.0C96.8 52.2 97.0 54.5 97.0 56.8C97.1 59.1 97.7 61.7 96.9 63.8C96.2 65.9 93.8 67.5 92.5 69.4C91.2 71.3 90.4 73.4 89.1 75.1C87.7 76.8 85.8 78.2 84.2 79.6C82.6 81.1 80.8 82.2 79.3 83.8C77.7 85.3 76.7 87.6 74.9 88.7C73.1 89.9 70.7 90.1 68.6 90.8C66.6 91.5 64.7 92.7 62.6 93.0C60.5 93.2 58.2 92.5 56.1 92.4C54.0 92.4 52.1 92.4 50.0 92.7C47.9 92.9 45.9 93.6 43.7 94.0C41.5 94.4 38.9 95.3 36.8 95.1C34.6 94.9 32.6 93.4 30.6 92.5C28.5 91.6 26.4 90.8 24.5 89.7C22.5 88.6 20.7 87.3 18.9 85.9C17.2 84.4 15.5 82.9 14.1 81.1C12.7 79.4 11.8 77.2 10.7 75.3C9.5 73.4 8.5 71.4 7.3 69.5C6.1 67.6 3.9 65.8 3.5 63.7C3.1 61.5 4.7 58.8 4.8 56.5C4.9 54.2 3.7 52.1 4.1 50.0C4.5 47.9 6.4 45.8 7.2 43.8C8.0 41.8 8.6 40.0 9.1 38.0C9.6 36.0 10.0 34.0 10.4 31.9C10.9 29.9 11.3 27.7 11.9 25.5C12.6 23.4 13.0 20.8 14.4 19.1C15.7 17.5 18.3 16.8 20.1 15.5C21.9 14.2 23.3 12.5 25.0 11.2C26.8 9.9 28.7 8.8 30.7 7.7C32.7 6.7 34.7 6.0 36.8 5.1C38.9 4.2 40.9 2.6 43.1 2.2C45.3 1.8 47.8 2.2 50.0 2.5C52.2 2.8 54.5 3.3 56.6 4.0C58.7 4.7 60.7 5.9 62.7 6.7C64.7 7.6 66.8 8.2 68.6 9.2C70.5 10.3 72.1 11.8 73.8 13.0C75.6 14.2 77.3 15.2 79.1 16.4C80.9 17.6 83.0 18.6 84.5 20.1C86.0 21.6 87.1 23.6 88.1 25.5C89.1 27.4 89.5 29.6 90.4 31.6C91.3 33.5 92.6 35.3 93.4 37.3C94.2 39.2 94.8 41.4 95.3 43.5C95.8 45.6 96.2 47.8 96.5 50.0Z" fill="#000" opacity=".42" transform="translate(2.2 3.4)"/>
+        <path d="M96.5 50.0C96.8 52.2 97.0 54.5 97.0 56.8C97.1 59.1 97.7 61.7 96.9 63.8C96.2 65.9 93.8 67.5 92.5 69.4C91.2 71.3 90.4 73.4 89.1 75.1C87.7 76.8 85.8 78.2 84.2 79.6C82.6 81.1 80.8 82.2 79.3 83.8C77.7 85.3 76.7 87.6 74.9 88.7C73.1 89.9 70.7 90.1 68.6 90.8C66.6 91.5 64.7 92.7 62.6 93.0C60.5 93.2 58.2 92.5 56.1 92.4C54.0 92.4 52.1 92.4 50.0 92.7C47.9 92.9 45.9 93.6 43.7 94.0C41.5 94.4 38.9 95.3 36.8 95.1C34.6 94.9 32.6 93.4 30.6 92.5C28.5 91.6 26.4 90.8 24.5 89.7C22.5 88.6 20.7 87.3 18.9 85.9C17.2 84.4 15.5 82.9 14.1 81.1C12.7 79.4 11.8 77.2 10.7 75.3C9.5 73.4 8.5 71.4 7.3 69.5C6.1 67.6 3.9 65.8 3.5 63.7C3.1 61.5 4.7 58.8 4.8 56.5C4.9 54.2 3.7 52.1 4.1 50.0C4.5 47.9 6.4 45.8 7.2 43.8C8.0 41.8 8.6 40.0 9.1 38.0C9.6 36.0 10.0 34.0 10.4 31.9C10.9 29.9 11.3 27.7 11.9 25.5C12.6 23.4 13.0 20.8 14.4 19.1C15.7 17.5 18.3 16.8 20.1 15.5C21.9 14.2 23.3 12.5 25.0 11.2C26.8 9.9 28.7 8.8 30.7 7.7C32.7 6.7 34.7 6.0 36.8 5.1C38.9 4.2 40.9 2.6 43.1 2.2C45.3 1.8 47.8 2.2 50.0 2.5C52.2 2.8 54.5 3.3 56.6 4.0C58.7 4.7 60.7 5.9 62.7 6.7C64.7 7.6 66.8 8.2 68.6 9.2C70.5 10.3 72.1 11.8 73.8 13.0C75.6 14.2 77.3 15.2 79.1 16.4C80.9 17.6 83.0 18.6 84.5 20.1C86.0 21.6 87.1 23.6 88.1 25.5C89.1 27.4 89.5 29.6 90.4 31.6C91.3 33.5 92.6 35.3 93.4 37.3C94.2 39.2 94.8 41.4 95.3 43.5C95.8 45.6 96.2 47.8 96.5 50.0Z" fill="url(#an-g-metaal)"/>
+        <circle cx="50" cy="50" r="38.5" fill="none" stroke="url(#an-g-rand)" stroke-width="3.6"/>
+        <circle cx="50" cy="50" r="35.2" fill="url(#an-g-schijf)"/>
+        <circle cx="50" cy="50" r="35.2" fill="none" stroke="url(#an-g-rand2)" stroke-width="1.1" opacity=".9"/>
+        <g class="an-zegel__merk" style="fill:#4A3A17">
+          <path d="M50 17.2l1.1 2.6 2.7.4-2 1.8.6 2.7-2.4-1.4-2.4 1.4.6-2.7-2-1.8 2.7-.4z" opacity=".7"/>
+          <path d="M50 76.4l1.1 2.6 2.7.4-2 1.8.6 2.7-2.4-1.4-2.4 1.4.6-2.7-2-1.8 2.7-.4z" opacity=".7" transform="translate(0 -1)"/>
+        </g>
+        <text class="an-zegel__tekst an-zegel__tekst--{{ v.monogram|length }}" x="50.8" y="51.6" text-anchor="middle" dominant-baseline="central" fill="#FFF3CE" opacity=".6">{{ v.monogram }}</text>
+        <text class="an-zegel__tekst an-zegel__tekst--{{ v.monogram|length }}" x="49.6" y="50.2" text-anchor="middle" dominant-baseline="central" fill="#5A4519">{{ v.monogram }}</text>
+        <circle id="an-ringlicht" cx="50" cy="50" r="38.5" fill="none" stroke="#FFF8E0" stroke-width="1.5" stroke-linecap="round" pathLength="100" stroke-dasharray="9 91" stroke-dashoffset="0" opacity="0" transform="rotate(-90 50 50)"/>
+        <ellipse id="an-glint" cx="14" cy="50" rx="10" ry="3" fill="url(#an-g-glint)" transform="rotate(-32 50 50)" opacity="0"/>
+      </g>
+    </defs>
+  </svg>
+  <div class="an-gat">
+    <div class="an-nacht"></div>
+    <div class="an-decor" aria-hidden="true">
+      <div class="an-stralen"></div>
+      <svg class="an-bogen" viewBox="0 0 400 520" focusable="false">
+        <path class="an-bogen__1" d="M12 520V196A188 188 0 0 1 388 196V520" pathLength="1"/>
+        <path class="an-bogen__2" d="M36 520V200A164 164 0 0 1 364 200V520" pathLength="1"/>
+        <path class="an-bogen__3" d="M60 520V204A140 140 0 0 1 340 204V520" pathLength="1"/>
+        <path class="an-ster" d="M200 0l3.5 9 9 3.5-9 3.5-3.5 9-3.5-9-9-3.5 9-3.5z"/>
+        <path class="an-ster" d="M18 150l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/>
+        <path class="an-ster" d="M382 150l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/>
+        <path class="an-ster an-ster--ruit" d="M200 24l5 8-5 8-5-8z"/>
+      </svg>
+      <i class="an-fonkel" style="left:12%;top:30%"></i><i class="an-fonkel" style="left:86%;top:26%"></i><i class="an-fonkel" style="left:22%;top:62%"></i><i class="an-fonkel" style="left:78%;top:58%"></i>
+      <i class="an-fonkel" style="left:50%;top:12%"></i><i class="an-fonkel" style="left:34%;top:20%"></i><i class="an-fonkel" style="left:68%;top:19%"></i><i class="an-fonkel" style="left:9%;top:48%"></i>
+      <i class="an-fonkel" style="left:91%;top:46%"></i><i class="an-fonkel" style="left:40%;top:76%"></i><i class="an-fonkel" style="left:62%;top:78%"></i><i class="an-fonkel" style="left:50%;top:88%"></i>
+      <div class="an-hoek an-hoek--lb"><img src="{% static beelden|add:'hoek.webp' %}" alt="" width="560" height="560" decoding="async"></div>
+      <div class="an-hoek an-hoek--rb"><img src="{% static beelden|add:'hoek.webp' %}" alt="" width="560" height="560" decoding="async"></div>
+      <div class="an-hoek an-hoek--lo"><img src="{% static beelden|add:'hoek.webp' %}" alt="" width="560" height="560" decoding="async"></div>
+      <div class="an-hoek an-hoek--ro"><img src="{% static beelden|add:'hoek.webp' %}" alt="" width="560" height="560" decoding="async"></div>
+      <p class="an-uitn"><span class="an-uitn__klein">{% if v.formal %}U bent uitgenodigd{% else %}Je bent uitgenodigd{% endif %}</span>{% if v.kicker %}<span class="an-uitn__groot">{{ v.kicker }}</span>{% endif %}</p>
+      {% if v.date %}<p class="an-dag"><small>{{ v.weekday }}</small>{{ v.day }} {{ v.month_name }} {{ v.year }}</p>{% endif %}
+    </div>
+    <div class="an-stage">
+      <div class="an-env">
+        <div class="an-env__schaduw"></div>
+        <div class="an-env__flapschaduw"></div>
+        <div class="an-env__body">
+          <div class="an-env__binnen"><i class="an-env__binnenlicht"></i><i class="an-env__open"></i></div>
+          <div class="an-env__voor"></div>
+          <div class="an-env__vschaduw"></div>
+          <div class="an-env__glans"></div>
+          <svg class="an-env__lijnen" viewBox="0 0 100 134" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path class="an-lijn-rand" d="M0 0H100V134H0Z"/>
+            <path class="an-lijn-v" d="M0 0L50 59L100 0"/>
+          </svg>
+        </div>
+        <div class="an-zegel an-zegel--onder"><svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><use href="#an-zegel-kunst" clip-path="url(#an-c-onder)"/></svg></div>
+        <div class="an-flap">
+          <div class="an-flap__voor"><i class="an-flap__tint"></i>
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="an-lijn-flap" d="M0 0L50 100L100 0Z"/><path class="an-lijn-binnen" d="M7 3L50 86L93 3"/></svg>
+          </div>
+          <div class="an-flap__achter"><i class="an-flap__licht"></i>
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="an-lijn-flap" d="M0 100L50 0L100 100Z"/></svg>
+          </div>
+          <div class="an-zegel an-zegel--boven"><svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><use href="#an-zegel-kunst" clip-path="url(#an-c-boven)"/></svg></div>
+        </div>
+        <svg class="an-scheur" viewBox="0 0 100 134" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path class="an-scheur__glans" d="M50 59L0 0M50 59L100 0" pathLength="1"/>
+          <path class="an-scheur__kern" d="M50 59L0 0M50 59L100 0" pathLength="1"/>
+        </svg>
+        <a class="an-hit" href="#uitnodiging" data-open data-fx-origin tabindex="-1" aria-hidden="true"></a>
+        <div class="an-chips" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+    </div>
+  </div>
+  <svg class="an-rand" aria-hidden="true" focusable="false"><path class="an-rand__zacht" d=""/><path class="an-rand__mid" d=""/><path class="an-rand__kern" d=""/></svg>
+  <div class="an-cover__acties">
+    <button type="button" class="an-open" data-open><span>Open uitnodiging</span></button>
+    {% if v.show.music %}<button type="button" class="an-open an-open--muziek" data-open data-open-music><span>Met muziek</span></button>{% endif %}
+  </div>
+  <canvas class="an-stof" aria-hidden="true"></canvas>
+</section>{% endwith %}
+{% endblock %}
+
+{% block content %}{% with beelden='designs/aurora-nocturne/v1/img/'|add:v.palette_key|add:'/' %}
+{% comment %}De kop is een scène in lagen (achter naar voor), elk in een eigen vlak: .an-l krijgt de camera van de film (GSAP), .an-p de parallax bij het
+scrollen (ScrollTrigger), zodat die twee elkaar nooit in de weg zitten. Lucht en aurora · heuvels en meer · mist · het paviljoen met vijf lichtkaarten ·
+mist · voorgrond · stof (één canvas) · tekst. De beelden komen uit tools/aurora_nocturne/. De lampen zijn geen losse elementen maar vijf doorzichtige
+lichtkaarten waarvan alleen de opacity verandert.{% endcomment %}
+<header class="an-hero" id="an-hero">
+  <div class="an-l an-l--lucht" aria-hidden="true"><div class="an-p">
+    <img class="an-bg" src="{% static beelden|add:'lucht.webp' %}" alt="" width="2400" height="1350" decoding="async">
+    <img class="an-bg an-aurora an-aurora--a" src="{% static beelden|add:'aurora-a.webp' %}" alt="" width="800" height="450" decoding="async">
+    <img class="an-bg an-aurora an-aurora--b" src="{% static beelden|add:'aurora-b.webp' %}" alt="" width="800" height="450" decoding="async">
+  </div></div>
+  <div class="an-l an-l--stralen" aria-hidden="true"><div class="an-p"><div class="an-stralen-h"></div></div></div>
+  <div class="an-l an-l--ver" aria-hidden="true"><div class="an-p">
+    <img class="an-bg" src="{% static beelden|add:'ver.webp' %}" alt="" width="2400" height="1350" decoding="async">
+  </div></div>
+  <div class="an-l an-l--mist-a" aria-hidden="true"><div class="an-p"><img class="an-mist an-mist--a" src="{% static beelden|add:'mist.webp' %}" alt="" width="1200" height="260" decoding="async"></div></div>
+  <div class="an-l an-l--pav" aria-hidden="true"><div class="an-p">
+    <div class="an-pav">
+      <img class="an-pav__basis" src="{% static beelden|add:'paviljoen.webp' %}" alt="" width="1080" height="1100" decoding="async">
+      <img class="an-licht an-licht--entree" src="{% static beelden|add:'licht-entree.webp' %}" alt="" width="1080" height="1100" decoding="async">
+      <img class="an-licht an-licht--zij" src="{% static beelden|add:'licht-zij.webp' %}" alt="" width="1080" height="1100" decoding="async">
+      <img class="an-licht an-licht--kroon" src="{% static beelden|add:'licht-kroon.webp' %}" alt="" width="1080" height="1100" decoding="async">
+      <img class="an-licht an-licht--lampjes" src="{% static beelden|add:'licht-lampjes.webp' %}" alt="" width="1080" height="1100" decoding="async">
+      <img class="an-licht an-licht--kaarsen" src="{% static beelden|add:'licht-kaarsen.webp' %}" alt="" width="1080" height="1100" decoding="async">
+    </div>
+  </div></div>
+  <div class="an-l an-l--mist-b" aria-hidden="true"><div class="an-p"><img class="an-mist an-mist--b" src="{% static beelden|add:'mist.webp' %}" alt="" width="1200" height="260" decoding="async"></div></div>
+  <div class="an-l an-l--voor-l" aria-hidden="true"><div class="an-p"><img class="an-voor an-voor--l" src="{% static beelden|add:'voor-l.webp' %}" alt="" width="600" height="760" decoding="async"></div></div>
+  <div class="an-l an-l--voor-r" aria-hidden="true"><div class="an-p"><img class="an-voor an-voor--r" src="{% static beelden|add:'voor-r.webp' %}" alt="" width="600" height="760" decoding="async"></div></div>
+  <div class="an-hero__licht" aria-hidden="true"></div>
+  <div class="an-hoeken" aria-hidden="true">
+    <div class="an-hh an-hh--l"><img src="{% static beelden|add:'hoek.webp' %}" alt="" width="560" height="560" decoding="async"></div>
+    <div class="an-hh an-hh--r"><img src="{% static beelden|add:'hoek.webp' %}" alt="" width="560" height="560" decoding="async"></div>
+  </div>
+  <div class="an-stofhaven" aria-hidden="true"></div>
+  <div class="an-hero__tekst" data-tekst-op-beeld>
+    <p class="an-kicker">{{ v.kicker }}</p>
+    <h1 class="an-namen an-namen--{{ v.names_size }}">{% if v.is_couple %}<span class="an-naam"><span class="an-naam__in">{{ v.names.0 }}</span></span><span class="an-amp" aria-label="en"><span class="an-amp__in">&amp;</span></span><span class="an-naam"><span class="an-naam__in">{{ v.names.1 }}</span></span>{% else %}<span class="an-naam"><span class="an-naam__in">{{ v.names.0 }}</span></span>{% endif %}</h1>
+    {% if v.subnames %}<p class="an-sub">{{ v.subnames }}</p>{% endif %}
+    {% if v.date %}<p class="an-datum"><i></i><span>{{ v.day }} {{ v.month_name }} {{ v.year }}</span><i></i></p>{% endif %}
+    {% if v.tagline %}<p class="an-tagline">{{ v.tagline }}</p>{% endif %}
+  </div>
+  <a class="an-scroll" href="#an-verder">Verder<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+</header>
+
+{% comment %}Vervolg van de uitnodiging: elk onderdeel van het platform staat erin, in een rijke opmaak met bloemenhoeken, een slinger, bogen, gouden lijnen en sierlijsten.
+De bloemen komen uit tools/aurora_nocturne/ (hoek.webp en slinger.webp per kleurvariant).{% endcomment %}
+<div class="an-body" id="an-verder">
+{% if v.has_event and v.date %}
+<section class="an-sec an-sec--datum" data-reveal aria-labelledby="an-datum-titel">
+  <div class="an-hoeken-s" aria-hidden="true">
+    <div class="an-hs an-hs--l"><img src="{% static beelden|add:'hoek.webp' %}" alt="" width="560" height="560" loading="lazy" decoding="async"></div>
+    <div class="an-hs an-hs--r"><img src="{% static beelden|add:'hoek.webp' %}" alt="" width="560" height="560" loading="lazy" decoding="async"></div>
+  </div>
+  <svg class="an-sier" viewBox="0 0 240 28" aria-hidden="true" focusable="false"><path class="an-sier__lijn" d="M6 14H92M148 14H234"/><path class="an-sier__blad" d="M100 14c-5-8-14-9-22-3 6 6 15 8 22 3zM140 14c5-8 14-9 22-3-6 6-15 8-22 3z"/><path class="an-sier__ruit" d="M120 3l7 11-7 11-7-11z"/><circle class="an-sier__punt" cx="104" cy="14" r="1.8"/><circle class="an-sier__punt" cx="136" cy="14" r="1.8"/></svg>
+  <h2 id="an-datum-titel" class="an-h2">De datum</h2>
+  <div class="an-datumboog" role="group" aria-label="{{ v.date_display }}">
+    <span class="an-dw">{{ v.weekday }}</span>
+    <span class="an-dd">{{ v.day }}</span>
+    <span class="an-dm">{{ v.month_name }}</span>
+    <span class="an-dj">{{ v.year }}</span>
+    {% if v.time_display %}<span class="an-dt">{{ v.time_display }}</span>{% endif %}
+  </div>
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+{% if v.welcome or v.hero %}
+<section class="an-sec an-sec--welkom" data-reveal aria-label="Welkom">
+  <img class="an-slinger" src="{% static beelden|add:'slinger.webp' %}" alt="" width="1400" height="300" loading="lazy" decoding="async">
+  {% if v.hero %}<figure class="an-foto"><div class="ph">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 420px, 80vw" %}</div></figure>{% endif %}
+  {% if v.welcome %}<div class="an-tekst an-tekst--welkom">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>{% endif %}
+  <svg class="an-sier" viewBox="0 0 240 28" aria-hidden="true" focusable="false"><path class="an-sier__lijn" d="M6 14H92M148 14H234"/><path class="an-sier__blad" d="M100 14c-5-8-14-9-22-3 6 6 15 8 22 3zM140 14c5-8 14-9 22-3-6 6-15 8-22 3z"/><path class="an-sier__ruit" d="M120 3l7 11-7 11-7-11z"/><circle class="an-sier__punt" cx="104" cy="14" r="1.8"/><circle class="an-sier__punt" cx="136" cy="14" r="1.8"/></svg>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="an-sec" data-reveal aria-labelledby="an-programma-titel">
+  <svg class="an-sier" viewBox="0 0 240 28" aria-hidden="true" focusable="false"><path class="an-sier__lijn" d="M6 14H92M148 14H234"/><path class="an-sier__blad" d="M100 14c-5-8-14-9-22-3 6 6 15 8 22 3zM140 14c5-8 14-9 22-3-6 6-15 8-22 3z"/><path class="an-sier__ruit" d="M120 3l7 11-7 11-7-11z"/><circle class="an-sier__punt" cx="104" cy="14" r="1.8"/><circle class="an-sier__punt" cx="136" cy="14" r="1.8"/></svg>
+  <h2 id="an-programma-titel" class="an-h2">Het programma</h2>
+  <ol class="an-programma">
+    {% for item in v.program %}<li><span class="an-programma__tijd">{{ item.time }}</span><span class="an-programma__tekst"><strong>{{ item.title }}</strong>{% if item.description %}<span>{{ item.description }}</span>{% endif %}</span></li>{% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="an-sec an-sec--tel" data-reveal aria-labelledby="an-tel-titel">
+  <svg class="an-sier" viewBox="0 0 240 28" aria-hidden="true" focusable="false"><path class="an-sier__lijn" d="M6 14H92M148 14H234"/><path class="an-sier__blad" d="M100 14c-5-8-14-9-22-3 6 6 15 8 22 3zM140 14c5-8 14-9 22-3-6 6-15 8-22 3z"/><path class="an-sier__ruit" d="M120 3l7 11-7 11-7-11z"/><circle class="an-sier__punt" cx="104" cy="14" r="1.8"/><circle class="an-sier__punt" cx="136" cy="14" r="1.8"/></svg>
+  <h2 id="an-tel-titel" class="an-h2">{% if v.is_past %}Dank je wel{% else %}Nog even{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="an-sec an-sec--locatie" data-reveal aria-labelledby="an-locatie-titel">
+  <svg class="an-paviljoen-icoon" viewBox="0 0 120 84" aria-hidden="true" focusable="false"><path d="M60 4v10M54 14h12"/><path d="M52 24a8 8 0 0 1 16 0v6H52z"/><path d="M34 80V50a26 26 0 0 1 52 0v30"/><path d="M47 80V50a13 13 0 0 1 26 0v30M60 37v43"/><path d="M8 80V52h26M86 52h26v28"/><path d="M14 58v22M22 58v22M98 58v22M106 58v22"/><path d="M2 80h116"/></svg>
+  <h2 id="an-locatie-titel" class="an-h2">Locatie</h2>
+  {% if v.venue %}<p class="an-locatie">{{ v.venue }}</p>{% endif %}
+  {% if v.address_lines %}<address class="an-adres">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+  {% if v.date_display %}<p class="an-wanneer">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="an-sec" data-reveal aria-labelledby="an-dress-titel">
+  <svg class="an-sier" viewBox="0 0 240 28" aria-hidden="true" focusable="false"><path class="an-sier__lijn" d="M6 14H92M148 14H234"/><path class="an-sier__blad" d="M100 14c-5-8-14-9-22-3 6 6 15 8 22 3zM140 14c5-8 14-9 22-3-6 6-15 8-22 3z"/><path class="an-sier__ruit" d="M120 3l7 11-7 11-7-11z"/><circle class="an-sier__punt" cx="104" cy="14" r="1.8"/><circle class="an-sier__punt" cx="136" cy="14" r="1.8"/></svg>
+  <h2 id="an-dress-titel" class="an-h2">Dresscode</h2>
+  {% if v.dresscode_colors %}<ul class="an-stalen" aria-label="Kleuren voor de dresscode">{% for c in v.dresscode_colors %}<li style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}</ul>{% endif %}
+  {% for p in v.dresscode_text %}<p class="an-tekst">{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="an-sec an-sec--verhaal" data-reveal aria-labelledby="an-verhaal-titel">
+  <svg class="an-sier" viewBox="0 0 240 28" aria-hidden="true" focusable="false"><path class="an-sier__lijn" d="M6 14H92M148 14H234"/><path class="an-sier__blad" d="M100 14c-5-8-14-9-22-3 6 6 15 8 22 3zM140 14c5-8 14-9 22-3-6 6-15 8-22 3z"/><path class="an-sier__ruit" d="M120 3l7 11-7 11-7-11z"/><circle class="an-sier__punt" cx="104" cy="14" r="1.8"/><circle class="an-sier__punt" cx="136" cy="14" r="1.8"/></svg>
+  <h2 id="an-verhaal-titel" class="an-h2">{{ v.story_title }}</h2>
+  <span class="an-aanhaal" aria-hidden="true">&ldquo;</span>
+  <div class="an-tekst">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="an-sec" data-reveal aria-labelledby="an-momenten-titel">
+  <svg class="an-sier" viewBox="0 0 240 28" aria-hidden="true" focusable="false"><path class="an-sier__lijn" d="M6 14H92M148 14H234"/><path class="an-sier__blad" d="M100 14c-5-8-14-9-22-3 6 6 15 8 22 3zM140 14c5-8 14-9 22-3-6 6-15 8-22 3z"/><path class="an-sier__ruit" d="M120 3l7 11-7 11-7-11z"/><circle class="an-sier__punt" cx="104" cy="14" r="1.8"/><circle class="an-sier__punt" cx="136" cy="14" r="1.8"/></svg>
+  <h2 id="an-momenten-titel" class="an-h2">Momenten</h2>
+  <ul class="an-fotos">{% for photo in v.gallery %}<li><figure><div class="ph">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 600px) 250px, 44vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}</ul>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="an-sec" data-reveal aria-labelledby="an-praktisch-titel">
+  <svg class="an-sier" viewBox="0 0 240 28" aria-hidden="true" focusable="false"><path class="an-sier__lijn" d="M6 14H92M148 14H234"/><path class="an-sier__blad" d="M100 14c-5-8-14-9-22-3 6 6 15 8 22 3zM140 14c5-8 14-9 22-3-6 6-15 8-22 3z"/><path class="an-sier__ruit" d="M120 3l7 11-7 11-7-11z"/><circle class="an-sier__punt" cx="104" cy="14" r="1.8"/><circle class="an-sier__punt" cx="136" cy="14" r="1.8"/></svg>
+  <h2 id="an-praktisch-titel" class="an-h2">Goed om te weten</h2>
+  <dl class="an-praktisch">{% for item in v.practical %}<div class="an-praktisch__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}</dl>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="an-sec an-sec--rsvp" id="aanmelden" data-reveal aria-labelledby="an-rsvp-titel">
+  <svg class="an-sier" viewBox="0 0 240 28" aria-hidden="true" focusable="false"><path class="an-sier__lijn" d="M6 14H92M148 14H234"/><path class="an-sier__blad" d="M100 14c-5-8-14-9-22-3 6 6 15 8 22 3zM140 14c5-8 14-9 22-3-6 6-15 8-22 3z"/><path class="an-sier__ruit" d="M120 3l7 11-7 11-7-11z"/><circle class="an-sier__punt" cx="104" cy="14" r="1.8"/><circle class="an-sier__punt" cx="136" cy="14" r="1.8"/></svg>
+  <h2 id="an-rsvp-titel" class="an-h2">{% if v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+  <div class="an-kaart-wrap">
+    <img class="an-slinger an-slinger--kaart" src="{% static beelden|add:'slinger.webp' %}" alt="" width="1400" height="300" loading="lazy" decoding="async">
+    <div class="an-kaart">{% include "invitations/partials/rsvp.html" %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="an-sec" data-reveal aria-labelledby="an-contact-titel">
+  <svg class="an-sier" viewBox="0 0 240 28" aria-hidden="true" focusable="false"><path class="an-sier__lijn" d="M6 14H92M148 14H234"/><path class="an-sier__blad" d="M100 14c-5-8-14-9-22-3 6 6 15 8 22 3zM140 14c5-8 14-9 22-3-6 6-15 8-22 3z"/><path class="an-sier__ruit" d="M120 3l7 11-7 11-7-11z"/><circle class="an-sier__punt" cx="104" cy="14" r="1.8"/><circle class="an-sier__punt" cx="136" cy="14" r="1.8"/></svg>
+  <h2 id="an-contact-titel" class="an-h2">Vragen?</h2>
+  {% if v.contact.note %}<p class="an-tekst">{{ v.contact.note }}</p>{% endif %}
+  <p class="an-contactnaam">{{ v.contact.name }}</p>
+  <p class="an-contactlinks">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="an-sec an-slot" data-reveal aria-label="Afsluiting">
+  <div class="an-hoeken-s an-hoeken-s--onder" aria-hidden="true">
+    <div class="an-hs an-hs--lo"><img src="{% static beelden|add:'hoek.webp' %}" alt="" width="560" height="560" loading="lazy" decoding="async"></div>
+    <div class="an-hs an-hs--ro"><img src="{% static beelden|add:'hoek.webp' %}" alt="" width="560" height="560" loading="lazy" decoding="async"></div>
+  </div>
+  <svg class="an-sier" viewBox="0 0 240 28" aria-hidden="true" focusable="false"><path class="an-sier__lijn" d="M6 14H92M148 14H234"/><path class="an-sier__blad" d="M100 14c-5-8-14-9-22-3 6 6 15 8 22 3zM140 14c5-8 14-9 22-3-6 6-15 8-22 3z"/><path class="an-sier__ruit" d="M120 3l7 11-7 11-7-11z"/><circle class="an-sier__punt" cx="104" cy="14" r="1.8"/><circle class="an-sier__punt" cx="136" cy="14" r="1.8"/></svg>
+  {% if v.show.closing %}{% for p in v.closing %}<p class="an-tekst an-tekst--slot">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  {% include "invitations/partials/share_buttons.html" %}
+</section>
+</div>
+{% endwith %}{% endblock %}

@@ -9,5 +9,5 @@ Niet toegestaan: gebruik in een tool waarmee gebruikers zonder code visuele anim
 Vaylide valt daar niet onder: klanten vullen in een Studio alleen teksten, foto's en keuzes in; de animaties zijn vast
 onderdeel van de ontwerpen. Controleer de voorwaarden opnieuw bij een grote wijziging van het product.
 
-Gebruikt door: `designs/midnight-emeraude/` (alleen dat ontwerp laadt deze bestanden).
-Bijwerken: `npm pack gsap`, uitpakken en de vier bestanden hier vervangen; draai daarna `node e2e/midnight_emeraude.cjs`.
+Gebruikt door: `designs/midnight-emeraude/` (alle vier de bestanden) en `designs/aurora-nocturne/` (alleen `gsap.min.js` en `ScrollTrigger.min.js`). Andere ontwerpen laden deze bestanden niet.
+Bijwerken: `npm pack gsap`, uitpakken en de vier bestanden hier vervangen; draai daarna `node e2e/midnight_emeraude.cjs` en `node e2e/aurora_nocturne.cjs`.
