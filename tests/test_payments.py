@@ -119,7 +119,7 @@ class PaymentOutcomeTests(VaylideTestCase):
 
     def test_already_paid_invitation_cannot_be_ordered_again(self):
         self.pay(self.inv, self.customer)
-        response = self.client_c.post(f"/maken/{self.inv.uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on"})
+        response = self.client_c.post(f"/maken/{self.inv.uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on", "online_dienst": "on"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Order.objects.count(), 1)
 

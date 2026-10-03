@@ -299,6 +299,25 @@
     });
   });
 
+  /* ---------- Envelop & zegel: na een andere envelop alleen de zegels die erbij passen ---------- */
+  document.querySelectorAll("[data-envelop-kiezer]").forEach(function (form) {
+    var blok = form.querySelector("[data-zegel-blok]");
+    var kaarten = form.querySelectorAll("[data-envelopen]");
+    function update() {
+      var gekozen = form.querySelector("input[name=envelop]:checked");
+      var passend = gekozen && gekozen.getAttribute("data-zegels") ? gekozen.getAttribute("data-zegels").split(" ") : [];
+      if (blok) blok.hidden = passend.length === 0;
+      kaarten.forEach(function (kaart) { kaart.hidden = passend.indexOf(kaart.querySelector("input").value) < 0; });
+      var nu = form.querySelector("input[name=zegel]:checked");
+      if (passend.length && (!nu || passend.indexOf(nu.value) < 0)) {
+        var standaard = form.querySelector("input[name=zegel][value='" + gekozen.getAttribute("data-standaard") + "']");
+        if (standaard) standaard.checked = true;
+      }
+    }
+    form.querySelectorAll("input[name=envelop]").forEach(function (radio) { radio.addEventListener("change", update); });
+    update();
+  });
+
   /* ---------- Je kaart, live naast de invulstappen: toont wat je invult, nog vóór het opslaan ---------- */
   document.querySelectorAll("[data-live]").forEach(function (box) {
     var frame = box.querySelector("[data-live-frame]");
@@ -311,6 +330,32 @@
     if (wide.matches) box.open = true;
     // Breed: altijd open naast de stappen. Smaller geworden: dicht, anders ligt hij over het hele scherm.
     if (wide.addEventListener) wide.addEventListener("change", function () { box.open = wide.matches; });
+    // Smal scherm: de zwevende knop 'Bekijk je kaart' maakt plaats voor wat je nu gebruikt. Hij verdwijnt zolang je in een veld typt
+    // (het toetsenbord) en zodra de knoppen onderaan de stap in beeld zijn, en komt daarna vanzelf terug. Open ('Sluiten') blijft hij staan.
+    var weg = { veld: false, knoppen: false };
+    function zetKnop() { if (box.toggleAttribute) box.toggleAttribute("data-knop-weg", weg.veld || weg.knoppen); }
+    function isVeld(el) {
+      return !!el && (el.tagName === "TEXTAREA" || el.tagName === "SELECT" ||
+        (el.tagName === "INPUT" && ["text", "email", "tel", "url", "number", "date", "time", "search", "password"].indexOf(el.type) >= 0));
+    }
+    document.addEventListener("focusin", function (event) { weg.veld = isVeld(event.target); zetKnop(); });
+    document.addEventListener("focusout", function () { window.setTimeout(function () { weg.veld = isVeld(document.activeElement); zetKnop(); }, 60); });
+    // De knoppen onderaan: alleen weg als ze in de strook komen waar de knop zelf zit (onderste ~5 rem van het scherm), niet zodra ze in beeld zijn.
+    var acties = document.querySelector(".step-actions");
+    if (acties) {
+      var wachtend = false;
+      var controleer = function () {
+        wachtend = false;
+        var r = acties.getBoundingClientRect();
+        var strook = Math.max(80, box.querySelector("summary").getBoundingClientRect().height + 28);
+        weg.knoppen = r.top < window.innerHeight && r.bottom > window.innerHeight - strook;
+        zetKnop();
+      };
+      var plan = function () { if (!wachtend) { wachtend = true; window.requestAnimationFrame(controleer); } };
+      window.addEventListener("scroll", plan, { passive: true });
+      window.addEventListener("resize", plan);
+      controleer();
+    }
     if (!form || !url || !window.fetch || !window.FormData) return;
     var timer = null, busy = false, again = false, pending = false, jump = false;
     function refresh() {

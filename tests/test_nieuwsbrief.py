@@ -14,7 +14,7 @@ class NewsletterTests(VaylideTestCase):
 
     def checkout(self, **extra):
         inv = self.make_invitation(owner=self.customer)
-        data = {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on"}
+        data = {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on", "online_dienst": "on"}
         data.update(extra)
         with self.captureOnCommitCallbacks(execute=True):
             return self.client.post(f"/maken/{inv.uid}/bestellen/", data)

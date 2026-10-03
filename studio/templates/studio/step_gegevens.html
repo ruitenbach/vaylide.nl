@@ -4,6 +4,7 @@
 <div class="studio-intro">
   <h1>De gegevens van je {{ occasion_label|lower }}</h1>
   <p class="lead">Velden met <span class="req">*</span> zijn verplicht.</p>
+  {% include "studio/_eigen_opening.html" %}
 </div>
 {% include "studio/_conflict.html" %}
 <form method="post" class="form studio-form" data-once data-dirty-check novalidate>

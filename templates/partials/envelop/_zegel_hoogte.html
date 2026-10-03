@@ -1,0 +1,15 @@
+{% load static %}{% comment %}Hoogtekaart van het lakzegel (licht = hoog): de was, de opgestuwde rand rond de stempel, het ingedrukte veld en het
+merkteken in reliëf. De filters in collectie.html maken hier licht, schaduw en glans van; de kleur ligt eronder.
+Merkteken (env.teken): "v" = de V uit het logo, precies zoals aangeleverd (static/img/merk/vaylide-v.png, niet hertekend;
+alleen de kleur wordt was: vorm en licht/donker van het beeld worden hoogte; akkoord eigenaar, 2 oktober 2026),
+"v-krans" = dezelfde V in een krans langs de rand, "roos" = een roos met steel en twee blaadjes (Rose Floral),
+"monogram" = initialen met krans.{% endcomment %}
+<path fill="#8E8E8E" d="{% include 'partials/envelop/_zegel_rand.svg' %}"/>
+<path fill="#D8D8D8" filter="url(#vx-wax-round-{{ env.uid }})" d="{% include 'partials/envelop/_zegel_rand.svg' %}"/>
+<path fill="#5C5C5C" stroke="#FFFFFF" stroke-width="4.6" d="{% include 'partials/envelop/_zegel_veld.svg' %}"/>
+{% if env.teken == "monogram" %}<g class="vx-sealmap" fill="#C9C9C9">{% include "partials/envelop/_zegel_krans.svg" %}
+  <text class="vx-seal__mono vx-seal__mono--{{ env.mono.maat }}" x="60.5" y="58.4" text-anchor="middle" dominant-baseline="central">{% if env.mono.rechts %}<tspan>{{ env.mono.links }}</tspan><tspan class="vx-seal__amp">&amp;</tspan><tspan>{{ env.mono.rechts }}</tspan>{% else %}{{ env.mono.links }}{% endif %}</text></g>
+{% elif env.teken == "roos" %}{% include "partials/envelop/_zegel_roos.svg" %}
+{% elif env.teken == "v-krans" %}<g class="vx-sealmap" fill="#C9C9C9">{% include "partials/envelop/_zegel_krans.svg" %}</g>
+<image href="{% static 'img/merk/vaylide-v.png' %}" x="42.5" y="43.3" width="36" height="32.4" filter="url(#vx-v-height-{{ env.uid }})"/>
+{% else %}<image href="{% static 'img/merk/vaylide-v.png' %}" x="38" y="39.3" width="45" height="40.4" filter="url(#vx-v-height-{{ env.uid }})"/>{% endif %}

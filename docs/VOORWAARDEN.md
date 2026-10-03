@@ -13,8 +13,8 @@ eigenaar. De tekst is een **concept**. Hij is niet juridisch beoordeeld en de si
 | Bedrijfsgegevens uit de instellingen, ontbrekende gegevens als geel invulveld | `core/company.py`, filter `invul` in `core/templatetags/vl.py` |
 | "Contact & bedrijfsgegevens", bereikbaar via de footer | `core/templates/core/contact.html`, `templates/partials/footer.html` |
 | Looptijd in kalendermaanden vanaf de bevestigde betaling, één keer vastgelegd als `Order.ends_at` | `invitations/availability.py`, `orders/fulfilment.py` |
-| Bij bestellen twee losse vinkjes, standaard uit: de voorwaarden (met versie en download), en de toestemming voor directe levering met de erkenning over het herroepingsrecht | `studio/forms.py`, `studio/templates/studio/step_bestellen.html` |
-| Op de bestelling vastgelegd: versie van de voorwaarden, tijdstip en letterlijke tekst van de toestemming | `orders/models.py` (`terms_version`, `delivery_consent_at`, `delivery_consent_text`) |
+| Bij bestellen drie losse, verplichte vinkjes, standaard uit: de voorwaarden (met versie en pdf), de toestemming voor directe levering van de digitale kaart met de erkenning over het herroepingsrecht (artikel 9.2), en het verzoek om de online beschikbaarheid direct te starten, zonder te beweren dat het herroepingsrecht voor die dienst vervalt (artikel 9.3). De nieuwsbrief is een apart, optioneel vinkje, los van het bestellen. Knop: "Bestellen en betalen € …" | `studio/forms.py`, `studio/templates/studio/step_bestellen.html` |
+| Op de bestelling vastgelegd: versie van de voorwaarden, en van beide toestemmingen het tijdstip en de letterlijke tekst (teksten in `core/voorwaarden.py`) | `orders/models.py` (`terms_version`, `delivery_consent_at`, `delivery_consent_text`, `service_consent_at`, `service_consent_text`) |
 | Bewaarbare bestelbevestiging (zie hieronder) | `processing/templates/emails/order_confirmation.txt`, `processing/emails.py` |
 | Herroepingsfunctie "Hier de overeenkomst ontbinden" / "Ontbinding bevestigen", met ontvangstbevestiging en een lijst in het beheer | `orders/views.py` (`withdraw`), model `Withdrawal`, `beheer` → Herroepingen |
 | Beveiliging: in live-modus start de site niet zonder juridische naam en vestigingsadres | `config/settings.py` |
@@ -26,6 +26,8 @@ eigenaar. De tekst is een **concept**. Hij is niet juridisch beoordeeld en de si
 - de toestemming voor directe levering (tijdstip en tekst);
 - de versie van de voorwaarden met een link, en de voorwaarden als bijlage;
 - de link naar de herroepingsfunctie.
+
+Opbouw sinds 3 oktober 2026 (`processing/templates/emails/order_confirmation.html` en `.txt`): bovenaan de bevestiging, het orderoverzicht en de knop naar Mijn VAYLIDE; daaronder in korte blokken Directe levering en bedenktijd, Online beschikbaarheid, Algemene voorwaarden, Herroepingsrecht en het ongewijzigde bedrijfsblok. De klanttekst van die blokken is aangeleverd door de eigenaar en staat letterlijk in de sjablonen. Tijdstip en letterlijke tekst van de toestemming komen uit de bestelling (`delivery_consent_at`, `delivery_consent_text`); de versie komt uit `Order.terms_version` (zonder opgeslagen versie geen versieregel en geen pdf-bijlage).
 
 ## Looptijd (artikel 6): hoe het technisch werkt
 
@@ -65,9 +67,10 @@ eigenaar. De tekst is een **concept**. Hij is niet juridisch beoordeeld en de si
 - **Artikel 6, eigen inhoud terugkrijgen:** er is een export van de gastenlijst. Er is geen export van de eigen inhoud,
   zoals geüploade foto's en teksten.
 - **Artikel 9.2 en 9.4, directe levering:**
-  - het vinkje voor directe levering is **verplicht** om te bestellen, want de kaart wordt direct na betaling gepubliceerd;
-  - bij Bestellen staat alleen een korte zin over de regels per onderdeel ("Voor de online beschikbaarheid (een dienst)
-    gelden aparte regels"); een volledige uitleg vóór aankoop ontbreekt nog.
+  - de vinkjes voor directe levering van de digitale kaart en voor het starten van de online dienst zijn **verplicht** om te bestellen, want de kaart wordt direct na betaling gepubliceerd;
+  - bij Bestellen staat een korte uitleg (kaart en online beschikbaarheid) met een link naar artikel 9; de bevestigingsmail toont nu alleen de toestemming voor de digitale kaart, het verzoek voor de online dienst wordt wel vastgelegd maar nog niet in de mail herhaald;
+  - de tekst van artikel 9 en 10 sluit nog niet volledig aan op deze twee vinkjes: zie het voorstel in het gesprek van 3 oktober 2026 (definitie digitale kaart en online dienst, prijsverdeling, berekening van het evenredige bedrag, herroeping van alleen de dienst).
+- **Bevestigingsmail, vastgelegd 3 oktober 2026:** de uiteindelijke versie moet ook het opgeslagen verzoek om de online dienst direct te starten bevestigen (`Order.service_consent_at` en `service_consent_text`, nu wel opgeslagen maar nog niet in de mail). Voorstel in `docs/CONCEPT-ARTIKEL-9-10.md`; de mail is nog niet gewijzigd.
 - **Artikel 10:** de herroepingsfunctie werkt voor registratie en ontvangstbevestiging. Toegang beëindigen en terugbetalen
   zijn handwerk.
 - **Artikel 12:** controleer of de AI-hulp bij teksten en de functie eigen gezichten vooraf genoeg uitleg geven over de

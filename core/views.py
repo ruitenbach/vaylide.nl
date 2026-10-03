@@ -357,3 +357,19 @@ def cron_jobs(request):
         made = make_backup()
         backup = f"{made.name} (tweede locatie: {copy_offsite(made)})"
     return HttpResponse(f"taken: {done}; retentie: {report}; backup: {backup}", content_type="text/plain")
+
+
+def envelop_lab(request):
+    """Ontwerpstudio voor de envelopcollectie (catalog/envelop_collectie.py). Alleen met DEBUG (lokaal); nooit bereikbaar
+    op de live site. ?stijl= kiest de envelop, ?zegel= een ander zegel, ?monogram= initialen in plaats van de V."""
+    if not settings.DEBUG:
+        raise Http404
+    from catalog import envelop_collectie
+
+    lijn = "kerst" if request.GET.get("lijn") == "kerst" else ""
+    env = envelop_collectie.envelop("lab", request.GET.get("stijl") or ("royal-evergreen" if lijn else None),
+                                    request.GET.get("zegel"), request.GET.get("monogram", ""),
+                                    kicker="Wij gaan trouwen", title="Sanne & Daan", date="12 · 06 · 2027")
+    if env["s"]["lijn"] == "kerst":
+        env.update(kicker="Kerstgroet", title="Familie de Vries", date="December 2026")
+    return render(request, "core/envelop_lab.html", {"env": env, "stijlen": envelop_collectie.STIJLEN})

@@ -85,39 +85,103 @@ class PurchaseDateTests(VaylideTestCase):
 
 
 class CheckoutConsentTests(VaylideTestCase):
+    """Drie afzonderlijke, verplichte vinkjes (voorwaarden, directe levering van de digitale kaart, start van de online dienst) en een
+    losse, optionele nieuwsbrief. De teksten zijn van de eigenaar en worden letterlijk met tijdstip vastgelegd op de bestelling."""
+
     def setUp(self):
         self.customer = self.make_customer()
         self.client = Client()
         self.client.force_login(self.customer)
 
     def post(self, inv, **extra):
-        data = {"actie": "betalen", "package": "essentieel", "terms": "on"}
+        data = {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on", "online_dienst": "on"}
         data.update(extra)
+        for sleutel in [k for k, v in extra.items() if v is None]:
+            data.pop(sleutel)
         with self.captureOnCommitCallbacks(execute=True):
             return self.client.post(f"/maken/{inv.uid}/bestellen/", data)
 
-    def test_two_separate_unticked_boxes(self):
+    def pagina(self, inv):
+        return self.client.get(f"/maken/{inv.uid}/bestellen/").content.decode()
+
+    def test_three_separate_unticked_boxes_and_the_exact_texts(self):
+        from django.utils.html import strip_tags
+
+        from core.voorwaarden import CHECKOUT_UITLEG, DELIVERY_CONSENT, SERVICE_CONSENT, TERMS_CONSENT
+
         inv = self.make_invitation(owner=self.customer)
-        html = self.client.get(f"/maken/{inv.uid}/bestellen/").content.decode()
-        for name in ('name="terms"', 'name="direct_leveren"'):
+        html = self.pagina(inv)
+        for name in ('name="terms"', 'name="direct_leveren"', 'name="online_dienst"'):
+            self.assertEqual(html.count(name), 1, name)
             box = html[html.index(name) - 80:html.index(name) + 60]
             self.assertNotIn("checked", box, name)
-        self.assertIn("versie 29 september 2026", html)
+        tekst = " ".join(strip_tags(html).split())
+        for verplicht in (CHECKOUT_UITLEG, TERMS_CONSENT, DELIVERY_CONSENT, SERVICE_CONSENT):
+            self.assertIn(verplicht, tekst)
+        self.assertIn("Versie 29 september 2026", html)
         self.assertIn("/voorwaarden/pdf/2026-09-29/", html)
+        self.assertIn("/voorwaarden/#artikel-9", html)                # korte link naar de bedenktijd
+        # De tekst over de dienst claimt niet dat het herroepingsrecht daarvoor vervalt.
+        self.assertNotIn("vervalt", SERVICE_CONSENT)
+        self.assertIn("vervalt zodra de levering is begonnen", DELIVERY_CONSENT)
 
-    def test_immediate_delivery_needs_its_own_consent(self):
+    def test_each_of_the_three_is_required(self):
         inv = self.make_invitation(owner=self.customer)
-        response = self.post(inv)
-        self.assertContains(response, "direct na je betaling mogen leveren")
+        verwacht = {"terms": "algemene voorwaarden om te kunnen bestellen", "direct_leveren": "directe levering van je digitale kaart",
+                    "online_dienst": "online beschikbaarheid direct mag starten"}
+        for veld, melding in verwacht.items():
+            response = self.post(inv, **{veld: None})
+            self.assertEqual(response.status_code, 200, veld)
+            self.assertContains(response, melding)
+            self.assertFalse(Order.objects.filter(invitation=inv).exists(), f"zonder {veld} mag er geen bestelling ontstaan")
+        # Alleen de voorwaarden aanvinken is niet genoeg.
+        self.post(inv, direct_leveren=None, online_dienst=None)
         self.assertFalse(Order.objects.filter(invitation=inv).exists())
 
-    def test_consent_and_terms_version_are_recorded(self):
+    def test_consents_are_stored_with_exact_text_time_and_terms_version(self):
+        from django.utils import timezone
+
+        from core.voorwaarden import DELIVERY_CONSENT, SERVICE_CONSENT
+
         inv = self.make_invitation(owner=self.customer)
-        self.post(inv, direct_leveren="on")
+        voor = timezone.now()
+        self.post(inv)
         order = Order.objects.get(invitation=inv)
         self.assertEqual(order.terms_version, "2026-09-29")
-        self.assertIsNotNone(order.delivery_consent_at)
-        self.assertIn("herroepingsrecht", order.delivery_consent_text)
+        self.assertEqual(order.delivery_consent_text, DELIVERY_CONSENT)
+        self.assertEqual(order.service_consent_text, SERVICE_CONSENT)
+        for moment in (order.delivery_consent_at, order.service_consent_at, order.terms_accepted_at):
+            self.assertIsNotNone(moment)
+            self.assertTrue(voor <= moment <= timezone.now())
+
+    def test_the_confirmation_mail_shows_the_stored_delivery_consent(self):
+        from processing.models import OutboundEmail
+
+        inv = self.make_invitation(owner=self.customer)
+        self.post(inv)
+        order = Order.objects.get(invitation=inv)
+        payment = Payment.objects.get(order=order)
+        self.provider_says(payment, Payment.Status.PAID)
+        mail = OutboundEmail.objects.get(order=order, kind="order_confirmation")
+        self.assertIn(order.delivery_consent_text, mail.body_text)
+        self.assertEqual(order.service_consent_text.count("vergoeding"), 1)      # vastgelegd, voor later gebruik in de mail
+
+    def test_newsletter_stays_optional_and_separate(self):
+        inv = self.make_invitation(owner=self.customer)
+        html = self.pagina(inv)
+        box = html[html.index('name="nieuwsbrief"') - 80:html.index('name="nieuwsbrief"') + 60]
+        self.assertNotIn("checked", box)
+        self.assertNotIn("nieuwsbrief", html[html.index('<div class="akkoord">'):html.index('</div>', html.index('<div class="akkoord">'))])
+        self.post(inv)                                                    # zonder nieuwsbrief bestellen kan
+        self.assertTrue(Order.objects.filter(invitation=inv).exists())
+        self.customer.refresh_from_db()
+        self.assertFalse(self.customer.newsletter)
+
+    def test_the_button_says_it_is_an_order_with_payment_obligation(self):
+        inv = self.make_invitation(owner=self.customer)
+        html = self.pagina(inv)
+        self.assertRegex(html, r">Bestellen en betalen € \d+")
+        self.assertNotIn("Betalen €", html)
 
     def test_warning_when_the_period_ends_before_the_event(self):
         inv = self.make_invitation(owner=self.customer, date=future_date(300))  # Essentieel: 6 maanden
@@ -137,7 +201,7 @@ class ConfirmationTests(VaylideTestCase):
         self.provider_says(payment, Payment.Status.PAID)
         order = Order.objects.get(pk=payment.order_id)
         email = OutboundEmail.objects.get(order=order, kind="order_confirmation")
-        for text in ("Pakket: Essentieel", "Aankoopdatum:", "Online tot en met:", "herroepingsrecht", "versie 29 september 2026",
+        for text in ("Pakket: Essentieel", "Aankoopdatum:", "Online tot en met:", "herroepingsrecht", "Versie: 29 september 2026",
                      "KvK-nummer: 94261423", settings.CONTACT_EMAIL, "/herroepen/"):
             self.assertIn(text, email.body_text, text)
         self.assertEqual(email.attach_terms_version, "2026-09-29")

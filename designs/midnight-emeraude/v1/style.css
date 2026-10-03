@@ -1,0 +1,288 @@
+/* Midnight Émeraude v1 — avondbruiloft op een landgoed. Kleurwereld: smaragd (of middernachtblauw), champagnegoud, ivoor, parel en kristal.
+   Alle beweging staat in midnight-emeraude.js (GSAP); dit bestand bevat alleen opmaak: er zijn hier bewust geen CSS-animaties.
+   Zonder GSAP, bij 'minder beweging' of stilgezette beweging blijft alles gewoon staan en leesbaar.
+   Beelden: tools/midnight_emeraude/ (eigen tekeningen, eenmalig gerenderd naar WebP). Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Bodoni Moda"; src: url("../../../fonts/bodoni-moda-latin-wght-italic.woff2") format("woff2"); font-weight: 400 900; font-style: italic; font-display: swap; }
+@font-face { font-family: "Bodoni Moda"; src: url("../../../fonts/bodoni-moda-latin-wght-normal.woff2") format("woff2"); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: "Great Vibes"; src: url("../../../fonts/great-vibes-latin-400-normal.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Marcellus"; src: url("../../../fonts/marcellus-latin-400-normal.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../../../fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 300 800; font-display: swap; }
+
+body {
+  --me-script: "Great Vibes", "Pinyon Script", cursive;
+  --me-display: "Bodoni Moda", "Playfair Display", Didot, Georgia, serif;
+  --me-caps: "Marcellus", "Cinzel", Georgia, serif;
+  --me-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --me-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --me-w: min(100vw - 40px, 600px);
+  --me-papier-img: url("../../../img/envelop/papier.webp");
+  --me-foil: linear-gradient(100deg, #B8994F 0%, #EBD7A0 24%, #FFF6DA 42%, #E3C987 60%, #BFA05A 80%, #A98B45 100%);
+  /* Gedeelde onderdelen (formulier, knoppen, muziek) in de kleuren van dit ontwerp. */
+  --inv-bg: var(--me-papier);
+  --inv-text: var(--me-ink);
+  --inv-muted: var(--me-muted);
+  --inv-accent: var(--me-accent);
+  --inv-accent-contrast: var(--me-accent-ink);
+  --inv-font-body: var(--me-serif);
+  --inv-font-ui: var(--me-ui);
+  --inv-focus: var(--me-goud-2);
+  --inv-radius: 4px;
+  --inv-surface-2: var(--me-ivoor-2);
+  --inv-btn-border: color-mix(in srgb, var(--me-goud-2) 75%, transparent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--me-goud) 16%, transparent);
+  --inv-field-bg: #FFFDF7;
+  --inv-field-text: var(--me-ink);
+  --inv-field-border: color-mix(in srgb, var(--me-ink) 30%, transparent);
+  --inv-music-bg: linear-gradient(180deg, #F3E4B8, #C9AC68);
+  --inv-music-text: #14261F;
+  --inv-music-border: rgba(60, 50, 20, .35);
+  --inv-photo-bg: var(--me-ivoor-2);
+  --fx-pulse: var(--me-goud);
+  background: var(--me-nacht);
+  color: var(--me-ink);
+  font-family: var(--me-serif);
+  font-size: 1.16rem;
+  font-weight: 500;
+}
+/* Het deeltjesvlak van de hele pagina ligt hier achter de ondoorzichtige kop en hoofdstukken en zou alleen rekenwerk kosten: uit.
+   De goudstof in de kop (eigen vlak) blijft. */
+.fx-slot--page { display: none; }
+.me-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+img.me-stralen, img.me-wereld, img.me-bloemen, img.me-ring, img.me-ring-spiegel, img.me-kristallen, img.me-voor, img.me-blad, img.me-venster__beeld, img.me-slot__beeld, img.me-slot__ring {
+  display: block; max-width: none; height: auto; user-select: none; -webkit-user-drag: none; }
+
+/* ================================================================ openingsscherm: uit het donker */
+.me-cover {
+  color: var(--me-n-goud);
+  background: radial-gradient(70% 55% at 50% 46%, #0B2A21 0%, #05130E 58%, #020706 100%);
+  --fx-bg: #04100C; --fx-1: #CDB173; --fx-2: #FFF3CF; --fx-3: #8FC9B1; --fx-4: #F1DFAF;
+}
+.me-cover .fx-slot { z-index: 0; }
+.me-cover__licht { position: absolute; left: 50%; top: 46%; width: 96vmax; height: 96vmax; margin: -48vmax 0 0 -48vmax; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle closest-side, rgba(241, 223, 175, .24) 0, rgba(205, 177, 115, .1) 20%, rgba(205, 177, 115, .03) 42%, transparent 66%); }
+.me-cover__stage { position: relative; z-index: 1; display: grid; justify-items: center; align-content: center; gap: .7rem; width: 100%; min-height: 100%; padding: 16px 0 24px; }
+.me-cover__aan { margin: 0; padding: 0 16px; font: 400 .74rem/1.3 var(--me-caps); letter-spacing: .34em; text-transform: uppercase; color: var(--me-n-goud); text-align: center; }
+.me-cover .vx-hint { color: var(--me-n-goud); }
+.me-cover__music { display: inline-flex; align-items: center; gap: .5rem; padding: .55rem 1.1rem; border: 1px solid color-mix(in srgb, var(--me-n-goud) 55%, transparent);
+  border-radius: 999px; background: rgba(8, 30, 23, .55); color: var(--me-n-goud); font: 500 .8rem/1 var(--me-ui); cursor: pointer; }
+.me-cover__music:focus-visible { outline: 2px solid var(--me-n-goud); outline-offset: 3px; }
+/* Dekt het onzichtbare opwarmen af (zie midnight-emeraude.js). Bewust niet helemaal ondoorzichtig, anders slaat de browser de lagen eronder over. */
+.me-warm { position: fixed; inset: 0; z-index: 75; background: #020706; opacity: .995; pointer-events: none; }
+/* Het openingsmoment tijdens het opwarmen: hoort bij het merk, niet bij het ontwerp. Staat standaard uit; het script zet het aan. */
+.me-open { position: fixed; inset: 0; z-index: 76; display: none; pointer-events: none; }
+.js .me-open.is-aan { display: block; }
+/* Al vanaf het eerste beeld (nog voordat het script klaar is) staat het merkmoment er, zodat de pagina meteen reageert. Zodra het script start (klasse
+   me-ready) neemt .is-aan het over zonder dat er iets verspringt; blijft het script weg, dan verdwijnt het vanzelf (vangnet). */
+.js:not(.me-ready):not(.is-open) body[data-has-cover] .me-open { display: block; animation: me-open-weg 0s linear 3.5s forwards; }
+@keyframes me-open-weg { to { opacity: 0; visibility: hidden; } }
+.me-open__gloed { position: absolute; left: 50%; top: 46%; width: 78vmin; height: 78vmin; margin: -39vmin 0 0 -39vmin; border-radius: 50%;
+  background: radial-gradient(circle closest-side, rgba(226, 203, 143, .2) 0, rgba(205, 177, 115, .07) 46%, transparent 72%); }
+.me-open__groep { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 16px; }
+.me-open__v { display: block; width: auto; height: 46px; opacity: .92; }
+.me-open__lijn { position: relative; display: block; width: 132px; height: 1px; background: linear-gradient(90deg, transparent, rgba(226, 203, 143, .7), transparent); }
+.me-open__glans { position: absolute; left: 0; top: -2px; width: 28px; height: 5px; border-radius: 50%; opacity: 0; background: radial-gradient(closest-side, #FFF6DA, rgba(255, 246, 218, 0)); }
+/* Het licht dat het zegel vangt: een zacht lichtpunt (goedkoper dan het filter in het zegel zelf te laten bewegen). */
+.me-glimp { position: absolute; left: 0; top: 0; z-index: 3; width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 50%; opacity: 0; pointer-events: none;
+  background: radial-gradient(circle closest-side, rgba(255, 247, 222, .8) 0, rgba(246, 226, 170, .32) 30%, rgba(246, 226, 170, 0) 100%); }
+/* De lichtvonk die uit het zegel de wereld in vliegt (MotionPath): een klein, zacht, champagnekleurig lichtpunt. */
+.me-vonk { position: fixed; left: 0; top: 0; z-index: 70; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle, #FFFFFF 0, #FFF1CC 22%, rgba(240, 214, 144, .5) 52%, rgba(232, 200, 120, 0) 72%); }
+
+/* Tot het script klaar is staat de envelop in het donker (zodat er geen flits van een volle envelop is). Komt het script niet, dan
+   verschijnt hij na 3 s vanzelf: dit is de enige CSS-animatie van dit ontwerp, een vangnet. */
+.js:not(.me-ready) .me-cover__stage > * { opacity: 0; animation: me-vangnet 0s linear 3s forwards; }
+@keyframes me-vangnet { to { opacity: 1; } }
+/* De envelop uit de collectie wordt hier door GSAP bestuurd: de eigen overgangen en bewegingen van de collectie staan uit,
+   zodat die GSAP niet in de weg zitten. Het zegel krijgt zijn plaats van GSAP (xPercent/yPercent). */
+.me-cover .vx, .me-cover .vx * { transition: none !important; }
+/* Eigen laag voor de envelop: de lichtfilters in de tekening worden zo één keer getekend en daarna alleen verschoven. */
+.me-cover .vx-stage { will-change: transform, opacity; }
+/* Eigen lagen voor de onderdelen die tijdens het openen van volgorde wisselen (de flap gaat achter de kaart): dan verschuift alleen de laagvolgorde en hoeft de browser hun inhoud (met filters) niet opnieuw te tekenen. */
+.me-cover .vx-back, .me-cover .vx-pocket, .me-cover .vx-flapcast, .me-cover .vx-sealpart { will-change: transform; }
+.me-cover .vx-stage, .me-cover .vx-sheen, .me-cover .vx-shadow, .me-cover .vx-seal__glint { animation: none !important; }
+body[data-palette="midnight"] .vx.vx--midnight-emeraude { --vx-paper: #1B3258; --vx-paper-hi: #2A4A7E; --vx-paper-lo: #101F3A; --vx-inside: #16294A; --vx-inside-lo: #0D1B33; --vx-liner-bg: #14284A; }
+
+/* ================================================================ de kop: een scène in lagen */
+.me-hero { --H: max(100vh, 720px); --pw: 205vw;
+  position: relative; min-height: var(--H); overflow: hidden; isolation: isolate; color: var(--me-n-ink);
+  background: linear-gradient(180deg, var(--me-lucht-1) 0%, var(--me-lucht-2) 22%, var(--me-lucht-3) 46%, var(--me-lucht-4) 66%, var(--me-lucht-5) 84%, var(--me-lucht-2) 100%);
+  --fx-1: #CDB173; --fx-2: #FFF3CF; --fx-3: #8FC9B1; --fx-4: #F1DFAF; --fx-bg: var(--me-lucht-2); }
+.me-l { position: absolute; inset: 0; pointer-events: none; }
+.me-p { position: absolute; inset: 0; }
+.me-l--lucht { z-index: 0; } .me-l--stralen { z-index: 1; } .me-l--wereld { z-index: 2; } .me-l--kristal { z-index: 4; } .me-l--voor-l { z-index: 7; } .me-l--voor-r { z-index: 8; }
+.me-hero__fx { position: absolute; inset: 0; z-index: 3; }
+/* Een lichte vignettering trekt het oog naar het midden en geeft de scène een lens (statisch, geen kosten tijdens het scrollen). */
+.me-hero::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background: radial-gradient(ellipse 88% 78% at 50% 46%, transparent 52%, rgba(2, 10, 8, .42) 100%); }
+.me-sterren { position: absolute; left: 0; top: 0; width: 100%; height: 66%; }
+.me-ster { fill: #FFF6DC; }
+.me-stralen { position: absolute; left: 50%; bottom: 6%; width: calc(var(--pw) * .9); margin-left: calc(var(--pw) * -.45); opacity: .62; }
+
+/* De wereld: landgoed, oranjerie en water in één plaat (16:9); alles daarin staat in procenten, zodat het samen meeschaalt. */
+.me-plaat { position: absolute; left: 50%; bottom: 3%; width: var(--pw); margin-left: calc(var(--pw) / -2); aspect-ratio: 16 / 9; }
+.me-wereld { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.me-water { position: absolute; left: 6%; right: 6%; top: 63%; bottom: 9%; overflow: hidden; pointer-events: none; -webkit-mask-image: linear-gradient(180deg, #000 0, #000 60%, transparent); mask-image: linear-gradient(180deg, #000 0, #000 60%, transparent); }
+.me-water__glinster { position: absolute; left: 0; top: 0; width: 40%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 240, 200, .16), transparent); }
+.me-bloemen { position: absolute; bottom: 6%; width: 15%; }
+.me-bloemen--l { left: 24%; } .me-bloemen--r { right: 24%; }
+.me-ringw { position: absolute; left: 31%; top: 30%; width: 38%; aspect-ratio: 900 / 720; }
+.me-ring { position: absolute; inset: 0; width: 100%; }
+.me-ring-spiegel { position: absolute; left: 0; top: 100%; width: 100%; transform: scaleY(-1); opacity: .26;
+  -webkit-mask-image: linear-gradient(0deg, #000 0, transparent 62%); mask-image: linear-gradient(0deg, #000 0, transparent 62%); }
+.me-glans { position: absolute; width: 11%; aspect-ratio: 1; background: #FFFFFF; clip-path: polygon(50% 0, 56% 44%, 100% 50%, 56% 56%, 50% 100%, 44% 56%, 0 50%, 44% 44%); opacity: .95; }
+.me-glans--1 { left: 67.5%; top: 21%; width: 13%; } .me-glans--2 { left: 12%; top: 22%; width: 8%; } .me-glans--3 { left: 87%; top: 76%; width: 8%; }
+
+/* De tekst staat in de avondlucht boven het landgoed. */
+.me-hero__tekst::before { content: ""; position: absolute; left: -20%; right: -20%; top: -12%; bottom: -8%; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse closest-side, rgba(2, 12, 9, .5), transparent); }
+.me-hero__tekst { position: relative; z-index: 5; width: min(92vw, 660px); margin: max(5.5vh, 40px) auto 0; text-align: center; }
+.me-kicker { margin: 0 0 .5rem; font: 400 .78rem/1.3 var(--me-caps); letter-spacing: .42em; text-transform: uppercase; color: var(--me-n-ink); text-shadow: 0 1px 10px rgba(2, 10, 8, .7); }
+.me-names { margin: 0; display: flex; flex-direction: column; align-items: center; font-family: var(--me-display); font-style: italic; font-weight: 400;
+  font-size: clamp(3rem, 15.2vw, 7.4rem); line-height: .98; letter-spacing: .01em; overflow-wrap: anywhere; }
+.me-names--long { font-size: clamp(2.7rem, 13vw, 5.8rem); }
+.me-names--xlong { font-size: clamp(2.2rem, 10.4vw, 4.6rem); }
+/* Elke naam staat in een 'masker' (overflow verborgen): de letters schuiven er van onderaf in. */
+.me-naam { display: block; overflow: hidden; padding: .08em .14em .14em; margin: -.08em -.14em -.14em; }
+.me-naam__in { display: block; background: var(--me-foil) 20% 0 / 240% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+.me-amp { display: block; font-family: var(--me-script); font-style: normal; font-size: .62em; line-height: .9; color: var(--me-n-goud); margin: .02em 0; }
+/* De regels van SplitText krijgen een masker; padding zodat schuine letters en staarten niet worden afgesneden. */
+.me-regel-mask { padding: .1em .12em .2em; margin: -.1em -.12em -.2em; }
+/* Het lint met de datum: champagnesatijn met gevorkte uiteinden. */
+.me-lint { display: inline-block; margin: 1rem 0 0; padding: .72em 2.6em;
+  background: linear-gradient(100deg, #A98B45 0%, #D9C082 22%, #FFF3CF 48%, #E0C57F 72%, #A98B45 100%);
+  clip-path: polygon(0 0, 100% 0, 96.5% 50%, 100% 100%, 0 100%, 3.5% 50%); }
+.me-lint__tekst { margin: 0; font: 400 .76rem/1 var(--me-caps); letter-spacing: .22em; text-transform: uppercase; color: #0A241B; }
+.me-tagline { margin: .9rem auto 0; max-width: 28ch; font-style: italic; font-size: 1.2rem; line-height: 1.4; color: var(--me-n-ink); text-shadow: 0 1px 10px rgba(2, 10, 8, .8); }
+
+.me-kristallen { position: absolute; left: 50%; top: 18%; width: 150vw; margin-left: -75vw; }
+.me-voor { position: absolute; bottom: -14vw; width: 82vw; }
+.me-voor--l { left: -22vw; } .me-voor--r { right: -22vw; }
+.me-scroll { position: absolute; left: 50%; bottom: 14px; z-index: 9; display: inline-flex; flex-direction: column; align-items: center; gap: .1rem; margin-left: -4.2rem; width: 8.4rem;
+  font: 400 .7rem/1 var(--me-caps); letter-spacing: .28em; text-transform: uppercase; color: var(--me-n-ink); text-decoration: none; text-shadow: 0 1px 8px rgba(2, 10, 8, .9); }
+.me-scroll:focus-visible { outline: 2px solid var(--me-n-goud); outline-offset: 4px; }
+
+@media (min-width: 760px) {
+  .me-hero { --pw: clamp(900px, 118vh, 1560px); }
+  .me-plaat { bottom: 1%; }
+  .me-hero__tekst { margin-top: max(6vh, 40px); }
+  .me-names { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0 .22em; font-size: clamp(3.4rem, 8.2vh, 6.4rem); }
+  .me-names--long { font-size: clamp(2.8rem, 6.8vh, 5.2rem); } .me-names--xlong { font-size: clamp(2.4rem, 5.6vh, 4.2rem); }
+  .me-amp { font-size: .66em; margin: 0; }
+  .me-kristallen { top: 8%; width: 110vw; margin-left: -55vw; }
+  /* De voorgrond is hoogstens iets meer dan een derde van de breedte: op een staande tablet blijft het landgoed met de ringen vrij. */
+  .me-voor { bottom: calc(var(--H) * -.14); width: min(calc(var(--H) * .74), 40vw); }
+  .me-voor--l { left: min(calc(var(--H) * -.1), -3vw); } .me-voor--r { right: min(calc(var(--H) * -.1), -3vw); }
+}
+
+/* ================================================================ één doorlopende uitnodiging */
+.me-body { position: relative; overflow-x: clip; }
+/* Het merkteken onderaan staat op de nachtkleur van het slot. */
+.inv-colophon { --inv-muted: var(--me-n-muted); color: var(--me-n-muted); }
+.me-sec { position: relative; padding: 118px 20px 136px; text-align: center; isolation: isolate; }
+.me-in { position: relative; z-index: 2; width: var(--me-w); margin: 0 auto; }
+.me-sec--ivoor { background: var(--me-ivoor) var(--me-papier-img) 0 0 / 460px; background-blend-mode: soft-light; color: var(--me-ink); }
+.me-sec--ivoor2 { background: var(--me-ivoor-2) var(--me-papier-img) 0 0 / 460px; background-blend-mode: soft-light; color: var(--me-ink); }
+/* Donkere banen: fluweel (smaragd of middernacht) met warm licht van onderen en fijne vezels. */
+.me-sec--nacht { color: var(--me-n-ink); background-color: var(--me-nacht);
+  background-image: radial-gradient(80% 60% at 50% 104%, rgba(205, 177, 115, .22), transparent 70%), var(--me-papier-img), linear-gradient(180deg, var(--me-nacht-2), var(--me-nacht));
+  background-size: auto, 460px, auto; background-blend-mode: normal, soft-light, normal;
+  --inv-text: var(--me-n-ink); --inv-muted: var(--me-n-muted); --inv-accent: var(--me-n-goud); --inv-accent-contrast: var(--me-nacht);
+  --inv-btn-border: color-mix(in srgb, var(--me-n-goud) 70%, transparent); --inv-btn-hover-bg: color-mix(in srgb, var(--me-n-goud) 14%, transparent); --inv-focus: var(--me-n-goud); }
+/* Hoofdstukken lopen in elkaar over: de bovenkant neemt de kleur van het vorige hoofdstuk over en lost er langzaam in op. */
+.me-sec::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 130px; z-index: 1; pointer-events: none; background: linear-gradient(180deg, var(--me-van, transparent), transparent); }
+.me-sec--nacht + :is(.me-sec--ivoor, .me-sec--ivoor2) { --me-van: var(--me-nacht-2); }
+:is(.me-sec--ivoor, .me-sec--ivoor2) + .me-sec--nacht { --me-van: var(--me-ivoor); }
+.me-sec--ivoor + .me-sec--ivoor2 { --me-van: var(--me-ivoor); }
+.me-sec--ivoor2 + .me-sec--ivoor { --me-van: var(--me-ivoor-2); }
+.me-hero + .me-body > .me-sec:first-child { --me-van: var(--me-lucht-2); }
+.me-label { margin: 0 0 .45rem; font: 400 .72rem/1.3 var(--me-caps); letter-spacing: .34em; text-transform: uppercase; color: var(--me-accent-tekst); }
+.me-sec--nacht .me-label { color: var(--me-n-goud); }
+.me-h2 { margin: 0 0 1.4rem; font: italic 500 clamp(2.2rem, 9.4vw, 3.4rem)/1.1 var(--me-display); color: var(--me-ink); }
+.me-sec--nacht .me-h2 { color: var(--me-n-ink); }
+.me-sec p { line-height: 1.55; }
+.me-sec .me-in > p, .me-in .me-split p { margin: 0 0 .85rem; }
+
+/* De gouden draad tussen hoofdstukken (onderkant van een hoofdstuk, over de rand heen). */
+.me-draad { position: absolute; left: 50%; bottom: -46px; z-index: 4; width: min(88vw, 520px); height: auto; margin-left: calc(min(88vw, 520px) / -2); overflow: visible; }
+.me-draad__fijn { opacity: .55; }
+
+/* Donker bladwerk langs de randen: de wereld van de kop loopt door in de uitnodiging. */
+.me-blad { position: absolute; z-index: 1; width: min(44vw, 240px); pointer-events: none; opacity: .94; }
+/* Op een smal scherm lost het blad op voordat het de tekst bereikt (leesbaarheid gaat voor). */
+.me-blad--l { left: -12vw; bottom: -6px; -webkit-mask-image: linear-gradient(0deg, #000 50%, transparent 98%); mask-image: linear-gradient(0deg, #000 50%, transparent 98%); }
+.me-blad--r { right: -12vw; top: -6px; transform: scaleX(-1); -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent 98%); mask-image: linear-gradient(180deg, #000 50%, transparent 98%); }
+.me-sec--nacht .me-blad { opacity: .8; }
+
+/* Welkom: een boogvormige foto met een gouden rand, en de tekst als couture-regels. */
+.me-boogfoto { margin: 0 auto 2rem; width: min(78%, 320px); }
+.me-boogfoto .ph { border-radius: 200px 200px 8px 8px; overflow: hidden; box-shadow: 0 0 0 6px var(--me-papier), 0 0 0 7px var(--me-goud-2), 0 26px 50px -24px rgba(8, 30, 23, .55); }
+.me-welkom__tekst p { font-style: italic; font-size: 1.32rem; }
+
+/* Datum: een enorm cijfer in champagnegoud, als de titel van een film. */
+.me-dag { display: grid; justify-items: center; margin: .4rem 0 1.4rem; }
+.me-dag p { margin: 0; }
+.me-dag__week, .me-dag__maand { font: 400 .82rem/1.3 var(--me-caps); letter-spacing: .34em; text-transform: uppercase; color: var(--me-n-goud); }
+.me-dag__getal { font: italic 400 clamp(7.4rem, 40vw, 13rem)/.92 var(--me-display); background: var(--me-foil); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 6px 22px rgba(205, 177, 115, .28)); }
+.me-datum__tijd { font-size: 1.24rem; margin: 0 0 .3rem; }
+.me-datum__plek { margin: 0; font-style: italic; color: var(--me-n-muted); }
+
+/* Programma langs een gouden draad met kleine ringen. */
+.me-prog { position: relative; display: grid; gap: 1.7rem; width: min(100%, 480px); margin: 0 auto; padding: 0; list-style: none; text-align: left; }
+.me-prog__lijn { position: absolute; left: 14px; top: 10px; bottom: 10px; width: 2px; background: linear-gradient(var(--me-goud), color-mix(in srgb, var(--me-goud) 25%, transparent)); transform-origin: 50% 0; list-style: none; }
+.me-prog__item { position: relative; display: grid; grid-template-columns: 30px 1fr; gap: 16px; align-items: start; }
+.me-prog__ring { position: relative; width: 30px; height: 30px; margin-top: 2px; border-radius: 50%; border: 3px solid var(--me-goud); background: var(--me-ivoor);
+  box-shadow: inset 0 0 0 3px var(--me-ivoor), 0 0 0 1px var(--me-goud-2), 0 4px 8px -3px rgba(40, 30, 10, .4); }
+.me-prog__item p { margin: 0; }
+.me-prog__tijd { font: 400 .78rem/1.4 var(--me-caps); letter-spacing: .2em; color: var(--me-goud-ink); }
+.me-prog__titel { font: italic 500 1.4rem/1.25 var(--me-display); }
+.me-prog__tekst { margin-top: .25rem !important; color: var(--me-muted); }
+
+/* Locatie: een boogvenster waar je doorheen naar het landgoed kijkt (het beeld beweegt bij het scrollen). */
+.me-venster { position: relative; width: min(88%, 400px); aspect-ratio: 4 / 5; margin: 0 auto 1.8rem; border-radius: 200px 200px 8px 8px; overflow: hidden;
+  background: linear-gradient(180deg, var(--me-lucht-2), var(--me-lucht-4));
+  box-shadow: 0 0 0 6px var(--me-nacht), 0 0 0 8px var(--me-goud), 0 0 0 9px rgba(255, 240, 200, .45), 0 34px 60px -22px rgba(0, 0, 0, .7); }
+.me-venster__beeld { position: absolute; left: 50%; bottom: -4%; width: 250%; margin-left: -125%; }
+.me-locatie__naam { margin: 0; font: italic 500 1.5rem/1.3 var(--me-display); }
+.me-locatie__adres { margin: .3rem 0 .6rem; font-style: normal; color: var(--me-n-muted); }
+.me-locatie__wanneer { margin: 0 0 1.2rem; }
+
+/* Dresscode als satijnen linten. */
+.me-linten { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; margin: 0 0 1.2rem; padding: 0; list-style: none; }
+.me-lintje { width: 42px; height: 76px; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 84%, 0 100%);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--c) 78%, #000), var(--c) 30%, color-mix(in srgb, var(--c) 60%, #fff) 50%, var(--c) 70%, color-mix(in srgb, var(--c) 78%, #000)); }
+
+.me-fotos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: min(100%, 520px); margin: 0 auto; padding: 0; list-style: none; }
+.me-foto figure { margin: 0; }
+.me-foto:nth-child(even) { margin-top: 26px; }
+.me-foto .ph { border-radius: 120px 120px 6px 6px; overflow: hidden; box-shadow: 0 0 0 4px var(--me-papier), 0 0 0 5px var(--me-goud-2), 0 16px 28px -18px rgba(8, 30, 23, .5); }
+.me-foto figcaption { margin-top: .45rem; font-size: .95rem; font-style: italic; color: var(--me-muted); }
+.me-praktisch__lijst { display: grid; gap: 1.1rem; width: min(100%, 480px); margin: 0 auto; text-align: left; }
+.me-praktisch__item dt { font: 400 .78rem/1.3 var(--me-caps); letter-spacing: .2em; text-transform: uppercase; color: var(--me-accent-tekst); }
+.me-praktisch__item dd { margin: .2rem 0 0; }
+
+.me-aanmelden { padding-bottom: 150px; }
+.me-formulier { width: min(100%, 500px); margin: 0 auto; padding: 32px 7% 28px; text-align: left; border-radius: 6px;
+  background: var(--me-papier) var(--me-papier-img) 0 0 / 420px; background-blend-mode: soft-light;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--me-goud-2) 55%, transparent), 0 28px 50px -26px rgba(8, 30, 23, .5); }
+.me-contact__naam { margin: .3rem 0; font-weight: 600; }
+
+/* Slot: terug in de avond, met het landgoed, de ringen en de namen. */
+.me-slot { padding-bottom: 80px; }
+.me-nachtsterren { position: absolute; left: 0; top: 0; z-index: 0; width: 100%; height: 100%; opacity: .8; }
+.me-slot__wereld { position: relative; width: 100vw; height: min(64vw, 380px); margin: 0 0 1.2rem calc(50% - 50vw); overflow: hidden; -webkit-mask-image: radial-gradient(ellipse 52% 62% at 50% 54%, #000 62%, transparent 100%); mask-image: radial-gradient(ellipse 52% 62% at 50% 54%, #000 62%, transparent 100%); }
+.me-slot__beeld { position: absolute; left: 50%; bottom: 0; width: max(150%, 640px); margin-left: calc(max(150%, 640px) / -2); }
+.me-slot__ring { position: absolute; left: 50%; top: 14%; width: min(48%, 230px); margin-left: calc(min(48%, 230px) / -2); filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .5)); }
+.me-slot__wens { margin: 0 0 .2rem; font: 400 .8rem/1.3 var(--me-caps); letter-spacing: .34em; text-transform: uppercase; color: var(--me-n-goud); }
+.me-slot__namen { margin: 0; font: italic 400 clamp(2.6rem, 12vw, 4.6rem)/1.05 var(--me-display);
+  background: var(--me-foil); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+.me-slot__tekst { margin: .9rem auto 0 !important; max-width: 34ch; }
+
+@media (min-width: 760px) {
+  .me-sec { padding-top: 150px; padding-bottom: 170px; }
+  .me-blad { width: min(23vw, 320px); -webkit-mask-image: none; mask-image: none; }
+  .me-blad--l { left: calc(50% - 720px); bottom: 6%; } .me-blad--r { right: calc(50% - 720px); top: 5%; }
+}

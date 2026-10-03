@@ -56,7 +56,7 @@ class FullJourneyTests(VaylideTestCase):
         self.assertEqual(preview["X-Frame-Options"], "SAMEORIGIN")
 
         # Account/verificatie is nodig om te betalen.
-        response = c.post(f"/maken/{uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on"})
+        response = c.post(f"/maken/{uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on", "online_dienst": "on"})
         self.assertContains(response, "Bevestig eerst je e-mailadres")
         self.assertFalse(Order.objects.exists())
 
@@ -68,7 +68,7 @@ class FullJourneyTests(VaylideTestCase):
         self.assertEqual(inv.owner.email, "sanne@example.com")
 
         # 8-9. Controleren en (test)betalen: het bedrag komt van de server.
-        response = c.post(f"/maken/{uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on", "total": "1"})
+        response = c.post(f"/maken/{uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on", "online_dienst": "on", "total": "1"})
         self.assertEqual(response.status_code, 302)
         order = Order.objects.get()
         self.assertEqual(order.total_cents, 3900)
@@ -237,11 +237,11 @@ class InvalidInputTests(VaylideTestCase):
         self.inv.owner = customer
         self.inv.save()
         self.c.force_login(customer)
-        response = self.c.post(f"/maken/{self.inv.uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on"})
+        response = self.c.post(f"/maken/{self.inv.uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on", "online_dienst": "on"})
         self.assertContains(response, "nog niet compleet")
         self.assertFalse(Order.objects.exists())
         complete = self.make_invitation(owner=customer)
-        response = self.c.post(f"/maken/{complete.uid}/bestellen/", {"actie": "betalen", "package": "gratis-alles", "terms": "on", "direct_leveren": "on"})
+        response = self.c.post(f"/maken/{complete.uid}/bestellen/", {"actie": "betalen", "package": "gratis-alles", "terms": "on", "direct_leveren": "on", "online_dienst": "on"})
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Order.objects.exists())
         response = self.c.post(f"/maken/{complete.uid}/bestellen/", {"actie": "betalen", "package": "essentieel"})
@@ -250,5 +250,5 @@ class InvalidInputTests(VaylideTestCase):
         # Het vinkje noemt de versie van de voorwaarden, zonder het woord "concept".
         page = self.c.get(f"/maken/{complete.uid}/bestellen/").content.decode()
         label = page.split('class="check terms-check"', 1)[1].split("</label>", 1)[0]
-        self.assertIn("(versie 29 september 2026)", label)
+        self.assertIn("Versie 29 september 2026", label)
         self.assertNotIn("concept", label.lower())

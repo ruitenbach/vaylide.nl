@@ -24,4 +24,6 @@ urlpatterns = [
     path("sitemap.xml", views.sitemap_xml, name="sitemap"),
     path("healthz", views.healthz, name="healthz"),
     path("intern/taken/", views.cron_jobs, name="cron_jobs"),
+    # Alleen lokaal (DEBUG): ontwerpstudio voor de VAYLIDE Envelope Collection.
+    path("lab/enveloppen/", views.envelop_lab, name="envelop_lab"),
 ]

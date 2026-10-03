@@ -1,0 +1,24 @@
+{
+  "slug": "rose-royale",
+  "version": 1,
+  "name": "Rosé Royale",
+  "tagline": "Een roségouden avond in de rozentuin: een lakzegel, een oranjerie in het schemerlicht en jullie namen in de lucht",
+  "description": "Het begint met de Rose Blush-envelop: een roségouden zegel met een roos breekt, de klep gaat open en de kaart schuift eruit. Dan opent de camera op een rozentuin in de schemering: een verlichte oranjerie die zich spiegelt in de vijver, een roségouden boog, sterren en een sikkelmaan, en vooraan cascades van rozen in blush, ivoor en oudroze. Jullie namen staan in roségoudfolie in de avondlucht. Daarna loopt de kaart als één geheel door: een medaillon met de datum, het programma langs een rozenrank, de locatie in een boogvenster, het aanmelden en een slot in de schemering. Alle beelden zijn eigen tekeningen.",
+  "style_notes": "Rosé, blush en roségoud, gelaagde rozen, oranjerie in de schemering, diepte en glans, koninklijk en romantisch",
+  "occasions": ["bruiloft", "verloving"],
+  "sort_order": 8,
+  "opening": "envelop",
+  "envelope_mode": "built_in",
+  "opening_label": "Rose Blush-envelop met lakzegel (Envelope Collection)",
+  "demo_melody": "canon",
+  "kaartbeeld": "open",
+  "palettes": [
+    {"key": "blush", "name": "Blush & roségoud", "swatch": ["#F6E7E2", "#C98B7E", "#3B2433"],
+     "vars": {"--rr-page": "#F6E7E2", "--rr-page-2": "#EFD6D0", "--rr-paper": "#FCF5F2", "--rr-ink": "#3E2530", "--rr-muted": "#6E4F57", "--rr-rose-ink": "#874455", "--rr-gold": "#C98B7E", "--rr-gold-2": "#A8625E", "--rr-accent": "#874455", "--rr-accent-ink": "#FFF6F2", "--rr-dusk": "#3B2433", "--rr-dusk-2": "#5A3448", "--rr-dusk-ink": "#FBEDEA", "--rr-dusk-muted": "#E8CFCF", "--rr-dusk-gold": "#F0C3B0", "--fx-1": "#E7A9A9", "--fx-2": "#FFFFFF", "--fx-3": "#C98B7E", "--fx-4": "#F6D3C3", "--fx-bg": "#F6E7E2", "--fx-shine": "#A8625E"}},
+    {"key": "ivoor", "name": "Ivoor & roségoud", "swatch": ["#F7F0E8", "#C98B7E", "#3A2531"],
+     "vars": {"--rr-page": "#F7F0E8", "--rr-page-2": "#EEE2D6", "--rr-paper": "#FFFBF6", "--rr-ink": "#3A2A26", "--rr-muted": "#665049", "--rr-rose-ink": "#83495A", "--rr-gold": "#C98B7E", "--rr-gold-2": "#A2615A", "--rr-accent": "#83495A", "--rr-accent-ink": "#FFF8F3", "--rr-dusk": "#3A2531", "--rr-dusk-2": "#573547", "--rr-dusk-ink": "#FBEFEA", "--rr-dusk-muted": "#E6D0CD", "--rr-dusk-gold": "#F0C6B2", "--fx-1": "#EBC3B8", "--fx-2": "#FFFFFF", "--fx-3": "#C98B7E", "--fx-4": "#F6D9CB", "--fx-bg": "#F7F0E8", "--fx-shine": "#A2615A"}}
+  ],
+  "sections": ["countdown", "story", "gallery", "program", "location", "dresscode", "practical", "rsvp", "contact", "closing", "music"],
+  "effects": {"sfeer": "blaadjes", "knal": "blaadjes", "viering": "harten", "namen": "schrijf", "onthul": "zacht", "extra": ["kenburns", "tik"]},
+  "changelog": "Eerste versie: een rozentuin in de schemering met de Rose Blush-envelop als opening."
+}

@@ -1,0 +1,6 @@
+{# Het lakzegel (viewBox 0 0 120): schaduw, kleur van de was, licht en schaduw (hard-light) en glans (screen) uit één hoogtekaart, en een glimlicht dat bij het aantikken oplicht. Wordt twee keer gebruikt: bovenste en onderste helft. #}
+<ellipse class="vx-seal__shadow" cx="62" cy="66" rx="48" ry="46"/>
+<g filter="url(#vx-wax-{{ env.uid }})"><path fill="url(#vx-wax-body-{{ env.uid }})" d="{% include 'partials/envelop/_zegel_rand.svg' %}"/></g>
+<g class="vx-seal__shade" filter="url(#vx-wax-shade-{{ env.uid }})">{% include "partials/envelop/_zegel_hoogte.html" %}</g>
+<g class="vx-seal__spec" filter="url(#vx-wax-spec-{{ env.uid }})">{% include "partials/envelop/_zegel_hoogte.html" %}</g>
+<ellipse class="vx-seal__glint" cx="46" cy="40" rx="22" ry="10" transform="rotate(-32 46 40)"/>

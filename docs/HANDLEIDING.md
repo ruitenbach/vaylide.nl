@@ -167,6 +167,18 @@ static/img/designs/mijn-ontwerp.webp   ← voorbeeldafbeelding (800×1000), opti
 7. **Publiceren**: controleer het in **Beheer → Ontwerpen** (zichtbaar, volgorde) en zet het live met een nieuwe deployment.
 8. **Testen**: `python manage.py test tests`. Het is ook verstandig de browsercontrole te draaien (zie `docs/CONTROLES.md`).
 
+### Ontwerp met GSAP (Midnight Émeraude)
+
+`designs/midnight-emeraude/v1/` laat zien hoe een ontwerp zijn beweging met GSAP doet: het template laadt in het blok `preload` de vier bestanden uit `static/vendor/gsap/` (met `defer`, vóór het eigen script) en `midnight-emeraude.js`; de stylesheet bevat alleen opmaak. Regels: één master-timeline voor de opening (`addPause` op de tik), twee lagen per beeld (`.me-l` voor de film, `.me-p` voor de parallax bij het scrollen, zodat ze elkaar niet in de weg zitten), alles in `gsap.matchMedia` en `gsap.context` zodat 'minder beweging' en de knop Beweging de rustige eindstand geven, geen CSS die iets verbergt dat GSAP later toont, en alleen `transform` en `opacity` animeren op grote lagen (geen bewegende filters). GSAP bijwerken: zie `static/vendor/gsap/README.md`. Beelden opnieuw maken: `python tools/midnight_emeraude/maak_beelden.py` en `maak_tekeningen.py`.
+
+## Envelop & zegel (Envelope Collection) in de Studio
+
+De klant kiest bij sommige ontwerpen een envelop en een zegel als losse laag om het ontwerp. Per ontwerp bepaalt `envelope_mode` of dat kan: in het manifest (`"envelope_mode": "optional" | "built_in" | "none"`, wint) of in `catalog/envelop_collectie.py` (`ONTWERP_MODUS`); zonder waarde is het `built_in` (de eigen opening van het ontwerp blijft). Een ontwerp dat zelf een envelop uit de collectie als opening heeft, zet `built_in`. Een nieuwe envelop of een nieuw zegel toevoegen: een item in `STIJLEN` of `ZEGELS` (artwork uit `tools/enveloppen/`), een regel in `KEUZE` (gelegenheden, passende zegels, beweging, duur, achtergrond), en voorbeeldbeelden maken met `node e2e/envelop_voorbeelden.cjs` en `python tools/enveloppen/maak_voorbeelden.py`. De keuze staat in `draft_content.style.envelop.collectie`; zonder keuze is er niets veranderd.
+
+Uitleg voor de klant: bovenaan de stap staat dat de envelop alleen bepaalt hoe gasten de uitnodiging openen en dat de uitnodiging zelf niet verandert. "Opening van het ontwerp" heet daar "De eigen opening van <ontwerpnaam>" (niet het technische `opening_label`). Een envelop die net zo heet als een ontwerp (Midnight Émeraude, Golden Noël) heet in de keuzelijst "… envelop"; de codes en stijlnamen blijven gelijk. Een ontwerp zonder deze stap zegt in Gegevens en Stijl "Dit ontwerp heeft een eigen opening (…)".
+
+Oude envelop- en zegelkeuzes (stap Stijl): de Studio toont alleen keuzes die bij het ontwerp echt iets veranderen (`catalog/envelop.py`, `zegelkeuzes()`). Ontwerpen die zelf de Envelope Collection gebruiken staan in `COLLECTIE_INGEBOUWD` met de oude keuzes die er werken: Midnight Émeraude alleen de initialen, Rosé Royale en Golden Noël niets. Voeg je een ontwerp toe dat `{% vx_envelop %}` in zijn sjabloon gebruikt, zet het dan in die lijst; `tests/test_envelop_stijl.py` controleert dat.
+
 ## Effecten
 
 Elk ontwerp heeft bewegende effecten: zwevende deeltjes (sfeer), een knal op het moment dat de uitnodiging opengaat, een feestje als een gast laat weten dat hij komt, een entree voor de namen, onthullingen bij het scrollen en een paar extra's. De keuzes staan per ontwerp in `manifest.json` in het blok `effects` (bij Atelier-ontwerpen in `tools/atelier/specs.py`, de generator zet ze in het manifest). De werking staat in `invitations/static/invitations/effects.js` en `effects.css`, de toegestane waarden in `catalog/effects.py`.
@@ -224,6 +236,8 @@ Pas je de scène aan (een nieuwe versie), controleer dan het contrast van de tek
 Welk tekeningetje een programmaonderdeel krijgt, staat in `PROGRAM_ICONS` in `invitations/render.py` (op trefwoorden zoals "diner", "glühwein" of "cadeau"). Een nieuw tekeningetje voeg je toe in `_icoon.html` en in die lijst.
 
 Ook voor Winterlicht geldt: na de livegang gaan wijzigingen via een `v2`, ook nieuwe beelden.
+
+**Het ontwerp Golden Noël** (`designs/golden-noel/v1/`) is een kerstspecial (`"special": true`): het staat onder Specials en is pas te bestellen als er in Beheer → Prijzen een extra optie met functie 'special' en code `special-golden-noel` is (er staat bewust geen prijs klaar). De opening is de envelop uit de VAYLIDE Envelope Collection (`catalog/envelop_collectie.py`, stijl `golden-noel`), in het sjabloon geplaatst met `{% load envelop_tags %}{% vx_envelop "golden-noel" ... as env %}` en `{% include "partials/envelop/collectie.html" %}`; het zegel is dan een link met `data-open`, zodat de uitnodiging ook zonder JavaScript opent. De envelop opent in ongeveer 3,8 seconden, daarna vervaagt het openingsscherm (`data-duration="4500"`). De decoratie van de kaart (boog van wintergroen met lichtjes, sectieslinger, hoektakken, scheiding, sneeuwkristal) maak je opnieuw met `python tools/golden_noel/maak_tekeningen.py`; `golden-noel.js` geeft de lichtvlekken en de boog diepte bij het scrollen (alleen met beweging aan). Controleer met `node e2e/golden_noel.cjs <basis-url> <uitvoermap>` (envelop tot kaart) en `node e2e/golden_noel_kaart.cjs <basis-url> <uitvoermap>` (de kaart per kleurvariant).
 
 ## Een bestaand ontwerp aanpassen
 

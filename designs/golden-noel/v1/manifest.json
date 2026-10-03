@@ -1,0 +1,25 @@
+{
+  "slug": "golden-noel",
+  "version": 1,
+  "name": "Golden Noël",
+  "tagline": "Een winteravond vol kaarslicht: een gouden kerstenvelop, en daarin een kerstkaart als een boutique kersthotel",
+  "description": "Een warm ivoren envelop met wintergroen, hulst en kerstballen in goudfolie en een champagnegouden lakzegel met de V. Na een tik breekt het zegel, gaat de klep open en schuift de kaart eruit. Daarin een gewelfd ivoren paneel onder een boog van wintergroen, eucalyptus en hulst met warme lichtjes, vijf kerstballen in kaarslichtgoud, champagne en parel, twee kaarsen en jullie namen in goudfolie in een zachte gloed. Daarna hoofdstukken in licht en kaarslicht: de datum, het programma, aftellen, de locatie, het aanmelden. Een special uit de VAYLIDE Envelope Collection.",
+  "style_notes": "Ivoor en champagne met kaarslichtgoud, wintergroen en eucalyptus, warme lichtjes, kaarsen, boutique kersthotel, editorial",
+  "occasions": ["kerst"],
+  "sort_order": 39,
+  "special": true,
+  "opening": "envelop",
+  "envelope_mode": "built_in",
+  "opening_label": "Envelop met lakzegel (Envelope Collection)",
+  "demo_melody": "we-wish-you",
+  "kaartbeeld": "open",
+  "palettes": [
+    {"key": "ivoor", "name": "Ivoor & goud", "swatch": ["#FBF7EE", "#C8A35A", "#3A2F22"],
+     "vars": {"--gn-page": "#EFE6D4", "--gn-page-2": "#E6DAC3", "--gn-card": "#FCF9F2", "--gn-card-2": "#F6F0E4", "--gn-ink": "#2F261B", "--gn-muted": "#5C4F3D", "--gn-gold": "#C8A35A", "--gn-gold-2": "#9A7633", "--gn-gold-ink": "#6E5222", "--gn-line": "#E3D6BD", "--gn-accent": "#6E5222", "--gn-accent-ink": "#FFF8EA", "--gn-night": "#2A1F14", "--gn-night-2": "#3B2C1C", "--gn-night-ink": "#F6EDDC", "--gn-night-muted": "#DCCDB3", "--gn-night-gold": "#E6CC93", "--gn-glow": "#FFD58A", "--fx-1": "#C8A35A", "--fx-2": "#FFFFFF", "--fx-3": "#E9D3A0", "--fx-4": "#B08A42", "--fx-bg": "#EFE6D4", "--fx-shine": "#9A7633"}},
+    {"key": "champagne", "name": "Champagne & goud", "swatch": ["#F3E7D2", "#B8914A", "#3B2E1F"],
+     "vars": {"--gn-page": "#E8D9BE", "--gn-page-2": "#DCCAA9", "--gn-card": "#FAF3E6", "--gn-card-2": "#F2E7D3", "--gn-ink": "#30251A", "--gn-muted": "#5A4A35", "--gn-gold": "#B8914A", "--gn-gold-2": "#8C6A2C", "--gn-gold-ink": "#664B1D", "--gn-line": "#DDCCAE", "--gn-accent": "#664B1D", "--gn-accent-ink": "#FFF6E4", "--gn-night": "#2C2016", "--gn-night-2": "#3E2E1D", "--gn-night-ink": "#F5EBD8", "--gn-night-muted": "#DACAAE", "--gn-night-gold": "#E2C68C", "--gn-glow": "#FFCF7F", "--fx-1": "#B8914A", "--fx-2": "#FFFFFF", "--fx-3": "#E2C890", "--fx-4": "#9A7633", "--fx-bg": "#E8D9BE", "--fx-shine": "#8C6A2C"}}
+  ],
+  "sections": ["countdown", "story", "gallery", "program", "location", "dresscode", "practical", "rsvp", "contact", "closing", "music"],
+  "effects": {"sfeer": "goudstof", "knal": "sneeuw", "viering": "sterren", "namen": "folie", "onthul": "zacht", "extra": ["kenburns", "tik"]},
+  "changelog": "Eerste versie: kerstspecial met de envelop uit de VAYLIDE Envelope Collection als opening, en een kaart als een winteravond vol kaarslicht."
+}

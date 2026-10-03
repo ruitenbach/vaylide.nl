@@ -97,11 +97,11 @@ class MailTests(VaylideTestCase):
         confirmation = OutboundEmail.objects.get(order=order, kind="order_confirmation")
         html = confirmation.body_html
         for text in ("Bedankt voor je bestelling", order.number, "Ontwerp", "Liefde op papier", "Pakket", "Essentieel", "Extra opties",
-                     "Langer online", "Aankoopdatum", "Online tot en met", order.total_display, "pdf-bijlage",
-                     "Hier de overeenkomst ontbinden", "toestemming voor directe levering", "KvK-nummer"):
+                     "Langer online", "Aankoopdatum", "Online tot en met", order.total_display, "als pdf bij deze e-mail gevoegd",
+                     "Hier de overeenkomst ontbinden", "Directe levering en bedenktijd", "KvK-nummer"):
             self.assertIn(text, html)
         self.assertIn("Ontwerp: Liefde op papier", confirmation.body_text)
-        self.assertIn("pdf-bijlage", confirmation.body_text)
+        self.assertIn("als pdf bij deze e-mail gevoegd", confirmation.body_text)
         self.assertNotIn("<script", html)
 
     def test_customer_input_is_escaped_once(self):

@@ -1,0 +1,301 @@
+/* VAYLIDE Envelope Collection: de envelop-engine. Eén bouw en één animatie; stijlen kiezen alleen materiaal en decoratie.
+   Markup: templates/partials/envelop/collectie.html; stijlen en zegels: catalog/envelop_collectie.py;
+   bediening: static/js/envelop-collectie.js. Papier, decoraties en voeringen komen uit tools/enveloppen/.
+   De waskleuren van het zegel komen als variabelen uit het style-attribuut (het zegel is los te kiezen). */
+
+@font-face { font-family: "Cormorant Garamond"; src: url("../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+
+/* ---------- Stijlen ---------------------------------------------------------------------------------------------- */
+.vx {
+  /* Signature Ivory (benchmark, naar het Canva-ontwerp): warm greige-ivoor papier, een botanisch boeket in blinddruk
+     op een diepe puntflap, een champagne-botanische voering. */
+  --vx-paper: #EAE1D1; --vx-paper-hi: #F3EDE2; --vx-paper-lo: #D6C9B4; --vx-inside: #E2D8C6; --vx-inside-lo: #CFC2AC;
+  --vx-relief: .8; --vx-relief-print: .5;
+  --vx-foil: #B4955A; --vx-liner-bg: #ECE5D7;
+  --vx-lift: rgba(96, 72, 44, .2); --vx-edge: rgba(255, 253, 248, .85);
+  --vx-card: #FCF9F3; --vx-card-ink: #45372A; --vx-card-soft: #8F7A5C;
+  --vx-texture: 1; --vx-texture-blend: soft-light;
+  --vx-shadow: 78, 58, 38;
+  --vx-sheen: rgba(255, 252, 244, .55);
+}
+.vx--royal-evergreen {
+  /* Royal Evergreen (kerstbenchmark, naar het Canva-ontwerp): warm kraft-ivoor met een gedrukte dennenslinger in diep
+     groen, hulst en rode bessen, kerstballen in rood en champagnegoud, en een diepgroen zegel met krans. */
+  --vx-paper: #E7DAC2; --vx-paper-hi: #F0E7D6; --vx-paper-lo: #CFC0A4; --vx-inside: #E1D3B9; --vx-inside-lo: #CBBB9E;
+  --vx-relief-print: .55;
+  --vx-card: #FBF7EE; --vx-card-ink: #2F3B2C; --vx-card-soft: #7C6A45;
+  --vx-shadow: 70, 54, 34;
+  --vx-pine-dark: #34523A; --vx-pine-light: #708D63; --vx-holly: #2E4E34; --vx-berry: #8C2328;
+  --vx-bauble-red: #7B2026; --vx-bauble-gold: #C8A35A; --vx-twig: #6E5A3E;
+  --vx-foil: #C3A157; --vx-liner-bg: #EEE6D6;
+}
+.vx--golden-noel {
+  /* Golden Noël (kerstspecial): warm ivoor en champagne; het wintergroen, de hulst en de kerstballen in goudfolie
+     (dezelfde slinger als Royal Evergreen, in goud), een gouden dennenvoering en een champagnegouden zegel. */
+  --vx-paper: #EFE6D4; --vx-paper-hi: #F7F1E6; --vx-paper-lo: #DCCFB6; --vx-inside: #E8DDC8; --vx-inside-lo: #D5C7AC;
+  --vx-relief-print: .75;
+  --vx-card: #FCF9F2; --vx-card-ink: #3A2F22; --vx-card-soft: #634C22;
+  --vx-shadow: 92, 70, 38;
+  --vx-pine-dark: #A9853F; --vx-pine-light: #D6BB7E; --vx-holly: #B38D47; --vx-berry: #C7A158;
+  --vx-bauble-red: #EDE2CB; --vx-bauble-gold: #C49E55; --vx-twig: #9A7A3E;
+  --vx-foil: #B48E48; --vx-liner-bg: #F3ECDD;
+}
+.vx--golden-noel .vx-deco--binnen .vx-needle--dark { stroke: #B08C47; }
+.vx--golden-noel .vx-deco--binnen .vx-needle--light { stroke: #D6BB7E; }
+.vx--golden-noel .vx-deco--binnen .vx-berry--red { fill: #C7A158; }
+.vx--rose-blush {
+  /* Rose Blush (special, naar het Canva-ontwerp): zacht poederroze vilt/katoenpapier, slanke takjes in blinddruk,
+     een roségouden zegel met een roos, voering in blush met een roségouden print en goudfolielijn. */
+  --vx-paper: #E6C7B6; --vx-paper-hi: #EFD6C9; --vx-paper-lo: #D2AD99; --vx-inside: #E2C3B2; --vx-inside-lo: #CDA894;
+  --vx-relief: .72;
+  --vx-foil: #BC8A70; --vx-liner-bg: #F2DFD5;
+  --vx-lift: rgba(110, 66, 50, .2); --vx-edge: rgba(255, 244, 238, .8);
+  --vx-card: #FCF8F5; --vx-card-ink: #54392F; --vx-card-soft: #7A4E40;
+  --vx-shadow: 98, 62, 50;
+  --vx-sheen: rgba(255, 246, 240, .5);
+}
+.vx--midnight-emeraude {
+  /* Midnight Émeraude: diep smaragdgroen, licht fluwelig papier; een champagnegouden zegel en goudfolie. */
+  --vx-paper: #1C5240; --vx-paper-hi: #27705A; --vx-paper-lo: #103A2E; --vx-inside: #17463A; --vx-inside-lo: #0E3027;
+  --vx-relief: .9; --vx-relief-print: .6;
+  --vx-foil: #CDB173; --vx-liner-bg: #14382C;
+  --vx-lift: rgba(2, 14, 10, .5); --vx-edge: rgba(255, 238, 196, .26);
+  --vx-card: #F7F1E3; --vx-card-ink: #17261F; --vx-card-soft: #6B5A22;
+  --vx-texture: .85;
+  --vx-shadow: 3, 16, 12;
+  --vx-sheen: rgba(255, 240, 200, .3);
+}
+.vx--sage {
+  /* Sage Romance: hetzelfde ivoor, iets koeler. (Nog niet uitgewerkt.) */
+  --vx-paper: #F2EEE4; --vx-paper-hi: #FAF8F2; --vx-paper-lo: #DFD9CA; --vx-inside: #E8E3D5; --vx-inside-lo: #D6D0BF;
+  --vx-card-soft: #7C8A6E;
+}
+.vx--noisette {
+  /* Noisette Luxe: diep chocolade mat papier. (Nog niet uitgewerkt.) */
+  --vx-paper: #5B3F31; --vx-paper-hi: #6C4D3D; --vx-paper-lo: #46301F; --vx-inside: #4E3528; --vx-inside-lo: #3C281D;
+  --vx-relief: .9;
+  --vx-lift: rgba(10, 5, 2, .45); --vx-edge: rgba(255, 226, 196, .22);
+  --vx-card: #F6EFE2; --vx-card-ink: #3E2C20; --vx-card-soft: #9A7C4E;
+  --vx-texture: .75;
+  --vx-shadow: 22, 12, 6;
+  --vx-sheen: rgba(255, 232, 196, .22);
+}
+
+/* Kleuren voor SVG-verlopen en filters (stop-color, flood-color en lighting-color volgen de variabelen hierboven). */
+.vx .vx-c-paper { stop-color: var(--vx-paper); }
+.vx .vx-c-paper-hi { stop-color: var(--vx-paper-hi); }
+.vx .vx-c-paper-lo { stop-color: var(--vx-paper-lo); }
+.vx .vx-c-inside { stop-color: var(--vx-inside); }
+.vx .vx-c-inside-lo { stop-color: var(--vx-inside-lo); }
+.vx .vx-c-wax-hi { stop-color: var(--vx-wax-hi); }
+.vx .vx-c-wax { stop-color: var(--vx-wax); }
+.vx .vx-c-wax-lo { stop-color: var(--vx-wax-lo); }
+.vx .vx-c-spec { lighting-color: var(--vx-wax-spec); }
+.vx .vx-lift { flood-color: var(--vx-lift); }
+.vx .vx-c-liner-bg { stop-color: var(--vx-liner-bg, var(--vx-inside)); stop-opacity: .94; }
+.vx .vx-c-liner-bg--uit { stop-opacity: 0; }
+
+/* ---------- Opbouw ----------------------------------------------------------------------------------------------- */
+/* Op een telefoon bijna de hele breedte (16 px marge); boven de envelop ruimte voor de open flap. Als de kaart uitkomt,
+   zakt de envelop iets, zodat kaart en envelop samen in beeld blijven. */
+.vx { --vx-w: min(calc(100vw - 32px), 500px); position: relative; display: grid; justify-items: center; gap: 1.1rem; width: 100%; }
+.vx-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.vx-stage { position: relative; width: var(--vx-w); padding-top: calc(var(--vx-w) * .7 * .64); }
+.vx-env { position: relative; width: 100%; aspect-ratio: 10 / 7; perspective: 1700px; transition: transform 1.3s cubic-bezier(.4, .1, .25, 1); }
+
+.vx-shadow { position: absolute; left: 4%; right: 4%; bottom: -5%; height: 12%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(var(--vx-shadow), .34), rgba(var(--vx-shadow), .12) 60%, transparent);
+  filter: blur(6px); transition: opacity .8s ease, transform .8s ease; }
+
+.vx-back { position: absolute; inset: 0; z-index: 1; border-radius: 2px; overflow: hidden;
+  background: var(--vx-inside) url("../img/envelop/papier.webp") 0 0 / 440px; background-blend-mode: var(--vx-texture-blend);
+  box-shadow: 0 1px 1px rgba(var(--vx-shadow), .10), 0 10px 18px -8px rgba(var(--vx-shadow), .24), 0 36px 64px -30px rgba(var(--vx-shadow), .40); }
+/* Binnenvoering achterin (zichtbaar boven de kaart): dezelfde print als in de flap. */
+.vx-liner--back { position: absolute; left: 4.6%; right: 4.6%; top: 3%; height: 60%; background-size: calc(var(--vx-w) * .3); }
+
+/* De kaart: zwaar katoenkarton met een geschepte rand. Tijdelijk: het echte kaartontwerp volgt later. */
+.vx-card { position: absolute; left: 6.5%; right: 6.5%; top: 5.5%; height: 88%; z-index: 2; color: var(--vx-card-ink);
+  filter: drop-shadow(0 1px 1.5px rgba(var(--vx-shadow), .22));
+  transition: transform .5s cubic-bezier(.2, .7, .2, 1), filter .9s ease; }
+.vx-card__paper { position: absolute; inset: 0; background: var(--vx-card) url("../img/envelop/papier.webp") 0 0 / 380px; background-blend-mode: soft-light; }
+.vx-card__body { position: relative; height: 100%; display: grid; align-content: center; justify-items: center; gap: .45rem; padding: 8% 7%; text-align: center; }
+.vx-card__kicker { font: 500 .58rem/1.2 "Cormorant Garamond", Georgia, serif; letter-spacing: .32em; text-transform: uppercase; color: var(--vx-card-soft); }
+.vx-card__title { font: italic 400 clamp(1.45rem, 6.4vw, 1.95rem)/1.05 "Cormorant Garamond", Georgia, serif; letter-spacing: .01em; }
+.vx-card__rule { width: 2.2rem; height: 1px; background: currentColor; opacity: .28; }
+.vx-card__date { font: 500 .68rem/1.2 "Cormorant Garamond", Georgia, serif; font-variant-numeric: lining-nums; letter-spacing: .3em; color: var(--vx-card-soft); }
+/* Schaduw van de voorkant van de envelop op de kaart, zolang hij er nog in zit. */
+.vx-card__pocketshade { position: absolute; inset: 0; pointer-events: none; transition: opacity .8s ease;
+  background: linear-gradient(to top, rgba(var(--vx-shadow), .26), rgba(var(--vx-shadow), .08) 40%, transparent 62%); }
+
+/* Schaduw die de flap tijdens het openen op het binnenste werpt (op de achterkant en voering, onder de kaart). */
+.vx-flapcast { position: absolute; left: 0; right: 0; top: 0; height: 46%; z-index: 1; pointer-events: none; opacity: 0;
+  background: linear-gradient(to bottom, rgba(var(--vx-shadow), .42), rgba(var(--vx-shadow), .12) 55%, transparent); }
+
+.vx-pocket { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 -1px 0 rgba(var(--vx-shadow), .05)); }
+.vx-texture { opacity: var(--vx-texture); mix-blend-mode: var(--vx-texture-blend); }
+.vx-edge { fill: none; stroke: var(--vx-edge); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+
+/* Reliëf: de decoratie als hoogtekaart (wit = hoog, grijs = lager); het lichtfilter maakt er reliëf van. */
+.vx-relief { mix-blend-mode: hard-light; }
+.vx-relief--blind { opacity: var(--vx-relief); }
+.vx-relief--print { opacity: var(--vx-relief-print); }
+.vx-hmap .vx-leaf, .vx-hmap .vx-berry, .vx-hmap .vx-holly, .vx-hmap .vx-bauble { fill: #FFF; }
+.vx-hmap .vx-stem { fill: none; stroke: #FFF; stroke-width: 2.3; stroke-linecap: round; }
+.vx-hmap .vx-needle { fill: none; stroke: #FFF; stroke-width: 2.6; stroke-linecap: round; }
+.vx-hmap .vx-vein { fill: none; stroke: #8C8C8C; stroke-width: 1.05; stroke-linecap: round; }
+.vx-hmap .vx-heart { fill: #9A9A9A; }
+/* Signature Ivory: hoogteverschillen in het boeket (wit = hoog): stelen laag, varens en aren iets hoger, takjes middenhoog, bloemen het hoogst. */
+.vx--signature .vx-hmap .vx-h3 { fill: #D2D2D2; }
+.vx--signature .vx-hmap .vx-h2 { fill: #E6E6E6; }
+.vx--signature .vx-hmap .vx-lo { stroke: #B4B4B4; stroke-width: 2.1; }
+.vx-hmap .vx-bauble-shade, .vx-hmap .vx-bauble-shine { display: none; }
+/* Gedrukte decoratie (kerst): kleur op het papier, met het reliëf erover. */
+.vx-deco .vx-stem { fill: none; stroke: var(--vx-twig); stroke-width: 2; stroke-linecap: round; }
+.vx-deco .vx-needle { fill: none; stroke-width: 2.6; stroke-linecap: round; }
+.vx-deco .vx-needle--dark { stroke: var(--vx-pine-dark); }
+.vx-deco .vx-needle--light { stroke: var(--vx-pine-light); }
+.vx-deco .vx-holly { fill: var(--vx-holly); }
+.vx-deco .vx-berry { fill: var(--vx-berry); }
+.vx-deco .vx-bauble--red { fill: var(--vx-bauble-red); }
+.vx-deco .vx-bauble--gold { fill: var(--vx-bauble-gold); }
+.vx-deco .vx-bauble-shade { fill: rgba(20, 10, 4, .3); }
+.vx-deco .vx-bauble-shine { fill: rgba(255, 250, 232, .85); }
+.vx-twinkle { fill: #FFF8E6; opacity: 0; transform-box: fill-box; transform-origin: center; }
+
+/* De flap: twee kanten in 3D. Decoratie en de bovenste helft van het zegel horen bij de buitenkant en draaien mee. */
+.vx-flap { position: absolute; left: 0; top: 0; width: 100%; height: 68%; z-index: 4; transform-origin: 50% 0; transform-style: preserve-3d;
+  transition: transform 1.2s cubic-bezier(.5, .05, .25, 1); }
+.vx-flap__out, .vx-flap__in { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.vx-flap__svg, .vx-flap__insvg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.vx-flap__svg { filter: drop-shadow(0 1.5px 1.5px rgba(var(--vx-shadow), .18)) drop-shadow(0 8px 10px rgba(var(--vx-shadow), .12)); }
+.vx-flap__edge { fill: none; stroke: var(--vx-edge); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.vx-flap__fold { fill: none; stroke: rgba(var(--vx-shadow), .12); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.vx-flap__in { transform: rotateX(180deg); }
+.vx-liner__edge { fill: none; stroke: rgba(var(--vx-shadow), .16); stroke-width: .8; vector-effect: non-scaling-stroke; }
+/* Binnenkant van de flap: een fijne goudfolielijn langs de voering en een motief onder de punt (goudfolie met licht reliëf). */
+.vx-liner__foil { fill: none; stroke: var(--vx-foil); stroke-width: 1.1; vector-effect: non-scaling-stroke; opacity: .9; }
+.vx-deco--binnen .vx-leaf, .vx-deco--binnen .vx-berry:not(.vx-berry--red) { fill: var(--vx-foil); }
+.vx-deco--binnen .vx-stem { stroke: var(--vx-foil); stroke-width: 1.6; }
+.vx-deco--binnen .vx-vein { fill: none; stroke: rgba(255, 252, 244, .55); stroke-width: .8; }
+.vx-deco--binnen .vx-heart { fill: rgba(255, 252, 244, .6); }
+.vx-deco .vx-star { fill: var(--vx-foil); }
+.vx-hmap .vx-star { fill: #FFF; }
+/* Licht op de flap tijdens het draaien: de buitenkant wordt donkerder als hij van het licht wegdraait, de binnenkant
+   komt uit de schaduw. */
+.vx-flap__dim, .vx-flap__indim { fill: rgb(var(--vx-shadow)); opacity: 0; pointer-events: none; }
+
+/* Het zegel: één object in twee helften (zie collectie.html). Iets groter dan in het Canva-ontwerp (18,5% van de breedte),
+   zodat de V goed leesbaar is; midden op de punt van de flap, op 360 px ruim 55 px om op te tikken. */
+.vx-sealpart { position: absolute; left: 50%; width: 18.5%; aspect-ratio: 1; overflow: visible; pointer-events: none;
+  transform: translate(-50%, -52%); transition: transform .32s cubic-bezier(.3, .6, .2, 1), filter .32s ease;
+  filter: drop-shadow(0 1.5px 1px rgba(var(--vx-shadow), .34)) drop-shadow(0 5px 7px rgba(var(--vx-shadow), .22)); }
+.vx-sealpart--top { top: 98.5%; }
+.vx-sealpart--base { top: calc(68% * .985); z-index: 5; }
+.vx-seal__shadow { fill: rgba(var(--vx-shadow), .2); filter: blur(2px); }
+.vx-seal__shade { mix-blend-mode: hard-light; }
+.vx-seal__spec { mix-blend-mode: screen; opacity: var(--vx-wax-gloss); }
+.vx-seal__glint { fill: var(--vx-wax-spec); opacity: 0; filter: blur(5px); mix-blend-mode: screen; }
+.vx-sealmap .vx-stem { fill: none; stroke: #C9C9C9; stroke-width: 1.3; stroke-linecap: round; }
+/* Initialen op het zegel: grote letters met een iets dikkere streek (dunne streken verdwijnen in de lichtberekening en worden
+   vlekken). Met een & staat dat teken kleiner en iets hoger tussen twee grote letters. Maat per aantal letters, zodat ze in de krans blijven. */
+.vx-seal__mono { font: italic 700 21px "Cormorant Garamond", Georgia, serif; letter-spacing: .02em; fill: #F0F0F0; stroke: #F0F0F0; stroke-width: .5; stroke-linejoin: round; }
+.vx-seal__mono--m1 { font-size: 40px; }
+.vx-seal__mono--m2 { font-size: 31px; }
+.vx-seal__mono--m3 { font-size: 23px; }
+.vx-seal__mono--m4 { font-size: 18px; }
+.vx-seal__mono--a2 { font-size: 28px; }
+.vx-seal__mono--a3 { font-size: 21px; }
+.vx-seal__amp { font-size: .56em; font-weight: 600; stroke-width: .3; baseline-shift: 12%; }
+.vx-seal-crack { fill: none; stroke: rgba(30, 18, 6, .55); stroke-width: 1.1; vector-effect: non-scaling-stroke; opacity: 0; transition: opacity .18s ease; }
+.vx-seal-hit { position: absolute; left: 50%; top: calc(68% * .985); z-index: 6; width: 20%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 50%;
+  background: transparent; cursor: pointer; transform: translate(-50%, -52%); -webkit-tap-highlight-color: transparent; }
+.vx-seal-hit:focus-visible { outline: 2px solid var(--vx-card-soft); outline-offset: 3px; }
+
+.vx-sheen { position: absolute; inset: 0; z-index: 7; pointer-events: none; border-radius: 3px; opacity: 0;
+  background: linear-gradient(112deg, transparent 38%, var(--vx-sheen) 50%, transparent 62%) 0 0 / 260% 100% no-repeat; mix-blend-mode: soft-light; }
+
+.vx-hint { display: inline-block; text-decoration: none; border: 0; background: none; padding: .55rem 1rem; font: 500 .66rem/1 "Cormorant Garamond", Georgia, serif; letter-spacing: .3em;
+  text-transform: uppercase; color: var(--vx-card-soft); cursor: pointer; transition: opacity .6s ease; }
+.vx-hint:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+
+/* ---------- Openen (stappen uit envelop-collectie.js) ---------------------------------------------------------------- */
+/* 1. Het zegel geeft mee en vangt het licht. */
+.vx.is-pressed .vx-sealpart { transform: translate(-50%, -52%) scale(.965);
+  filter: drop-shadow(0 1px .8px rgba(var(--vx-shadow), .32)) drop-shadow(0 3px 4px rgba(var(--vx-shadow), .16)); }
+.vx.is-pressed .vx-hint { opacity: 0; pointer-events: none; }
+.vx.is-glint .vx-seal__glint { animation: vx-glint .55s ease-out forwards; }
+/* 2. Het zegel breekt langs de rand van de flap: een fijne barst, de bovenste helft komt net los. */
+.vx.is-cracked .vx-seal-crack { opacity: 1; }
+.vx.is-cracked .vx-sealpart--top { transform: translate(-50%, -59%) rotate(-3deg);
+  filter: drop-shadow(0 3px 2px rgba(var(--vx-shadow), .3)) drop-shadow(0 9px 10px rgba(var(--vx-shadow), .22)); }
+.vx.is-cracked .vx-sealpart--base { transform: translate(-50%, -51.6%); }
+.vx.is-cracked .vx-seal-hit { visibility: hidden; }
+/* 3. De flap gaat open; licht en schaduw veranderen mee. */
+.vx.is-opening .vx-flap { transform: rotateX(180deg); }
+.vx.is-opening .vx-flap__dim { animation: vx-dim-out 1.2s linear forwards; }
+.vx.is-opening .vx-flap__indim { animation: vx-dim-in 1.2s linear forwards; }
+.vx.is-opening .vx-flapcast { animation: vx-cast 1.5s ease forwards; }
+.vx.is-flap-back .vx-flap { z-index: 1; }
+/* 4. De kaart: eerst een stukje (ongeveer 20%) boven de rand, dan verder omhoog tot hij helemaal uit de envelop is,
+   en tot slot naar voren, iets over de envelop heen. De schaduw groeit mee. */
+.vx.is-card-peek .vx-card { transform: translateY(-27%); transition-duration: .42s; }
+.vx.is-card-out .vx-card { transform: translateY(-108%); transition: transform .72s cubic-bezier(.45, .05, .25, 1), filter .9s ease;
+  filter: drop-shadow(0 2px 2px rgba(var(--vx-shadow), .2)) drop-shadow(0 12px 14px rgba(var(--vx-shadow), .2)); }
+.vx.is-card-peek .vx-card__pocketshade { opacity: .55; }
+.vx.is-card-out .vx-card__pocketshade { opacity: 0; }
+.vx.is-card-front .vx-card { z-index: 8; transform: translateY(-74%) scale(1.02); transition: transform .55s cubic-bezier(.25, .6, .2, 1), filter .55s ease;
+  filter: drop-shadow(0 2px 3px rgba(var(--vx-shadow), .22)) drop-shadow(0 18px 22px rgba(var(--vx-shadow), .26)); }
+.vx.is-card-out .vx-shadow { opacity: .85; }
+.vx.is-card-out .vx-env, .vx.is-card-out .vx-shadow { transform: translateY(calc(var(--vx-w) * .7 * .16)); }
+
+@keyframes vx-glint { 0% { opacity: 0; transform: translate(-6px, -4px); } 40% { opacity: .55; } 100% { opacity: 0; transform: translate(10px, 7px); } }
+@keyframes vx-dim-out { 0% { opacity: 0; } 50% { opacity: .2; } 100% { opacity: .2; } }
+@keyframes vx-dim-in { 0%, 50% { opacity: .32; } 100% { opacity: 0; } }
+@keyframes vx-cast { 0% { opacity: 0; } 45% { opacity: 1; } 100% { opacity: .22; } }
+
+/* ---------- Rust ---------------------------------------------------------------------------------------------------- */
+/* Een nauwelijks merkbare zweving, af en toe licht over papier en was, en bij kerst één heel kort lichtpuntje. */
+@media (prefers-reduced-motion: no-preference) {
+  .vx:not(.is-pressed) .vx-stage { animation: vx-float 7.5s ease-in-out infinite; }
+  .vx:not(.is-pressed) .vx-sheen { animation: vx-sheen 11s ease-in-out infinite; }
+  .vx:not(.is-pressed) .vx-shadow { animation: vx-shadow 7.5s ease-in-out infinite; }
+  .vx:not(.is-pressed) .vx-sealpart .vx-seal__glint { animation: vx-glint-idle 9s ease-in-out 2s infinite; }
+  .vx--kerst .vx-twinkle { animation: vx-twinkle 10s ease-in-out 3s infinite; }
+}
+@keyframes vx-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes vx-shadow { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(.975); opacity: .86; } }
+@keyframes vx-sheen { 0%, 18% { opacity: 0; background-position: 110% 0; } 30% { opacity: 1; } 62% { opacity: 1; } 76%, 100% { opacity: 0; background-position: -10% 0; } }
+@keyframes vx-glint-idle { 0%, 82%, 100% { opacity: 0; transform: translate(-6px, -4px); } 88% { opacity: .3; } 95% { opacity: 0; transform: translate(9px, 6px); } }
+@keyframes vx-twinkle { 0%, 90%, 100% { opacity: 0; transform: scale(.4) rotate(0deg); } 94% { opacity: .9; transform: scale(1) rotate(20deg); } }
+
+/* ---------- Minder beweging ------------------------------------------------------------------------------------------ */
+/* Geen 3D-draai en geen schuivende kaart: het script laat de envelop kort vervagen en toont dan meteen de eindstand. */
+@media (prefers-reduced-motion: reduce) {
+  .vx *, .vx { animation: none !important; }
+}
+.vx.is-rm *, .vx.is-rm { transition: none !important; animation: none !important; }
+.vx.is-rm .vx-stage { transition: opacity .35s ease !important; }
+.vx.is-rm-hide .vx-stage { opacity: 0; }
+.vx.is-rm .vx-flap__dim { opacity: .2; }
+.vx.is-rm .vx-flapcast { opacity: .22; }
+
+/* ---------- Signature Ivory met GSAP (static/js/envelop-signature.js) -------------------------------------------------- */
+/* De kaart van Signature Ivory: een dun champagnefolielijntje binnen de rand. */
+.vx--signature .vx-card__body::before { content: ""; position: absolute; inset: 5.5% 4.5%; border: 1px solid color-mix(in srgb, var(--vx-foil) 50%, transparent); pointer-events: none; }
+/* Met GSAP bepaalt het script alle beweging: geen overgangen of animaties uit deze stylesheet, en geen filters die bij een klassewissel
+   van waarde veranderen (dat gaf een nieuw tekenen midden in de beweging). De schaduwen staan vast. */
+.vx[data-vx-gsap], .vx[data-vx-gsap] * { transition: none !important; }
+.vx[data-vx-gsap] .vx-stage, .vx[data-vx-gsap] .vx-shadow, .vx[data-vx-gsap] .vx-sheen, .vx[data-vx-gsap] .vx-seal__glint,
+.vx[data-vx-gsap] .vx-flap__dim, .vx[data-vx-gsap] .vx-flap__indim, .vx[data-vx-gsap] .vx-flapcast { animation: none !important; }
+.vx[data-vx-gsap] .vx-card { filter: drop-shadow(0 1px 2px rgba(var(--vx-shadow), .2)) drop-shadow(0 7px 11px rgba(var(--vx-shadow), .12)) !important; }
+.vx[data-vx-gsap] .vx-sealpart { filter: drop-shadow(0 1.5px 1px rgba(var(--vx-shadow), .34)) drop-shadow(0 5px 7px rgba(var(--vx-shadow), .22)) !important; }
+/* Eigen lagen voor wat tijdens het openen van volgorde wisselt: dan verschuift alleen de laagvolgorde en hoeft de inhoud (met filters) niet opnieuw te worden getekend. */
+.vx[data-vx-gsap] .vx-stage { will-change: transform, opacity; }
+.vx[data-vx-gsap] .vx-back, .vx[data-vx-gsap] .vx-pocket, .vx[data-vx-gsap] .vx-flapcast, .vx[data-vx-gsap] .vx-sealpart,
+.vx[data-vx-gsap] .vx-card, .vx[data-vx-gsap] .vx-glimp, .vx[data-vx-gsap] .vx-lift { will-change: transform; }
+/* Licht dat het zegel vangt en een zachte schaduw onder de kaart terwijl die opstijgt: eenvoudige verlopen, geen filters. */
+.vx-glimp { position: absolute; left: 50%; top: 66.9%; z-index: 9; width: 30%; aspect-ratio: 1; border-radius: 50%; opacity: 0; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 250, 236, .95), rgba(244, 228, 186, .4) 36%, rgba(244, 228, 186, 0)); }
+.vx-lift { position: absolute; left: -5%; right: -5%; top: 70%; height: 42%; z-index: -1; opacity: 0; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(var(--vx-shadow), .34), rgba(var(--vx-shadow), .1) 62%, transparent); }

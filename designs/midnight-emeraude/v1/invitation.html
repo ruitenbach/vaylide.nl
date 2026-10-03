@@ -1,0 +1,257 @@
+{% extends "invitations/base_invitation.html" %}{% load static envelop_tags %}
+{# Midnight Émeraude v1 — trouwontwerp met een filmische opening, helemaal met GSAP (static/vendor/gsap/). De enige ander ontwerp-JS is midnight-emeraude.js. Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/bodoni-moda-latin-wght-italic.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/great-vibes-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<script src="{% static 'vendor/gsap/gsap.min.js' %}" defer></script>
+<script src="{% static 'vendor/gsap/ScrollTrigger.min.js' %}" defer></script>
+<script src="{% static 'vendor/gsap/MotionPathPlugin.min.js' %}" defer></script>
+<script src="{% static 'vendor/gsap/SplitText.min.js' %}" defer></script>
+<script src="{% static 'designs/midnight-emeraude/v1/midnight-emeraude.js' %}" defer></script>{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/envelop-collectie.css' %}">{% endblock %}
+
+{% block cover %}
+{% comment %}Het openingsscherm is het begin van één GSAP-master-timeline (midnight-emeraude.js): in het donker verschijnt champagnegoud
+licht, de envelop komt uit de duisternis en het zegel vangt het licht (dit deel loopt vanzelf en wacht dan op een tik). Na de tik
+breekt het zegel, gaat de klep open, komt de kaart eruit en rijdt de camera de kaart in: die wordt de wereld erachter. Het
+scherm verdwijnt na ongeveer 5 s (data-duration); de rest van de film (licht, ringen, namen) loopt op de kaart zelf door.
+Zonder GSAP, bij 'minder beweging' of stilgezette beweging werkt alles gewoon: tik op het zegel en de uitnodiging opent.{% endcomment %}
+<section class="cover me-cover" data-cover data-duration="5000" data-fx-delay="520" data-fx-intro="7000" aria-label="Openingsscherm">
+  <div class="fx-slot" data-fx-slot="cover" aria-hidden="true"></div>
+  <div class="me-cover__licht" aria-hidden="true"></div>
+  <i class="me-glimp" aria-hidden="true"></i>
+  <div class="me-cover__stage">
+    <p class="me-cover__aan">{% if v.formal %}Een uitnodiging voor u{% else %}Een uitnodiging voor jou{% endif %}</p>
+    {% vx_envelop "midnight-emeraude" uid="me" monogram=v.monogram kicker=v.kicker title=v.title date=v.date_short as env %}
+    {% include "partials/envelop/collectie.html" %}
+    {% if v.show.music %}<button type="button" class="me-cover__music" data-open data-open-music><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor"/></svg>Openen met muziek</button>{% endif %}
+  </div>
+</section>
+<i class="me-vonk" aria-hidden="true"></i>
+{% comment %}Openingsmoment tijdens het (onzichtbare) opwarmen door midnight-emeraude.js: het merkteken van Vaylide (de V uit het logo, zelfde vorm en lichtval, op verzoek van de eigenaar in champagnegoud: tools/midnight_emeraude/maak_merk.py) in een zachte champagne gloed met een gouden lijntje. Alleen zichtbaar als het script het aanzet.{% endcomment %}
+<div class="me-open" aria-hidden="true"><i class="me-open__gloed"></i><div class="me-open__groep"><img class="me-open__v" src="{% static 'designs/midnight-emeraude/v1/img/merk-v.webp' %}" alt="" width="178" height="160" decoding="async"><i class="me-open__lijn"><b class="me-open__glans"></b></i></div></div>
+{% endblock %}
+
+{% block content %}
+{% include "midnight-emeraude/v1/_defs.html" %}
+{% comment %}De kop is een scène in lagen (achter naar voor), elk in een eigen vlak: .me-l krijgt de beweging van de opening (master
+timeline), .me-p de parallax bij het scrollen (ScrollTrigger scrub), zodat die twee elkaar nooit in de weg zitten:
+lucht met sterren en maan · lichtstralen · de wereld (landgoed met oranjerie en water, bloemstukken, de gouden ringen met hun
+spiegeling) · de tekst · kristallen · onscherpe bladeren en bloemen vooraan. De beelden komen uit tools/midnight_emeraude/.{% endcomment %}
+<header class="me-hero" id="me-hero">
+  <div class="me-l me-l--lucht" aria-hidden="true"><div class="me-p">
+    <svg class="me-sterren" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMin slice" focusable="false">{% include "midnight-emeraude/v1/_sterren.svg" %}</svg>
+  </div></div>
+  <div class="me-l me-l--stralen" aria-hidden="true"><div class="me-p">
+    <img class="me-stralen" src="{% static 'designs/midnight-emeraude/v1/img/stralen.webp' %}" alt="" width="1400" height="900" decoding="async">
+  </div></div>
+  <div class="me-l me-l--wereld" aria-hidden="true"><div class="me-p">
+    <div class="me-plaat">
+      <img class="me-wereld me-wereld--donker" src="{% static 'designs/midnight-emeraude/v1/img/wereld-donker.webp' %}" alt="" width="1600" height="900" decoding="async">
+      <img class="me-wereld me-wereld--licht" src="{% static 'designs/midnight-emeraude/v1/img/wereld-licht.webp' %}" alt="" width="1600" height="900" decoding="async">
+      <div class="me-water"><i class="me-water__glinster"></i></div>
+      <img class="me-bloemen me-bloemen--l" src="{% static 'designs/midnight-emeraude/v1/img/bloemen-links.webp' %}" alt="" width="700" height="800" decoding="async">
+      <img class="me-bloemen me-bloemen--r" src="{% static 'designs/midnight-emeraude/v1/img/bloemen-rechts.webp' %}" alt="" width="700" height="800" decoding="async">
+      <div class="me-ringw">
+        <img class="me-ring-spiegel" src="{% static 'designs/midnight-emeraude/v1/img/ring.webp' %}" alt="" width="900" height="720" decoding="async">
+        <img class="me-ring" src="{% static 'designs/midnight-emeraude/v1/img/ring.webp' %}" alt="" width="900" height="720" decoding="async">
+        <i class="me-glans me-glans--1"></i><i class="me-glans me-glans--2"></i><i class="me-glans me-glans--3"></i>
+      </div>
+    </div>
+  </div></div>
+  <div class="fx-slot me-hero__fx" data-fx-slot="hero" aria-hidden="true"></div>
+  <div class="me-hero__tekst">
+    <p class="me-kicker">{{ v.kicker }}</p>
+    <h1 class="me-names me-names--{{ v.names_size }}">{% if v.is_couple %}<span class="me-naam"><span class="me-naam__in">{{ v.names.0 }}</span></span> <span class="me-amp" aria-label="en">&amp;</span> <span class="me-naam"><span class="me-naam__in">{{ v.names.1 }}</span></span>{% else %}<span class="me-naam"><span class="me-naam__in">{{ v.names.0 }}</span></span>{% endif %}</h1>
+    {% if v.date %}<div class="me-lint"><p class="me-lint__tekst">{{ v.weekday }} · {{ v.day }} {{ v.month_name }} {{ v.year }}</p></div>{% endif %}
+    {% if v.tagline %}<p class="me-tagline">{{ v.tagline }}</p>{% endif %}
+  </div>
+  <div class="me-l me-l--kristal" aria-hidden="true"><div class="me-p">
+    <img class="me-kristallen" src="{% static 'designs/midnight-emeraude/v1/img/kristallen.webp' %}" alt="" width="1200" height="700" decoding="async">
+  </div></div>
+  <div class="me-l me-l--voor-l" aria-hidden="true"><div class="me-p">
+    <img class="me-voor me-voor--l" src="{% static 'designs/midnight-emeraude/v1/img/voor-links.webp' %}" alt="" width="800" height="1100" decoding="async">
+  </div></div>
+  <div class="me-l me-l--voor-r" aria-hidden="true"><div class="me-p">
+    <img class="me-voor me-voor--r" src="{% static 'designs/midnight-emeraude/v1/img/voor-rechts.webp' %}" alt="" width="800" height="1100" decoding="async">
+  </div></div>
+  <a class="me-scroll" href="#me-verder">Scroll verder<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+</header>
+
+{% comment %}Daarna één doorlopende uitnodiging: ivoor en smaragd (of middernacht) wisselen elkaar af als banen van één wereld, met een gouden
+draad (een lichtvonk reist er bij het scrollen langs) en donker bladwerk langs de randen. ScrollTrigger laat licht, letters en
+decoratie meegroeien met het scrollen.{% endcomment %}
+<div class="me-body" id="me-verder">
+{% if v.welcome or v.hero %}
+<section class="me-sec me-sec--ivoor me-welkom" aria-label="Welkom">
+  <img class="me-blad me-blad--l" src="{% static 'designs/midnight-emeraude/v1/img/blad-rand.webp' %}" alt="" width="520" height="640" loading="lazy" decoding="async">
+  <div class="me-in">
+    {% if v.hero %}<figure class="me-boogfoto me-fade"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 360px, 70vw" %}</div></figure>{% endif %}
+    {% if v.welcome %}<div class="me-welkom__tekst me-split">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>{% endif %}
+  </div>
+  <svg class="me-draad" viewBox="0 0 600 90" aria-hidden="true" focusable="false">{% include "midnight-emeraude/v1/_draad.svg" %}<circle class="me-draad__vonk" r="9" fill="url(#me-vonk)"/></svg>
+</section>
+{% endif %}
+
+{% if v.has_event and v.date %}
+<section class="me-sec me-sec--nacht me-datum" aria-labelledby="me-datum-titel">
+  <img class="me-blad me-blad--r" src="{% static 'designs/midnight-emeraude/v1/img/blad-rand.webp' %}" alt="" width="520" height="640" loading="lazy" decoding="async">
+  <div class="me-in">
+    <p class="me-label me-fade">Noteer de datum</p>
+    <h2 id="me-datum-titel" class="me-h2 me-split">Onze trouwdag</h2>
+    <div class="me-dag">
+      <p class="me-dag__week">{{ v.weekday }}</p>
+      <p class="me-dag__getal">{{ v.day }}</p>
+      <p class="me-dag__maand">{{ v.month_name }} {{ v.year }}</p>
+    </div>
+    {% if v.time_display %}<p class="me-datum__tijd me-fade">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+    {% if v.venue %}<p class="me-datum__plek me-fade">{{ v.venue }}</p>{% endif %}
+  </div>
+  <svg class="me-draad" viewBox="0 0 600 90" aria-hidden="true" focusable="false">{% include "midnight-emeraude/v1/_draad.svg" %}<circle class="me-draad__vonk" r="9" fill="url(#me-vonk)"/></svg>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="me-sec me-sec--ivoor me-programma" aria-labelledby="me-programma-titel">
+  <div class="me-in">
+    <p class="me-label me-fade">De dag</p>
+    <h2 id="me-programma-titel" class="me-h2 me-split">Programma</h2>
+    <ol class="me-prog">
+      <li class="me-prog__lijn" aria-hidden="true"></li>
+      {% for item in v.program %}
+      <li class="me-prog__item">
+        <span class="me-prog__ring" aria-hidden="true"></span>
+        <div>
+          {% if item.time %}<p class="me-prog__tijd">{{ item.time }}</p>{% endif %}
+          <p class="me-prog__titel">{{ item.title }}</p>
+          {% if item.description %}<p class="me-prog__tekst">{{ item.description }}</p>{% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+  <svg class="me-draad" viewBox="0 0 600 90" aria-hidden="true" focusable="false">{% include "midnight-emeraude/v1/_draad.svg" %}<circle class="me-draad__vonk" r="9" fill="url(#me-vonk)"/></svg>
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="me-sec me-sec--nacht me-locatie" aria-labelledby="me-locatie-titel">
+  <div class="me-in">
+    <p class="me-label me-fade">Waar</p>
+    <h2 id="me-locatie-titel" class="me-h2 me-split">Locatie</h2>
+    <div class="me-venster" aria-hidden="true"><img class="me-venster__beeld" src="{% static 'designs/midnight-emeraude/v1/img/wereld-licht.webp' %}" alt="" width="1600" height="900" loading="lazy" decoding="async"></div>
+    {% if v.venue %}<p class="me-locatie__naam me-fade">{{ v.venue }}</p>{% endif %}
+    {% if v.address_lines %}<address class="me-locatie__adres me-fade">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+    {% if v.date_display %}<p class="me-locatie__wanneer me-fade">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+    {% if v.route_url %}<a class="inv-btn inv-btn--primary me-fade" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+  </div>
+  <svg class="me-draad" viewBox="0 0 600 90" aria-hidden="true" focusable="false">{% include "midnight-emeraude/v1/_draad.svg" %}<circle class="me-draad__vonk" r="9" fill="url(#me-vonk)"/></svg>
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="me-sec me-sec--ivoor me-dresscode" aria-labelledby="me-dresscode-titel">
+  <img class="me-blad me-blad--l" src="{% static 'designs/midnight-emeraude/v1/img/blad-rand.webp' %}" alt="" width="520" height="640" loading="lazy" decoding="async">
+  <div class="me-in">
+    <p class="me-label me-fade">Wat trek je aan</p>
+    <h2 id="me-dresscode-titel" class="me-h2 me-split">Dresscode</h2>
+    {% if v.dresscode_colors %}<ul class="me-linten" aria-label="Kleuren voor de dresscode">
+      {% for c in v.dresscode_colors %}<li class="me-lintje me-fade" style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+    </ul>{% endif %}
+    {% for p in v.dresscode_text %}<p class="me-dresscode__tekst me-fade">{{ p|linebreaksbr }}</p>{% endfor %}
+  </div>
+  <svg class="me-draad" viewBox="0 0 600 90" aria-hidden="true" focusable="false">{% include "midnight-emeraude/v1/_draad.svg" %}<circle class="me-draad__vonk" r="9" fill="url(#me-vonk)"/></svg>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="me-sec me-sec--nacht me-aftellen" aria-labelledby="me-aftellen-titel">
+  <svg class="me-nachtsterren" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">{% include "midnight-emeraude/v1/_sterren.svg" %}</svg>
+  <div class="me-in">
+    <p class="me-label me-fade">Aftellen</p>
+    <h2 id="me-aftellen-titel" class="me-h2 me-split">{% if v.is_past %}Dank je wel{% else %}Nog even en het is zover{% endif %}</h2>
+    <div class="me-fade">{% include "invitations/partials/countdown.html" %}</div>
+    <div class="me-fade">{% include "invitations/partials/calendar_buttons.html" %}</div>
+  </div>
+  <svg class="me-draad" viewBox="0 0 600 90" aria-hidden="true" focusable="false">{% include "midnight-emeraude/v1/_draad.svg" %}<circle class="me-draad__vonk" r="9" fill="url(#me-vonk)"/></svg>
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="me-sec me-sec--ivoor me-verhaal" aria-labelledby="me-verhaal-titel">
+  <div class="me-in">
+    <h2 id="me-verhaal-titel" class="me-h2 me-split">{{ v.story_title }}</h2>
+    <div class="me-verhaal__tekst me-split">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="me-sec me-sec--ivoor2 me-galerij" aria-labelledby="me-galerij-titel">
+  <div class="me-in">
+    <p class="me-label me-fade">Herinneringen</p>
+    <h2 id="me-galerij-titel" class="me-h2 me-split">Momenten</h2>
+    <ul class="me-fotos">
+      {% for photo in v.gallery %}<li class="me-foto me-fade"><figure><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 600px) 260px, 44vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="me-sec me-sec--ivoor me-praktisch" aria-labelledby="me-praktisch-titel">
+  <div class="me-in">
+    <p class="me-label me-fade">Praktisch</p>
+    <h2 id="me-praktisch-titel" class="me-h2 me-split">Goed om te weten</h2>
+    <dl class="me-praktisch__lijst">
+      {% for item in v.practical %}<div class="me-praktisch__item me-fade">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+    </dl>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="me-sec me-sec--ivoor me-aanmelden" id="aanmelden" aria-labelledby="me-aanmelden-titel">
+  <img class="me-blad me-blad--l" src="{% static 'designs/midnight-emeraude/v1/img/blad-rand.webp' %}" alt="" width="520" height="640" loading="lazy" decoding="async">
+  <img class="me-blad me-blad--r" src="{% static 'designs/midnight-emeraude/v1/img/blad-rand.webp' %}" alt="" width="520" height="640" loading="lazy" decoding="async">
+  <div class="me-in">
+    <p class="me-label me-fade">R.S.V.P.</p>
+    <h2 id="me-aanmelden-titel" class="me-h2 me-split">{% if v.formal %}Bent u erbij?{% else %}Ben je erbij?{% endif %}</h2>
+    <div class="me-formulier me-fade">
+      {% include "invitations/partials/rsvp.html" %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="me-sec me-sec--ivoor me-contact" aria-labelledby="me-contact-titel">
+  <div class="me-in">
+    <p class="me-label me-fade">Contact</p>
+    <h2 id="me-contact-titel" class="me-h2 me-split">Vragen?</h2>
+    {% if v.contact.note %}<p class="me-fade">{{ v.contact.note }}</p>{% endif %}
+    <p class="me-contact__naam me-fade">{{ v.contact.name }}</p>
+    <p class="me-contact__links me-fade">
+      {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+      {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+      {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+    </p>
+  </div>
+</section>
+{% endif %}
+
+<section class="me-sec me-sec--nacht me-slot" aria-label="Afsluiting">
+  <svg class="me-nachtsterren" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMin slice" aria-hidden="true" focusable="false">{% include "midnight-emeraude/v1/_sterren.svg" %}</svg>
+  <div class="me-in">
+    <div class="me-slot__wereld" aria-hidden="true">
+      <img class="me-slot__beeld" src="{% static 'designs/midnight-emeraude/v1/img/wereld-licht.webp' %}" alt="" width="1600" height="900" loading="lazy" decoding="async">
+      <img class="me-slot__ring" src="{% static 'designs/midnight-emeraude/v1/img/ring.webp' %}" alt="" width="900" height="720" loading="lazy" decoding="async">
+    </div>
+    <p class="me-slot__wens me-fade">Tot op onze trouwdag</p>
+    <p class="me-slot__namen me-split">{% if v.is_couple %}{{ v.names.0 }} &amp; {{ v.names.1 }}{% else %}{{ v.names.0 }}{% endif %}</p>
+    {% if v.show.closing %}{% for p in v.closing %}<p class="me-slot__tekst me-fade">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+    <div class="me-fade">{% include "invitations/partials/share_buttons.html" %}</div>
+  </div>
+</section>
+</div>
+{% endblock %}

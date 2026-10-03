@@ -1,5 +1,5 @@
 {% load static vl %}<!doctype html>
-<html lang="nl" class="inv inv-{{ v.design_slug }}{% if v.embed %} inv-embed{% endif %}{% if v.live %} inv-live{% endif %}{% if v.kader %} inv-kader{% endif %}{% if v.effects %} {{ v.effects.classes }}{% endif %}" data-mode="{{ v.mode }}"{% if v.live %} data-live="{{ v.live }}"{% endif %}{% if v.direct_open %} data-direct-open{% endif %}{% if v.effects %} data-fx-sfeer="{{ v.effects.sfeer }}" data-fx-knal="{{ v.effects.knal }}" data-fx-viering="{{ v.effects.viering }}"{% if v.effects.tik %} data-fx-tik{% endif %}{% endif %}>
+<html lang="nl" class="inv inv-{{ v.design_slug }}{% if v.embed %} inv-embed{% endif %}{% if v.live %} inv-live{% endif %}{% if v.kader %} inv-kader{% endif %}{% if v.effects %} {{ v.effects.classes }}{% endif %}" data-mode="{{ v.mode }}"{% if v.live %} data-live="{{ v.live }}"{% endif %}{% if v.direct_open %} data-direct-open{% endif %}{% if v.effects %} data-fx-sfeer="{{ v.effects.sfeer }}" data-fx-knal="{% if v.opening_enabled and v.envelop_collectie %}geen{% else %}{{ v.effects.knal }}{% endif %}" data-fx-viering="{{ v.effects.viering }}"{% if v.effects.tik %} data-fx-tik{% endif %}{% endif %}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -16,9 +16,14 @@
 <link rel="stylesheet" href="{% static 'invitations/invite-base.css' %}">
 {% if v.effects %}<link rel="stylesheet" href="{% static 'invitations/effects.css' %}">{% endif %}
 {% block extra_css %}{% endblock %}
+{% if v.opening_enabled and v.envelop_collectie %}<link rel="stylesheet" href="{% static 'css/envelop-collectie.css' %}">
+<link rel="stylesheet" href="{% static 'css/envelop-cover.css' %}">{% endif %}
 <link rel="stylesheet" href="{% static v.stylesheet %}">
 <script src="{% static 'invitations/invite.js' %}" defer></script>
 {% if v.effects %}<script src="{% static 'invitations/effects.js' %}" defer></script>{% endif %}
+{% if v.opening_enabled and v.envelop_collectie %}{% if v.envelop_collectie.beweging == "gsap" %}<script src="{% static 'vendor/gsap/gsap.min.js' %}" defer></script>
+<script src="{% static 'js/envelop-signature.js' %}" defer></script>
+{% endif %}<script src="{% static 'js/envelop-collectie.js' %}" defer></script>{% endif %}
 {% if v.live %}<link rel="stylesheet" href="{% static 'invitations/live.css' %}">
 <script src="{% static 'invitations/live.js' %}" defer></script>{% endif %}
 </head>
@@ -26,7 +31,7 @@
 {% if v.effects %}<div class="fx-slot fx-slot--page" data-fx-slot="page" aria-hidden="true"></div>{% endif %}
 {% include "invitations/partials/mode_banner.html" %}
 <a class="skip-link" href="#uitnodiging">Direct naar de uitnodiging</a>
-{% if v.opening_enabled %}{% block cover %}{% endblock %}{% endif %}
+{% if v.opening_enabled %}{% if v.envelop_collectie %}{% include "invitations/partials/envelop_cover.html" %}{% else %}{% block cover %}{% endblock %}{% endif %}{% endif %}
 <main id="uitnodiging" class="inv-main" tabindex="-1">
 {% if v.notice %}<p class="inv-notice">{{ v.notice }}</p>{% endif %}
 {% block content %}{% endblock %}

@@ -1,0 +1,192 @@
+{% load static %}{% comment %}
+VAYLIDE Envelope Collection: de envelop-engine. Eén bouw voor alle stijlen; de stijl en het zegel komen uit
+catalog/envelop_collectie.py (env = envelop_collectie.envelop(...)), kleuren en materiaal uit static/css/envelop-collectie.css.
+Bediening: static/js/envelop-collectie.js (tik of klik op het zegel, of Enter/Spatie; zonder JavaScript blijft hij dicht).
+
+Lagen, van achter naar voor:
+  vx-back        achterkant van de envelop met de binnenvoering
+  vx-flapcast    schaduw die de flap tijdens het openen op het binnenste werpt (onder de kaart)
+  vx-card        de kaart (tijdelijke kaart; het echte ontwerp volgt later)
+  vx-pocket      voorvakken (links, rechts, onder) met papierstructuur
+  vx-flap        de flap in 3D: buitenkant (papier, decoratie, reliëf, bovenste helft van het zegel) en binnenkant (voering)
+  vx-seal-base   onderste helft van het zegel; blijft op de envelop als het zegel breekt
+  vx-seal-hit    de knop om te openen (over het zegel heen)
+Het zegel is één object in twee helften, gesplitst langs de rand van de flap: zo breekt het echt. De maat en plek van het
+zegel (18,5% breed, midden op de punt) staan ook in de CSS en in de omrekening hieronder (matrix): samen aanpassen.
+
+Reliëf is echt belicht: de vormen zijn een hoogtekaart (wit = hoog) en een lichtfilter maakt er licht en schaduw van,
+met het licht linksboven. Die laag ligt met hard-light op het papier. Ornamenten: tools/enveloppen/maak_ornamenten.py.
+{% endcomment %}
+<div class="vx vx--{{ env.stijl }} vx--{{ env.s.lijn }}" id="{{ env.uid }}-env" data-vx style="{{ env.zegel_stijl }}">
+  <svg class="vx-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      {# Blinddruk in papier: hoogte uit de helderheid, zacht afgerond, belicht van linksboven. Vlak = 50% grijs = neutraal. #}
+      <filter id="vx-relief-{{ env.uid }}" x="-6%" y="-6%" width="112%" height="112%" color-interpolation-filters="sRGB">
+        <feColorMatrix in="SourceGraphic" type="luminanceToAlpha" result="l"/>
+        <feComposite in="l" in2="SourceAlpha" operator="arithmetic" k1="1" result="hm"/>
+        <feGaussianBlur in="hm" stdDeviation="{{ env.s.relief.blur|default:"2.1" }}" result="h"/>
+        <feDiffuseLighting in="h" surfaceScale="{{ env.s.relief.schaal|default:"3" }}" diffuseConstant="1" lighting-color="#fff"><feDistantLight azimuth="225" elevation="30"/></feDiffuseLighting>
+        <feComponentTransfer result="lit0"><feFuncR type="linear" slope="0.4" intercept="0.3"/><feFuncG type="linear" slope="0.4" intercept="0.3"/><feFuncB type="linear" slope="0.4" intercept="0.3"/></feComponentTransfer>
+        <feFlood flood-color="#fff"/><feComposite in2="h" operator="in" result="hw"/>
+        <feComposite in="lit0" in2="hw" operator="arithmetic" k2="1" k3=".09" result="lit"/>
+        <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="m0"/>
+        <feGaussianBlur in="m0" stdDeviation="2.5" result="m"/>
+        <feComposite in="lit" in2="m" operator="in"/>
+      </filter>
+      {% comment %}Lakzegel: licht en schaduw uit de hoogtekaart. De natuurlijke onregelmaat zit niet als grove ruis in de hoogte (8 bits hoogte
+        geeft dan hoogtelijnen en 'compressievlekken'), maar als (1) een heel fijne korrel in de hoogte die afrondingsstapjes tot korrel maakt en
+        (2) zachte lichtvlekken in de belichting. Per materiaal bij te stellen: ZEGELS[..]["korrel"] en ["vlek"] in catalog/envelop_collectie.py.{% endcomment %}
+      <filter id="vx-wax-shade-{{ env.uid }}" x="-6%" y="-6%" width="112%" height="112%" color-interpolation-filters="sRGB">
+        <feColorMatrix in="SourceGraphic" type="luminanceToAlpha" result="l"/>
+        <feComposite in="l" in2="SourceAlpha" operator="arithmetic" k1="1" result="hm"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="1" seed="11" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  {{ env.was.korrel }} 0 0 0 0" result="na0"/>
+        <feGaussianBlur in="na0" stdDeviation=".3" result="na"/>
+        <feComposite in="hm" in2="na" operator="arithmetic" k2="1" k3="1" result="h0"/>
+        <feGaussianBlur in="h0" stdDeviation=".75" result="h"/>
+        <feDiffuseLighting in="h" surfaceScale="6.4" diffuseConstant="1" lighting-color="#fff"><feDistantLight azimuth="225" elevation="30"/></feDiffuseLighting>
+        <feComponentTransfer result="d0"><feFuncR type="linear" slope="0.66" intercept="0.17"/><feFuncG type="linear" slope="0.66" intercept="0.17"/><feFuncB type="linear" slope="0.66" intercept="0.17"/></feComponentTransfer>
+        {# Hoog vangt meer licht dan laag: de V en de rand lichter, het ingedrukte veld donkerder. #}
+        <feFlood flood-color="#fff"/><feComposite in2="h" operator="in" result="hw"/>
+        <feComposite in="d0" in2="hw" operator="arithmetic" k2="1" k3=".62" k4="-.34" result="d"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".07" numOctaves="2" seed="5" result="mot0"/>
+        <feColorMatrix in="mot0" type="matrix" values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 1" result="mot"/>
+        <feComposite in="d" in2="mot" operator="arithmetic" k2="1" k3="{{ env.was.vlek }}" k4="{{ env.was.vlek_offset }}" result="dm"/>
+        <feComposite in="dm" in2="SourceAlpha" operator="in"/>
+      </filter>
+      {# Lakzegel: glans op de hoogste randen (breed en zacht: geen plastic). Zonder ruis in de hoogte: de glans is erg gevoelig voor afrondingsstapjes en laat dan lichte hoogtelijntjes zien. #}
+      <filter id="vx-wax-spec-{{ env.uid }}" x="-6%" y="-6%" width="112%" height="112%" color-interpolation-filters="sRGB">
+        <feColorMatrix in="SourceGraphic" type="luminanceToAlpha" result="l"/>
+        <feComposite in="l" in2="SourceAlpha" operator="arithmetic" k1="1" result="hm"/>
+        <feGaussianBlur in="hm" stdDeviation=".75" result="h"/>
+        <feSpecularLighting in="h" surfaceScale="6.4" specularConstant=".8" specularExponent="16" class="vx-c-spec" result="s"><feDistantLight azimuth="225" elevation="52"/></feSpecularLighting>
+        <feComposite in="s" in2="SourceAlpha" operator="in"/>
+      </filter>
+      {# Was: fijne vlekjes in kleur, zoals gegoten lak. #}
+      <filter id="vx-wax-{{ env.uid }}" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .08 0" result="speck"/>
+        <feComposite in="speck" in2="SourceGraphic" operator="in" result="speckIn"/>
+        <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="speckIn"/></feMerge>
+      </filter>
+      {# Afgeronde bovenkant van de was: de rand loopt zacht af, zoals gestolde lak. #}
+      <filter id="vx-wax-round-{{ env.uid }}" x="-5%" y="-5%" width="110%" height="110%">
+        <feMorphology operator="erode" radius="2.6"/><feGaussianBlur stdDeviation="2.6"/>
+      </filter>
+      {# Logo-V als hoogte: de hele vorm (alfa) staat hoog in de was, met de lichte/donkere delen van het beeld als fijn detail. #}
+      <filter id="vx-v-height-{{ env.uid }}" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+        <feColorMatrix type="matrix" values=".05 .12 .03 0 .8  .05 .12 .03 0 .8  .05 .12 .03 0 .8  0 0 0 1 0"/>
+      </filter>
+      {# Overlap van papierlagen: een zachte, korte schaduw onder de rand. #}
+      <filter id="vx-lift-{{ env.uid }}" x="-5%" y="-5%" width="110%" height="115%" color-interpolation-filters="sRGB">
+        <feDropShadow dx="0" dy="1.6" stdDeviation="2.4" class="vx-lift"/>
+      </filter>
+      {# Papierstructuur ongeveer op ware grootte (1300 eenheden ≈ de breedte van de envelop op een telefoon). #}
+      <pattern id="vx-paper-{{ env.uid }}" width="1300" height="1300" patternUnits="userSpaceOnUse">
+        <image href="{% static 'img/envelop/papier.webp' %}" width="1300" height="1300"/>
+      </pattern>
+      <pattern id="vx-liner-{{ env.uid }}" width="300" height="300" patternUnits="userSpaceOnUse">
+        <image href="{% static 'img/envelop/'|add:env.s.voering %}" width="300" height="300"/>
+      </pattern>
+      <linearGradient id="vx-side-l-{{ env.uid }}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" class="vx-c-paper-hi"/><stop offset="1" class="vx-c-paper"/></linearGradient>
+      <linearGradient id="vx-side-r-{{ env.uid }}" x1="1" y1="0" x2="0" y2="0"><stop offset="0" class="vx-c-paper"/><stop offset="1" class="vx-c-paper-lo"/></linearGradient>
+      <linearGradient id="vx-bottom-{{ env.uid }}" x1="0" y1="1" x2="0" y2="0"><stop offset="0" class="vx-c-paper-lo"/><stop offset=".55" class="vx-c-paper"/><stop offset="1" class="vx-c-paper-hi"/></linearGradient>
+      <linearGradient id="vx-flap-{{ env.uid }}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="vx-c-paper-hi"/><stop offset=".7" class="vx-c-paper"/><stop offset="1" class="vx-c-paper-lo"/></linearGradient>
+      <linearGradient id="vx-inside-{{ env.uid }}" x1="0" y1="1" x2="0" y2="0"><stop offset="0" class="vx-c-inside-lo"/><stop offset=".45" class="vx-c-inside"/><stop offset="1" class="vx-c-inside"/></linearGradient>
+      <radialGradient id="vx-wax-body-{{ env.uid }}" cx="42%" cy="38%" r="70%"><stop offset="0" class="vx-c-wax-hi"/><stop offset=".55" class="vx-c-wax"/><stop offset="1" class="vx-c-wax-lo"/></radialGradient>
+      <radialGradient id="vx-veld-{{ env.uid }}"><stop offset=".55" class="vx-c-liner-bg"/><stop offset="1" class="vx-c-liner-bg vx-c-liner-bg--uit"/></radialGradient>
+      <clipPath id="vx-flap-clip-{{ env.uid }}"><path d="M0 0H1000C900 120 690 332 550 440Q500 478 450 440C310 332 100 120 0 0Z"/></clipPath>
+      {% comment %}Het zegel in twee helften: de flapvorm omgerekend naar de maat van het zegel (viewBox 0 0 120): schaal 120/185,
+         verschoven naar de plek van het zegel op de punt (links 407.5, boven 372.7 in flapeenheden).{% endcomment %}
+      <clipPath id="vx-seal-top-{{ env.uid }}" clipPathUnits="userSpaceOnUse"><path transform="matrix(0.64865 0 0 0.64865 -264.32 -241.75)" d="M0 0H1000C900 120 690 332 550 440Q500 478 450 440C310 332 100 120 0 0Z"/></clipPath>
+      <mask id="vx-seal-bottom-{{ env.uid }}" maskUnits="userSpaceOnUse" x="-20" y="-20" width="160" height="160">
+        <rect x="-20" y="-20" width="160" height="160" fill="#fff"/>
+        <path fill="#000" transform="matrix(0.64865 0 0 0.64865 -264.32 -241.75)" d="M0 0H1000C900 120 690 332 550 440Q500 478 450 440C310 332 100 120 0 0Z"/>
+      </mask>
+      <clipPath id="vx-seal-blob-{{ env.uid }}"><path d="{% include 'partials/envelop/_zegel_rand.svg' %}"/></clipPath>
+    </defs>
+  </svg>
+
+  <div class="vx-stage">
+    <div class="vx-shadow" aria-hidden="true"></div>
+    <div class="vx-env">
+      <div class="vx-back" aria-hidden="true"><div class="vx-liner vx-liner--back" style="background-image: url('{% static 'img/envelop/'|add:env.s.voering %}')"></div></div>
+
+      <div class="vx-flapcast" aria-hidden="true"></div>
+      <div class="vx-card" aria-hidden="true">
+        <div class="vx-card__paper" style="clip-path: polygon({% include 'partials/envelop/_kaart_rand.txt' %})"></div>
+        <div class="vx-card__body" data-tekst-op-beeld>
+          <span class="vx-card__kicker">{{ env.kicker }}</span>
+          <span class="vx-card__title">{{ env.title }}</span>
+          <span class="vx-card__rule"></span>
+          <span class="vx-card__date">{{ env.date }}</span>
+        </div>
+        <div class="vx-card__pocketshade"></div>
+      </div>
+
+      <svg class="vx-pocket" viewBox="0 0 1000 700" preserveAspectRatio="none" focusable="false" aria-hidden="true">
+        <path d="M0 0L506 384Q516 392 506 402L0 700Z" fill="url(#vx-side-l-{{ env.uid }})"/>
+        <path d="M1000 0L494 384Q484 392 494 402L1000 700Z" fill="url(#vx-side-r-{{ env.uid }})"/>
+        <g filter="url(#vx-lift-{{ env.uid }})"><path d="M0 700L462 356Q500 330 538 356L1000 700Z" fill="url(#vx-bottom-{{ env.uid }})"/></g>
+        <path class="vx-texture" d="M0 0L506 384Q516 392 506 402L0 700Z" fill="url(#vx-paper-{{ env.uid }})"/>
+        <path class="vx-texture" d="M1000 0L494 384Q484 392 494 402L1000 700Z" fill="url(#vx-paper-{{ env.uid }})"/>
+        <path class="vx-texture" d="M0 700L462 356Q500 330 538 356L1000 700Z" fill="url(#vx-paper-{{ env.uid }})"/>
+        <path class="vx-edge" d="M0 700L462 356Q500 330 538 356L1000 700"/>
+      </svg>
+
+      <div class="vx-flap">
+        <div class="vx-flap__out">
+          {% comment %}Buitenkant: diepe puntflap met licht bolle zijden. Decoratie hoort bij deze laag en draait dus mee.
+            De clip staat op dezelfde groep als de mengmodus: een clip op een oudergroep isoleert hem (dan mengt hij niet).{% endcomment %}
+          <svg class="vx-flap__svg" viewBox="0 0 1000 476" preserveAspectRatio="none" focusable="false" aria-hidden="true">
+            <path d="M0 0H1000C900 120 690 332 550 440Q500 478 450 440C310 332 100 120 0 0Z" fill="url(#vx-flap-{{ env.uid }})"/>
+            <path class="vx-texture" d="M0 0H1000C900 120 690 332 550 440Q500 478 450 440C310 332 100 120 0 0Z" fill="url(#vx-paper-{{ env.uid }})"/>
+            {% if env.s.flap.soort == "print" %}<g class="vx-deco" clip-path="url(#vx-flap-clip-{{ env.uid }})">
+              <svg x="0" y="0" width="1000" height="476" viewBox="0 0 1000 476">{% include env.s.flap.fragment %}</svg>
+            </g>{% endif %}
+            <g class="vx-relief vx-relief--{{ env.s.flap.soort }}" filter="url(#vx-relief-{{ env.uid }})" clip-path="url(#vx-flap-clip-{{ env.uid }})">
+              <svg class="vx-hmap" x="0" y="0" width="1000" height="476" viewBox="0 0 1000 476">{% include env.s.flap.fragment %}</svg>
+            </g>
+            {% if env.s.twinkel %}<path class="vx-twinkle" d="M{{ env.s.twinkel.0 }} {{ env.s.twinkel.1 }}m0 -9l2 7l7 2l-7 2l-2 7l-2 -7l-7 -2l7 -2z"/>{% endif %}
+            <path class="vx-flap__edge" d="M2 1C102 121 312 332 450 440Q500 478 550 440C690 332 900 121 998 1"/>
+            <path class="vx-flap__fold" d="M0 1H1000"/>
+            <path class="vx-flap__dim" d="M0 0H1000C900 120 690 332 550 440Q500 478 450 440C310 332 100 120 0 0Z"/>
+          </svg>
+          <svg class="vx-sealpart vx-sealpart--top" viewBox="0 0 120 120" focusable="false" aria-hidden="true">
+            <g clip-path="url(#vx-seal-top-{{ env.uid }})">{% include "partials/envelop/_zegel.html" %}</g>
+          </svg>
+        </div>
+        {# Binnenkant: getekend met de punt omhoog; na het openen staat hij zo: voering, goudfolielijn en een motief onder de punt. #}
+        <div class="vx-flap__in" aria-hidden="true">
+          <svg class="vx-flap__insvg" viewBox="0 0 1000 476" preserveAspectRatio="none" focusable="false">
+            <path d="M0 476H1000C900 356 690 144 550 36Q500 -2 450 36C310 144 100 356 0 476Z" fill="url(#vx-inside-{{ env.uid }})"/>
+            <path class="vx-texture" d="M0 476H1000C900 356 690 144 550 36Q500 -2 450 36C310 144 100 356 0 476Z" fill="url(#vx-paper-{{ env.uid }})"/>
+            {# De voering is een eigen vel: met een zachte schaduwrand op het papier van de envelop en een fijne goudfolielijn. #}
+            <g filter="url(#vx-lift-{{ env.uid }})"><path class="vx-liner" d="M50 476H950C858 366 666 178 540 80Q500 50 460 80C334 178 142 366 50 476Z" fill="url(#vx-liner-{{ env.uid }})"/></g>
+            <path class="vx-texture" d="M50 476H950C858 366 666 178 540 80Q500 50 460 80C334 178 142 366 50 476Z" fill="url(#vx-paper-{{ env.uid }})"/>
+            <path class="vx-liner__edge" d="M50 476H950C858 366 666 178 540 80Q500 50 460 80C334 178 142 366 50 476Z"/>
+            <path class="vx-liner__foil" d="M74 476H926C838 374 654 196 535 104Q500 78 465 104C346 196 162 374 74 476Z"/>
+            {% if env.s.binnen %}{% with b=env.s.binnen %}
+            {# Rustig veld in de voering achter het motief (zacht uitlopend), zodat de print er niet doorheen loopt. #}
+            <ellipse class="vx-binnen-veld" cx="{{ b.cx }}" cy="{{ b.cy }}" rx="{{ b.rx }}" ry="{{ b.ry }}" fill="url(#vx-veld-{{ env.uid }})"/>
+            <g class="vx-deco vx-deco--binnen"><svg x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" viewBox="{{ b.vb }}">{% include b.fragment %}</svg></g>
+            <g class="vx-relief vx-relief--print" filter="url(#vx-relief-{{ env.uid }})"><svg class="vx-hmap" x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" viewBox="{{ b.vb }}">{% include b.fragment %}</svg></g>
+            {% endwith %}{% endif %}
+            <path class="vx-flap__indim" d="M0 476H1000C900 356 690 144 550 36Q500 -2 450 36C310 144 100 356 0 476Z"/>
+          </svg>
+        </div>
+      </div>
+
+      <svg class="vx-sealpart vx-sealpart--base" viewBox="0 0 120 120" focusable="false" aria-hidden="true">
+        <g mask="url(#vx-seal-bottom-{{ env.uid }})">{% include "partials/envelop/_zegel.html" %}</g>
+        {# De barst: de rand van de flap, alleen binnen de was (clip op de groep, anders schuift de clip mee met de omrekening). #}
+        <g clip-path="url(#vx-seal-blob-{{ env.uid }})"><path class="vx-seal-crack" transform="matrix(0.64865 0 0 0.64865 -264.32 -241.75)" d="M2 1C102 121 312 332 450 440Q500 478 550 440C690 332 900 121 998 1"/></g>
+      </svg>
+      {% if env.link %}<a href="{{ env.link }}" class="vx-seal-hit" data-vx-open data-open data-fx-origin role="button" aria-label="Verbreek het zegel en open de envelop"></a>
+      {% else %}<button type="button" class="vx-seal-hit" data-vx-open aria-label="Verbreek het zegel en open de envelop"></button>{% endif %}
+      <div class="vx-sheen" aria-hidden="true"></div>
+    </div>
+  </div>
+  {% if env.link %}<a href="{{ env.link }}" class="vx-hint" data-vx-open data-open>Tik op het zegel om te openen</a>
+  {% else %}<button type="button" class="vx-hint" data-vx-open>Tik op het zegel om te openen</button>{% endif %}
+</div>

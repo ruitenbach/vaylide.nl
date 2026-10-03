@@ -1,0 +1,55 @@
+{% extends "studio/base_studio.html" %}{% load static %}
+{% block title %}Envelop en zegel{% endblock %}
+{% block studio %}
+<div class="studio-intro studio-intro--compact">
+  <h1>Envelop &amp; zegel</h1>
+  <p class="lead">Hoe openen je gasten <strong>{{ inv.template_version.template.name }}</strong>? Kies een envelop en een zegel; je ziet het meteen op je kaart. <a href="{% url 'studio:step' inv.uid 'ontwerp' %}">Ander ontwerp</a></p>
+  <p class="studio-opening" id="envelop-uitleg">De envelop bepaalt alleen hoe je gasten de uitnodiging openen. Je gekozen uitnodiging zelf verandert niet.</p>
+</div>
+{% include "studio/_conflict.html" %}
+{% comment %}De Envelope Collection als losse laag om het ontwerp. Zonder JavaScript blijft alles bruikbaar: kies een envelop, tik op Opslaan en de passende zegels staan er.
+Met JavaScript (static/js/studio.js, data-envelop-kiezer) tonen we meteen alleen de zegels die bij de gekozen envelop horen.{% endcomment %}
+<form method="post" class="form studio-form" data-once data-dirty-check novalidate data-envelop-kiezer>
+  {% csrf_token %}
+  <fieldset class="studio-block" id="envelop">
+    <legend class="studio-block__title">Kies je envelop</legend>
+    <div class="env-grid">
+      <label class="env-kaart">
+        <input type="radio" name="envelop" value=""{% if form.envelop.value == "" %} checked{% endif %}>
+        <span class="env-kaart__beeld env-kaart__beeld--tekst" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34" focusable="false"><path d="M4 6h16v12H4z M4 6l8 7 8-7" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" opacity=".55"/></svg></span>
+        <strong>Opening van het ontwerp</strong><span class="small muted">{{ form.ontwerp_opening }}</span>
+      </label>
+      <label class="env-kaart">
+        <input type="radio" name="envelop" value="geen"{% if form.envelop.value == "geen" %} checked{% endif %}>
+        <span class="env-kaart__beeld env-kaart__beeld--tekst" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34" focusable="false"><rect x="5" y="4" width="14" height="16" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/><path d="M8.5 9h7M8.5 12h7M8.5 15h4" stroke="currentColor" stroke-width="1.2" opacity=".55"/></svg></span>
+        <strong>Geen envelop</strong><span class="small muted">Gasten zien direct je uitnodiging.</span>
+      </label>
+      {% for o in form.opties %}
+      <label class="env-kaart">
+        <input type="radio" name="envelop" value="{{ o.code }}" data-zegels="{{ o.zegels|join:' ' }}" data-standaard="{{ o.standaard }}"{% if o.gekozen %} checked{% endif %}>
+        <img class="env-kaart__beeld" src="{% static o.voorbeeld %}" alt="" width="560" height="409" loading="lazy" decoding="async">
+        <strong>{{ o.naam }}</strong><span class="small muted">{{ o.tekst }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+  <fieldset class="studio-block" id="zegel" data-zegel-blok{% if not form.zegel_zichtbaar %} hidden{% endif %}>
+    <legend class="studio-block__title">Kies je zegel</legend>
+    <p class="hint">Alleen de zegels die bij deze envelop passen.</p>
+    <div class="zegel-grid">
+      {% for z in form.zegel_opties %}
+      <label class="zegel-kaart" data-envelopen="{{ z.envelopen }}"{% if not z.zichtbaar %} hidden{% endif %}>
+        <input type="radio" name="zegel" value="{{ z.code }}"{% if z.gekozen %} checked{% endif %}>
+        <img class="zegel-kaart__beeld" src="{% static z.voorbeeld %}" alt="" width="200" height="200" loading="lazy" decoding="async">
+        <strong>{{ z.naam }}</strong><span class="small muted">{{ z.materiaal }}</span>
+      </label>
+      {% endfor %}
+    </div>
+    <div class="field"><span class="label">{{ form.teken.label }}</span>
+      <div class="chips">{% for r in form.teken %}<label class="chip">{{ r.tag }} {{ r.choice_label }}</label>{% endfor %}</div>
+    </div>
+    <div data-initialen-veld>{% include "studio/_field.html" with field=form.initialen %}</div>
+  </fieldset>
+  {% include "studio/_actions.html" %}
+</form>
+{% endblock %}

@@ -1,0 +1,293 @@
+/* Rosé Royale v1 — trouwontwerp: een roségouden avond in de rozentuin. Opening: de Rose Blush-envelop uit de VAYLIDE
+   Envelope Collection. Daarna een scène in lagen (lucht, oranjerie met spiegeling, tuin, roségouden boog, rozen vooraan)
+   met de namen in de avondlucht, en één doorlopende kaart die van schemering naar blush loopt en terug naar de avond.
+   Beelden uit tools/rose_royale/maak_tekeningen.py (eigen tekeningen). Beweging alleen onder .fx-motion, doorlopend met
+   animation-play-state: var(--fx-play). Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Great Vibes"; src: url("../../../fonts/great-vibes-latin-400-normal.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Marcellus"; src: url("../../../fonts/marcellus-latin-400-normal.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Playfair Display"; src: url("../../../fonts/playfair-display-latin-wght-italic.woff2") format("woff2"); font-weight: 400 900; font-style: italic; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../../../fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 300 800; font-display: swap; }
+
+body {
+  --rr-script: "Great Vibes", "Pinyon Script", cursive;
+  --rr-caps: "Marcellus", "Cinzel", Georgia, serif;
+  --rr-display: "Playfair Display", Georgia, serif;
+  --rr-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --rr-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --rr-w: min(100vw - 32px, 560px);
+  --rr-kant: max(16px, calc((100vw - var(--rr-w)) / 2));
+  --rr-paper-img: url("../../../img/envelop/papier.webp");
+  /* Roségoudfolie: licht voor op de avondlucht, donker (leesbaar) voor op blush. */
+  --rr-foil-licht: linear-gradient(100deg, #E8B4A0 0%, #FFF3EC 30%, #F6D3C3 46%, #FFFFFF 54%, #EDBBA8 72%, #D99A88 100%);
+  --rr-foil-donker: linear-gradient(100deg, #6E2F3A 0%, #9A4E56 30%, #B86A68 46%, #8A4450 64%, #5E2833 100%);
+  --inv-bg: var(--rr-paper);
+  --inv-text: var(--rr-ink);
+  --inv-muted: var(--rr-muted);
+  --inv-accent: var(--rr-accent);
+  --inv-accent-contrast: var(--rr-accent-ink);
+  --inv-font-body: var(--rr-serif);
+  --inv-font-ui: var(--rr-ui);
+  --inv-focus: var(--rr-gold-2);
+  --inv-radius: 4px;
+  --inv-surface-2: var(--rr-page-2);
+  --inv-btn-border: color-mix(in srgb, var(--rr-gold-2) 70%, transparent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--rr-gold) 16%, transparent);
+  --inv-field-bg: #FFFCFA;
+  --inv-field-text: var(--rr-ink);
+  --inv-field-border: color-mix(in srgb, var(--rr-ink) 28%, transparent);
+  --inv-music-bg: linear-gradient(180deg, #F8DDD0, #D9A08F);
+  --inv-music-text: #2E1520;
+  --inv-music-border: rgba(110, 50, 60, .3);
+  --inv-photo-bg: var(--rr-page-2);
+  --fx-pulse: var(--rr-gold);
+  background: var(--rr-page) var(--rr-paper-img) 0 0 / 520px;
+  background-blend-mode: soft-light;
+  color: var(--rr-ink);
+  font-family: var(--rr-serif);
+  font-size: 1.16rem;
+  font-weight: 500;
+}
+
+/* ================================================================ openingsscherm: de Rose Blush-envelop */
+.rr-cover {
+  color: var(--rr-rose-ink);
+  background: radial-gradient(60% 46% at 50% 50%, rgba(255, 214, 196, .55), transparent 72%),
+    radial-gradient(120% 90% at 50% 30%, var(--rr-paper), var(--rr-page-2) 80%);
+  --fx-bg: var(--rr-page);
+  /* Rozenblaadjes bij het breken van het zegel: dieper roze, zodat ze op blush niet grijs lijken. */
+  --fx-1: #D98A92; --fx-2: #E8A7A9; --fx-3: #C2737D; --fx-4: #F0BDB6;
+}
+.rr-cover .fx-slot { z-index: 0; }
+.rr-cover__stage { position: relative; z-index: 1; display: grid; justify-items: center; align-content: center; gap: .6rem; width: 100%; min-height: 100%; padding: 16px 0 24px; }
+.rr-cover__to { margin: 0; padding: 0 16px; font: 400 .74rem/1.3 var(--rr-caps); letter-spacing: .32em; text-transform: uppercase; color: var(--rr-rose-ink); text-align: center; }
+.rr-cover .vx-hint { color: var(--rr-rose-ink); }
+.rr-cover__music { display: inline-flex; align-items: center; gap: .5rem; margin-top: .2rem; padding: .55rem 1.1rem; border: 1px solid color-mix(in srgb, var(--rr-gold-2) 60%, transparent);
+  border-radius: 999px; background: color-mix(in srgb, var(--rr-paper) 70%, transparent); color: var(--rr-rose-ink); font: 500 .8rem/1 var(--rr-ui); cursor: pointer; }
+.rr-cover__music:focus-visible { outline: 2px solid var(--rr-gold-2); outline-offset: 3px; }
+/* Als de kaart uit de envelop komt, rijdt de camera de scène in: het scherm vergroot heel licht en vervaagt. */
+.is-opening:not(.is-opening-reduced) .rr-cover { animation: rr-camera .8s cubic-bezier(.5, 0, .2, 1) 3.8s forwards; }
+@keyframes rr-camera { to { opacity: 0; transform: scale(1.08); } }
+
+/* ================================================================ gedeelde tekenstijl */
+.rr-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.rr-ster { fill: #FFF3EA; }
+img.rr-roos, img.rr-oranjerie, img.rr-boog, img.rr-hart, img.rr-stralen { display: block; max-width: none; height: auto; user-select: none; -webkit-user-drag: none; }
+
+/* ================================================================ de kop: een kleine trouwfilm
+   Lagen van achter naar voor (elk in een eigen 'diepte'-vlak dat tijdens de opening een eigen beweging krijgt):
+   lucht (sterren, maan, horizon, stralen) · oranjerie (gedoofd en verlicht) · boog en hartsculptuur · tekst ·
+   rozen halverwege · onscherpe rozen vooraan. De beelden zijn eenmalig gerenderd (tools/rose_royale/maak_beelden.py),
+   dus de pagina hoeft ze alleen te verplaatsen: goedkoop en soepel. */
+.rr-hero { --H: max(100vh, 720px);  /* vh, niet svh: in calc() rekent dit betrouwbaarder; de compositie schaalt mee met deze hoogte */ --aw: min(80vw, calc(var(--H) * .62)); --ah: calc(var(--aw) * 1.5);
+  position: relative; display: grid; justify-items: center; min-height: var(--H); overflow: hidden; color: #FBEDEA; isolation: isolate;
+  background-color: #3B2433;
+  /* Warme rozenblaadjes op de avondlucht (de deeltjes nemen deze kleuren over). */
+  --fx-1: #F4B9B6; --fx-2: #FFE2DA; --fx-3: #EBA79F; --fx-4: #FFD3C6; --fx-bg: #5A3448; }
+/* De avondlucht (een pseudo-element, geen aparte laag). De tekst staat in het donkere middenstuk: minstens 4,5:1. */
+.rr-hero::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(180deg, #2A1827 0%, #3E2338 18%, #5E3550 36%, #7F4A5E 50%, #B26B73 62%, #E8AE99 72%, #F6D2BC 78%, #E7B4A5 85%, #6B3D4E 100%); }
+.rr-diepte { position: absolute; inset: 0; pointer-events: none; transform-origin: 50% 64%; }
+.rr-diepte--lucht { z-index: 0; } .rr-diepte--oranjerie { z-index: 2; } .rr-diepte--boog { z-index: 4; }
+.rr-diepte--rozen { z-index: 7; } .rr-diepte--voor { z-index: 8; }
+.rr-sterren { position: absolute; left: 0; top: 0; width: 100%; height: 66%; translate: 0 calc(var(--rr-scroll, 0px) * .4); }
+.rr-horizon { position: absolute; left: -10%; right: -10%; top: 48%; height: 40%; background: radial-gradient(56% 46% at 50% 56%, rgba(255, 222, 192, .6), rgba(255, 190, 170, .16) 50%, transparent 72%); translate: 0 calc(var(--rr-scroll, 0px) * .3); }
+.rr-stralen { position: absolute; left: 50%; bottom: 8%; width: calc(var(--plaat) * 1.15); translate: -50% calc(var(--rr-scroll, 0px) * .22); mix-blend-mode: screen; opacity: .85; }
+
+/* De oranjerie: twee beelden op elkaar; het verlichte beeld gaat tijdens de opening langzaam aan (het licht 'brandt'). */
+.rr-hero { --plaat: 200vw; }  /* de oranjerie vult op een telefoon de breedte; het midden (koepel en hal) staat in beeld */
+.rr-oranjerie { position: absolute; left: 50%; bottom: calc(var(--H) * .06); width: var(--plaat); translate: calc(-50% + var(--rr-mx, 0) * -6px) calc(var(--rr-scroll, 0px) * .2); }
+.rr-oranjerie--licht { opacity: 1; }
+.rr-boog { position: absolute; left: 50%; bottom: 0; width: var(--aw); translate: calc(-50% + var(--rr-mx, 0) * 4px) calc(var(--rr-scroll, 0px) * .08); }
+.rr-hart { position: absolute; left: 50%; top: calc(100% - var(--ah) + var(--ah) * .018); width: calc(var(--aw) * .32); translate: calc(-50% + var(--rr-mx, 0) * 5px) calc(var(--rr-scroll, 0px) * .08);
+  transform-origin: 50% 0; filter: drop-shadow(0 10px 14px rgba(30, 8, 20, .4)); }
+.fx-motion .rr-hart { animation: rr-zwaai 7.5s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes rr-zwaai { 0%, 100% { rotate: -1.8deg; } 50% { rotate: 1.8deg; } }
+.rr-hero__fx { position: absolute; inset: 0; z-index: 5; }
+
+/* De tekst staat in de avondlucht (op een telefoon boven de boog, op een groter scherm erin, onder het hart). */
+.rr-hero__tekst { position: relative; z-index: 6; align-self: start; width: min(88vw, 560px); margin-top: max(8svh, 56px); text-align: center; }
+.rr-kicker { margin: 0 0 .4rem; font: 400 .78rem/1.3 var(--rr-caps); letter-spacing: .42em; text-transform: uppercase; color: #FBE3DA; text-shadow: 0 1px 8px rgba(40, 10, 30, .6); }
+.rr-names { margin: 0; font: 400 clamp(3rem, 14.5vw, 6.2rem)/1.02 var(--rr-script); letter-spacing: 0;
+  background: var(--rr-foil-licht); background-size: 100% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 2px rgba(50, 15, 35, .55)) drop-shadow(0 0 20px rgba(255, 196, 176, .5)); overflow-wrap: anywhere; }
+.rr-names--long { font-size: clamp(2.5rem, 12vw, 4.8rem); }
+.rr-names--xlong { font-size: clamp(2.1rem, 9.6vw, 3.9rem); }
+.rr-names__amp { font-size: .7em; }
+/* Het lint met de datum: roségoud satijn met gevouwen punten. */
+.rr-lint { position: relative; display: grid; place-items: center; width: min(84%, 380px); height: 52px; margin: .8rem auto 0; }
+.rr-lint__band { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 4px 5px rgba(50, 15, 30, .4)); }
+.rr-lint__vlak { fill: url(#rr-lint-goud); }
+.rr-lint__eind { fill: #C98B7E; }
+.rr-lint__tekst { position: relative; margin: 0 0 4px; padding: .3em .6em; border-radius: 2px; background: #F7D9CC; font: 400 .78rem/1 var(--rr-caps); letter-spacing: .2em; text-transform: uppercase; color: #3A1826; }
+.rr-tagline { margin: .8rem auto 0; max-width: 28ch; font-style: italic; font-size: 1.2rem; line-height: 1.38; color: #FFF2EE; text-shadow: 0 1px 10px rgba(40, 10, 30, .7); }
+
+/* Rozen: halverwege (scherp) en vooraan (onscherp, diepteonscherpte), elk met hun eigen parallax. */
+.rr-roos { position: absolute; }
+.rr-roos--links { left: -34vw; bottom: -14vw; width: 108vw; translate: calc(var(--rr-mx, 0) * 10px) calc(var(--rr-scroll, 0px) * -.1); }
+.rr-roos--rechts { right: -30vw; bottom: -12vw; width: 84vw; translate: calc(var(--rr-mx, 0) * 12px) calc(var(--rr-scroll, 0px) * -.08); }
+.rr-roos--boven { right: -30vw; top: -24vw; width: 74vw; translate: calc(var(--rr-mx, 0) * 8px) calc(var(--rr-scroll, 0px) * -.04); }
+.rr-roos--voor-links { left: -52vw; bottom: -44vw; width: 98vw; translate: calc(var(--rr-mx, 0) * 20px) calc(var(--rr-scroll, 0px) * -.2); opacity: .92; }
+.rr-roos--voor-rechts { right: -56vw; bottom: -40vw; width: 98vw; translate: calc(var(--rr-mx, 0) * 24px) calc(var(--rr-scroll, 0px) * -.24); opacity: .92; }
+.rr-scroll { position: absolute; left: 50%; bottom: 16px; z-index: 9; display: inline-flex; flex-direction: column; align-items: center; gap: .1rem; translate: -50% 0;
+  font: 400 .7rem/1 var(--rr-caps); letter-spacing: .28em; text-transform: uppercase; color: #FFF2EE; text-decoration: none; text-shadow: 0 1px 8px rgba(40, 10, 20, .8); }
+.rr-scroll:focus-visible { outline: 2px solid #F6D3C3; outline-offset: 4px; }
+
+/* Groter scherm: alles schaalt mee met de hoogte (H). De boog staat bijna schermhoog, het hart hangt aan de top, de tekst staat
+   eronder in de boog en de oranjerie eronder; de rozen staan om de boog heen en de onscherpe rozen aan de rand van het scherm. */
+@media (min-width: 760px) {
+  .rr-hero { --aw: calc(var(--H) * .64); --ah: calc(var(--H) * .96); --plaat: calc(var(--H) * .78); }
+  .rr-hart { top: calc(var(--H) * .052); width: calc(var(--H) * .17); }
+  .rr-hero__tekst { align-self: start; width: min(var(--aw) * .84, 520px); margin-top: calc(var(--H) * .285); }
+  .rr-names { font-size: min(5.4rem, calc(var(--H) * .088)); }
+  .rr-names--long { font-size: min(4.4rem, calc(var(--H) * .072)); }
+  .rr-names--xlong { font-size: min(3.6rem, calc(var(--H) * .06)); }
+  .rr-kicker { font-size: .74rem; }
+  .rr-tagline { font-size: 1.12rem; max-width: 30ch; }
+  .rr-roos--links { left: calc(50% - var(--aw) * .5 - var(--H) * .46); bottom: calc(var(--H) * -.05); width: calc(var(--H) * .78); }
+  .rr-roos--rechts { left: auto; right: calc(50% - var(--aw) * .5 - var(--H) * .36); bottom: calc(var(--H) * -.04); width: calc(var(--H) * .62); }
+  .rr-roos--boven { right: calc(50% - var(--aw) * .5 - var(--H) * .22); top: calc(var(--H) * -.06); width: calc(var(--H) * .5); }
+  .rr-roos--voor-links { left: calc(var(--H) * -.26); bottom: calc(var(--H) * -.46); width: calc(var(--H) * .74); }
+  .rr-roos--voor-rechts { right: calc(var(--H) * -.28); bottom: calc(var(--H) * -.42); width: calc(var(--H) * .74); }
+}
+
+/* ---------------------------------------------------------------- de film: vanaf het indrukken van het zegel (html.rr-film, gezet door rose-royale.js)
+   0-3,8 s: de envelop; 3,2 s: de camera begint de tuin in te rijden (lagen schuiven op hun eigen snelheid naar buiten);
+   4,1 s: het licht in de oranjerie gaat aan; 4,4 s: de stralen; 5,2 s: de namen. Alleen met beweging aan. */
+.fx-motion.rr-film .rr-diepte { animation: rr-rijden var(--dur, 3.4s) cubic-bezier(.22, .6, .16, 1) var(--t0, 3.2s) both; }
+.fx-motion.rr-film .rr-diepte--lucht { --s0: .96; --o0: 1; --dur: 4s; --t0: 3s; }
+.fx-motion.rr-film .rr-diepte--oranjerie { --s0: .88; --o0: 1; --dur: 3.8s; --t0: 3.1s; }
+.fx-motion.rr-film .rr-diepte--boog { --s0: .8; --o0: 0; --dur: 3.4s; --t0: 3.3s; }
+.fx-motion.rr-film .rr-diepte--rozen { --s0: .62; --o0: 0; --dur: 3.2s; --t0: 3.5s; }
+.fx-motion.rr-film .rr-diepte--voor { --s0: .42; --o0: 0; --dur: 3.4s; --t0: 3.2s; }
+@keyframes rr-rijden { from { transform: scale(var(--s0, 1)); opacity: var(--o0, 1); } 35% { opacity: 1; } to { transform: none; opacity: 1; } }
+.fx-motion.rr-film .rr-oranjerie--licht { animation: rr-aan 2.6s ease-in-out 4.1s both; }
+.fx-motion.rr-film .rr-stralen { animation: rr-stralen-aan 3s ease-out 4.4s both; }
+.fx-motion.rr-film .rr-hart { animation: rr-hart-aan 1.8s ease-out 4.3s both, rr-zwaai 7.5s ease-in-out 6.2s infinite; }
+@keyframes rr-aan { from { opacity: 0; } }
+@keyframes rr-stralen-aan { from { opacity: 0; } }
+@keyframes rr-hart-aan { from { opacity: 0; translate: calc(-50% + var(--rr-mx, 0) * 5px) -26px; } }
+
+/* ================================================================ één doorlopende kaart */
+.rr-body { position: relative; overflow-x: clip; }  /* rozen en ranken mogen over de rand groeien, maar nooit zijwaarts scrollen */
+/* Overgang: de donkere tuin loopt over in blush, als dageraad. */
+.rr-body::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 180px; z-index: 0; pointer-events: none;
+  background: linear-gradient(180deg, #2E1C28 0%, #6B3D4E 26%, color-mix(in srgb, var(--rr-page-2) 80%, #C98384) 62%, transparent 100%); }
+.rr-sec { position: relative; z-index: 1; padding: 76px var(--rr-kant) 80px; text-align: center; isolation: isolate; }
+.rr-body > .rr-sec:first-child { padding-top: 150px; }
+/* Een zacht lichtaccent dat opgloeit als het hoofdstuk in beeld komt, afwisselend links en rechts. */
+.rr-sec::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity 1.8s ease .2s;
+  background: radial-gradient(min(72%, 560px) 48% at var(--lx, 50%) 8%, rgba(255, 214, 200, .5), transparent 72%); }
+.rr-sec:nth-of-type(odd) { --lx: 30%; } .rr-sec:nth-of-type(even) { --lx: 70%; }
+.rr-sec.is-visible::before, html:not(.invite-ready) .rr-sec::before { opacity: 1; }
+.rr-label { margin: 0 0 .4rem; font: 400 .74rem/1.3 var(--rr-caps); letter-spacing: .34em; text-transform: uppercase; color: var(--rr-rose-ink); }
+.rr-h2 { margin: 0 0 1.2rem; font: italic 500 clamp(2rem, 8.4vw, 2.9rem)/1.12 var(--rr-display); color: var(--rr-ink); }
+.rr-sec p { line-height: 1.55; }
+.rr-rankje { display: block; width: min(76%, 420px); height: auto; margin: -20px auto 14px; overflow: visible; }
+.invite-ready .rr-sec :is(.rr-rankje, .rr-cartouche__rozen, .rr-medaillon__rozen, .rr-aanmelden__rozen, .rr-slot__rozen) { opacity: 0; translate: 0 10px; transition: opacity 1.2s ease .4s, translate 1.2s cubic-bezier(.2, .7, .2, 1) .4s; }
+.invite-ready .rr-sec.is-visible :is(.rr-rankje, .rr-cartouche__rozen, .rr-medaillon__rozen, .rr-aanmelden__rozen, .rr-slot__rozen) { opacity: 1; translate: 0 0; }
+
+/* Welkom: een gegraveerde roségouden cartouche met een rozenrank en de tekst erin verwerkt. */
+.rr-cartouche { position: relative; width: min(100%, 440px); margin: 0 auto; padding: 72px 12% 56px; }
+.rr-cartouche__lijst { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 10px 18px rgba(110, 50, 60, .18)); }
+.rr-cartouche__buiten { fill: color-mix(in srgb, var(--rr-paper) 85%, transparent); stroke: url(#rr-goud); stroke-width: 3; }
+.rr-cartouche__binnen { fill: none; stroke: url(#rr-goud-v); stroke-width: 1.2; }
+.rr-cartouche__rozen { position: absolute; left: 50%; top: -34px; width: 92%; max-width: none; height: auto; transform: translateX(-50%); }
+.rr-welkom__foto { position: relative; margin: 0 auto 1.2rem; width: min(100%, 300px); }
+.rr-welkom__foto .ph { border-radius: 150px 150px 6px 6px; box-shadow: 0 0 0 5px var(--rr-paper), 0 0 0 6px color-mix(in srgb, var(--rr-gold) 70%, transparent), 0 16px 30px -16px rgba(80, 30, 40, .45); overflow: hidden; }
+.rr-welkom__tekst { position: relative; }
+.rr-welkom__tekst p { margin: 0 0 .7rem; font-style: italic; font-size: 1.22rem; }
+
+/* De datum: een roségouden medaillon met gegraveerde letters en een glans die er langzaam overheen gaat. */
+.rr-medaillon { position: relative; width: min(74vw, 270px); margin: 0 auto 1.4rem; }
+.rr-medaillon__munt { position: relative; display: grid; align-content: center; justify-items: center; aspect-ratio: 1; border-radius: 50%; overflow: hidden;
+  background: radial-gradient(circle at 34% 28%, #FFF4EE 0, #F7D6C8 22%, #E6AE9C 48%, #D49585 72%, #C07E70 100%);
+  box-shadow: inset 0 0 0 6px rgba(255, 240, 232, .55), inset 0 0 0 7px rgba(140, 70, 70, .35), inset 0 0 0 14px rgba(255, 236, 226, .25), inset 0 0 0 15px rgba(140, 70, 70, .3),
+    inset 0 -10px 24px rgba(120, 50, 55, .35), 0 18px 34px -14px rgba(90, 30, 40, .5), 0 0 0 1px rgba(150, 80, 80, .4); }
+.rr-medaillon__munt::after { content: ""; position: absolute; inset: -40%; background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, .55) 50%, transparent 60%); translate: -60% 0; pointer-events: none; }
+.fx-motion .rr-medaillon__munt::after { animation: rr-munt 7s ease-in-out 1s infinite; animation-play-state: var(--fx-play, running); }
+@keyframes rr-munt { 0%, 55% { translate: -60% 0; } 85%, 100% { translate: 60% 0; } }
+.rr-medaillon__munt p { position: relative; margin: 0; color: #2E1018; text-shadow: 0 1px 0 rgba(255, 245, 238, .7); }
+.rr-medaillon__dag, .rr-medaillon__maand { font: 400 .78rem/1.3 var(--rr-caps); letter-spacing: .26em; text-transform: uppercase; }
+.rr-medaillon__getal { font: italic 500 clamp(4rem, 20vw, 5.4rem)/1 var(--rr-display); color: #2E1018; }
+.rr-medaillon__rozen { position: absolute; left: 50%; bottom: -32px; width: 118%; max-width: none; height: auto; transform: translateX(-50%); }
+.rr-datum__tijd { margin: 2.2rem 0 .2rem; font-size: 1.2rem; }
+.rr-datum__plek { margin: 0; font-style: italic; color: var(--rr-muted); }
+
+/* Avondhoofdstukken: een baan schemering over de hele breedte, met sterren (aftellen en het slot). */
+.rr-sec--avond { color: var(--rr-dusk-ink); background: linear-gradient(180deg, var(--rr-dusk), var(--rr-dusk-2) 60%, #6A3C50); background-color: var(--rr-dusk);
+  --inv-text: var(--rr-dusk-ink); --inv-muted: var(--rr-dusk-muted); --inv-accent: var(--rr-dusk-gold); --inv-accent-contrast: var(--rr-dusk);
+  --inv-btn-border: color-mix(in srgb, var(--rr-dusk-gold) 70%, transparent); --inv-btn-hover-bg: color-mix(in srgb, var(--rr-dusk-gold) 14%, transparent); --inv-focus: var(--rr-dusk-gold);
+  box-shadow: inset 0 1px 0 rgba(240, 195, 176, .5), inset 0 -1px 0 rgba(240, 195, 176, .5); overflow: hidden; }
+.rr-sec--avond::before { display: none; }
+.rr-sec--avond .rr-label { color: var(--rr-dusk-gold); }
+.rr-sec--avond .rr-h2 { color: var(--rr-dusk-ink); }
+.rr-avond__sterren { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; opacity: .8; }
+
+/* Programma langs een roségouden rank met rozenknoppen. */
+.rr-programma__lijst { position: relative; display: grid; gap: 1.3rem; width: min(100%, 460px); margin: 0 auto; padding: 0; list-style: none; text-align: left; }
+.rr-programma__lijst::before { content: ""; position: absolute; left: 21px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(var(--rr-gold), color-mix(in srgb, var(--rr-gold) 30%, transparent)); border-radius: 2px; }
+.rr-programma__item { position: relative; display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: start; }
+.rr-programma__knop { position: relative; width: 40px; height: auto; margin-top: -4px; }
+.rr-programma__inhoud p { margin: 0; }
+.rr-programma__tijd { font: 400 .78rem/1.4 var(--rr-caps); letter-spacing: .2em; color: var(--rr-rose-ink); }
+.rr-programma__titel { font: italic 500 1.3rem/1.25 var(--rr-display); }
+.rr-programma__tekst { margin-top: .2rem !important; color: var(--rr-muted); }
+
+/* Locatie: de oranjerie nog eens, in een roségouden boogvenster (een scène in de scène). */
+.rr-venster { position: relative; width: min(86%, 380px); aspect-ratio: 4 / 5; margin: 0 auto 1.4rem; border-radius: 190px 190px 8px 8px; overflow: hidden;
+  box-shadow: 0 0 0 6px var(--rr-paper), 0 0 0 8px var(--rr-gold), 0 0 0 9px rgba(255, 240, 232, .6), 0 22px 40px -18px rgba(80, 30, 40, .5); }
+.rr-venster { background: linear-gradient(180deg, #3A2234 0%, #8A5266 40%, #E2A592 66%, #F4CDB8 74%, #6B3D4E 100%); }
+.rr-venster__plaat { position: absolute; left: 50%; bottom: -2%; width: 250%; max-width: none; height: auto; translate: -50% 0; }
+.rr-venster__rozen { position: absolute; right: -16%; bottom: -14%; width: 66%; max-width: none; height: auto; }
+.rr-locatie__naam { margin: 0; font: italic 500 1.4rem/1.3 var(--rr-display); }
+.rr-locatie__adres { margin: .3rem 0 .6rem; font-style: normal; color: var(--rr-muted); }
+.rr-locatie__wanneer { margin: 0 0 1.1rem; }
+
+/* Dresscode als satijnen linten. */
+.rr-linten { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin: 0 0 1.1rem; padding: 0; list-style: none; }
+.rr-lintje { width: 42px; height: 72px; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 84%, 0 100%);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--c) 82%, #000), var(--c) 30%, color-mix(in srgb, var(--c) 62%, #fff) 50%, var(--c) 70%, color-mix(in srgb, var(--c) 82%, #000));
+  filter: drop-shadow(0 6px 6px rgba(80, 30, 40, .25)); }
+
+.rr-verhaal__tekst p { margin: 0 0 .8rem; }
+.rr-fotos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: min(100%, 520px); margin: 0 auto; padding: 0; list-style: none; }
+.rr-foto figure { margin: 0; }
+.rr-foto:nth-child(even) { transform: translateY(18px); }
+.rr-foto .ph { border-radius: 120px 120px 6px 6px; overflow: hidden; box-shadow: 0 0 0 4px var(--rr-paper), 0 0 0 5px color-mix(in srgb, var(--rr-gold) 65%, transparent), 0 14px 26px -16px rgba(80, 30, 40, .45); }
+.rr-foto figcaption { margin-top: .45rem; font-size: .95rem; font-style: italic; color: var(--rr-muted); }
+
+.rr-praktisch__lijst { display: grid; gap: 1.1rem; width: min(100%, 480px); margin: 0 auto; text-align: left; }
+.rr-praktisch__item dt { font: 400 .78rem/1.3 var(--rr-caps); letter-spacing: .2em; text-transform: uppercase; color: var(--rr-rose-ink); }
+.rr-praktisch__item dd { margin: .2rem 0 0; }
+
+/* Aanmelden: het formulier op roomwit papier, met rozen die over de rand groeien. */
+.rr-aanmelden { padding-bottom: 96px; }
+.rr-formulier { position: relative; width: min(100%, 500px); margin: 0 auto; padding: 30px 7% 26px; text-align: left; border-radius: 6px;
+  background: var(--rr-paper) var(--rr-paper-img) 0 0 / 420px; background-blend-mode: soft-light;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--rr-gold) 50%, transparent), 0 24px 44px -24px rgba(80, 30, 40, .45); }
+.rr-aanmelden__rozen { position: absolute; z-index: 2; height: auto; max-width: none; pointer-events: none; }
+.rr-aanmelden__rozen--l { left: calc(var(--rr-kant) - 70px); bottom: 10px; width: min(44vw, 230px); }
+.rr-aanmelden__rozen--r { right: calc(var(--rr-kant) - 50px); top: 120px; width: min(34vw, 170px); }
+
+.rr-contact__naam { margin: .3rem 0; font-weight: 600; }
+
+/* Het slot: terug naar de avond in de rozentuin. */
+.rr-slot { padding-bottom: 0; }
+.rr-slot__paviljoen { display: block; width: min(150%, 760px); max-width: none; height: auto; margin: -10% auto -12% 50%; translate: -50% 0; opacity: .95; }
+.rr-slot__wens { margin: 0 0 .2rem; font: 400 .8rem/1.3 var(--rr-caps); letter-spacing: .34em; text-transform: uppercase; color: var(--rr-dusk-gold); }
+.rr-slot__namen { margin: 0; font: 400 clamp(3rem, 14vw, 4.8rem)/1.05 var(--rr-script);
+  background: var(--rr-foil-licht); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 18px rgba(255, 200, 180, .45)); }
+.rr-slot__tekst { margin: .8rem auto 0; max-width: 34ch; }
+.rr-slot__rozen { display: block; width: min(80%, 460px); height: auto; margin: 1.4rem auto 0; overflow: visible; }
+.rr-slot .share { position: relative; }
+
+@media (min-width: 760px) {
+  .rr-sec { padding-top: 96px; padding-bottom: 100px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rr-cover, .rr-diepte, .rr-oranjerie, .rr-stralen, .rr-hart, .rr-medaillon__munt::after { animation: none !important; }
+}

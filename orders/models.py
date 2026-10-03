@@ -68,6 +68,9 @@ class Order(models.Model):
     terms_version = models.CharField("versie voorwaarden", max_length=20, blank=True)
     delivery_consent_at = models.DateTimeField("toestemming directe levering", null=True, blank=True)
     delivery_consent_text = models.TextField("tekst toestemming", blank=True)
+    # Het verzoek om de online beschikbaarheid (de dienst) direct te starten, tijdens de bedenktijd (artikel 9.3): tijdstip en letterlijke tekst.
+    service_consent_at = models.DateTimeField("verzoek start online dienst", null=True, blank=True)
+    service_consent_text = models.TextField("tekst verzoek start online dienst", blank=True)
     # Online tot en met (einde van die dag). Eén keer vastgelegd bij de eerste bevestigde betaling.
     ends_at = models.DateTimeField("online tot en met", null=True, blank=True)
     test_mode = models.BooleanField(default=True)

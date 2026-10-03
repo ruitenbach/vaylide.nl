@@ -227,24 +227,31 @@ def _kind(invitation) -> dict:
 def send_order_confirmation(order) -> OutboundEmail:
     """De bewaarbare bestelbevestiging: bedrijfsgegevens, pakket, prijs, aankoop- en einddatum, de toestemming voor
     directe levering en de algemene voorwaarden (versie van de bestelling) als bijlage."""
-    from core.voorwaarden import CURRENT, version_info
+    from core.voorwaarden import version_info
 
-    version = order.terms_version or CURRENT
+    # Alleen de versie die echt aan deze bestelling is gekoppeld (Order.terms_version, vastgelegd bij het bestellen): geen terugval op
+    # de huidige versie. Is er geen (bekende) versie, dan staat er geen versieregel en geen pdf-bijlage in de mail.
+    version = order.terms_version
+    try:
+        terms = version_info(version) if version else None
+    except KeyError:
+        terms = None
     lines = list(order.lines.all())
+    voornaam = (order.customer.name or "").strip().split(" ")[0] if order.customer_id else ""
     return queue_email(
         to=order.customer.email,
         subject=f"Bevestiging van je bestelling {order.number}",
         template="order_confirmation",
         context={"order": order, "lines": lines, "overzicht": _order_overview(order, lines), "design": _design_name(order),
-                 "portal": absolute(reverse("portal:home")), **_kind(order.invitation),
-                 "company": _company_text(), "terms": version_info(version),
-                 "terms_url": absolute(reverse("core:terms_version", args=[version])),
+                 "portal": absolute(reverse("portal:home")), **_kind(order.invitation), "voornaam": voornaam,
+                 "company": _company_text(), "terms": terms, "terms_version": version,
+                 "terms_url": absolute(reverse("core:terms_version", args=[version])) if terms else "",
                  "withdraw_url": absolute(reverse("orders:withdraw"))},
         unique_key=f"order-confirmation:{order.pk}",
         user=order.customer,
         order=order,
         invitation=order.invitation,
-        attach_terms_version=version,
+        attach_terms_version=version if terms else "",
     )
 
 

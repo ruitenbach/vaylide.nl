@@ -39,33 +39,50 @@
   {% endif %}
   {% if form.has_seal %}
   <fieldset class="studio-block" id="envelop">
+    {% comment %}Alleen controls die bij dit ontwerp echt iets veranderen (catalog/envelop.py: zegelkeuzes). Bij een ontwerp dat zelf de Envelope Collection gebruikt zijn envelop en zegel vast.{% endcomment %}
+    {% if form.keuzes.vast %}
+    <legend class="studio-block__title">Zegel</legend>
+    <p class="hint">De envelop en het zegel horen bij dit ontwerp. Alleen de initialen kies je zelf. Je ziet het meteen op je kaart.</p>
+    {% else %}
     <legend class="studio-block__title">Envelop en lakzegel</legend>
     <p class="hint">Maak de opening helemaal van jullie: kies de kleuren en zet jullie initialen of een eigen logo op het zegel. Je ziet het meteen op je kaart.</p>
-    {% if form.has_envelope %}
+    {% endif %}
+    {% if form.keuzes.env_kleur %}
     <div class="field"><span class="label">{{ form.env_kleur.label }}</span>
       <div class="kleurstalen">{% for r in form.env_kleur %}<label class="kleurstaal">{{ r.tag }}<span class="kleurstaal__bol kleurstaal__bol--{{ r.data.value|default:'ontwerp' }}" aria-hidden="true"></span><span>{{ r.choice_label }}</span></label>{% endfor %}</div>
     </div>
     {% endif %}
+    {% if form.keuzes.zegel_kleur %}
     <div class="field"><span class="label">{{ form.zegel_kleur.label }}</span>
       <div class="kleurstalen">{% for r in form.zegel_kleur %}<label class="kleurstaal">{{ r.tag }}<span class="kleurstaal__bol kleurstaal__bol--zegel-{{ r.data.value|default:'ontwerp' }}" aria-hidden="true"></span><span>{{ r.choice_label }}</span></label>{% endfor %}</div>
     </div>
+    {% endif %}
+    {% if form.keuzes.inhoud %}
     <div class="field"><span class="label">{{ form.zegel.label }}</span>
       <div class="chips">{% for r in form.zegel %}<label class="chip">{{ r.tag }} {{ r.choice_label }}</label>{% endfor %}</div>
     </div>
-    {% include "studio/_field.html" with field=form.initialen %}
+    {% endif %}
+    {% if form.keuzes.initialen %}{% include "studio/_field.html" with field=form.initialen %}{% endif %}
+    {% if form.keuzes.logo %}
     <div class="zegel-logo-upload">
       {% if zegel_logo %}<p class="zegel-logo-upload__nu"><img src="{% url 'studio:media' inv.uid zegel_logo.uid 'groot' %}" alt="Je logo" width="64" height="64"> <span class="small">Je logo staat klaar. Kies 'Eigen logo' hierboven om het te gebruiken.</span> <button type="submit" class="link-button small" form="delete-{{ zegel_logo.uid }}">verwijderen</button></p>{% endif %}
       <label class="field"><span class="label">Eigen logo uploaden (bijv. van je bedrijf)</span><input type="file" name="zegel_logo" accept="image/png,image/webp,image/jpeg" form="upload-logo-form"></label>
       <button type="submit" class="btn btn--secondary btn--sm" form="upload-logo-form" formnovalidate>Logo uploaden</button>
       <p class="hint">PNG met doorzichtige achtergrond werkt het mooist. Een witte achtergrond maken we zelf doorzichtig.</p>
     </div>
+    {% endif %}
   </fieldset>
   {% endif %}
+  {% if form.opening_hier %}
   <section class="studio-block" aria-labelledby="blok-opening">
-    <h2 class="studio-block__title" id="blok-opening">Openingsanimatie</h2>
+    <h2 class="studio-block__title" id="blok-opening">Opening</h2>
+    <p class="hint">Dit ontwerp heeft een eigen opening{% if eigen_opening.label %} ({{ eigen_opening.label }}){% endif %}.</p>
     {% include "studio/_check.html" with field=form.opening %}
-    <p class="hint">{{ inv.template_version.manifest.opening_label }}. Met 'minder beweging' krijgen gasten vanzelf een rustige variant.</p>
+    <p class="hint">Met 'minder beweging' krijgen gasten vanzelf een rustige variant.</p>
   </section>
+  {% else %}
+  <p class="hint">De opening (een envelop uit de collectie, de opening van het ontwerp, of geen) kies je bij <a href="{% url 'studio:step' inv.uid 'envelop' %}">Envelop &amp; zegel</a>.</p>
+  {% endif %}
   <fieldset class="studio-block">
     <legend class="studio-block__title">Onderdelen tonen</legend>
     <p class="hint">Lege onderdelen worden altijd verborgen.</p>

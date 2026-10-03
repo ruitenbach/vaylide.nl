@@ -1,0 +1,19 @@
+/* Envelopstudio (alleen lokaal): een rustige productpresentatie, zoals een stationery-atelier zijn werk fotografeert. */
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body.lab { min-height: 100svh; font-family: "Cormorant Garamond", Georgia, serif; color: #4A3B2C;
+  background: radial-gradient(120% 70% at 50% 34%, #F6F0E6 0%, #ECE3D5 55%, #E1D5C3 100%); }
+body.lab--noisette { color: #F1E6D4; background: radial-gradient(120% 70% at 50% 34%, #EFE7DB 0%, #E2D6C4 55%, #D4C5AF 100%); }
+.lab__main { display: grid; justify-items: center; align-content: center; gap: 1.2rem; min-height: 100svh; padding: 2rem 16px 2.4rem; }
+.lab__eyebrow { margin: 0; font-size: .7rem; letter-spacing: .36em; text-transform: uppercase; color: #8C7656; }
+.lab__meta { display: grid; justify-items: center; gap: .35rem; max-width: 30rem; text-align: center; color: #4A3B2C; }
+.lab__name { margin: 0; font-weight: 400; font-style: italic; font-size: 1.55rem; letter-spacing: .01em; }
+.lab__text { margin: 0; font-size: 1rem; line-height: 1.45; color: #6E5C46; }
+.lab__done { margin: .4rem 0 0; font-size: .82rem; letter-spacing: .08em; color: #8C7656; opacity: 0; transition: opacity .8s ease; }
+.lab__done.is-visible { opacity: 1; }
+.lab__again { margin-top: .4rem; padding: .55rem 1.2rem; border: 1px solid rgba(110, 90, 62, .35); border-radius: 999px; background: transparent;
+  font: 500 .72rem/1 "Cormorant Garamond", Georgia, serif; letter-spacing: .26em; text-transform: uppercase; color: #6E5C46; cursor: pointer; }
+.lab__nav { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem 1rem; font-size: .8rem; }
+.lab__nav a { color: #8C7656; text-decoration: none; letter-spacing: .06em; padding: .2rem 0; border-bottom: 1px solid transparent; }
+.lab__nav a[aria-current] { color: #4A3B2C; border-bottom-color: currentColor; }
+.lab__concept { font-size: .8rem; font-style: normal; letter-spacing: .04em; color: #8C7656; }

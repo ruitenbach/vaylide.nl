@@ -3,6 +3,7 @@
 STEPS = [
     ("gelegenheid", "Gelegenheid"),
     ("ontwerp", "Ontwerp"),
+    ("envelop", "Envelop & zegel"),
     ("gegevens", "Gegevens"),
     ("programma", "Programma & info"),
     ("aanmelden", "Aanmelden"),
@@ -13,13 +14,24 @@ STEPS = [
 ]
 STEP_KEYS = [key for key, _ in STEPS]
 STEP_LABELS = dict(STEPS)
-FORM_STEPS = ["ontwerp", "gegevens", "programma", "aanmelden", "fotos", "stijl"]
+FORM_STEPS = ["ontwerp", "envelop", "gegevens", "programma", "aanmelden", "fotos", "stijl"]
 
 
 # Bij een wenskaart (Kerst zonder evenement) is er niets aan te melden, en van 'Programma & info' blijft alleen de
 # afsluitende tekst over.
 WENSKAART_SKIP = frozenset({"aanmelden"})
+
+# Bij een ontwerp zonder keuze uit de Envelope Collection (envelope_mode is niet "optional") bestaat de stap Envelop & zegel niet.
+ENVELOP_SKIP = frozenset({"envelop"})
 WENSKAART_LABELS = {"programma": "Afsluiting"}
+
+
+def heeft_envelopstap(inv) -> bool:
+    """De stap Envelop & zegel bestaat alleen bij een ontwerp met de keuze uit de Envelope Collection (envelope_mode optional) en
+    als er voor de gelegenheid een uitgewerkte envelop is. Eén plek voor de Studio en Mijn VAYLIDE."""
+    from catalog import envelop_collectie
+
+    return envelop_collectie.modus(inv.template_version) == "optional" and bool(envelop_collectie.beschikbaar(inv.occasion))
 
 
 def next_step(step: str, *, paid: bool = False, skip=frozenset()) -> str:

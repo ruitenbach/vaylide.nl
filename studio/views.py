@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+import re
 
 from django.conf import settings
 from django.contrib import messages
@@ -15,6 +16,7 @@ from django.views.decorators.http import require_http_methods, require_POST
 
 from catalog.models import Package, Template, format_euro
 from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, occasion_config
+from catalog import envelop_collectie
 from catalog.envelop import choice as envelop_choice
 from catalog.specials import is_special, special_addon
 from studio import pakket
@@ -38,7 +40,7 @@ from orders.pricing import PricingError, compare_packages, optional_addons, reco
 from orders.services import CheckoutError, invitation_is_paid, start_checkout
 
 from .forms import FORM_CLASSES, CheckoutForm, DesignForm
-from .steps import STEP_LABELS, WENSKAART_LABELS, WENSKAART_SKIP, next_step, previous_step, progress
+from .steps import ENVELOP_SKIP, STEP_LABELS, STEPS, WENSKAART_LABELS, WENSKAART_SKIP, heeft_envelopstap, next_step, previous_step, progress
 
 MAX_PHOTOS_PER_INVITATION = 30
 
@@ -66,14 +68,36 @@ def _wenskaart(inv: Invitation, content: dict | None = None) -> bool:
     return card_kind(content if content is not None else _content(inv), inv.occasion) == "wenskaart"
 
 
+def _envelop_stap(inv: Invitation) -> bool:
+    """De stap Envelop & zegel bestaat alleen bij een ontwerp met de keuze uit de Envelope Collection (envelope_mode optional)."""
+    return heeft_envelopstap(inv)
+
+
 def _skip(inv: Invitation, content: dict | None = None):
-    return WENSKAART_SKIP if _wenskaart(inv, content) else frozenset()
+    skip = set(WENSKAART_SKIP) if _wenskaart(inv, content) else set()
+    if not _envelop_stap(inv):
+        skip |= ENVELOP_SKIP
+    return frozenset(skip)
+
+
+def _eigen_opening(inv: Invitation) -> dict | None:
+    """Heeft dit ontwerp een eigen opening (en dus geen stap Envelop & zegel)? Dan een korte uitleg voor de klant, met de opening zoals
+    de klant die kent (zonder technische toevoeging als '(Envelope Collection)')."""
+    if _envelop_stap(inv):
+        return None
+    label = re.sub(r"\s*\(Envelope Collection\)", "", (inv.template_version.manifest or {}).get("opening_label") or "").strip()
+    return {"label": label}
+
+
+def _na_ontwerp(inv: Invitation) -> str:
+    """De stap na het kiezen van een ontwerp: Envelop & zegel als dat ontwerp die keuze heeft, anders Gegevens."""
+    return "envelop" if _envelop_stap(inv) else "gegevens"
 
 
 def _context(request, inv: Invitation, step: str, **extra) -> dict:
     paid = invitation_is_paid(inv)
     wens = _wenskaart(inv)
-    items = progress(step, paid=paid, skip=WENSKAART_SKIP if wens else frozenset(), labels=WENSKAART_LABELS if wens else None)
+    items = progress(step, paid=paid, skip=_skip(inv), labels=WENSKAART_LABELS if wens else None)
     current = next((i for i in items if i["state"] == "current"), items[0])
     ctx = {
         "inv": inv,
@@ -92,6 +116,8 @@ def _context(request, inv: Invitation, step: str, **extra) -> dict:
     }
     if step in ("fotos", "stijl", "aanmelden"):
         ctx["feature_badges"] = pakket.feature_badges(pakket.chosen_package(inv))
+    if step in ("gegevens", "stijl"):
+        ctx["eigen_opening"] = _eigen_opening(inv)
     ctx.update(extra)
     return ctx
 
@@ -119,7 +145,7 @@ def start(request):
                 inv.package_code = package_code
                 inv.save(update_fields=["package_code"])
             remember_draft(request, inv)
-            return redirect("studio:step", uid=inv.uid, step="gegevens")
+            return redirect("studio:step", uid=inv.uid, step=_na_ontwerp(inv))
     else:
         form = DesignForm(initial={"occasion": occasion, "template": chosen}, templates=templates)
     shown = by_occasion([t for t in templates if not occasion or t.supports(occasion)], occasion)
@@ -149,9 +175,9 @@ def start(request):
             "packages": packages,
             "chosen_package": chosen_pkg.code if chosen_pkg else "",
             "login_url": f"{reverse('accounts:login')}?next={request.get_full_path()}",
-            "progress": progress("gelegenheid" if not occasion else "ontwerp"),
+            "progress": progress("gelegenheid" if not occasion else "ontwerp", skip=ENVELOP_SKIP),
             "progress_current": {"number": 1 if not occasion else 2, "label": "Gelegenheid" if not occasion else "Ontwerp"},
-            "progress_pct": round(100 * (1 if not occasion else 2) / 9),
+            "progress_pct": round(100 * (1 if not occasion else 2) / (len(STEPS) - 1)),
         },
     )
 
@@ -280,10 +306,11 @@ def _terms_info() -> dict:
     return version_info()
 
 
-def _delivery_text() -> str:
-    from core.voorwaarden import DELIVERY_CONSENT
+def _consent_texts() -> dict:
+    """De teksten bij het bestellen (core/voorwaarden.py): precies wat ook letterlijk op de bestelling wordt vastgelegd."""
+    from core.voorwaarden import CHECKOUT_UITLEG, DELIVERY_CONSENT, SERVICE_CONSENT, TERMS_CONSENT
 
-    return DELIVERY_CONSENT
+    return {"uitleg_tekst": CHECKOUT_UITLEG, "terms_tekst": TERMS_CONSENT, "levering_tekst": DELIVERY_CONSENT, "dienst_tekst": SERVICE_CONSENT}
 
 
 def _availability_hint(content: dict, quote) -> dict | None:
@@ -316,7 +343,7 @@ def _form_kwargs(inv: Invitation, step: str) -> dict:
             photo.analyse()
         return {"photos": photos,
                 "audio": list(inv.assets.filter(kind=MediaAsset.Kind.AUDIO))}
-    if step == "stijl":
+    if step in ("stijl", "envelop"):
         return {"template_version": inv.template_version}
     return {}
 
@@ -328,6 +355,7 @@ def _conflict_info(latest: Invitation, mine: dict, step: str) -> dict:
         "aanmelden": ["rsvp"],
         "fotos": ["photos", "story", "music"],
         "stijl": ["style", "sections"],
+        "envelop": ["style"],
     }.get(step, [])
     labels = {
         "names": "Namen", "headline": "Kopregel", "date": "Datum", "start_time": "Begintijd", "end_time": "Eindtijd",
@@ -365,11 +393,12 @@ def design_step(request, inv: Invitation):
             try:
                 inv = save_draft(inv, expected_rev=posted_rev, content=content, template_version=version, occasion=occasion,
                                  user=request.user, source=_source(request), step="gegevens")
+
             except DraftConflict:
                 messages.error(request, "Deze uitnodiging is intussen gewijzigd. Bekijk de nieuwste versie en kies opnieuw.")
                 return redirect("studio:step", uid=inv.uid, step="ontwerp")
             messages.success(request, "Ontwerp en gelegenheid zijn bijgewerkt.")
-            return redirect("studio:step", uid=inv.uid, step="gegevens")
+            return redirect("studio:step", uid=inv.uid, step=_na_ontwerp(inv))
     else:
         form = DesignForm(initial={"occasion": inv.occasion, "template": inv.template_version.template.slug}, templates=templates)
     return render(
@@ -411,7 +440,7 @@ def preview_step(request, inv: Invitation):
         "studio/step_voorbeeld.html",
         _context(request, inv, "voorbeeld", issues=issues, blocking=blocking, rev=inv.draft_rev,
                  frame_url=reverse("studio:preview_frame", args=[inv.uid]), unpaid_features=unpaid_features,
-                 has_changes=inv.has_unpublished_changes),
+                 has_changes=inv.has_unpublished_changes, envelop_stap=_envelop_stap(inv)),
     )
 
 
@@ -425,7 +454,7 @@ def preview_frame(request, uid):
     return render(request, inv.template_version.template_path, {"v": view, "rsvp_form": {"client_token": "voorbeeld-formulier-0000", "form_ts": ""}})
 
 
-LIVE_PARTS = {"gegevens", "programma", "aanmelden", "fotos", "stijl"}
+LIVE_PARTS = {"envelop", "gegevens", "programma", "aanmelden", "fotos", "stijl"}
 
 
 def _live_key(inv: Invitation) -> str:
@@ -720,7 +749,7 @@ def checkout_step(request, inv: Invitation):
             try:
                 payment = start_checkout(inv, user=request.user, package_code=form.cleaned_data["package"],
                                          optional_codes=form.cleaned_data.get("extras") or [], terms_accepted=True,
-                                         delivery_consent=True)
+                                         delivery_consent=True, service_consent=True)
             except (CheckoutError, PricingError) as exc:
                 error = str(exc)
             else:
@@ -731,6 +760,6 @@ def checkout_step(request, inv: Invitation):
         _context(request, inv, "bestellen", form=form, quotes=quotes, quote=quote, best=best, optional=optional,
                  selected_extras=selected_extras, issues=issues, error=error, test_payments=settings.PAYMENT_PROVIDER == "test",
                  upgrade=upgrade, downgrade=downgrade, nieuwsbrief_tekst=_newsletter_text(),
-                 voorwaarden=_terms_info(), levering_tekst=_delivery_text(), looptijd=_availability_hint(content, quote), losse_extras=pakket.extras_for(quote.package, quote) if quote else [],
+                 voorwaarden=_terms_info(), **_consent_texts(), looptijd=_availability_hint(content, quote), losse_extras=pakket.extras_for(quote.package, quote) if quote else [],
                  login_url=f"{reverse('accounts:login')}?doel=bewaren&next={reverse('studio:step', args=[inv.uid, 'bestellen'])}"),
     )

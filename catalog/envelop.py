@@ -43,6 +43,23 @@ _ATELIER_VARS = lambda b, s, i: {"--a-env": b}  # noqa: E731
 _ZEGEL_ZONDER_ENVELOP = {"eerste-dans"}
 
 
+# Ontwerpen die zelf de Envelope Collection als opening gebruiken (envelope_mode built_in, {% vx_envelop %} in hun sjabloon).
+# Envelop en zegel komen daar uit de collectie; de oude keuzes uit de stap Stijl doen er dus niets, behalve de initialen waar het ontwerp
+# ze op het zegel zet. Waarde = de oude keuzes die er wél werken (gecontroleerd in 3 oktober 2026; tests/test_envelop_stijl.py bewaakt de lijst).
+# Midnight Émeraude zet de initialen op het zegel; Rosé Royale en Golden Noël hebben een vast zegel (bij Golden Noël komt het veld
+# initialen alleen in een sierletter-monogram aan het eind van de kaart terecht, dus niet 'op het zegel').
+COLLECTIE_INGEBOUWD = {"midnight-emeraude": {"initialen"}, "rose-royale": set(), "golden-noel": set()}
+
+
+def zegelkeuzes(template_version) -> dict:
+    """Welke keuzes uit het paneel 'Envelop en lakzegel' (stap Stijl) bij dit ontwerp echt iets veranderen. Nooit een keuze tonen die niets doet."""
+    werkt = COLLECTIE_INGEBOUWD.get(template_version.template.slug)
+    if werkt is not None:
+        return {"env_kleur": False, "zegel_kleur": False, "inhoud": False, "logo": False, "initialen": "initialen" in werkt, "vast": True}
+    zegel = has_seal(template_version)
+    return {"env_kleur": has_envelope(template_version), "zegel_kleur": zegel, "inhoud": zegel, "logo": zegel, "initialen": zegel, "vast": False}
+
+
 def defaults() -> dict:
     return {"kleur": "", "zegel_kleur": "", "zegel": "initialen", "initialen": "", "logo": ""}
 

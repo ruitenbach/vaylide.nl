@@ -12,7 +12,8 @@ from datetime import date, timedelta
 from django import forms
 from django.utils import timezone
 
-from catalog import envelop, paar
+from catalog import envelop, envelop_collectie, paar
+from catalog.models import Template
 from catalog.occasions import OCCASION_CHOICES, occasion_config
 from invitations import vragen
 from invitations.content import (
@@ -26,6 +27,18 @@ from invitations.content import (
     parse_date,
 )
 
+# Zegels in de keuzelijst van de Studio: wat de klant ziet is het materiaal en wat er op staat, geen merk- of ontwerpnaam
+# (Champagne Monogram, Noisette Gold, ...). Alleen de zichtbare labels; de codes en de namen in de registry blijven zoals ze zijn.
+ZEGEL_KEUZENAMEN = {
+    "champagne-monogram": ("Champagnegoud", "Met de V"),
+    "noisette-gold": ("Warm goud", "Met de V"),
+    "sage-botanical": ("Saliegroen", "Met de V"),
+    "rose-floral": ("Roségoud", "Met een roos"),
+    "evergreen": ("Dennengroen", "Met de V in een krans"),
+}
+
+# Zegels uit de Envelope Collection tonen hoogstens zoveel tekens (catalog/envelop_collectie.py: monogram[:4]); de klassieke zegels 5.
+INITIALEN_COLLECTIE = 4
 PHONE_RE = re.compile(r"^[+()\d\s.-]{6,30}$")
 DATE_WIDGET = forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")
 TIME_WIDGET = forms.TimeInput(attrs={"type": "time"}, format="%H:%M")
@@ -508,6 +521,100 @@ class PhotosForm(StepForm):
         return content
 
 
+class EnvelopeForm(StepForm):
+    """Envelop & zegel: de Envelope Collection als losse presentatielaag om het ontwerp (catalog/envelop_collectie.py).
+    Opgeslagen in style.envelop.collectie; de andere keuzes in style.envelop (kleur, logo) en de rest van het document blijven bewaard.
+    Een zegel dat niet bij de gekozen envelop hoort, wordt vervangen door het standaardzegel van die envelop."""
+
+    envelop = forms.ChoiceField(label="Envelop", widget=forms.RadioSelect, required=False)
+    zegel = forms.ChoiceField(label="Zegel", widget=forms.RadioSelect, required=False)
+    teken = forms.ChoiceField(label="Op het zegel", widget=forms.RadioSelect, required=False,
+                              choices=[("standaard", "Het teken van het zegel"), ("initialen", "Jullie initialen")])
+    initialen = forms.CharField(label="Initialen op het zegel", max_length=20, required=False,
+                                help_text=f"Hoogstens {INITIALEN_COLLECTIE} tekens, bijvoorbeeld S&D. Laat leeg om de initialen voor het zegel uit jullie namen te gebruiken.")
+
+    def __init__(self, *args, template_version, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.template_version = template_version
+        self.fields["initialen"].widget.attrs["maxlength"] = INITIALEN_COLLECTIE    # het zegel toont er niet meer
+        self.stijlen = envelop_collectie.beschikbaar(self.occasion)
+        self.fields["envelop"].choices = [(envelop_collectie.ONTWERP, "Opening van het ontwerp"), (envelop_collectie.GEEN, "Geen envelop")] + [
+            (code, s["naam"]) for code, s in self.stijlen.items()]
+        self.fields["zegel"].choices = [(code, z["naam"]) for code, z in envelop_collectie.ZEGELS.items()]
+        if not self.is_bound:
+            keuze = envelop_collectie.keuze_van(self.content)
+            style = self.content.get("style") or {}
+            code = keuze["envelop"]
+            if code == envelop_collectie.ONTWERP and not style.get("opening", True):
+                code = envelop_collectie.GEEN      # een oudere keuze om de openingsanimatie uit te zetten blijft 'geen opening'
+            if code not in (envelop_collectie.ONTWERP, envelop_collectie.GEEN) and code not in self.stijlen:
+                code = envelop_collectie.ONTWERP
+            zegel = keuze["zegel"] if code in self.stijlen and keuze["zegel"] in envelop_collectie.zegels_voor(code) else (
+                envelop_collectie.standaard_zegel(code) if code in self.stijlen else "")
+            self.initial.update({"envelop": code, "zegel": zegel, "teken": keuze["teken"], "initialen": keuze["initialen"]})
+
+    def clean_initialen(self):
+        return envelop.clean_initials(self.cleaned_data.get("initialen"))[:INITIALEN_COLLECTIE].strip()
+
+    def _keuzenaam(self, naam: str) -> str:
+        """In de keuzelijst: heet een envelop net als een ontwerp (Midnight Émeraude, Golden Noël), dan komt er 'envelop' achter,
+        zodat de klant ze niet verwart. Alleen de zichtbare naam in deze lijst; de stijlnaam en de codes blijven zoals ze zijn."""
+        if not hasattr(self, "_ontwerpnamen"):
+            self._ontwerpnamen = set(Template.objects.filter(is_active=True).values_list("name", flat=True))
+        return f"{naam} envelop" if naam in self._ontwerpnamen else naam
+
+    def opties(self) -> list[dict]:
+        """Voor het sjabloon: elke envelop met voorbeeld, tekst en zijn passende zegels."""
+        gekozen = self["envelop"].value() or ""
+        uit = []
+        for code, s in self.stijlen.items():
+            uit.append({"code": code, "naam": self._keuzenaam(s["naam"]), "tekst": s["tekst"], "voorbeeld": f"img/envelop/voorbeeld/{code}.webp",
+                        "beweging": envelop_collectie.KEUZE[code]["beweging"], "gekozen": gekozen == code,
+                        "zegels": envelop_collectie.zegels_voor(code), "standaard": envelop_collectie.standaard_zegel(code)})
+        return uit
+
+    def zegel_opties(self) -> list[dict]:
+        gekozen_envelop = self["envelop"].value() or ""
+        passend = envelop_collectie.zegels_voor(gekozen_envelop) if gekozen_envelop in self.stijlen else []
+        keuze = self["zegel"].value() or ""
+        uit = []
+        for code, z in envelop_collectie.ZEGELS.items():
+            welke = [c for c in self.stijlen if code in envelop_collectie.zegels_voor(c)]
+            if not welke:
+                continue
+            naam, regel = ZEGEL_KEUZENAMEN.get(code, (z["naam"], z["materiaal"]))
+            uit.append({"code": code, "naam": naam, "materiaal": regel, "voorbeeld": f"img/envelop/zegel/{code}.webp",
+                        "envelopen": " ".join(welke), "zichtbaar": code in passend, "gekozen": keuze == code})
+        return uit
+
+    def zegel_zichtbaar(self) -> bool:
+        return (self["envelop"].value() or "") in self.stijlen
+
+    def ontwerp_opening(self) -> str:
+        """Ondertitel bij 'Opening van het ontwerp': de naam van het gekozen ontwerp, geen technische omschrijving."""
+        return f"De eigen opening van {self.template_version.template.name}"
+
+    def apply(self, content: dict) -> dict:
+        d = self.cleaned_data
+        code = d.get("envelop") or envelop_collectie.ONTWERP
+        if code not in (envelop_collectie.ONTWERP, envelop_collectie.GEEN) and code not in self.stijlen:
+            code = envelop_collectie.ONTWERP
+        zegel = d.get("zegel") or ""
+        if code in self.stijlen:
+            if zegel not in envelop_collectie.zegels_voor(code):
+                zegel = envelop_collectie.standaard_zegel(code)
+        else:
+            zegel = ""
+        style = dict(content.get("style") or {})
+        keuze = envelop.choice(content)     # de oudere keuzes (kleur, logo) blijven bewaard
+        keuze["collectie"] = {"envelop": code, "zegel": zegel, "teken": d.get("teken") or "standaard", "initialen": d.get("initialen") or ""}
+        style["envelop"] = keuze
+        if code != envelop_collectie.GEEN:
+            style["opening"] = True       # wie een envelop (of de opening van het ontwerp) kiest, wil een opening
+        content["style"] = style
+        return content
+
+
 class StyleForm(StepForm):
     palette = forms.ChoiceField(label="Kleurvariant", widget=forms.RadioSelect)
     opening = forms.BooleanField(label="Openingsanimatie tonen", required=False,
@@ -532,6 +639,10 @@ class StyleForm(StepForm):
         self.template_version = template_version
         self.hidden_sections = self.WENSKAART_HIDDEN if card_kind(self.content, self.occasion) == "wenskaart" else frozenset()
         self.fields["palette"].choices = [(p["key"], p["name"]) for p in template_version.palettes]
+        # Bij een ontwerp met de keuze uit de Envelope Collection staat de opening bij Envelop & zegel ('geen envelop' = geen opening).
+        self.opening_hier = not (envelop_collectie.modus(template_version) == "optional" and envelop_collectie.beschikbaar(self.occasion))
+        if not self.opening_hier:
+            del self.fields["opening"]
         for key, label in self.SECTION_FIELDS:
             self.fields[f"s_{key}"] = forms.BooleanField(label=label, required=False)
         # Haarkleur van het bruidspaar (Balzaal): alleen als alle combinaties als beeld bestaan (catalog/paar.py).
@@ -541,18 +652,26 @@ class StyleForm(StepForm):
             self.fields["haar_man"] = forms.ChoiceField(label="Haarkleur man", choices=kleuren, widget=forms.RadioSelect)
             self.fields["haar_vrouw"] = forms.ChoiceField(label="Haarkleur vrouw", choices=kleuren, widget=forms.RadioSelect)
         # Envelop en lakzegel naar keuze (catalog/envelop.py), alleen bij ontwerpen met een zegel.
-        self.has_seal = envelop.has_seal(template_version)
-        self.has_envelope = envelop.has_envelope(template_version)
-        if self.has_envelope:
+        # Alleen keuzes tonen die bij dit ontwerp echt iets veranderen (catalog/envelop.py: zegelkeuzes). Bij een ontwerp dat zelf de
+        # Envelope Collection gebruikt zijn envelop- en zegelkleur vast; dan blijft hoogstens het veld voor de initialen over.
+        self.keuzes = envelop.zegelkeuzes(template_version)
+        self.has_seal = any(v for k, v in self.keuzes.items() if k != "vast")
+        self.has_envelope = self.keuzes["env_kleur"]
+        if self.keuzes["env_kleur"]:
             self.fields["env_kleur"] = forms.ChoiceField(label="Kleur van de envelop", required=False, widget=forms.RadioSelect,
                                                          choices=[("", "Zoals het ontwerp")] + [(k, v[0]) for k, v in envelop.ENVELOP_KLEUREN.items()])
-        if self.has_seal:
+        if self.keuzes["zegel_kleur"]:
             self.fields["zegel_kleur"] = forms.ChoiceField(label="Kleur van het lakzegel", required=False, widget=forms.RadioSelect,
                                                            choices=[("", "Zoals het ontwerp")] + [(k, v[0]) for k, v in envelop.ZEGEL_KLEUREN.items()])
+        if self.keuzes["inhoud"]:
             self.fields["zegel"] = forms.ChoiceField(label="Op het zegel", widget=forms.RadioSelect, required=False,
                                                      choices=list(envelop.ZEGEL_INHOUD.items()))
-            self.fields["initialen"] = forms.CharField(label="Initialen op het zegel", max_length=20, required=False,
-                                                       help_text="Hoogstens 5 tekens, bijvoorbeeld S&D. Leeg: we maken ze uit jullie namen.")
+        if self.keuzes["initialen"]:
+            hoogstens = INITIALEN_COLLECTIE if self.keuzes["vast"] else 5
+            self.fields["initialen"] = forms.CharField(
+                label="Initialen op het zegel", max_length=20, required=False,
+                help_text=f"Hoogstens {hoogstens} tekens, bijvoorbeeld S&D. Laat leeg om de initialen voor het zegel uit jullie namen te gebruiken.")
+            self.fields["initialen"].widget.attrs["maxlength"] = hoogstens
         if not self.is_bound:
             style = self.content.get("style") or {}
             if self.has_seal:
@@ -560,7 +679,8 @@ class StyleForm(StepForm):
                 self.initial.update({"env_kleur": keuze["kleur"], "zegel_kleur": keuze["zegel_kleur"],
                                      "zegel": keuze["zegel"] or "initialen", "initialen": keuze["initialen"]})
             self.initial["palette"] = style.get("palette") or template_version.default_palette_key
-            self.initial["opening"] = bool(style.get("opening", True))
+            if self.opening_hier:
+                self.initial["opening"] = bool(style.get("opening", True))
             for key, _ in self.SECTION_FIELDS:
                 self.initial[f"s_{key}"] = bool((self.content.get("sections") or {}).get(key))
             if self.hair_enabled:
@@ -580,12 +700,19 @@ class StyleForm(StepForm):
             haar = {"man": d["haar_man"], "vrouw": d["haar_vrouw"]}
         # Een eerder gekozen haarkleur blijft bewaard, ook als de keuze (tijdelijk) niet getoond wordt.
         style = dict(content.get("style") or {})  # andere keuzes (eigen gezichten, logo) blijven bewaard
-        style.update({"palette": d["palette"], "opening": bool(d.get("opening")), "haar": haar})
+        style.update({"palette": d["palette"], "haar": haar})
+        if self.opening_hier:
+            style["opening"] = bool(d.get("opening"))
         if self.has_seal:
+            # Alleen de keuzes die dit ontwerp toont worden overschreven; een eerdere stand van de rest blijft bewaard.
             keuze = envelop.choice(content)
-            keuze.update({"zegel_kleur": d.get("zegel_kleur") or "", "zegel": d.get("zegel") or "initialen",
-                          "initialen": envelop.clean_initials(d.get("initialen"))})
-            if self.has_envelope:
+            if "zegel_kleur" in self.fields:
+                keuze["zegel_kleur"] = d.get("zegel_kleur") or ""
+            if "zegel" in self.fields:
+                keuze["zegel"] = d.get("zegel") or "initialen"
+            if "initialen" in self.fields:
+                keuze["initialen"] = envelop.clean_initials(d.get("initialen"))[: INITIALEN_COLLECTIE if self.keuzes["vast"] else 5].strip()
+            if "env_kleur" in self.fields:
                 keuze["kleur"] = d.get("env_kleur") or ""
             style["envelop"] = keuze
         content["style"] = style
@@ -601,7 +728,8 @@ class CheckoutForm(forms.Form):
     extras = forms.MultipleChoiceField(label="Extra opties", required=False, widget=forms.CheckboxSelectMultiple)
     terms = forms.BooleanField(label="Ik ga akkoord met de voorwaarden", required=False)
     nieuwsbrief = forms.BooleanField(required=False)  # los van de voorwaarden, standaard uit
-    direct_leveren = forms.BooleanField(required=False)  # afzonderlijke toestemming (voorwaarden, artikel 9.2)
+    direct_leveren = forms.BooleanField(required=False)  # afzonderlijke toestemming digitale kaart (voorwaarden, artikel 9.2)
+    online_dienst = forms.BooleanField(required=False)   # afzonderlijk verzoek om de online beschikbaarheid direct te starten (artikel 9.3)
 
     def __init__(self, *args, packages, optional, **kwargs):
         super().__init__(*args, **kwargs)
@@ -615,11 +743,17 @@ class CheckoutForm(forms.Form):
 
     def clean_direct_leveren(self):
         if not self.cleaned_data.get("direct_leveren"):
-            raise forms.ValidationError("Geef aan dat we direct na je betaling mogen leveren; anders kunnen we je kaart niet direct publiceren.")
+            raise forms.ValidationError("Geef toestemming voor directe levering van je digitale kaart; anders kunnen we je kaart niet direct na je betaling beschikbaar maken.")
+        return True
+
+    def clean_online_dienst(self):
+        if not self.cleaned_data.get("online_dienst"):
+            raise forms.ValidationError("Geef aan dat de online beschikbaarheid direct mag starten; anders kunnen we je uitnodiging niet direct na je betaling online zetten.")
         return True
 
 
 FORM_CLASSES = {
+    "envelop": EnvelopeForm,
     "gegevens": DetailsForm,
     "programma": ProgramForm,
     "aanmelden": RsvpSettingsForm,

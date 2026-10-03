@@ -15,7 +15,7 @@ from django.templatetags.static import static
 from django.utils import timezone
 
 from catalog.effects import effect_view
-from catalog import envelop
+from catalog import envelop, envelop_collectie
 from catalog.occasions import display_title, doc_kind, monogram, occasion_config
 from catalog.paar import view as paar_view
 
@@ -458,6 +458,9 @@ def build_view(
                  "required": bool(q.get("required"))}
             )
 
+    envelop_keuze = envelop_collectie.gekozen(content, occasion, template_version)
+    if envelop_keuze and envelop_keuze["teken"] == "initialen":
+        envelop_keuze["monogram"] = envelop.clean_initials(envelop_keuze["monogram"]) or monogram(occasion, content)
     palette = template_version.palette(palette_key)
     css_vars = dict(palette.get("vars") or {})
     for key, value in (overrides.get("css_vars") or {}).items():
@@ -584,7 +587,10 @@ def build_view(
         },
         "palette_key": palette.get("key"),
         "palette_style": palette_style,
-        "opening_enabled": bool((content.get("style") or {}).get("opening", True)),
+        # Het openingsscherm: aan zoals de klant koos, en uit bij de bewuste keuze 'geen envelop' (alleen bij ontwerpen met die keuze).
+        "opening_enabled": bool((content.get("style") or {}).get("opening", True)) and not envelop_collectie.geen_envelop(content, template_version),
+        # De envelop uit de Envelope Collection als losse laag om het ontwerp (None = de opening van het ontwerp zelf, het gedrag van vroeger).
+        "envelop_collectie": envelop_keuze,
         "calendar": calendar,
         "share_url": options.share_url,
         "whatsapp_url": whatsapp_url,

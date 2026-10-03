@@ -1,0 +1,32 @@
+{
+  "slug": "midnight-emeraude",
+  "version": 1,
+  "name": "Midnight Émeraude",
+  "tagline": "Een avondbruiloft op een landgoed: uit het donker, door een gouden zegel, de tuin in",
+  "description": "Het begint in het donker: champagnegoud licht, een diepgroene envelop met een gouden lakzegel. Het zegel breekt, de camera beweegt de kaart in en die wordt de wereld erachter: onscherpe bladeren en kristallen glijden langs, een verlicht landgoed met glazen oranjerie weerspiegelt in het water, en twee gouden ringen met een kristal vangen het licht. Jullie namen verschijnen in champagnegoud. Daarna loopt de uitnodiging als één geheel door in ivoor en smaragd (of middernachtblauw) met een gouden draad die het licht van hoofdstuk naar hoofdstuk draagt: datum, programma, locatie in een boogvenster, dresscode, aftellen en aanmelden. Alle beweging is gebouwd met GSAP; alle beelden zijn eigen tekeningen.",
+  "style_notes": "Smaragd of middernachtblauw, champagnegoud, ivoor, parel en kristal; cinematic, landgoed, orangery, gouden ringen; GSAP",
+  "occasions": ["bruiloft", "verloving"],
+  "sort_order": 9,
+  "opening": "envelop",
+  "envelope_mode": "built_in",
+  "opening_label": "Smaragdgroene envelop met gouden zegel (Envelope Collection), met een filmische opening",
+  "demo_melody": "canon",
+  "kaartbeeld": "open",
+  "palettes": [
+    {"key": "emeraude", "name": "Smaragd & champagnegoud", "swatch": ["#0B2A21", "#CDB173", "#F6F0E2"],
+     "vars": {"--me-nacht": "#06120E", "--me-nacht-2": "#0B2820", "--me-diep": "#12433A", "--me-lucht-1": "#04100C", "--me-lucht-2": "#08241C", "--me-lucht-3": "#0F3D30", "--me-lucht-4": "#1F6B55", "--me-lucht-5": "#0A2A21",
+              "--me-ivoor": "#F6F0E2", "--me-ivoor-2": "#EEE5D0", "--me-papier": "#FBF7EC", "--me-ink": "#14261F", "--me-muted": "#455850", "--me-goud-ink": "#6A561C", "--me-accent-tekst": "#17513F",
+              "--me-goud": "#CDB173", "--me-goud-2": "#8F7438", "--me-accent": "#14503E", "--me-accent-ink": "#F7F1E1", "--me-line": "#DCCFAE",
+              "--me-n-ink": "#F4ECD8", "--me-n-muted": "#CFC8B2", "--me-n-goud": "#E2CB8F",
+              "--fx-1": "#CDB173", "--fx-2": "#FFFFFF", "--fx-3": "#8FC9B1", "--fx-4": "#F1DFAF", "--fx-bg": "#08241C", "--fx-shine": "#8F7438"}},
+    {"key": "midnight", "name": "Middernacht & champagnegoud", "swatch": ["#0B1A33", "#CDB173", "#F6F0E2"],
+     "vars": {"--me-nacht": "#050B18", "--me-nacht-2": "#0B1A33", "--me-diep": "#14305A", "--me-lucht-1": "#030812", "--me-lucht-2": "#08142B", "--me-lucht-3": "#10264A", "--me-lucht-4": "#2A5183", "--me-lucht-5": "#0A1A33",
+              "--me-ivoor": "#F6F0E2", "--me-ivoor-2": "#ECE4D2", "--me-papier": "#FBF7EC", "--me-ink": "#131F33", "--me-muted": "#475467", "--me-goud-ink": "#6A561C", "--me-accent-tekst": "#1B3F6B",
+              "--me-goud": "#CDB173", "--me-goud-2": "#8F7438", "--me-accent": "#17325C", "--me-accent-ink": "#F7F1E1", "--me-line": "#DCCFAE",
+              "--me-n-ink": "#F4ECD8", "--me-n-muted": "#CBCDD6", "--me-n-goud": "#E2CB8F",
+              "--fx-1": "#CDB173", "--fx-2": "#FFFFFF", "--fx-3": "#9DB8E0", "--fx-4": "#F1DFAF", "--fx-bg": "#0B1A33", "--fx-shine": "#8F7438"}}
+  ],
+  "sections": ["countdown", "story", "gallery", "program", "location", "dresscode", "practical", "rsvp", "contact", "closing", "music"],
+  "effects": {"sfeer": "goudstof", "knal": "vonken", "viering": "sterren", "namen": "zacht", "onthul": "zacht", "extra": ["kenburns", "tik"]},
+  "changelog": "Eerste versie: filmische avondopening met GSAP (master timeline, ScrollTrigger, MotionPath, SplitText) en gouden ringen als herkenbaar object."
+}

@@ -1,6 +1,9 @@
-Hallo,
+Je bestelling is bevestigd
 
-Bedankt voor je bestelling. Je betaling is bevestigd. Bewaar deze e-mail: dit is je bestelbevestiging.
+Hoi{% if voornaam %} {{ voornaam }}{% endif %},
+
+Bedankt voor je bestelling bij VAYLIDE. Je betaling is ontvangen en je digitale {{ doc_kind }} staat voor je klaar.
+Bewaar deze e-mail: dit is je bestelbevestiging.
 
 Bestelnummer: {{ order.number }}{% if design %}
 Ontwerp: {{ design }}{% endif %}{% if order.package_name %}
@@ -15,14 +18,30 @@ Je {{ doc_kind }} wordt automatisch gepubliceerd. Zodra dat is gebeurd, ontvang 
 
 Later publiceren, aanpassen of je evenement verplaatsen verschuift de einddatum niet. Er is geen automatische verlenging.
 {% if order.delivery_consent_at %}
-Je toestemming voor directe levering ({{ order.delivery_consent_at|date:"j F Y H:i" }}):
+Directe levering en bedenktijd
+Je hebt bij het afronden van je bestelling uitdrukkelijk gevraagd om de levering van je digitale kaart direct te laten beginnen, voordat de wettelijke bedenktijd is verstreken.
+Je hebt daarbij bevestigd dat je begrijpt dat je herroepingsrecht voor de digitale kaart vervalt zodra de levering is begonnen.
+
+Toestemming gegeven op: {{ order.delivery_consent_at|date:"j F Y H:i" }}
+Vastgelegde toestemming:
 "{{ order.delivery_consent_text }}"
+{% endif %}{% if order.availability_months %}
+Online beschikbaarheid
+Je digitale uitnodiging wordt via VAYLIDE online beschikbaar gesteld volgens de afspraken die bij je bestelling en in de algemene voorwaarden staan.
+{% endif %}{% if terms %}
+Algemene voorwaarden
+Op je bestelling zijn de algemene voorwaarden van toepassing die golden op het moment waarop je de bestelling hebt geplaatst.
+De bijbehorende versie van de algemene voorwaarden is als pdf bij deze e-mail gevoegd.
+Versie: {{ terms.date|date:"j F Y" }}
+Deze versie online: {{ terms_url }}
 {% endif %}
-Algemene voorwaarden: {{ terms.status|lower }}, versie {{ terms.date|date:"j F Y" }}. Die versie geldt voor deze bestelling en zit als pdf-bijlage bij deze e-mail. Je kunt hem ook bekijken op:
-{{ terms_url }}
+Herroepingsrecht
+Voor de digitale kaart waarvoor je hierboven toestemming hebt gegeven voor directe levering, vervalt het herroepingsrecht zodra de levering is begonnen.
+Voor eventuele andere onderdelen van je bestelling waarop het herroepingsrecht nog van toepassing is, gelden de voorwaarden zoals beschreven in de algemene voorwaarden.
+Heb je hierover een vraag? Neem dan contact met ons op via het bestaande contactadres in deze e-mail.
+Hier de overeenkomst ontbinden: {{ withdraw_url }}
 
-Herroepen (binnen de bedenktijd, zie artikel 9 en 10): {{ withdraw_url }}
-
+Contact en bedrijfsgegevens
 {{ company }}
 
 Hartelijke groet,

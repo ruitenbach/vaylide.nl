@@ -1,0 +1,3 @@
+{% comment %}Bij een ontwerp met een eigen opening bestaat de stap Envelop & zegel niet. Een korte uitleg, zodat de klant niet denkt dat er iets ontbreekt.
+Context: eigen_opening ({"label": ...} of None), gezet door studio/views.py (_eigen_opening).{% endcomment %}
+{% if eigen_opening %}<p class="studio-opening">Dit ontwerp heeft een eigen opening{% if eigen_opening.label %} ({{ eigen_opening.label }}){% endif %}. Daarom hoef je hier geen envelop te kiezen.</p>{% endif %}

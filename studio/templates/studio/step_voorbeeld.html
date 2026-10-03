@@ -19,6 +19,7 @@
   <aside class="preview-aside">
     {% include "studio/_controle.html" with issues=issues %}
     <ul class="edit-links">
+      {% if envelop_stap %}<li><a href="{% url 'studio:step' inv.uid 'envelop' %}">Envelop en zegel</a></li>{% endif %}
       <li><a href="{% url 'studio:step' inv.uid 'gegevens' %}">Gegevens aanpassen</a></li>
       {% if wenskaart %}<li><a href="{% url 'studio:step' inv.uid 'programma' %}">Afsluiting</a></li>{% else %}
       <li><a href="{% url 'studio:step' inv.uid 'programma' %}">Programma en info</a></li>

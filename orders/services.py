@@ -17,7 +17,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from catalog.models import Package
-from core.voorwaarden import CURRENT as TERMS_VERSION, DELIVERY_CONSENT
+from core.voorwaarden import CURRENT as TERMS_VERSION, DELIVERY_CONSENT, SERVICE_CONSENT
 from invitations.content import publish_issues
 from invitations.models import Invitation, Source
 from invitations.services import snapshot
@@ -63,7 +63,7 @@ def refresh_open_payments(invitation: Invitation, limit: int = 3) -> None:
 
 
 def start_checkout(invitation: Invitation, *, user, package_code: str, optional_codes: list[str], terms_accepted: bool,
-                   delivery_consent: bool = False) -> Payment:
+                   delivery_consent: bool = False, service_consent: bool = False) -> Payment:
     if not terms_accepted:
         raise CheckoutError("Ga akkoord met de voorwaarden om te bestellen.")
     refresh_open_payments(invitation)
@@ -102,6 +102,8 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
             terms_version=TERMS_VERSION,
             delivery_consent_at=timezone.now() if delivery_consent else None,
             delivery_consent_text=DELIVERY_CONSENT if delivery_consent else "",
+            service_consent_at=timezone.now() if service_consent else None,
+            service_consent_text=SERVICE_CONSENT if service_consent else "",
             test_mode=settings.TEST_MODE,
         )
         for line in quote.lines:

@@ -104,9 +104,12 @@ def default_content(occasion: str, palette_key: str = "") -> dict:
         "music": {"asset": None, "title": ""},
         # haar: gekozen haarkleuren van het bruidspaar (alleen bij ontwerpen met een paar, zie catalog/paar.py).
         # paar_eigen: goedgekeurde eigen versie van het bruidspaar (upload-id, zie gezichten/).
-        # envelop: envelop en lakzegel naar keuze (catalog/envelop.py).
+        # envelop: envelop en lakzegel naar keuze (catalog/envelop.py); envelop.collectie: de Envelope Collection als losse laag om het ontwerp.
         "style": {"palette": palette_key, "opening": True, "haar": {"man": "", "vrouw": ""}, "paar_eigen": "",
-                  "envelop": {"kleur": "", "zegel_kleur": "", "zegel": "initialen", "initialen": "", "logo": ""}},
+                  "envelop": {"kleur": "", "zegel_kleur": "", "zegel": "initialen", "initialen": "", "logo": "",
+                              # Envelope Collection (catalog/envelop_collectie.py): envelop ("" = de opening van het ontwerp, "geen" of een stijl),
+                              # zegel, teken ("standaard" of "initialen") en initialen. Leeg = het gedrag van bestaande uitnodigingen.
+                              "collectie": {"envelop": "", "zegel": "", "teken": "standaard", "initialen": ""}}},
         "sections": {
             "countdown": True,
             "story": bool(cfg.get("story_default")),

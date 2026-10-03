@@ -68,6 +68,8 @@ def page(html: str) -> str:
     # Links en formulieren naar de website: terug naar het overzicht.
     html = re.sub(r'href="/(?!/)[^"]*"', 'href="index.html"', html)
     html = re.sub(r'action="/[^"]*"', 'action="#"', html)
+    # Lettertype-preload is in een losse export overbodig en geeft onder file:// alleen een CORS-melding in de console.
+    html = re.sub(r'<link[^>]*rel="preload"[^>]*as="font"[^>]*>\s*', "", html)
     # Deellinks verwijzen naar het adres van de server waarop de voorvertoning is gemaakt: weglaten.
     html = re.sub(r'<a[^>]*href="https://wa\.me/[^"]*"[^>]*>.*?</a>', "", html, flags=re.S)
     return html

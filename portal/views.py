@@ -23,6 +23,7 @@ from invitations.models import GuestResponse, Invitation
 from invitations.qr import qr_png, qr_svg
 from orders.models import Order
 from orders.services import CheckoutError, invitation_is_paid
+from studio.steps import heeft_envelopstap
 from wishes.forms import MessageForm, WishForm
 from wishes.models import CustomRequest
 from wishes.services import WishError, accept_proposal, add_message, create_request, pay_open_proposal
@@ -106,6 +107,7 @@ def invitation_detail(request, uid):
             "has_changes": invitation.has_unpublished_changes,
             "processing_order": orders.filter(status=Order.Status.PAID).exclude(fulfilment_status=Order.Fulfilment.DONE).first(),
             "wishes": invitation.custom_requests.order_by("-updated_at")[:5],
+            "envelop_stap": heeft_envelopstap(invitation),
         },
     )
 

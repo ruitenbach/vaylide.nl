@@ -57,6 +57,7 @@
     <section class="panel" aria-labelledby="acties-titel">
       <h2 id="acties-titel">Aanpassen</h2>
       <ul class="edit-links">
+        {% if envelop_stap %}<li><a href="{% url 'studio:step' inv.uid 'envelop' %}">Envelop en zegel</a></li>{% endif %}
         <li><a href="{% url 'studio:step' inv.uid 'gegevens' %}">Gegevens</a></li>
         <li><a href="{% url 'studio:step' inv.uid 'programma' %}">Programma en info</a></li>
         <li><a href="{% url 'studio:step' inv.uid 'aanmelden' %}">Aanmelden</a></li>

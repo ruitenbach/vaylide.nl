@@ -1,0 +1,210 @@
+{% extends "invitations/base_invitation.html" %}{% load static envelop_tags %}
+{# Golden Noël v1 — kerstspecial. Opening: de envelop-engine uit de VAYLIDE Envelope Collection (stijl golden-noel). Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/pinyon-script-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cinzel-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<script src="{% static 'js/envelop-collectie.js' %}" defer></script>
+<script src="{% static 'designs/golden-noel/v1/golden-noel.js' %}" defer></script>{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/envelop-collectie.css' %}">{% endblock %}
+
+{% block cover %}
+{% comment %}De envelop opent in ongeveer 3,8 s (zegel, flap, kaart eruit); daarna vervaagt het openingsscherm en wordt de
+kaart de uitnodiging (data-duration). De knal (sneeuw en sterretjes) komt bij het breken van het zegel.{% endcomment %}
+<section class="cover gn-cover" data-cover data-duration="4500" data-fx-delay="650" data-fx-intro="4100" aria-label="Openingsscherm">
+  <div class="fx-slot" data-fx-slot="cover" aria-hidden="true"></div>
+  <div class="gn-cover__stage">
+    <p class="gn-cover__to">{% if v.has_event %}Een kerstuitnodiging voor {% else %}Een kerstgroet voor {% endif %}{% if v.formal %}u{% else %}jou{% endif %}</p>
+    {% vx_envelop "golden-noel" uid="gn" kicker=v.kicker title=v.title date=v.date_short as env %}
+    {% include "partials/envelop/collectie.html" %}
+    {% if v.show.music %}<button type="button" class="gn-cover__music" data-open data-open-music data-vx-open-for="gn-env"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor"/></svg>Openen met muziek</button>{% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+{% comment %}De kaart: een winteravond in een boutique kersthotel. Bovenaan een gewelfd ivoren paneel met een boog van
+wintergroen en warme lichtjes, vijf kerstballen, kaarslicht achter de namen en twee kaarsen. Daaronder hoofdstukken: licht
+(met slinger of hoektakken) en avond (donker kaarslicht), elk met een eigen boven- en onderkant en een eigen lichtaccent.
+Diepte: lichtvlekken (bokeh) die bij het scrollen langzamer meebewegen (golden-noel.js), alleen met beweging aan.{% endcomment %}
+<header class="gn-hero">
+  <div class="gn-bokeh" aria-hidden="true">
+    <span style="--x:8%;--y:14%;--s:110px;--k:-.22;--d:0s"></span><span style="--x:84%;--y:10%;--s:150px;--k:-.3;--d:-3s"></span>
+    <span style="--x:18%;--y:62%;--s:90px;--k:-.16;--d:-6s"></span><span style="--x:90%;--y:55%;--s:120px;--k:-.26;--d:-2s"></span>
+    <span style="--x:50%;--y:4%;--s:70px;--k:-.12;--d:-4s"></span><span style="--x:4%;--y:88%;--s:140px;--k:-.34;--d:-8s"></span>
+    <span style="--x:72%;--y:86%;--s:80px;--k:-.18;--d:-5s"></span><span style="--x:36%;--y:28%;--s:46px;--k:-.08;--d:-7s"></span>
+    <span style="--x:64%;--y:34%;--s:56px;--k:-.1;--d:-1s"></span><span style="--x:28%;--y:96%;--s:64px;--k:-.2;--d:-9s"></span>
+  </div>
+  <div class="fx-slot gn-hero__fx" data-fx-slot="hero" aria-hidden="true"></div>
+  <div class="gn-boog-wrap">
+    <div class="gn-card">
+      <div class="gn-card__gloed" aria-hidden="true"></div>
+      <svg class="gn-boog" viewBox="0 0 1000 560" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_boog.svg" %}{% include "golden-noel/v1/_boog_lichtjes.svg" %}</svg>
+      {% include "golden-noel/v1/_ballen.html" %}
+      <div class="gn-sterren" aria-hidden="true">{% for i in "123456" %}<svg class="gn-ster4 gn-ster4--{{ i }}" viewBox="0 0 20 20"><path d="M10 0l2 8 8 2-8 2-2 8-2-8-8-2 8-2z"/></svg>{% endfor %}</div>
+      <p class="gn-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
+      <h1 class="gn-names gn-names--{{ v.names_size }} fx-names">{% if v.is_couple %}<span>{{ v.names.0 }}</span> <span class="gn-names__amp" aria-label="en">&amp;</span> <span>{{ v.names.1 }}</span>{% else %}<span>{{ v.names.0 }}</span>{% endif %}</h1>
+      {% if v.subnames %}<p class="gn-members fx-intro" style="--fx-d:4">{{ v.subnames }}</p>{% endif %}
+      <div class="gn-rule fx-intro" style="--fx-d:5">{% include "golden-noel/v1/_ster.html" %}</div>
+      {% if v.tagline %}<p class="gn-tagline fx-intro" style="--fx-d:6">{{ v.tagline }}</p>{% endif %}
+      {% if v.has_event and v.date %}<div class="gn-event fx-intro" style="--fx-d:7">
+        <p class="gn-event__weekday">{{ v.weekday }}</p>
+        <p class="gn-event__day">{{ v.day }} {{ v.month_name }} {{ v.year }}</p>
+        {% if v.time_display or v.venue %}<p class="gn-event__meta">{% if v.time_display %}{{ v.time_display }}{% endif %}{% if v.time_display and v.venue %} · {% endif %}{% if v.venue %}{{ v.venue }}{% endif %}</p>{% endif %}
+      </div>{% endif %}
+    </div>
+    <span class="gn-kaars gn-kaars--l" aria-hidden="true"><span class="gn-kaars__vlam"></span></span>
+    <span class="gn-kaars gn-kaars--r" aria-hidden="true"><span class="gn-kaars__vlam"></span></span>
+  </div>
+  <a class="gn-scroll fx-intro" href="#gn-verder" style="--fx-d:8">Scroll verder<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+</header>
+
+<div class="gn-body" id="gn-verder">
+{% if v.welcome or v.hero %}
+<section class="gn-sec gn-sec--slinger gn-licht-l gn-letter" data-reveal aria-label="{% if v.occasion == 'kerst' %}Kerstgroet{% else %}Welkom{% endif %}">
+  <svg class="gn-sec__top" viewBox="0 0 600 90" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_slinger_sectie.svg" %}</svg>
+  {% if v.hero %}<figure class="gn-letter__photo"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 420px, 80vw" %}</div></figure>{% endif %}
+  {% if v.welcome %}<div class="gn-letter__text">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>{% endif %}
+  <svg class="gn-sec__bottom" viewBox="0 0 600 80" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_scheiding.svg" %}</svg>
+</section>
+{% endif %}
+
+{% if v.has_event and v.date %}
+<section class="gn-sec gn-sec--avond gn-date" data-reveal aria-labelledby="gn-date-title">
+  {% include "golden-noel/v1/_avond.html" %}
+  <p class="gn-label">Noteer de datum</p>
+  <h2 id="gn-date-title" class="gn-h2">{% if v.formal %}Wij verwelkomen u graag{% else %}We zien je graag{% endif %}</h2>
+  <div class="gn-datecard">
+    <p class="gn-datecard__weekday">{{ v.weekday }}</p>
+    <p class="gn-datecard__day">{{ v.day }}</p>
+    <p class="gn-datecard__month">{{ v.month_name }} {{ v.year }}</p>
+    {% if v.time_display %}<p class="gn-datecard__time">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+    {% if v.venue %}<p class="gn-datecard__venue">{{ v.venue }}</p>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="gn-sec gn-sec--hoeken gn-licht-r gn-program" data-reveal aria-labelledby="gn-program-title">
+  <svg class="gn-hoek gn-hoek--lb" viewBox="0 0 240 240" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_hoek.svg" %}</svg>
+  <svg class="gn-hoek gn-hoek--ro" viewBox="0 0 240 240" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_hoek.svg" %}</svg>
+  <p class="gn-label">{% if v.occasion == "kerst" %}De kerstavond{% else %}Het programma{% endif %}</p>
+  <h2 id="gn-program-title" class="gn-h2">Programma</h2>
+  <ol class="gn-program__list" data-fx-stagger>
+    {% for item in v.program %}
+    <li class="gn-program__item">
+      <span class="gn-program__bal" aria-hidden="true"></span>
+      <p class="gn-program__row">{% if item.time %}<span class="gn-program__time">{{ item.time }}</span>{% endif %}<span class="gn-program__title">{{ item.title }}</span></p>
+      {% if item.description %}<p class="gn-program__desc">{{ item.description }}</p>{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+  <svg class="gn-sec__bottom" viewBox="0 0 600 80" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_scheiding.svg" %}</svg>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="gn-sec gn-sec--avond gn-count" data-reveal aria-labelledby="gn-count-title">
+  {% include "golden-noel/v1/_avond.html" %}
+  <p class="gn-label">{% if v.countdown_label == "kerst" %}Tot kerst{% else %}Aftellen{% endif %}</p>
+  <h2 id="gn-count-title" class="gn-h2">{% if v.countdown_label == "kerst" %}Nog even en het is kerst{% elif v.is_past %}Dank je wel{% else %}Nog even en het is zover{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="gn-sec gn-sec--slinger gn-licht-m gn-place" data-reveal aria-labelledby="gn-place-title">
+  <svg class="gn-sec__top" viewBox="0 0 600 90" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_slinger_sectie.svg" %}</svg>
+  <p class="gn-label">Waar</p>
+  <h2 id="gn-place-title" class="gn-h2">Locatie</h2>
+  {% if v.venue %}<p class="gn-place__venue">{{ v.venue }}</p>{% endif %}
+  {% if v.address_lines %}<address class="gn-place__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+  {% if v.date_display %}<p class="gn-place__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+  <svg class="gn-sec__bottom" viewBox="0 0 600 80" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_scheiding.svg" %}</svg>
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="gn-sec gn-sec--hoeken gn-licht-l gn-dress" data-reveal aria-labelledby="gn-dress-title">
+  <svg class="gn-hoek gn-hoek--rb" viewBox="0 0 240 240" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_hoek.svg" %}</svg>
+  <p class="gn-label">Feestelijk gekleed</p>
+  <h2 id="gn-dress-title" class="gn-h2">Dresscode</h2>
+  {% if v.dresscode_colors %}<ul class="gn-swatches" aria-label="Kleuren voor de dresscode">
+    {% for c in v.dresscode_colors %}<li class="gn-swatch" style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+  {% for p in v.dresscode_text %}<p class="gn-dress__text">{{ p|linebreaksbr }}</p>{% endfor %}
+  <svg class="gn-sec__bottom" viewBox="0 0 600 80" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_scheiding.svg" %}</svg>
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="gn-sec gn-sec--slinger gn-licht-r gn-story" data-reveal aria-labelledby="gn-story-title">
+  <svg class="gn-sec__top" viewBox="0 0 600 90" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_slinger_sectie.svg" %}</svg>
+  <h2 id="gn-story-title" class="gn-h2">{{ v.story_title }}</h2>
+  <div class="gn-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+  <svg class="gn-sec__bottom" viewBox="0 0 600 80" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_scheiding.svg" %}</svg>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="gn-sec gn-sec--hoeken gn-licht-m gn-gallery" data-reveal aria-labelledby="gn-gallery-title">
+  <svg class="gn-hoek gn-hoek--lb" viewBox="0 0 240 240" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_hoek.svg" %}</svg>
+  <p class="gn-label">Herinneringen</p>
+  <h2 id="gn-gallery-title" class="gn-h2">Momenten</h2>
+  <ul class="gn-photos">
+    {% for photo in v.gallery %}<li class="gn-photo"><figure><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 600px) 250px, 44vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+  </ul>
+  <svg class="gn-sec__bottom" viewBox="0 0 600 80" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_scheiding.svg" %}</svg>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="gn-sec gn-sec--slinger gn-licht-l gn-practical" data-reveal aria-labelledby="gn-practical-title">
+  <svg class="gn-sec__top" viewBox="0 0 600 90" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_slinger_sectie.svg" %}</svg>
+  <p class="gn-label">Praktisch</p>
+  <h2 id="gn-practical-title" class="gn-h2">Goed om te weten</h2>
+  <dl class="gn-practical__list" data-fx-stagger>
+    {% for item in v.practical %}<div class="gn-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+  <svg class="gn-sec__bottom" viewBox="0 0 600 80" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_scheiding.svg" %}</svg>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="gn-sec gn-sec--rsvp gn-licht-m gn-rsvp" id="aanmelden" data-reveal aria-labelledby="gn-rsvp-title">
+  <svg class="gn-hoek gn-hoek--lb" viewBox="0 0 240 240" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_hoek.svg" %}</svg>
+  <svg class="gn-hoek gn-hoek--ro" viewBox="0 0 240 240" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_hoek.svg" %}</svg>
+  <p class="gn-label">R.S.V.P.</p>
+  <h2 id="gn-rsvp-title" class="gn-h2">{% if v.formal %}Schuift u aan?{% else %}Schuif je aan?{% endif %}</h2>
+  <div class="gn-panel">
+    {% include "invitations/partials/rsvp.html" %}
+  </div>
+  <svg class="gn-sec__bottom" viewBox="0 0 600 80" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_scheiding.svg" %}</svg>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="gn-sec gn-licht-r gn-contact" data-reveal aria-labelledby="gn-contact-title">
+  <p class="gn-label">Contact</p>
+  <h2 id="gn-contact-title" class="gn-h2">Vragen?</h2>
+  {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+  <p class="gn-contact__name">{{ v.contact.name }}</p>
+  <p class="gn-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="gn-sec gn-sec--avond gn-closing" data-reveal aria-label="Afsluiting">
+  {% include "golden-noel/v1/_avond.html" %}
+  <svg class="gn-closing__boog" viewBox="0 0 600 90" aria-hidden="true" focusable="false">{% include "golden-noel/v1/_slinger_sectie.svg" %}</svg>
+  <p class="gn-closing__wish">Fijne feestdagen</p>
+  {% if v.show.closing %}{% for p in v.closing %}<p class="gn-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  <p class="gn-closing__mono" aria-hidden="true">{{ v.monogram }}</p>
+  {% include "invitations/partials/share_buttons.html" %}
+</section>
+</div>
+{% endblock %}

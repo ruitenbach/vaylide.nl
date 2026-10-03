@@ -1,0 +1,290 @@
+/* Golden Noël v1 — kerstspecial: een winteravond in een boutique kersthotel. Opening: de envelop uit de VAYLIDE Envelope
+   Collection (static/css/envelop-collectie.css, stijl golden-noel). Daarna een gewelfd ivoren paneel onder een boog van
+   wintergroen met warme lichtjes, kerstballen, kaarsen en kaarslicht, en hoofdstukken in licht en avond.
+   Decoratie uit tools/golden_noel/maak_tekeningen.py. Alles met CSS en SVG (alleen de papierstructuur is een beeld).
+   Beweging alleen onder .fx-motion, doorlopend met animation-play-state: var(--fx-play). Wijzig een uitgebrachte versie
+   niet: maak een v2. */
+
+@font-face { font-family: "Pinyon Script"; src: url("../../../fonts/pinyon-script-latin-400-normal.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Cinzel"; src: url("../../../fonts/cinzel-latin-wght-normal.woff2") format("woff2"); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../../../fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 300 800; font-display: swap; }
+
+body {
+  --gn-script: "Pinyon Script", "Great Vibes", cursive;
+  --gn-caps: "Cinzel", "Trajan Pro", Georgia, serif;
+  --gn-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --gn-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --gn-w: min(100vw - 32px, 560px);
+  /* Goudfolie voor grote letters: warm kaarslichtgoud, donker genoeg om op ivoor leesbaar te blijven (groot: 3:1). */
+  --gn-foil: linear-gradient(100deg, #5A4116 0%, var(--gn-gold-2) 28%, #B8914A 44%, #8E6C2E 58%, #5A4116 100%);
+  --gn-foil-night: linear-gradient(100deg, #C9A665 0%, #F3DFAF 30%, #FFF2D2 46%, #E6CC93 62%, #C9A665 100%);
+  --gn-paper: url("../../../img/envelop/papier.webp");
+  --inv-bg: var(--gn-card);
+  --inv-text: var(--gn-ink);
+  --inv-muted: var(--gn-muted);
+  --inv-accent: var(--gn-accent);
+  --inv-accent-contrast: var(--gn-accent-ink);
+  --inv-font-body: var(--gn-serif);
+  --inv-font-ui: var(--gn-ui);
+  --inv-focus: var(--gn-gold-2);
+  --inv-radius: 2px;
+  --inv-surface-2: var(--gn-card-2);
+  --inv-btn-border: color-mix(in srgb, var(--gn-gold-2) 70%, transparent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--gn-gold) 14%, transparent);
+  --inv-field-bg: #FFFDF8;
+  --inv-field-text: var(--gn-ink);
+  --inv-field-border: color-mix(in srgb, var(--gn-ink) 30%, transparent);
+  --inv-music-bg: linear-gradient(180deg, #F6E3B4, #D2AB63);
+  --inv-music-text: #1A140C;
+  --inv-music-border: rgba(90, 60, 20, .35);
+  --inv-photo-bg: var(--gn-card-2);
+  --fx-pulse: var(--gn-gold);
+  background:
+    radial-gradient(90% 60% at 50% 0%, color-mix(in srgb, var(--gn-glow) 22%, transparent), transparent 70%),
+    var(--gn-page) var(--gn-paper) 0 0 / 520px;
+  background-blend-mode: normal, soft-light;
+  color: var(--gn-ink);
+  font-family: var(--gn-serif);
+  font-size: 1.16rem;
+  font-weight: 500;
+}
+
+/* ================================================================ openingsscherm: de envelop (ongewijzigd) */
+.gn-cover {
+  color: var(--gn-gold-ink);
+  background:
+    radial-gradient(60% 46% at 50% 50%, color-mix(in srgb, var(--gn-glow) 26%, transparent), transparent 72%),
+    radial-gradient(120% 90% at 50% 30%, var(--gn-card-2), var(--gn-page) 78%);
+  --fx-bg: var(--gn-page);
+}
+.gn-cover .fx-slot { z-index: 0; }
+.gn-cover__stage { position: relative; z-index: 1; display: grid; justify-items: center; align-content: center; gap: .6rem; width: 100%; min-height: 100%; padding: 16px 0 24px; }
+.gn-cover__to { margin: 0; font: 500 .72rem/1.3 var(--gn-caps); letter-spacing: .3em; text-transform: uppercase; color: var(--gn-gold-ink); text-align: center; padding: 0 16px; }
+.gn-cover .vx-hint { color: var(--gn-gold-ink); }
+.gn-cover__music {
+  display: inline-flex; align-items: center; gap: .5rem; margin-top: .2rem; padding: .55rem 1.1rem; border: 1px solid color-mix(in srgb, var(--gn-gold-2) 60%, transparent);
+  border-radius: 999px; background: color-mix(in srgb, var(--gn-card) 70%, transparent); color: var(--gn-gold-ink); font: 500 .8rem/1 var(--gn-ui); cursor: pointer;
+}
+.gn-cover__music:focus-visible { outline: 2px solid var(--gn-gold-2); outline-offset: 3px; }
+.is-opening:not(.is-opening-reduced) .gn-cover { animation: gn-cover-uit .6s ease 3.85s forwards; }
+@keyframes gn-cover-uit { to { opacity: 0; } }
+
+/* ================================================================ gedeelde decoratie: wintergroen en lichtjes */
+.gn-stem { fill: none; stroke: #6B5634; stroke-width: 1.7; stroke-linecap: round; }
+.gn-needle-d { fill: none; stroke: #2F4A36; stroke-width: 2.5; stroke-linecap: round; }
+.gn-needle-l { fill: none; stroke: #5E7D5C; stroke-width: 2.3; stroke-linecap: round; }
+.gn-euca { fill: #8FA59A; }
+.gn-holly { fill: #2D4733; }
+.gn-twig { fill: none; stroke: #B8914A; stroke-width: 1.4; stroke-linecap: round; }
+.gn-twig-dot, .gn-star { fill: #C9A35C; }
+.gn-berry { fill: #D3B26C; }
+.gn-pearl { fill: #F7F0E1; stroke: rgba(150, 120, 70, .35); stroke-width: .8; }
+.gn-foil-line { fill: none; stroke: var(--gn-gold); stroke-width: 1; }
+/* Warme lichtjes: een kern en een zachte gloed die heel rustig ademt (niet knipperen). */
+.gn-licht__gloed { fill: url(#gn-gloed); }
+.gn-licht__kern { fill: #FFF7DE; }
+.fx-motion .gn-licht { animation: gn-adem 5.5s ease-in-out infinite; animation-delay: var(--d, 0s); animation-play-state: var(--fx-play, running); }
+@keyframes gn-adem { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+
+/* ================================================================ kop: winteravond met kaarslicht */
+.gn-hero { position: relative; display: grid; justify-items: center; align-content: center; gap: 1.1rem; min-height: 100svh; padding: 34px 16px 26px; overflow: hidden; }
+.gn-hero__fx { position: absolute; inset: 0; z-index: 0; }
+/* Lichtvlekken als door een beslagen raam; bij het scrollen iets langzamer (diepte). */
+.gn-bokeh { position: absolute; inset: -10% 0; z-index: 0; pointer-events: none; }
+.gn-bokeh span { position: absolute; left: var(--x); top: var(--y); width: var(--s); height: var(--s); border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--gn-glow) 55%, transparent) 0, color-mix(in srgb, var(--gn-glow) 18%, transparent) 45%, transparent 70%);
+  filter: blur(6px); opacity: .7; transform: translate3d(-50%, calc(-50% + var(--gn-scroll, 0px) * var(--k)), 0); }
+.fx-motion .gn-bokeh span { animation: gn-zweef 14s ease-in-out infinite; animation-delay: var(--d); animation-play-state: var(--fx-play, running); }
+@keyframes gn-zweef { 0%, 100% { opacity: .7; } 50% { opacity: .38; } }
+
+.gn-boog-wrap { position: relative; z-index: 1; width: var(--gn-w); }
+/* Het gewelfde paneel: een halve cirkel bovenaan, dubbele goudfolielijn, warm papier. */
+.gn-card {
+  position: relative; padding: calc(var(--gn-w) * .5) 9% 11%; text-align: center;
+  background: var(--gn-card) var(--gn-paper) 0 0 / 420px; background-blend-mode: soft-light;
+  border-radius: calc(var(--gn-w) * .5) calc(var(--gn-w) * .5) 3px 3px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gn-gold) 45%, transparent) inset, 0 2px 4px rgba(70, 50, 20, .1),
+    0 30px 60px -26px rgba(70, 50, 20, .42), 0 0 120px -20px color-mix(in srgb, var(--gn-glow) 60%, transparent);
+}
+.gn-card::after { content: ""; position: absolute; inset: 11px; border: 1px solid color-mix(in srgb, var(--gn-gold) 60%, transparent);
+  border-radius: calc(var(--gn-w) * .5 - 11px) calc(var(--gn-w) * .5 - 11px) 2px 2px; pointer-events: none; }
+/* Kaarslicht achter de namen (een zachte halo). */
+.gn-card__gloed { position: absolute; left: 50%; top: 46%; width: 115%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, color-mix(in srgb, var(--gn-glow) 34%, transparent) 0, color-mix(in srgb, var(--gn-glow) 12%, transparent) 38%, transparent 64%); }
+.fx-motion .gn-card__gloed { animation: gn-gloed 7s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes gn-gloed { 0%, 100% { opacity: 1; } 50% { opacity: .8; } }
+.gn-boog, .gn-ballen { position: absolute; left: 0; top: 0; width: 100%; height: auto; overflow: visible; pointer-events: none; }
+.gn-boog { filter: drop-shadow(0 3px 3px rgba(40, 30, 10, .18)); transform: translateY(calc(var(--gn-scroll, 0px) * .05)); }
+.gn-ballen { filter: drop-shadow(0 6px 6px rgba(60, 40, 10, .22)); }
+.gn-bal__draad { fill: none; stroke: color-mix(in srgb, var(--gn-gold-2) 85%, transparent); stroke-width: 1.2; }
+.gn-bal { transform-box: view-box; transform-origin: var(--o); }
+.fx-motion .gn-bal { animation: gn-wieg var(--t, 7s) ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .gn-bal:nth-of-type(2n) { animation-delay: -2.4s; }
+@keyframes gn-wieg { 0%, 100% { rotate: -1.6deg; } 50% { rotate: 1.6deg; } }
+/* Kleine gouden sterretjes rond de namen, die af en toe fonkelen. */
+.gn-sterren { position: absolute; inset: 0; pointer-events: none; }
+.gn-ster4 { position: absolute; width: 12px; fill: #D9B56A; opacity: .75; }
+.gn-ster4--1 { left: 13%; top: 46%; } .gn-ster4--2 { right: 12%; top: 50%; width: 9px; } .gn-ster4--3 { left: 22%; top: 70%; width: 8px; }
+.gn-ster4--4 { right: 20%; top: 74%; width: 11px; } .gn-ster4--5 { left: 50%; top: 41%; width: 7px; } .gn-ster4--6 { right: 32%; top: 88%; width: 8px; }
+.fx-motion .gn-ster4 { animation: gn-fonkel 6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .gn-ster4--2 { animation-delay: -1.5s; } .fx-motion .gn-ster4--3 { animation-delay: -3s; } .fx-motion .gn-ster4--4 { animation-delay: -4.2s; }
+.fx-motion .gn-ster4--5 { animation-delay: -2.2s; } .fx-motion .gn-ster4--6 { animation-delay: -5s; }
+@keyframes gn-fonkel { 0%, 70%, 100% { opacity: .35; transform: scale(.8); } 82% { opacity: 1; transform: scale(1.15); } }
+
+.gn-kicker { position: relative; margin: 0 0 .6rem; font: 500 .76rem/1.3 var(--gn-caps); letter-spacing: .36em; text-transform: uppercase; color: var(--gn-gold-ink); }
+.gn-names { position: relative; margin: 0; font: 400 clamp(2.7rem, 12.5vw, 4.4rem)/1.08 var(--gn-script); letter-spacing: 0;
+  background: var(--gn-foil); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(255, 250, 235, .85)) drop-shadow(0 0 18px color-mix(in srgb, var(--gn-glow) 55%, transparent)); overflow-wrap: anywhere; }
+.gn-names--long { font-size: clamp(2.2rem, 10vw, 3.5rem); }
+.gn-names--xlong { font-size: clamp(1.9rem, 8.4vw, 2.9rem); }
+.gn-names__amp { font-size: .75em; }
+.gn-members { position: relative; margin: .5rem 0 0; font-style: italic; font-size: 1.15rem; color: var(--gn-muted); }
+.gn-rule { position: relative; margin: 1.1rem auto .9rem; color: var(--gn-gold); }
+.gn-ster { display: block; width: min(240px, 70%); height: auto; margin: 0 auto; color: var(--gn-gold); }
+.gn-tagline { position: relative; margin: 0 auto; max-width: 30ch; font-style: italic; font-size: 1.24rem; line-height: 1.45; color: var(--gn-ink); }
+/* De datum als een uitnodiging voor een avond: een plaquette met dubbele folielijn. */
+.gn-event { position: relative; display: grid; gap: .15rem; width: min(100%, 320px); margin: 1.4rem auto 0; padding: 14px 18px;
+  border-top: 1px solid var(--gn-gold); border-bottom: 1px solid var(--gn-gold); box-shadow: 0 -4px 0 -3px var(--gn-gold), 0 4px 0 -3px var(--gn-gold); }
+.gn-event p { margin: 0; }
+.gn-event__weekday { font: 500 .72rem/1.4 var(--gn-caps); letter-spacing: .26em; text-transform: uppercase; color: var(--gn-gold-ink); }
+.gn-event__day { font: 500 1.35rem/1.25 var(--gn-caps); letter-spacing: .1em; color: var(--gn-ink); }
+.gn-event__meta { font: italic 500 1.02rem/1.4 var(--gn-serif); color: var(--gn-muted); }
+
+/* Twee slanke kaarsen aan de voet van het paneel, met een rustige vlam en warm licht. */
+.gn-kaars { position: absolute; bottom: -8px; z-index: 2; width: 13px; border-radius: 3px 3px 1px 1px;
+  background: linear-gradient(90deg, #E2D5BB, #FFFBF2 42%, #EDE3CF 70%, #D6C7AA); box-shadow: 0 0 0 1px rgba(150, 120, 70, .2); }
+.gn-kaars::after { content: ""; position: absolute; left: 50%; bottom: -7px; width: 30px; height: 9px; transform: translateX(-50%); border-radius: 3px;
+  background: linear-gradient(90deg, #7E5E25, #F3DDA6 45%, #B8914A 60%, #6A4F1F); box-shadow: 0 3px 6px rgba(60, 40, 10, .3); }
+.gn-kaars--l { left: -4px; height: 112px; }
+.gn-kaars--r { right: -4px; height: 84px; }
+.gn-kaars__vlam { position: absolute; left: 50%; bottom: 100%; width: 10px; height: 20px; margin-left: -5px; margin-bottom: 3px; border-radius: 50% 50% 45% 45% / 62% 62% 38% 38%;
+  background: radial-gradient(ellipse at 50% 72%, #FFFFFF 0, #FFF1C4 26%, #FFC968 58%, rgba(255, 160, 60, .2) 82%, transparent); transform-origin: 50% 90%; }
+.gn-kaars__vlam::before { content: ""; position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 214, 140, .42), rgba(255, 200, 120, .12) 40%, transparent 68%); }
+.fx-motion .gn-kaars__vlam { animation: gn-vlam 3.2s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .gn-kaars--r .gn-kaars__vlam { animation-duration: 2.7s; animation-delay: -1s; }
+@keyframes gn-vlam { 0%, 100% { transform: scale(1) rotate(-1deg); } 30% { transform: scale(.96, 1.04) rotate(1.2deg); } 60% { transform: scale(1.03, .97) rotate(-.6deg); } }
+
+.gn-scroll { position: relative; z-index: 1; display: inline-flex; flex-direction: column; align-items: center; gap: .1rem; font: 500 .7rem/1 var(--gn-caps); letter-spacing: .26em; text-transform: uppercase; color: var(--gn-gold-ink); text-decoration: none; }
+.gn-scroll:focus-visible { outline: 2px solid var(--gn-gold-2); outline-offset: 4px; }
+
+/* ================================================================ hoofdstukken: één doorlopende kaart
+   Geen losse panelen: de hoofdstukken liggen op één doorlopend vel, als banen die in elkaar overlopen (net als de andere
+   kaarten). Een scheiding met ster leidt naar het volgende hoofdstuk; de avondhoofdstukken zijn een donkere baan over de
+   hele breedte. De inhoud blijft in een smalle kolom (--gn-w). */
+.gn-body { position: relative; padding: 0 0 20px; }
+.gn-sec { --gn-kant: max(16px, calc((100% - var(--gn-w)) / 2)); position: relative; padding: 72px var(--gn-kant) 88px; text-align: center; isolation: isolate; }
+/* Afwisselend iets lichter papier, zodat het ritme voelbaar is zonder dat het losse kaarten worden. */
+.gn-sec:not(.gn-sec--avond):nth-of-type(even) { background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--gn-card) 62%, transparent) 18%, color-mix(in srgb, var(--gn-card) 62%, transparent) 82%, transparent); }
+/* Eigen lichtaccent per hoofdstuk (links, rechts of midden), dat zacht opgloeit als het hoofdstuk in beeld komt. */
+.gn-sec::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity 1.8s ease .2s;
+  background: radial-gradient(min(70%, 520px) 50% at var(--lx, 50%) var(--ly, 0%), color-mix(in srgb, var(--gn-glow) 26%, transparent), transparent 72%); }
+.gn-sec.is-visible::before, html:not(.invite-ready) .gn-sec::before { opacity: 1; }
+.gn-licht-l { --lx: 30%; --ly: 6%; } .gn-licht-r { --lx: 70%; --ly: 6%; } .gn-licht-m { --lx: 50%; --ly: 0%; }
+.gn-label { margin: 0 0 .35rem; font: 500 .7rem/1.3 var(--gn-caps); letter-spacing: .32em; text-transform: uppercase; color: var(--gn-gold-ink); }
+.gn-h2 { margin: 0 0 1.1rem; font: italic 500 clamp(1.8rem, 7.4vw, 2.35rem)/1.15 var(--gn-serif); color: var(--gn-ink); }
+.gn-sec p { line-height: 1.55; }
+
+/* Bovenkant (een slinger) en de scheiding naar het volgende hoofdstuk. Ze komen rustig binnen als het hoofdstuk in beeld komt. */
+.gn-sec__top { display: block; width: min(78%, 440px); height: auto; margin: -36px auto 10px; overflow: visible; filter: drop-shadow(0 3px 3px rgba(40, 30, 10, .16)); }
+.gn-sec__bottom { position: absolute; left: 50%; bottom: -30px; z-index: 2; width: min(74%, 420px); height: auto; transform: translateX(-50%); overflow: visible; }
+.invite-ready .gn-sec__top, .invite-ready .gn-sec__bottom, .invite-ready .gn-hoek { opacity: 0; transition: opacity 1.2s ease .35s, translate 1.2s cubic-bezier(.2, .7, .2, 1) .35s; }
+.invite-ready .gn-sec__top { translate: 0 -8px; }
+.invite-ready .gn-sec.is-visible :is(.gn-sec__top, .gn-sec__bottom, .gn-hoek) { opacity: 1; }
+.invite-ready .gn-sec.is-visible .gn-sec__top { translate: 0 0; }
+/* Begint het volgende hoofdstuk met een slinger of een avondbaan, dan is die de overgang: geen dubbele versiering. */
+.gn-sec:has(+ :is(.gn-sec--slinger, .gn-sec--avond)) .gn-sec__bottom { display: none; }
+/* Hoektakken langs de kolom (niet langs de schermrand). */
+.gn-hoek { position: absolute; width: min(30%, 150px); height: auto; overflow: visible; pointer-events: none; filter: drop-shadow(0 2px 2px rgba(40, 30, 10, .14)); }
+.gn-hoek--lb { left: calc(var(--gn-kant) - 14px); top: 20px; }
+.gn-hoek--ro { right: calc(var(--gn-kant) - 14px); bottom: 26px; rotate: 180deg; }
+.gn-hoek--rb { right: calc(var(--gn-kant) - 14px); top: 20px; scale: -1 1; }
+
+/* Avondhoofdstukken: een donkere baan van kaarslicht over de hele breedte, met een fijne gouden rand boven en onder. */
+.gn-sec--avond {
+  color: var(--gn-night-ink);
+  background: radial-gradient(min(80%, 700px) 70% at 50% 112%, color-mix(in srgb, var(--gn-glow) 28%, transparent), transparent 72%),
+    linear-gradient(180deg, var(--gn-night-2), var(--gn-night));
+  background-color: var(--gn-night);  /* vaste ondergrond: contrast ook zonder verloop */
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--gn-night-gold) 55%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--gn-night-gold) 55%, transparent),
+    0 -18px 30px -24px rgba(30, 20, 8, .5), 0 18px 30px -24px rgba(30, 20, 8, .5);
+  --inv-text: var(--gn-night-ink); --inv-muted: var(--gn-night-muted); --inv-accent: var(--gn-night-gold); --inv-accent-contrast: var(--gn-night);
+  --inv-btn-border: color-mix(in srgb, var(--gn-night-gold) 70%, transparent); --inv-btn-hover-bg: color-mix(in srgb, var(--gn-night-gold) 14%, transparent);
+  --inv-focus: var(--gn-night-gold);
+  padding-top: 86px;
+}
+.gn-sec--avond::before { display: none; }
+.gn-sec--avond .gn-label { color: var(--gn-night-gold); }
+.gn-sec--avond .gn-h2 { color: var(--gn-night-ink); }
+.gn-avond { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.gn-avond__snoer { position: absolute; left: 50%; top: 4px; width: min(100%, 760px); height: auto; transform: translateX(-50%); }
+.gn-avond__draad { fill: none; stroke: color-mix(in srgb, var(--gn-night-gold) 55%, transparent); stroke-width: 1; }
+.gn-kristal { position: absolute; width: 22px; fill: none; stroke: color-mix(in srgb, var(--gn-night-gold) 45%, transparent); stroke-width: 1.1; stroke-linecap: round; }
+.gn-kristal--1 { left: calc(var(--gn-kant) + 2%); top: 42%; } .gn-kristal--2 { right: calc(var(--gn-kant) + 3%); top: 58%; width: 16px; } .gn-kristal--3 { left: calc(var(--gn-kant) + 12%); bottom: 12%; width: 13px; }
+.fx-motion .gn-kristal { animation: gn-zweef 12s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+
+/* ---------------------------------------------------------------- per hoofdstuk */
+.gn-letter__photo { margin: 0 auto 1.3rem; width: min(100%, 420px); }
+.gn-letter__photo .ph { border-radius: 2px; box-shadow: 0 0 0 6px var(--gn-card-2), 0 0 0 7px color-mix(in srgb, var(--gn-gold) 55%, transparent), 0 16px 30px -18px rgba(60, 40, 10, .4); }
+.gn-letter__text p { margin: 0 0 .8rem; font-size: 1.2rem; }
+
+.gn-datecard { display: grid; justify-items: center; gap: .2rem; width: min(100%, 300px); margin: 0 auto; padding: 24px 18px;
+  border: 1px solid var(--gn-night-gold); outline: 1px solid color-mix(in srgb, var(--gn-night-gold) 45%, transparent); outline-offset: 5px; }
+.gn-datecard p { margin: 0; }
+.gn-datecard__weekday, .gn-datecard__month { font: 500 .78rem/1.3 var(--gn-caps); letter-spacing: .26em; text-transform: uppercase; color: var(--gn-night-gold); }
+.gn-datecard__day { font: 400 4.4rem/1 var(--gn-caps); background: var(--gn-foil-night); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 16px rgba(255, 210, 130, .35)); }
+.gn-datecard__time { font-size: 1.12rem; }
+.gn-datecard__venue { font-style: italic; color: var(--gn-night-muted); }
+
+.gn-program__list { display: grid; gap: 1.15rem; margin: 0; padding: 0; list-style: none; text-align: left; }
+.gn-program__item { position: relative; padding-left: 36px; }
+.gn-program__bal { position: absolute; left: 4px; top: .25rem; width: 17px; height: 17px; border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #FFF6DA, #F0D59A 22%, #C9A25A 55%, #8E6C2E 85%, #6A4F1F); box-shadow: 0 2px 4px rgba(80, 56, 20, .3), 0 0 10px rgba(255, 210, 130, .45); }
+.gn-program__bal::before { content: ""; position: absolute; left: 5px; top: -4px; width: 7px; height: 4px; border-radius: 1px; background: #B08A42; }
+.gn-program__item:not(:last-child)::after { content: ""; position: absolute; left: 12px; top: 1.6rem; bottom: -1rem; width: 1px; background: linear-gradient(var(--gn-gold), transparent); opacity: .6; }
+.gn-program__row { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .7rem; margin: 0; }
+.gn-program__time { font: 500 .78rem/1.3 var(--gn-caps); letter-spacing: .18em; color: var(--gn-gold-ink); }
+.gn-program__title { font-weight: 600; font-size: 1.16rem; }
+.gn-program__desc { margin: .2rem 0 0; color: var(--gn-muted); }
+
+.gn-place__venue { margin: 0; font-size: 1.32rem; font-weight: 600; }
+.gn-place__address { margin: .3rem 0 .6rem; font-style: normal; color: var(--gn-muted); }
+.gn-place__when { margin: 0 0 1rem; }
+
+.gn-swatches { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 0 0 1rem; padding: 0; list-style: none; }
+.gn-swatch { width: 40px; height: 40px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px var(--gn-card), 0 0 0 4px color-mix(in srgb, var(--gn-gold) 60%, transparent), 0 6px 12px -6px rgba(60, 40, 10, .4); }
+
+.gn-story__text p { margin: 0 0 .8rem; }
+.gn-photos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.gn-photo figure { margin: 0; }
+.gn-photo:nth-child(3n + 1) { transform: translateY(10px); }
+.gn-photo .ph { box-shadow: 0 0 0 4px var(--gn-card-2), 0 0 0 5px color-mix(in srgb, var(--gn-gold) 45%, transparent); }
+.gn-photo figcaption { margin-top: .4rem; font-size: .95rem; font-style: italic; color: var(--gn-muted); }
+
+.gn-practical__list { display: grid; gap: 1rem; margin: 0; text-align: left; }
+.gn-practical__item dt { font: 500 .78rem/1.3 var(--gn-caps); letter-spacing: .18em; text-transform: uppercase; color: var(--gn-gold-ink); }
+.gn-practical__item dd { margin: .2rem 0 0; }
+
+.gn-panel { position: relative; text-align: left; }
+.gn-contact__name { margin: .3rem 0; font-weight: 600; }
+
+.gn-closing { padding-bottom: 46px; }
+.gn-closing__boog { display: block; width: 70%; height: auto; margin: -6px auto 4px; overflow: visible; }
+.gn-closing__wish { margin: 0; font: 400 clamp(2.6rem, 12vw, 3.6rem)/1.1 var(--gn-script);
+  background: var(--gn-foil-night); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 18px rgba(255, 210, 130, .4)); }
+.gn-closing__text { margin: .7rem auto 0; max-width: 34ch; }
+.gn-closing__mono { margin: 1.1rem 0 .7rem; font: 500 1rem/1 var(--gn-caps); letter-spacing: .3em; color: var(--gn-night-gold); }
+
+@media (min-width: 700px) {
+  .gn-sec { padding-top: 84px; padding-bottom: 100px; }
+  .gn-sec--avond { padding-top: 96px; }
+  .gn-kaars--l { left: -26px; height: 150px; }
+  .gn-kaars--r { right: -24px; height: 112px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gn-cover, .gn-bal, .gn-licht, .gn-kaars__vlam, .gn-ster4, .gn-bokeh span, .gn-card__gloed, .gn-kristal { animation: none !important; }
+}

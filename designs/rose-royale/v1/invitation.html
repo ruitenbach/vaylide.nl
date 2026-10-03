@@ -1,0 +1,218 @@
+{% extends "invitations/base_invitation.html" %}{% load static envelop_tags %}
+{# Rosé Royale v1 — trouwontwerp: de Rose Blush-envelop als opening, daarna een rozentuin in de schemering met een oranjerie. Eigen tekeningen (tools/rose_royale/). Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/great-vibes-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/marcellus-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<script src="{% static 'js/envelop-collectie.js' %}" defer></script>
+<script src="{% static 'designs/rose-royale/v1/rose-royale.js' %}" defer></script>{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/envelop-collectie.css' %}">{% endblock %}
+
+{% block cover %}
+{% comment %}De envelop opent in ongeveer 3,8 s; daarna 'rijdt de camera de scène in' (het openingsscherm vergroot en vervaagt)
+en komen de lagen van de rozentuin één voor één binnen. De knal (rozenblaadjes) komt bij het breken van het zegel.{% endcomment %}
+<section class="cover rr-cover" data-cover data-duration="4600" data-fx-delay="650" data-fx-intro="4300" aria-label="Openingsscherm">
+  <div class="fx-slot" data-fx-slot="cover" aria-hidden="true"></div>
+  <div class="rr-cover__stage">
+    <p class="rr-cover__to">{% if v.formal %}Een uitnodiging voor u{% else %}Een uitnodiging voor jou{% endif %}</p>
+    {% vx_envelop "rose-blush" uid="rr" kicker=v.kicker title=v.title date=v.date_short as env %}
+    {% include "partials/envelop/collectie.html" %}
+    {% if v.show.music %}<button type="button" class="rr-cover__music" data-open data-open-music data-vx-open-for="rr-env"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor"/></svg>Openen met muziek</button>{% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+{% include "rose-royale/v1/_defs.html" %}
+{% comment %}De kop is een kleine trouwfilm in lagen (achter naar voor): de avondlucht met sterren, maan, horizon en lichtstralen,
+de oranjerie (gedoofd, en daarop dezelfde scène verlicht), de roségouden boog met het hartsculptuur, de tekst, rozen halverwege
+en onscherpe rozen vooraan. Elke laag is een eigen 'diepte'-vlak: bij het openen rijdt de camera de tuin in, bij het scrollen
+beweegt elke laag op een eigen snelheid (rose-royale.js, alleen met beweging aan). De beelden komen uit
+tools/rose_royale/maak_beelden.py.{% endcomment %}
+<header class="rr-hero">
+  <div class="rr-diepte rr-diepte--lucht" aria-hidden="true">
+    <svg class="rr-sterren" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMin slice" focusable="false">{% include "rose-royale/v1/_sterren.svg" %}</svg>
+    <div class="rr-horizon"></div>
+    <img class="rr-stralen" src="{% static 'designs/rose-royale/v1/img/stralen.webp' %}" alt="" width="1400" height="900" decoding="async">
+  </div>
+  <div class="rr-diepte rr-diepte--oranjerie" aria-hidden="true">
+    <img class="rr-oranjerie rr-oranjerie--donker" src="{% static 'designs/rose-royale/v1/img/oranjerie-donker.webp' %}" alt="" width="1600" height="900" decoding="async">
+    <img class="rr-oranjerie rr-oranjerie--licht" src="{% static 'designs/rose-royale/v1/img/oranjerie-licht.webp' %}" alt="" width="1600" height="900" decoding="async">
+  </div>
+  <div class="rr-diepte rr-diepte--boog" aria-hidden="true">
+    <img class="rr-boog" src="{% static 'designs/rose-royale/v1/img/boog.webp' %}" alt="" width="600" height="900" decoding="async">
+    <img class="rr-hart" src="{% static 'designs/rose-royale/v1/img/hart.webp' %}" alt="" width="660" height="860" decoding="async">
+  </div>
+  <div class="fx-slot rr-hero__fx" data-fx-slot="hero" aria-hidden="true"></div>
+  <div class="rr-hero__tekst">
+    <p class="rr-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
+    <h1 class="rr-names rr-names--{{ v.names_size }} fx-names">{% if v.is_couple %}<span class="rr-names__een">{{ v.names.0 }}</span> <span class="rr-names__amp" aria-label="en">&amp;</span> <span class="rr-names__twee">{{ v.names.1 }}</span>{% else %}<span>{{ v.names.0 }}</span>{% endif %}</h1>
+    {% if v.date %}<div class="rr-lint fx-intro" style="--fx-d:5">
+      <svg class="rr-lint__band" viewBox="0 0 400 70" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 18L34 10L28 35L34 60L0 52L14 35Z" class="rr-lint__eind"/><path d="M400 18L366 10L372 35L366 60L400 52L386 35Z" class="rr-lint__eind"/><path d="M30 8Q200 -2 370 8V58Q200 48 30 58Z" class="rr-lint__vlak"/></svg>
+      <p class="rr-lint__tekst">{{ v.weekday }} · {{ v.day }} {{ v.month_name }} {{ v.year }}</p>
+    </div>{% endif %}
+    {% if v.tagline %}<p class="rr-tagline fx-intro" style="--fx-d:6">{{ v.tagline }}</p>{% endif %}
+  </div>
+  <div class="rr-diepte rr-diepte--rozen" aria-hidden="true">
+    <img class="rr-roos rr-roos--boven" src="{% static 'designs/rose-royale/v1/img/rozen-boven.webp' %}" alt="" width="600" height="480" decoding="async">
+    <img class="rr-roos rr-roos--rechts" src="{% static 'designs/rose-royale/v1/img/rozen-rechts.webp' %}" alt="" width="700" height="700" decoding="async">
+    <img class="rr-roos rr-roos--links" src="{% static 'designs/rose-royale/v1/img/rozen-links.webp' %}" alt="" width="900" height="900" decoding="async">
+  </div>
+  <div class="rr-diepte rr-diepte--voor" aria-hidden="true">
+    <img class="rr-roos rr-roos--voor-links" src="{% static 'designs/rose-royale/v1/img/voor-links.webp' %}" alt="" width="800" height="1100" decoding="async">
+    <img class="rr-roos rr-roos--voor-rechts" src="{% static 'designs/rose-royale/v1/img/voor-rechts.webp' %}" alt="" width="800" height="1100" decoding="async">
+  </div>
+  <a class="rr-scroll fx-intro" href="#rr-verder" style="--fx-d:8">Scroll verder<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+</header>
+
+{% comment %}Daarna één doorlopende kaart: de schemering loopt over in blush, hoofdstukken gaan via rozenranken in elkaar
+over, en het slot keert terug naar de avond.{% endcomment %}
+<div class="rr-body" id="rr-verder">
+{% if v.welcome or v.hero %}
+<section class="rr-sec rr-welkom" data-reveal aria-label="Welkom">
+  <div class="rr-cartouche">
+    <svg class="rr-cartouche__lijst" viewBox="0 0 400 520" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M200 6C318 6 394 86 394 200V420C394 470 352 514 300 514H100C48 514 6 470 6 420V200C6 86 82 6 200 6Z" class="rr-cartouche__buiten"/><path d="M200 20C306 20 380 94 380 200V418C380 462 344 500 300 500H100C56 500 20 462 20 418V200C20 94 94 20 200 20Z" class="rr-cartouche__binnen"/></svg>
+    <img class="rr-cartouche__rozen" src="{% static 'designs/rose-royale/v1/img/rankje.webp' %}" alt="" width="1200" height="260" loading="lazy" decoding="async">
+    {% if v.hero %}<figure class="rr-welkom__foto"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 360px, 70vw" %}</div></figure>{% endif %}
+    {% if v.welcome %}<div class="rr-welkom__tekst">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.has_event and v.date %}
+<section class="rr-sec rr-datum" data-reveal aria-labelledby="rr-datum-titel">
+  <p class="rr-label">Noteer de datum</p>
+  <h2 id="rr-datum-titel" class="rr-h2">Onze trouwdag</h2>
+  <div class="rr-medaillon">
+    <div class="rr-medaillon__munt">
+      <p class="rr-medaillon__dag">{{ v.weekday }}</p>
+      <p class="rr-medaillon__getal">{{ v.day }}</p>
+      <p class="rr-medaillon__maand">{{ v.month_name }} {{ v.year }}</p>
+    </div>
+    <img class="rr-medaillon__rozen" src="{% static 'designs/rose-royale/v1/img/rankje.webp' %}" alt="" width="1200" height="260" loading="lazy" decoding="async">
+  </div>
+  {% if v.time_display %}<p class="rr-datum__tijd">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  {% if v.venue %}<p class="rr-datum__plek">{{ v.venue }}</p>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="rr-sec rr-sec--avond rr-aftellen" data-reveal aria-labelledby="rr-aftellen-titel">
+  <svg class="rr-avond__sterren" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">{% include "rose-royale/v1/_sterren.svg" %}</svg>
+  <p class="rr-label">Aftellen</p>
+  <h2 id="rr-aftellen-titel" class="rr-h2">{% if v.is_past %}Dank je wel{% else %}Nog even en het is zover{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="rr-sec rr-programma" data-reveal aria-labelledby="rr-programma-titel">
+  <img class="rr-rankje" src="{% static 'designs/rose-royale/v1/img/rankje.webp' %}" alt="" width="1200" height="260" loading="lazy" decoding="async">
+  <p class="rr-label">De dag</p>
+  <h2 id="rr-programma-titel" class="rr-h2">Programma</h2>
+  <ol class="rr-programma__lijst" data-fx-stagger>
+    {% for item in v.program %}
+    <li class="rr-programma__item">
+      <img class="rr-programma__knop" src="{% static 'designs/rose-royale/v1/img/knop.webp' %}" alt="" width="200" height="260" loading="lazy" decoding="async">
+      <div class="rr-programma__inhoud">
+        {% if item.time %}<p class="rr-programma__tijd">{{ item.time }}</p>{% endif %}
+        <p class="rr-programma__titel">{{ item.title }}</p>
+        {% if item.description %}<p class="rr-programma__tekst">{{ item.description }}</p>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="rr-sec rr-locatie" data-reveal aria-labelledby="rr-locatie-titel">
+  <p class="rr-label">Waar</p>
+  <h2 id="rr-locatie-titel" class="rr-h2">Locatie</h2>
+  <div class="rr-venster" aria-hidden="true">
+    <img class="rr-venster__plaat" src="{% static 'designs/rose-royale/v1/img/oranjerie-licht.webp' %}" alt="" width="1600" height="900" loading="lazy" decoding="async">
+    <img class="rr-venster__rozen" src="{% static 'designs/rose-royale/v1/img/rozen-rechts.webp' %}" alt="" width="700" height="700" loading="lazy" decoding="async">
+  </div>
+  {% if v.venue %}<p class="rr-locatie__naam">{{ v.venue }}</p>{% endif %}
+  {% if v.address_lines %}<address class="rr-locatie__adres">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+  {% if v.date_display %}<p class="rr-locatie__wanneer">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="rr-sec rr-dresscode" data-reveal aria-labelledby="rr-dresscode-titel">
+  <p class="rr-label">Wat trek je aan</p>
+  <h2 id="rr-dresscode-titel" class="rr-h2">Dresscode</h2>
+  {% if v.dresscode_colors %}<ul class="rr-linten" aria-label="Kleuren voor de dresscode">
+    {% for c in v.dresscode_colors %}<li class="rr-lintje" style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+  {% for p in v.dresscode_text %}<p class="rr-dresscode__tekst">{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="rr-sec rr-verhaal" data-reveal aria-labelledby="rr-verhaal-titel">
+  <img class="rr-rankje" src="{% static 'designs/rose-royale/v1/img/rankje.webp' %}" alt="" width="1200" height="260" loading="lazy" decoding="async">
+  <h2 id="rr-verhaal-titel" class="rr-h2">{{ v.story_title }}</h2>
+  <div class="rr-verhaal__tekst">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="rr-sec rr-galerij" data-reveal aria-labelledby="rr-galerij-titel">
+  <p class="rr-label">Herinneringen</p>
+  <h2 id="rr-galerij-titel" class="rr-h2">Momenten</h2>
+  <ul class="rr-fotos">
+    {% for photo in v.gallery %}<li class="rr-foto"><figure><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 600px) 260px, 44vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="rr-sec rr-praktisch" data-reveal aria-labelledby="rr-praktisch-titel">
+  <p class="rr-label">Praktisch</p>
+  <h2 id="rr-praktisch-titel" class="rr-h2">Goed om te weten</h2>
+  <dl class="rr-praktisch__lijst" data-fx-stagger>
+    {% for item in v.practical %}<div class="rr-praktisch__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="rr-sec rr-aanmelden" id="aanmelden" data-reveal aria-labelledby="rr-aanmelden-titel">
+  <img class="rr-aanmelden__rozen rr-aanmelden__rozen--l" src="{% static 'designs/rose-royale/v1/img/rozen-links.webp' %}" alt="" width="900" height="900" loading="lazy" decoding="async">
+  <img class="rr-aanmelden__rozen rr-aanmelden__rozen--r" src="{% static 'designs/rose-royale/v1/img/rozen-boven.webp' %}" alt="" width="600" height="480" loading="lazy" decoding="async">
+  <p class="rr-label">R.S.V.P.</p>
+  <h2 id="rr-aanmelden-titel" class="rr-h2">{% if v.formal %}Bent u erbij?{% else %}Ben je erbij?{% endif %}</h2>
+  <div class="rr-formulier">
+    {% include "invitations/partials/rsvp.html" %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="rr-sec rr-contact" data-reveal aria-labelledby="rr-contact-titel">
+  <p class="rr-label">Contact</p>
+  <h2 id="rr-contact-titel" class="rr-h2">Vragen?</h2>
+  {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+  <p class="rr-contact__naam">{{ v.contact.name }}</p>
+  <p class="rr-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="rr-sec rr-sec--avond rr-slot" data-reveal aria-label="Afsluiting">
+  <svg class="rr-avond__sterren" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMin slice" aria-hidden="true" focusable="false">{% include "rose-royale/v1/_sterren.svg" %}</svg>
+  <img class="rr-slot__paviljoen" src="{% static 'designs/rose-royale/v1/img/oranjerie-licht.webp' %}" alt="" width="1600" height="900" loading="lazy" decoding="async">
+  <p class="rr-slot__wens">Tot op onze trouwdag</p>
+  <p class="rr-slot__namen">{% if v.is_couple %}{{ v.names.0 }} &amp; {{ v.names.1 }}{% else %}{{ v.names.0 }}{% endif %}</p>
+  {% if v.show.closing %}{% for p in v.closing %}<p class="rr-slot__tekst">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  {% include "invitations/partials/share_buttons.html" %}
+  <img class="rr-slot__rozen" src="{% static 'designs/rose-royale/v1/img/rankje.webp' %}" alt="" width="1200" height="260" loading="lazy" decoding="async">
+</section>
+</div>
+{% endblock %}
