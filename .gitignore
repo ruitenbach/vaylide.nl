@@ -11,3 +11,8 @@ e2e/node_modules/
 .DS_Store
 # Lokale instellingen van ontwerphulpmiddelen
 .impeccable/
+
+# Gegenereerde exports en schermafbeeldingen van controles: niet in Git
+/voorvertoning-*/
+/voorvertoning-*.zip
+/docs/*-schermafbeeldingen/
