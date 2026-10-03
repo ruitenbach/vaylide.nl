@@ -1,0 +1,65 @@
+# Render-blueprint voor de STAGINGomgeving van Vaylide: één vaste online testsite vóór productie.
+# Aparte webdienst, aparte database en aparte schijf; deelt niets met de live dienst `vaylide` en de database `vaylide-db`.
+# Gebruik: Render -> New -> Blueprint -> repository vaylide.nl -> branch claude/envelop-collectie -> Blueprint Path: render.staging.yaml.
+# Uitleg stap voor stap: docs/STAGING.md. Dit bestand wijzigt de bestaande live blueprint (render.yaml) niet.
+#
+# Bewust anders dan de live blueprint:
+# - VIERLIEF_MODE=test: betalen is gesimuleerd (geen Mollie-sleutel nodig) en e-mails gaan alleen naar de outbox (er wordt niets verstuurd);
+#   de site weigert in testmodus een live Mollie-sleutel.
+# - Hele site achter het bestaande previewwachtwoord (VIERLIEF_PREVIEW_PASSWORD); VIERLIEF_PREVIEW_OPEN_PUBLIC staat niet aan.
+# - Geen cron-dienst: taken lopen direct bij het opslaan (VIERLIEF_JOBS_INLINE is standaard aan).
+# - DJANGO_ALLOWED_HOSTS is niet gezet: Render voegt het eigen adres van deze dienst zelf toe (RENDER_EXTERNAL_HOSTNAME), meer is niet nodig.
+services:
+  - type: web
+    name: vaylide-staging
+    runtime: python
+    region: frankfurt
+    plan: starter
+    buildCommand: >-
+      pip install -r requirements.txt &&
+      DJANGO_DEBUG=false VIERLIEF_ALLOW_DEV_SECRET=true VIERLIEF_DATA_DIR=/tmp/build-data
+      python manage.py collectstatic --noinput
+    startCommand: >-
+      python manage.py migrate --noinput &&
+      gunicorn config.wsgi --bind 0.0.0.0:$PORT --workers 2 --timeout 60 --access-logfile -
+    healthCheckPath: /healthz
+    disk:
+      name: vaylide-staging-gegevens
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: VIERLIEF_MODE
+        value: test
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      # Alleen de eigen stagingdatabase, nooit vaylide-db.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vaylide-staging-db
+          property: connectionString
+      - key: VIERLIEF_DATA_DIR
+        value: /var/data
+      - key: VIERLIEF_UPLOAD_DIR
+        value: /var/data/uploads
+      - key: VIERLIEF_TRUSTED_PROXY_HOPS
+        value: "1"
+      # Hieronder vraagt Render om een waarde bij het aanmaken.
+      # Het adres van deze stagingdienst, bijvoorbeeld https://vaylide-staging.onrender.com (zonder slash aan het eind).
+      - key: VIERLIEF_BASE_URL
+        sync: false
+      # Het wachtwoord van de hele site (een wegwerpwachtwoord voor de testers; gebruikersnaam is `voorbeeld`).
+      - key: VIERLIEF_PREVIEW_USER
+        value: voorbeeld
+      - key: VIERLIEF_PREVIEW_PASSWORD
+        sync: false
+
+databases:
+  - name: vaylide-staging-db
+    region: frankfurt
+    plan: basic-256mb
+    databaseName: vaylide_staging
+    user: vaylide_staging
