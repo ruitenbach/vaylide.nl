@@ -7,12 +7,18 @@
 <title>{% block title %}VAYLIDE{% endblock %}{% block title_suffix %} · VAYLIDE{% endblock %}</title>
 <meta name="description" content="{% block description %}Persoonlijke digitale uitnodigingen met aanmelden, afteller en route. Voor bruiloften, verjaardagen, jubilea en zakelijke evenementen.{% endblock %}">
 {% block meta_robots %}{% endblock %}
-{% block canonical %}<link rel="canonical" href="{{ BASE_URL }}{{ request.path }}">{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ BASE_URL }}{{ canonical_path|default:request.path }}">{% endblock %}
 <meta property="og:site_name" content="VAYLIDE">
+<meta property="og:locale" content="nl_NL">
+<meta property="og:url" content="{{ BASE_URL }}{{ canonical_path|default:request.path }}">
 <meta property="og:title" content="{% block og_title %}VAYLIDE · digitale uitnodigingen{% endblock %}">
-<meta property="og:description" content="{{ SLOGAN }}">
-<meta property="og:image" content="{{ BASE_URL }}{% static 'img/og-vaylide.jpg' %}">
-<meta property="og:type" content="website">
+<meta property="og:description" content="{% block og_description %}{{ SLOGAN }}{% endblock %}">
+{% block og_image %}<meta property="og:image" content="{{ BASE_URL }}{% static 'img/og-vaylide.jpg' %}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="VAYLIDE: persoonlijke digitale uitnodigingen">
+{% endblock %}<meta property="og:type" content="website">
+<meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}">
 <meta name="theme-color" content="#FBF8F2">
 {% include "partials/icons.html" %}
 <link rel="preload" href="{% static 'fonts/playfair-display-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
@@ -22,7 +28,8 @@
 {% block extra_css %}{% endblock %}
 <script src="{% static 'js/site.js' %}" defer></script>
 {% block extra_js %}{% endblock %}
-</head>
+{% for item in jsonld %}{{ item|json_ld }}
+{% endfor %}</head>
 <body class="{% block body_class %}{% endblock %}">
 <a class="skip-link" href="#inhoud">Direct naar de inhoud</a>
 {% if TEST_MODE %}<div class="test-banner" role="note"><strong>Testomgeving</strong> · {{ TEST_BANNER }}</div>{% endif %}

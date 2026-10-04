@@ -20,6 +20,9 @@ PRIVATE_PREFIXES = (
     "/betalen/",
     "/inloggen/",
     "/voorbeeld/",
+    "/voorwaarden/versie/",       # kopieën van /voorwaarden/ (per versie, download en pdf): niet in zoekmachines
+    "/voorwaarden/download/",
+    "/voorwaarden/pdf/",
     f"/{settings.ADMIN_URL}",
 )
 NO_STORE_PREFIXES = ("/account/", "/beheer/", "/maken/", "/bestelling/", "/betalen/", "/inloggen/", f"/{settings.ADMIN_URL}")

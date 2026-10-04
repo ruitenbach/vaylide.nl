@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 from catalog.assets import design_image_url
 from core.csp import BOOT_SCRIPT
 from core.icons import ICONS
+from core.seo import render_json_ld
 from catalog.models import format_euro
 
 register = template.Library()
@@ -64,3 +65,9 @@ def invul(value, placeholder):
     if value:
         return value
     return format_html('<mark class="invulveld">{}</mark>', placeholder)
+
+
+@register.filter
+def json_ld(data):
+    """Zet een dict om naar een JSON-LD-gegevensblok (zie core/seo.py)."""
+    return render_json_ld(data)

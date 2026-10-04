@@ -1,6 +1,14 @@
 {% extends "base.html" %}{% load vl %}
-{% block title %}{{ template.name }}{% endblock %}
-{% block description %}{{ template.tagline }}. {{ template.description|truncatechars:120 }}{% endblock %}
+{% block title %}{{ template.name }}, digitale {{ seo_kind }}{% endblock %}
+{% block description %}{{ seo_description }}{% endblock %}
+{% block og_title %}{{ template.name }}, digitale {{ seo_kind }} · VAYLIDE{% endblock %}
+{% block og_description %}{{ seo_description }}{% endblock %}
+{% block og_image %}<meta property="og:image" content="{{ image_url }}">
+<meta property="og:image:width" content="800">
+<meta property="og:image:height" content="1000">
+<meta property="og:image:alt" content="{{ template.name }}, een ontwerp voor een digitale {{ seo_kind }}">
+{% endblock %}
+{% block twitter_card %}summary{% endblock %}
 {% block content %}
 <section class="page-head">
   <div class="container detail-grid">
