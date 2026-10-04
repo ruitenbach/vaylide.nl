@@ -168,3 +168,16 @@ class KerstkaartBewegingTests(VaylideTestCase):
         css = self.css()
         self.assertIn("@keyframes kk-ringklop", css)
         self.assertNotRegex(css, r"\.kk-vonk[^{]*\{[^}]*filter\s*:")
+
+
+class NieuweKaartenOpeningInFrameTests(VaylideTestCase):
+    """Het voorbeeldframe op de ontwerppagina (embed) en de live kaart bij Stijl en Envelop tonen, net als invite.js, de dichte opening zodat die te bekijken en aan te klikken is;
+    alleen de bedankpagina (data-direct-open) en een link naar de aanmelding tonen direct het eindbeeld."""
+
+    def test_embed_toont_de_dichte_opening_voor_gouden_avond_kerstbol_en_kerstkaart(self):
+        for naam, bestand in (("gouden-avond", "gouden-avond.js"), ("kerstbol", "kerstbol.js"), ("kerstkaart", "kerstkaart.js")):
+            js = (settings.BASE_DIR / "designs" / naam / "v1" / bestand).read_text(encoding="utf-8")
+            start = js[js.index("data-direct-open") - 400:js.index("data-direct-open") + 200]
+            self.assertNotIn('classList.contains("inv-embed")', start, naam)
+            self.assertIn('["stijl", "envelop"].indexOf(live) < 0', start, naam)
+            self.assertIn("data-direct-open", start, naam)

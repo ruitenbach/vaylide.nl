@@ -220,9 +220,12 @@
   /* ---------- begin ---------- */
   function start() {
     if (!heeftOpening) { toonEind(false); hero.classList.add("kb-klaar"); knopTekst(); return; }
-    var direct = /^#(aanmelden|aanmelden-formulier|uitnodiging)/.test(location.hash) || html.hasAttribute("data-live") ||
-      html.hasAttribute("data-direct-open") || html.classList.contains("inv-embed");
-    if (direct || gezien() || rustig()) { toonEind(false); return; }
+    // Net als invite.js (Golden Noël, Winterlicht): het voorbeeldframe op de ontwerppagina en de live kaart bij Stijl en Envelop laten de dichte opening zien en klikbaar;
+    // alleen de bedankpagina (data-direct-open), een link naar de aanmelding en de live kaart bij de andere stappen tonen direct het eindbeeld.
+    var live = html.getAttribute("data-live");
+    var direct = /^#(aanmelden|aanmelden-formulier|uitnodiging)/.test(location.hash) || (html.hasAttribute("data-live") && ["stijl", "envelop"].indexOf(live) < 0) ||
+      html.hasAttribute("data-direct-open");
+    if (direct || (!html.hasAttribute("data-live") && gezien()) || rustig()) { toonEind(false); return; }
     vergrendel(true);
     glinten(0, 40);          // warme gouden fonkelingen rond het gesloten cadeau
     tekenBeeld("poster", video.poster);

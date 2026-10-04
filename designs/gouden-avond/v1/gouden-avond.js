@@ -222,9 +222,11 @@
   /* ---------- begin ---------- */
   function start() {
     if (!heeftOpening || !sleutel) { direct(); return; }
-    var direct_open = /^#(aanmelden|aanmelden-formulier|uitnodiging)/.test(location.hash) || html.hasAttribute("data-live") ||
-      html.hasAttribute("data-direct-open") || html.classList.contains("inv-embed");
-    if (direct_open || gezien() || rustig()) { direct(); return; }
+    // Net als invite.js (Golden Noël, Winterlicht): het voorbeeldframe op de ontwerppagina en de live kaart bij Stijl en Envelop laten de dichte opening zien en klikbaar.
+    var live = html.getAttribute("data-live");
+    var direct_open = /^#(aanmelden|aanmelden-formulier|uitnodiging)/.test(location.hash) || (html.hasAttribute("data-live") && ["stijl", "envelop"].indexOf(live) < 0) ||
+      html.hasAttribute("data-direct-open");
+    if (direct_open || (!html.hasAttribute("data-live") && gezien()) || rustig()) { direct(); return; }
     vergrendel(true);
     if (video) video.preload = "auto";  // de dans moet klaar zijn als de deuren opengaan
   }
