@@ -42,6 +42,20 @@ class SpecialsTests(VaylideTestCase):
         quote = build_quote(inv.draft_content, essentieel, template_version=inv.template_version)
         self.assertEqual(quote.total_cents, essentieel.price_cents)
 
+    def test_gouden_avond_kerstbol_en_kerstkaart_zijn_specials_zonder_eigen_prijs_en_kosten_de_pakketprijs(self):
+        # Er is nog geen special-gouden-avond, special-kerstbol of special-kerstkaart ingesteld: er wordt geen prijs bedacht, de pakketprijs geldt.
+        essentieel = Package.objects.get(code="essentieel")
+        customer = self.make_customer()
+        for slug in ("gouden-avond", "kerstbol", "kerstkaart"):
+            self.assertTrue(is_special(Template.objects.get(slug=slug)), slug)
+            self.assertFalse(AddOn.objects.filter(code=addon_code(slug)).exists(), slug)
+            inv = self.make_invitation(owner=customer, template=slug)
+            quote = build_quote(inv.draft_content, essentieel, template_version=inv.template_version)
+            self.assertEqual(quote.total_cents, essentieel.price_cents, slug)
+            client = Client()
+            client.force_login(customer)
+            self.assertNotContains(client.get(f"/maken/{inv.uid}/bestellen/"), "nog niet te bestellen", msg_prefix=slug)
+
     def test_with_its_price_the_surcharge_is_a_visible_line(self):
         AddOn.objects.create(code=addon_code("balzaal"), name="Special Balzaal", price_cents=100, feature="special")  # testbedrag
         inv = self.make_invitation(template="balzaal")

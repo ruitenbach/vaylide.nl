@@ -36,7 +36,7 @@ class KerstbolOntwerpTests(VaylideTestCase):
     def test_is_een_special_voor_kerst_met_eigen_opening_en_zonder_prijs_niet_te_bestellen(self):
         template = Template.objects.get(slug="kerstbol")
         self.assertTrue(template.special)
-        self.assertIsNone(special_addon(template), "zonder meerprijs is een special niet te bestellen (er komt nooit een verzonnen prijs)")
+        self.assertIsNone(special_addon(template), "er is geen verzonnen meerprijs: zonder optie special-<code> geldt de pakketprijs (zie test_specials)")
         self.assertEqual(template.occasions, ["kerst"])
         self.assertEqual(self.manifest()["envelope_mode"], "built_in")
         self.assertEqual(collectie.groep("kerstbol"), "A")

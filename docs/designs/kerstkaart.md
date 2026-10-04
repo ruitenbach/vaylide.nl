@@ -16,7 +16,7 @@ Kerst
 
 ## 4. Status
 
-**Gebouwd, lokaal** (4 oktober 2026): Kerstkaart is als VAYLIDE-kaart gebouwd in `designs/kerstkaart/v1/` op de lokale werkbranch `claude/kerstkaart` (vanaf `8c429a7`). Hij is een **Special** (categorie Kerst, groep A van de collectie, sort_order 8). De **prijs voor `special-kerstkaart` is nog niet bepaald**: zonder die optie in Beheer, Prijzen is de kaart niet te bestellen. Nog niet gecommit, niet gepusht, niet op staging, niet current/live.
+**Gebouwd, lokaal** (4 oktober 2026): Kerstkaart is als VAYLIDE-kaart gebouwd in `designs/kerstkaart/v1/` op de lokale werkbranch `claude/kerstkaart` (vanaf `8c429a7`). Hij is een **Special** (categorie Kerst, groep A van de collectie, sort_order 8). De **prijs voor `special-kerstkaart` is nog niet bepaald**: zonder die optie in Beheer, Prijzen kost de kaart gewoon de prijs van het gekozen pakket en is hij dus bestelbaar (de bestaande Special-terugval). Nog niet gecommit, niet gepusht, niet op staging, niet current/live.
 
 **Besluit van de eigenaar (4 oktober 2026): geen nieuwe Higgsfield-generaties.** De bestaande video `Vaylide-Chocoladehuis-Elfjes-preview.mp4` is goed genoeg en is de definitieve videobasis. Er is dus geen eindbeeld F, geen nieuwe Shot 1 en geen nieuwe Shot 2 gemaakt en er zijn geen Higgsfield-credits gebruikt. Bewust aanvaard, en geen blockers meer: er zijn 3 elfjes zichtbaar in de video; het huis wordt niet letterlijk door zichtbare happen opgegeten (het lost op en valt uiteen); de lolly springt maar kort; de camera zoomt aan het eind in.
 

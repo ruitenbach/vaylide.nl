@@ -88,7 +88,7 @@ de pixelmeting hierboven is de echte meting over de video.
 ## Prijs en bestellen
 
 Een special heeft een eigen meerprijs (Beheer → Prijzen, functie `special`, code `special-gouden-avond`). **Die is er niet**: tot de eigenaar
-hem instelt is het ontwerp niet te bestellen (de bestelpagina zegt dat eerlijk). Lokaal is voor de klantreis tijdelijk een testbedrag van € 1 gebruikt
+hem instelt kost het ontwerp gewoon de prijs van het gekozen pakket en is het dus bestelbaar (keuze van de eigenaar, zie `tests/test_specials.py`). Lokaal is voor de klantreis tijdelijk een testbedrag van € 1 gebruikt
 en daarna verwijderd.
 
 ## Getest

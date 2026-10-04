@@ -33,7 +33,7 @@ class GoudenAvondOntwerpTests(VaylideTestCase):
     def test_is_een_zelfstandige_special_en_zonder_prijs_niet_te_bestellen(self):
         template = Template.objects.get(slug="gouden-avond")
         self.assertTrue(template.special)
-        self.assertIsNone(special_addon(template), "zonder meerprijs is een special niet te bestellen (er komt nooit een verzonnen prijs)")
+        self.assertIsNone(special_addon(template), "er is geen verzonnen meerprijs: zonder optie special-<code> geldt de pakketprijs (zie test_specials)")
         self.assertEqual(template.occasions, ["bruiloft", "verloving"])
         balzaal = Template.objects.get(slug="balzaal")
         self.assertNotEqual(template.pk, balzaal.pk)

@@ -14,11 +14,11 @@ Kerstbol
 
 ## 3. Categorie
 
-Kerst, en een **Special** (besluit van de eigenaar, 4 oktober 2026): hij staat onder Specials, in groep A van de collectie (`sort_order` 7, direct na Golden Noël). Er is **geen meerprijs bedacht**: zolang er geen optie `special-kerstbol` in Beheer → Prijzen bestaat, is Kerstbol niet te bestellen en valt de bestaande prijslogica veilig terug (net als bij de andere Specials).
+Kerst, en een **Special** (besluit van de eigenaar, 4 oktober 2026): hij staat onder Specials, in groep A van de collectie (`sort_order` 7, direct na Golden Noël). Er is **geen meerprijs bedacht**: zolang er geen optie `special-kerstbol` in Beheer → Prijzen bestaat, kost Kerstbol gewoon de prijs van het gekozen pakket en is hij dus bestelbaar (de bestaande Special-terugval, net als bij de andere Specials).
 
 ## 4. Status
 
-**Gebouwd** (4 oktober 2026): Kerstbol is als echte VAYLIDE-kaart gebouwd in `designs/kerstbol/v1/` en gecommit op de lokale werkbranch `claude/kerstbol` (vanaf `8c429a7`). Hij is een **Special** (categorie Kerst, groep A van de collectie). De **prijs voor `special-kerstbol` is nog niet bepaald**: zolang er geen optie `special-kerstbol` in Beheer → Prijzen staat, is Kerstbol niet te bestellen en valt de bestaande prijslogica veilig terug, net als bij de andere Specials. Niet gepusht, niet op staging, niet current/live.
+**Gebouwd** (4 oktober 2026): Kerstbol is als echte VAYLIDE-kaart gebouwd in `designs/kerstbol/v1/` en gecommit op de lokale werkbranch `claude/kerstbol` (vanaf `8c429a7`). Hij is een **Special** (categorie Kerst, groep A van de collectie). De **prijs voor `special-kerstbol` is nog niet bepaald**: zolang er geen optie `special-kerstbol` in Beheer → Prijzen staat, kost Kerstbol gewoon de prijs van het gekozen pakket en is hij dus bestelbaar (de bestaande Special-terugval, net als bij de andere Specials). Niet gepusht, niet op staging, niet current/live.
 
 **Vastgelegde keuzes (eigenaar, 4 oktober 2026):**
 
