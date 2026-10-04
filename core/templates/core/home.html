@@ -135,11 +135,11 @@
   <div class="container">
     <div class="unique-card">
       <div class="unique-card__text">
-        <h2 id="uniek-titel">Liever iets unieks?</h2>
-        <p>Heb je een bijzondere wens of zoek je een ontwerp op maat? Stuur ons je vraag. We bekijken hem persoonlijk en je krijgt eerst een voorstel.</p>
-        <a class="btn btn--primary" href="{% url 'core:contact' %}?onderwerp=maatwerk">Neem contact op {% icon "pijl" %}</a>
+        <h2 id="uniek-titel">Jullie verhaal verdient iets bijzonders</h2>
+        <p>Soms maken juist de kleine details het verschil. Een favoriete quote, een mooie herinnering, een eigen foto of een persoonlijke boodschap maakt jullie uitnodiging écht van jullie.</p>
+        <a class="btn btn--primary" href="{% url 'core:contact' %}?onderwerp=maatwerk">Vertel jullie wens {% icon "pijl" %}</a>
       </div>
-      <div class="unique-card__media"><img src="{% static 'img/site/maatwerk.webp' %}" srcset="{% static 'img/site/maatwerk-700.webp' %} 700w, {% static 'img/site/maatwerk.webp' %} 1200w" sizes="(max-width: 720px) 100vw, 38rem" alt="" width="1200" height="760" loading="lazy" decoding="async"></div>
+      <div class="unique-card__media"><picture><source media="(max-width: 720px)" srcset="{% static 'img/site/op-maat-mobiel.webp' %}"><img src="{% static 'img/site/op-maat.webp' %}" srcset="{% static 'img/site/op-maat-700.webp' %} 700w, {% static 'img/site/op-maat.webp' %} 1200w" sizes="38rem" alt="Voorbeeld van een persoonlijke uitnodiging in een envelop met monogramzegel (S&amp;D), een fotokader en een eigen quote" width="1100" height="800" loading="lazy" decoding="async"></picture></div>
     </div>
   </div>
 </section>

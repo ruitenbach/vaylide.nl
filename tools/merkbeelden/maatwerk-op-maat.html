@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="nl"><head><meta charset="utf-8"><title>Maatwerkbeeld: Jullie verhaal verdient iets bijzonders</title>
+<style>
+/* Compositie van het beeld bij "Jullie verhaal verdient iets bijzonders" (homepage). Uitleg: tools/merkbeelden/maatwerk-op-maat.md.
+   open.png = de echte Signature Ivory-envelop met de voorbeeldkaart (zie maatwerk-kaart.css), doorzichtige achtergrond. ?v=d (desktop) of ?v=m (mobiel). */
+@font-face { font-family: "Cormorant Garamond"; font-style: italic; src: url("/static/fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; }
+@font-face { font-family: "DM Sans"; src: url("/static/fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; }
+html, body { margin: 0; background: transparent; }
+#stage { position: relative; overflow: hidden; }
+#stage.d { width: 1100px; height: 800px; } #stage.m { width: 700px; height: 640px; }
+#stage > * { position: absolute; }
+.glow { border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 244, 214, .95) 0%, rgba(250, 232, 190, .55) 45%, rgba(250, 232, 190, 0) 100%); }
+.d .glow { left: 130px; top: 20px; width: 860px; height: 780px; } .m .glow { left: 90px; top: 30px; width: 580px; height: 580px; }
+.grond { border-radius: 50%; background: radial-gradient(closest-side, rgba(86, 60, 24, .34), rgba(86, 60, 24, .12) 60%, rgba(86, 60, 24, 0)); filter: blur(6px); }
+.d .grond { left: 215px; top: 712px; width: 860px; height: 66px; } .m .grond { left: 90px; top: 548px; width: 580px; height: 52px; }
+.env { width: 740px; height: 760px; transform-origin: 0 0; }
+.d .env { left: 235px; top: -16px; transform: scale(1.12); } .m .env { left: 66px; top: -8px; transform: scale(.80); }
+.sprig { transform-origin: 50% 50%; filter: drop-shadow(0 8px 10px rgba(70, 50, 20, .28)); }
+.d .sprig--a { left: 40px; top: 560px; width: 440px; transform: rotate(-18deg); }
+.d .sprig--b { left: 738px; top: 50px; width: 420px; transform: rotate(142deg) scaleY(-1); opacity: .96; }
+.m .sprig--a { left: -20px; top: 470px; width: 300px; transform: rotate(-16deg); }
+.m .sprig--b { left: 470px; top: 30px; width: 290px; transform: rotate(142deg) scaleY(-1); opacity: .96; }
+.tag { width: 214px; height: 66px; filter: drop-shadow(0 6px 7px rgba(70, 48, 16, .35)); }
+.d .tag { left: 830px; top: 668px; transform: rotate(7deg); } .m .tag { left: 478px; top: 520px; transform: rotate(7deg) scale(.8); transform-origin: 0 0; }
+.tag__papier { position: absolute; inset: 0; clip-path: polygon(0 0, 92% 0, 100% 50%, 92% 100%, 0 100%); background: linear-gradient(160deg, #FFFBF1, #F3E7CD); }
+.tag__papier::before { content: ""; position: absolute; inset: 4px 11px 4px 4px; border: 1px solid #C7A867; clip-path: polygon(0 0, 92% 0, 100% 50%, 92% 100%, 0 100%); }
+.tag__gat { position: absolute; right: 12px; top: 50%; width: 9px; height: 9px; margin-top: -4.5px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #D9B96C, #8A6420); box-shadow: inset 0 1px 1px rgba(255, 255, 255, .6); }
+.tag__tekst { position: absolute; left: 14px; right: 30px; top: 12px; text-align: center; }
+.tag__tekst b { display: block; font: italic 700 20px/1.1 "Cormorant Garamond", Georgia, serif; color: #3A2E1A; white-space: nowrap; }
+.tag__tekst i { display: block; margin-top: 5px; font: 700 7.6px/1 "DM Sans", sans-serif; font-style: normal; letter-spacing: .3em; color: #7E6024; text-indent: .3em; }
+.koord { overflow: visible; }
+/* de voorbeeldfoto: klein, in een boogvormige lijst, deels achter de envelop; warm getint zodat hij bij beige/champagne past */
+.foto { width: 194px; height: 268px; border-radius: 97px 97px 6px 6px; background: #E9DCC2 url("/designs/balzaal/v1/img/scene-bruin-blond.webp") 50% 34% / 100% auto no-repeat;
+  box-shadow: 0 0 0 7px #FBF6EA, 0 0 0 8px #C7A867, 0 26px 30px -14px rgba(70, 48, 16, .55), 0 6px 10px -4px rgba(70, 48, 16, .3); filter: saturate(.84) sepia(.12); transform-origin: 0 100%; }
+.foto::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(160deg, rgba(255, 238, 200, .22), rgba(214, 178, 110, .16)); mix-blend-mode: soft-light; pointer-events: none; }
+.d .foto { left: 128px; top: 352px; transform: rotate(-6deg); } .m .foto { left: 16px; top: 322px; width: 138px; height: 190px; border-radius: 69px 69px 5px 5px; transform: rotate(-6deg); }
+</style></head>
+<body>
+<div id="stage">
+  <div class="glow"></div><div class="grond"></div>
+  <img class="sprig sprig--a" src="/designs/silk-reveal/v1/img/takje.webp" alt="">
+  <img class="sprig sprig--b" src="/designs/silk-reveal/v1/img/takje.webp" alt="">
+  <div class="foto"></div>
+  <img class="env" src="/voorvertoning-op-maat/open.png" alt="">
+  <svg class="koord" id="koord" width="1300" height="940" viewBox="0 0 1300 940" fill="none"><path id="koordpad" d="" stroke="#B88F3E" stroke-width="2.2" stroke-linecap="round"/></svg>
+  <div class="tag"><div class="tag__papier"></div><div class="tag__gat"></div><div class="tag__tekst"><b>Persoonlijk ontwerp</b><i>VOORBEELDKAART</i></div></div>
+</div>
+<script>
+const v = new URLSearchParams(location.search).get("v") || "d";
+const st = document.getElementById("stage"); st.className = v;
+// het koordje loopt van het zegel naar het gat van het hangertje
+const zegel = v === "d" ? [ 235 + 372 * 1.12, -16 + 598 * 1.12 ] : [ 66 + 372 * 0.80, -8 + 598 * 0.80 ];
+const gat = v === "d" ? [ 830 + 186, 668 + 33 ] : [ 478 + 186 * 0.8, 520 + 33 * 0.8 ];
+const mid = [ (zegel[0] + gat[0]) / 2, Math.max(zegel[1], gat[1]) + 46 ];
+document.getElementById("koordpad").setAttribute("d", `M${zegel[0]},${zegel[1]} Q${mid[0]},${mid[1]} ${gat[0]},${gat[1]}`);
+window.__klaar = true;
+</script></body></html>

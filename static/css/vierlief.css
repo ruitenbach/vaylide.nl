@@ -466,18 +466,18 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
 .feature-list dt { font-weight: 600; }
 .feature-list dd { margin: 0; color: var(--ink-2); }
 
-/* 'Liever iets unieks?' */
+/* 'Jullie verhaal verdient iets bijzonders' (op maat) */
 .unique-card { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; border-radius: var(--radius-xl); background: var(--ivory-2); min-height: 17rem; }
 .unique-card__text { position: relative; z-index: 2; padding: clamp(1.75rem, 5vw, 3.25rem); }
 .unique-card__text h2 { margin-bottom: .75rem; }
 .unique-card__text p { color: var(--ink-2); max-width: 26rem; margin-bottom: 1.6rem; }
-.unique-card__media { align-self: stretch; position: relative; min-height: 14rem; }
-.unique-card__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.unique-card__media::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, var(--ivory-2) 0%, rgba(245, 238, 230, 0) 40%); }
+.unique-card__media { align-self: stretch; position: relative; min-height: 26rem; }
+.unique-card__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 82% 50%; }
+.unique-card__media::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, var(--ivory-2) 0%, rgba(245, 238, 230, 0) 10%); pointer-events: none; }
 @media (max-width: 720px) {
   .unique-card { grid-template-columns: 1fr; }
-  .unique-card__media { order: -1; min-height: 11rem; }
-  .unique-card__media::before { background: linear-gradient(0deg, var(--ivory-2) 0%, rgba(245, 238, 230, 0) 45%); }
+  .unique-card__media { order: -1; min-height: 0; aspect-ratio: 35 / 32; }
+  .unique-card__media::before { background: linear-gradient(0deg, var(--ivory-2) 0%, rgba(245, 238, 230, 0) 22%); }
 }
 
 /* Filters en keuzes */
