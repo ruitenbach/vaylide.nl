@@ -1,0 +1,379 @@
+/* Gouden Avond v1: twee ivoor-gouden balzaaldeuren, een losse messing sleutel en daarachter de dans van het bruidspaar (video).
+   Daarna loopt de uitnodiging door als een nacht in de balzaal: donkere banden met goud, ivoren banden, een gouden aftelband, boogvensters,
+   goudfolie en een langzaam draaiende stralenkrans. Opening, kop en feest: één scène (.bc-hero) die gouden-avond.js timet.
+   Hartjes en confetti spreiden uit en vervagen; ze vallen niet. Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Pinyon Script"; src: url("../../../fonts/pinyon-script-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../../../fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 300 800; font-display: swap; }
+
+body {
+  --bc-script: "Pinyon Script", "Great Vibes", cursive;
+  --bc-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --bc-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bc-w: min(100vw, 560px);
+  --inv-bg: var(--bc-bg);
+  --inv-text: var(--bc-ink);
+  --inv-muted: var(--bc-muted);
+  --inv-accent: var(--bc-accent);
+  --inv-accent-contrast: var(--bc-accent-ink);
+  --inv-font-body: var(--bc-serif);
+  --inv-font-ui: var(--bc-ui);
+  --inv-focus: var(--bc-accent);
+  --inv-radius: 14px;
+  --inv-surface-2: color-mix(in srgb, var(--bc-bg-2) 70%, var(--bc-line));
+  --inv-btn-border: color-mix(in srgb, var(--bc-accent) 55%, transparent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--bc-accent) 10%, transparent);
+  --inv-field-bg: var(--bc-bg);
+  --inv-field-text: var(--bc-ink);
+  --inv-field-border: color-mix(in srgb, var(--bc-ink) 28%, transparent);
+  --inv-music-bg: linear-gradient(180deg, #FFF6E2, #E4C88E);
+  --inv-music-text: #2B2010;
+  --inv-music-border: rgba(120, 90, 30, .35);
+  --inv-photo-bg: var(--bc-bg-2);
+  --fx-pulse: var(--bc-gold);
+  background: var(--bc-bg);
+  color: var(--bc-ink);
+  font-family: var(--bc-serif);
+  font-size: 1.16rem;
+  font-weight: 500;
+}
+
+
+/* ================================================================ de balzaaldeuren (opening en kop in één scène) */
+/* Eén scène: de deuren, de sleutel, de filmscène en de feestlaag staan samen in de kop. De opening loopt via klassen op .bc-hero die
+   gouden-avond.js timet (in de volgorde en met de tijden van het goedgekeurde prototype). Een bezoeker zonder JavaScript, met
+   'minder beweging', of een bezoeker die de opening al zag, krijgt direct de open scène. Zie docs/GOUDEN-AVOND.md. */
+.bc-hero {
+  --bc-h: 100vh; --bc-h: 100svh;
+  --bc-hero-muted: #6F5832;
+  position: relative; isolation: isolate; overflow: hidden; height: var(--bc-h); min-height: 450px; color: var(--bc-hero-ink, #534533);
+  background: radial-gradient(ellipse at 50% 35%, #fffcf4, #e6dbca); font-family: Georgia, "Cormorant Garamond", serif;
+}
+html:not(.inv-embed) body:has(.inv-banner) .bc-hero { --bc-h: calc(100svh - var(--inv-banner-h, 3.9rem)); }
+html.bc-bezig, html.bc-bezig body { overflow: hidden; overscroll-behavior: none; }
+html.bc-bezig { scrollbar-gutter: stable; }  /* geen verspringende pagina (en geen herberekening van de hele uitnodiging) als de scrollbalk bij het einde van de opening terugkomt */
+.bc-heading { position: absolute; top: max(22px, calc(env(safe-area-inset-top) + 12px)); left: 0; right: 0; z-index: 1; margin: 0; padding: 0 56px; text-align: center; font: italic 15px Georgia, "Cormorant Garamond", serif; color: var(--bc-hero-muted); transition: opacity .8s; }
+.bc-portal {
+  position: absolute; left: 50%; top: 50%; z-index: 1; transform: translate(-50%, -50%); aspect-ratio: 9 / 16; border-radius: 8px; perspective: 1300px; background: #ac8c55;
+  width: min(88vw, 436px, calc((var(--bc-h) - 132px) * .5625)); box-shadow: 0 22px 65px #51381535;
+}
+.bc-frame { position: absolute; inset: -12px; z-index: 8; pointer-events: none; border: 12px solid #cab58f; border-radius: 9px;
+  box-shadow: inset 0 0 0 2px #fff3cf, inset 0 0 0 4px #916d36, 0 0 0 2px #977844, 0 0 0 5px #e4d6ba, 0 9px 20px #61462121; }
+.bc-frame::after { content: ""; position: absolute; inset: -17px; border: 6px ridge #d9c097; border-radius: 10px; box-shadow: 0 4px 9px #5c3c2438; pointer-events: none; }
+.bc-frame::before { content: ""; position: absolute; inset: -9px; border: 1px solid #fdf1d4; border-radius: 3px; }
+.bc-crown { position: absolute; top: -28px; left: 50%; z-index: 9; transform: translateX(-50%); display: grid; place-items: center; min-width: 66px; width: max-content; max-width: 90%; height: 29px; padding: 0 12px;
+  border: 1px solid #b38d4d; border-radius: 50% 50% 12% 12%; background: linear-gradient(#f2e3c3, #d6b97e); box-shadow: 0 2px 5px #775a2b30; font: italic 17px/1 Georgia, "Cormorant Garamond", serif; color: #46300C; white-space: nowrap; }
+
+/* de scène achter de deuren: de dansvideo met de namen en de datum */
+.bc-scene { position: absolute; inset: 0; z-index: 0; overflow: hidden; border-radius: 5px; background: #3b2c16; }
+.bc-scene video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.bc-schaduw { position: absolute; inset: 0; z-index: 1; box-shadow: inset 0 0 40px #2116077a; pointer-events: none; transition: opacity 2s; }
+.bc-caption { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 68px 18px 20px; text-align: center; color: #fff7e6; background: linear-gradient(to bottom, rgba(33, 23, 11, 0), rgba(33, 23, 11, .74) 36%, rgba(33, 23, 11, .86));  /* sneller donker dan het prototype: de bovenste regels (Wij gaan trouwen) haalden 2,4:1 op de lichte vloer */
+  opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity 1.2s, transform 1.2s, visibility 0s 1.2s; }
+html.bc-bezig .bc-caption { will-change: opacity, transform; }  /* de laag staat klaar voor het verschijnen van de namen (6,5 s) */
+.bc-eyebrow { margin: 0 0 9px; font: 600 10px/1.2 Arial, "DM Sans", sans-serif; letter-spacing: .23em; text-transform: uppercase; color: #f7ecd2; }
+.bc-names { margin: 0 0 9px; font: normal clamp(23px, 6vw, 33px)/1.15 Georgia, "Cormorant Garamond", serif; overflow-wrap: anywhere; text-wrap: balance; color: #fff7e6; }
+.bc-names__amp { font-style: italic; opacity: .9; }
+.bc-datum { margin: 0 0 16px; font: 11px/1.4 Arial, "DM Sans", sans-serif; letter-spacing: .12em; }
+.bc-view { min-height: 44px; padding: 10px 19px; border: 1px solid #d5bd89cc; border-radius: 30px; background: #ffffff10; color: #fff0d1; font: 600 11px Arial, "DM Sans", sans-serif; letter-spacing: .1em; cursor: pointer; backdrop-filter: blur(4px); }
+
+/* de deuren: twee 3D-vleugels met scharnier aan de buitenkant */
+.bc-door { position: absolute; top: 0; bottom: 0; z-index: 4; width: 50%; transform-style: preserve-3d; transition: transform 3.9s cubic-bezier(.37, .04, .26, 1); will-change: transform; }
+.bc-door--l { left: 0; transform-origin: left center; }
+.bc-door--r { right: 0; transform-origin: right center; }
+.bc-face { position: absolute; inset: 0; backface-visibility: hidden; background: #ddd1b8; box-shadow: inset 0 0 16px #70552330; }
+.bc-face svg { display: block; width: 100%; height: 100%; }
+.bc-face--rug { transform: rotateY(180deg); background: linear-gradient(90deg, #d9c6a6, #ede0c6); border: 5px ridge #c1a472; }
+.bc-door--r .bc-art { transform: scaleX(-1); }
+.bc-door--l::after { content: ""; position: absolute; top: 0; bottom: 0; right: -5px; width: 6px; background: linear-gradient(90deg, #c2a674, #7b5a2e); transform-origin: left; transform: rotateY(90deg); }
+.bc-door--r::after { content: ""; position: absolute; top: 0; bottom: 0; left: -5px; width: 6px; background: #af8950; transform-origin: right; transform: rotateY(-90deg); }
+.bc-handle { position: absolute; top: 51%; width: 10px; height: 68px; border-radius: 8px; background: linear-gradient(90deg, #6e4d22, #f4d699 34%, #c59d57 63%, #7c5d2b); box-shadow: 2px 2px 4px #4a301c55, inset 0 0 0 1px #b08b48; }
+.bc-door--l .bc-handle { right: 18px; } .bc-door--r .bc-handle { left: 18px; }
+.bc-handle::before, .bc-handle::after { content: ""; position: absolute; left: -4px; width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #fff0bf, #b58a49 65%, #75552b); box-shadow: 1px 2px 2px #4a301b40; }
+.bc-handle::before { top: -4px; } .bc-handle::after { bottom: -4px; }
+.bc-lockplate { position: absolute; top: 54%; right: -3px; width: 28px; height: 40px; border: 1px solid #89632c; border-radius: 12px; background: linear-gradient(105deg, #b48a43, #ffe5a4, #996c2c); box-shadow: 1px 2px 4px #563b2577; }
+.bc-keyhole { position: absolute; left: 10px; top: 10px; width: 7px; height: 7px; border-radius: 50%; background: #24170c; box-shadow: 0 0 0 1px #fff0b377; }
+.bc-keyhole::after { content: ""; position: absolute; top: 5px; left: 2px; width: 3px; height: 9px; background: #24170c; }
+
+/* de sleutel: eerst uitlijnen, dan schuift het getande uiteinde in het slot (het wordt weggeknipt), dan draait hij om */
+.bc-key {
+  position: absolute; top: calc(54% + 14.5px); left: calc(50% - 10.5px); z-index: 12; width: 160px; height: 73.846px; padding: 0; border: 0; background: transparent; cursor: pointer; perspective: 500px;
+  transform-origin: 96.154% 47.5%; transform: translate(-96.154%, -47.5%) translate(-5px, 100px) rotate(-20deg); transition: transform .85s cubic-bezier(.23, .7, .22, 1), opacity .45s;
+  filter: drop-shadow(0 1px 1px #fff5d9) drop-shadow(2px 5px 3px #32200bcc);
+}
+.bc-key-art { position: relative; display: block; width: 100%; height: 100%; transform-origin: 96.154% 47.5%; transition: transform .65s cubic-bezier(.4, .05, .2, 1), clip-path .45s; clip-path: inset(0 0 0 0); }
+.bc-aligning .bc-key { transform: translate(-96.154%, -47.5%) translate(-26px, 0) rotate(0); }
+.bc-inserting .bc-key { transform: translate(-75.385%, -47.5%) rotate(0); transition-duration: .45s; }
+.bc-inserting .bc-key-art { clip-path: inset(0 24.615% 0 0); transform: rotateX(72deg); transition-duration: .45s; }
+.bc-turning .bc-key-art { transform: rotateX(252deg); transition-duration: .65s; }
+.bc-unlocked .bc-key { transform: translate(-96.154%, -47.5%) translate(-35px, 22px) rotate(8deg); opacity: 0; pointer-events: none; visibility: hidden; transition: transform .85s cubic-bezier(.23, .7, .22, 1), opacity .45s, visibility 0s .45s; }
+.bc-key:focus-visible, .bc-skip:focus-visible, .bc-view:focus-visible, .bc-replay:focus-visible { outline: 3px solid #997039; outline-offset: 6px; }
+.bc-opened .bc-door--l { transform: rotateY(105deg); }
+.bc-opened .bc-door--r { transform: rotateY(-105deg); }
+.bc-opened .bc-schaduw { opacity: 0; }
+.bc-text-visible .bc-caption { opacity: 1; visibility: visible; transform: translateY(0); transition: opacity 1.2s, transform 1.2s, visibility 0s; }
+
+.bc-hint { position: absolute; bottom: max(15px, env(safe-area-inset-bottom)); left: 0; right: 0; z-index: 1; margin: 0; text-align: center; font: 600 10px Arial, "DM Sans", sans-serif; letter-spacing: .15em; color: var(--bc-hero-muted); transition: opacity .5s; }
+.bc-aligning .bc-hint, .bc-aligning .bc-heading { opacity: 0; }
+.bc-replay { position: absolute; bottom: max(9px, env(safe-area-inset-bottom)); left: 50%; z-index: 2; transform: translateX(-50%); min-height: 44px; padding: 8px 14px; border: 0; background: none; font: 11px Arial, "DM Sans", sans-serif; color: var(--bc-hero-muted); cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .7s; }
+.bc-text-visible .bc-replay { opacity: 1; pointer-events: auto; }
+/* Opening overslaan: rustig, rechtsboven; alleen zolang de opening nog loopt */
+.bc-skip { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 20; min-height: 44px; padding: 8px 15px; border: 1px solid #b38d4d88; border-radius: 30px; background: #fffcf4cc; color: var(--bc-hero-muted); font: 600 11px Arial, "DM Sans", sans-serif; letter-spacing: .08em; cursor: pointer; backdrop-filter: blur(3px); transition: opacity .5s; }
+.bc-klaar .bc-skip, html:not(.js) .bc-skip { opacity: 0; pointer-events: none; visibility: hidden; }
+.bc-resetting, .bc-resetting * { transition: none !important; }
+.bc-status { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* feestlaag: hartjes en confetti spreiden uit en vervagen (ze vallen niet), kleine lichtpuntjes fonkelen. 145 deeltjes, alleen tijdens het feest. */
+.bc-feest { position: absolute; inset: 0; z-index: 10; overflow: hidden; border-radius: 5px; pointer-events: none; }
+.bc-spark { position: absolute; left: 50%; top: 57%; width: var(--size); height: var(--size); color: var(--tone); opacity: 0; }  /* geen drop-shadow per hartje of confettistuk: 145 gefilterde lagen kostten bij de start van het feest drie rasterframes van 13 tot 23 ms; de schaduw (1 px, 27 % bruin) was nauwelijks te zien */
+.bc-spark svg { display: block; width: 100%; height: 100%; fill: currentColor; }
+.bc-spark--confetti { height: calc(var(--size) * .45); background: var(--tone); border-radius: 1px; }
+.bc-spark.bc-spark--aan { animation: bc-uitspreiden var(--duration) cubic-bezier(.12, .5, .3, 1) var(--delay) both; }
+@keyframes bc-uitspreiden {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0) scale(.4); }
+  12% { opacity: .95; }
+  44% { opacity: .85; transform: translate(var(--dx), var(--dy)) rotate(var(--spin)) scale(1); }
+  100% { opacity: 0; transform: translate(var(--endx), var(--endy)) rotate(var(--endspin)) scale(.65); }
+}
+.bc-spark--star { left: var(--glintx); top: var(--glinty); width: var(--glintsize); height: var(--glintsize); filter: drop-shadow(0 0 3px #fff4cf) drop-shadow(0 0 7px #e2bc72); }
+.bc-spark--star.bc-spark--aan { animation: bc-fonkel 1.6s ease-in-out var(--glintdelay) 3 both; }
+@keyframes bc-fonkel { 0%, 100% { opacity: 0; transform: scale(.2); } 35% { opacity: 1; transform: scale(1); } 65% { opacity: .45; transform: scale(.65); } }
+
+/* Open scène zonder opening (geen opening ingesteld, geen JavaScript, minder beweging, al gezien): de deuren staan open, de tekst staat er. */
+:is(.bc-klaar, html:not(.js) .bc-hero) .bc-door--l { transform: rotateY(105deg); transition: none; }
+:is(.bc-klaar, html:not(.js) .bc-hero) .bc-door--r { transform: rotateY(-105deg); transition: none; }
+:is(.bc-klaar, html:not(.js) .bc-hero) .bc-key, :is(.bc-klaar, html:not(.js) .bc-hero) .bc-hint { display: none; }
+:is(.bc-klaar, html:not(.js) .bc-hero) .bc-schaduw { opacity: 0; }
+:is(.bc-klaar, html:not(.js) .bc-hero) .bc-caption { opacity: 1; visibility: visible; transform: none; transition: none; }
+:is(.bc-klaar, html:not(.js) .bc-hero) .bc-heading { opacity: 0; }
+html:not(.js) .bc-replay { display: none; }
+.bc-klaar .bc-replay { opacity: 1; pointer-events: auto; }
+
+/* Smal scherm: de koptekst links, zodat Opening overslaan er niet overheen staat. */
+@media (max-width: 520px) {
+  .bc-heading { text-align: left; padding: 0 0 0 20px; font-size: 13px; white-space: nowrap; }
+  .bc-skip { padding: 8px 12px; }
+}
+@media (max-height: 620px) {
+  .bc-portal { width: min(84vw, calc((var(--bc-h) - 100px) * .5625)); }
+  .bc-heading { display: none; }
+  .bc-crown { min-width: 50px; height: 22px; top: -22px; font-size: 14px; }
+  .bc-caption { padding-bottom: 12px; } .bc-datum { margin-bottom: 10px; } .bc-names { font-size: 23px; }
+  .bc-frame { inset: -9px; border-width: 9px; }
+  .bc-key { width: 140px; height: 64.615px; }
+  .bc-hint { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bc-hero *, .bc-hero *::before, .bc-hero *::after { transition: none !important; animation: none !important; }
+  .bc-door { will-change: auto; }
+}
+
+
+/* Sfeer rond de deuren: een waas in de kleuren van de scène (klein, vooraf vervaagd bestand), een langzaam draaiende stralenkrans en een gloed onder het portaal.
+   De deuren, de sleutel en de scène zelf zijn niet veranderd. */
+.bc-hero::before { content: ""; position: absolute; inset: -4%; z-index: 0; background: url("media/waas.webp") 50% 38% / cover; opacity: .5; pointer-events: none; }
+.bc-hero::after { content: ""; position: absolute; left: 50%; top: 52%; z-index: 0; width: 70vmax; height: 70vmax; translate: -50% -50%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 238, 190, .75), rgba(255, 238, 190, .25) 45%, transparent); }
+.bc-stralen--hero { top: 52%; z-index: 0; background: repeating-conic-gradient(from 0deg, rgba(190, 150, 80, .2) 0 2.5deg, transparent 2.5deg 9deg); }
+.fx-motion .bc-stralen--hero { animation: bc-draai 140s linear infinite; animation-play-state: var(--fx-play, running); }
+/* de namen naast het portaal, alleen op een breed scherm, zodra de namen in beeld komen */
+.bc-flank { display: none; position: absolute; top: 46%; z-index: 1; margin: 0; max-width: 24vw; font: 400 clamp(4rem, 7.6vw, 8.4rem)/1 var(--bc-script); opacity: 0; pointer-events: none;
+  transition: opacity 1.6s ease .3s, transform 1.8s cubic-bezier(.2, .7, .2, 1) .3s; }
+.bc-flank--l { right: calc(50% + min(240px, 16vw) + 3.5rem); text-align: right; transform: translate(-40px, -50%); }
+.bc-flank--r { left: calc(50% + min(240px, 16vw) + 3.5rem); text-align: left; transform: translate(40px, -50%); }
+.bc-flank { padding-inline: .3em; }  /* de uithalen van het schrift vallen anders buiten het vlak waarin de goudfolie loopt en worden afgesneden */
+.bc-flank.bc-folie { background-image: linear-gradient(100deg, #6d4c14 0%, #a8803a 28%, #d9b866 46%, #94702a 66%, #6d4c14 100%); }
+@media (min-width: 1100px) { .bc-flank { display: block; } }
+.bc-text-visible .bc-flank, .bc-klaar .bc-flank { opacity: 1; transform: translate(0, -50%); }
+html:not(.js) .bc-flank { opacity: 1; transform: translate(0, -50%); }
+
+
+/* ================================================================ de uitnodiging: een nacht in de balzaal */
+/* Afwisselend donkere "nacht"-banden met goud (kroonluchter, boog en vloer uit dezelfde scène), ivoren banden, en één gouden band voor het aftellen.
+   Alles wat beweegt (stralenkrans, glans op het goud, meebewegende achtergrondfoto's) staat onder .fx-motion en pauzeert buiten beeld. */
+.bc-body { position: relative; z-index: 1; overflow-x: clip; }
+.bc-sec { position: relative; isolation: isolate; overflow: hidden; padding: clamp(4.6rem, 15vw, 8.5rem) 1.25rem; text-align: center; }
+.bc-in { position: relative; z-index: 2; width: min(100%, 40rem); margin-inline: auto; }
+.bc-in--breed { width: min(100%, 62rem); }
+.bc-ivoor { background: var(--bc-bg); }
+.bc-ivoor2 { background: var(--bc-bg-2); }
+.bc-nacht { --bc-t: #F6ECD4; --bc-t2: #E0D2AE; --bc-tg: #EBD08F; background: var(--bc-nacht); color: var(--bc-t); }
+.bc-goud { background: linear-gradient(135deg, #F6E7BC, #E3C37F 48%, #F2DCA4); color: #2F2108; }
+
+.bc-h2 { margin: 0 0 1.5rem; font: 400 clamp(2.9rem, 12.5vw, 5rem)/1.05 var(--bc-script); color: var(--bc-accent); text-wrap: balance; }
+.bc-goud .bc-h2 { color: #3A2808; }
+.bc-krul { display: block; width: 11.5rem; height: auto; margin: 1.1rem auto; color: var(--bc-gold); }
+.bc-nacht .bc-krul { color: var(--bc-tg); filter: drop-shadow(0 0 8px rgba(235, 208, 143, .45)); }
+
+/* goudfolie: een verloop in de letters, met een langzame glans */
+.bc-h2.bc-folie, .bc-closing__wish.bc-folie, .bc-tl__tijd.bc-folie { padding-inline: .14em; }
+.bc-folie {
+  background: linear-gradient(100deg, #8d6a26 0%, #d9b66c 20%, #fff2c8 38%, #c79b4a 56%, #f4dea4 78%, #a07733 100%) 0 0 / 220% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+}
+.bc-nacht .bc-folie { background-image: linear-gradient(100deg, #c9a255 0%, #f0d796 20%, #fff7dc 38%, #e2bf72 56%, #fbeabd 78%, #cfa95b 100%); }
+.fx-motion .bc-zichtbaar .bc-folie { animation: bc-glans 7s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes bc-glans { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
+
+/* stralenkrans achter de tekst: draait zeer langzaam, alleen als de band in beeld is */
+.bc-stralen {
+  position: absolute; left: 50%; top: 50%; z-index: 0; width: max(150vw, 1300px); aspect-ratio: 1; translate: -50% -50%; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, rgba(235, 208, 143, .17) 0 3deg, transparent 3deg 10deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0, rgba(0, 0, 0, .55) 32%, transparent 64%); mask-image: radial-gradient(circle, #000 0, rgba(0, 0, 0, .55) 32%, transparent 64%);
+}
+.bc-stralen--licht { background: repeating-conic-gradient(from 0deg, rgba(255, 250, 230, .5) 0 3deg, transparent 3deg 10deg); }
+.fx-motion .bc-zichtbaar .bc-stralen { animation: bc-draai 150s linear infinite; animation-play-state: var(--fx-play, running); }
+@keyframes bc-draai { to { rotate: 360deg; } }
+
+/* achtergrondfoto's uit de scène, donker gemaakt zodat tekst leesbaar blijft; ze schuiven iets mee bij het scrollen (gouden-avond.js) */
+.bc-bg { position: absolute; inset: -8% 0; z-index: -1; width: 100%; height: 116%; object-fit: cover; opacity: .62; }
+.bc-bg--spiegel { scale: -1 1; }
+.bc-foto-sec::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, var(--bc-nacht) 0%, rgba(29, 20, 10, .72) 26%, rgba(29, 20, 10, .76) 74%, var(--bc-nacht) 100%); }
+
+/* hoekornamenten */
+.bc-hoeken svg { position: absolute; z-index: 1; width: clamp(2.6rem, 9vw, 4.4rem); height: auto; color: var(--bc-gold); pointer-events: none; }
+.bc-hoeken svg:nth-child(1) { left: .9rem; top: .9rem; }
+.bc-hoeken svg:nth-child(2) { right: .9rem; top: .9rem; transform: scaleX(-1); }
+.bc-hoeken svg:nth-child(3) { left: .9rem; bottom: .9rem; transform: scaleY(-1); }
+.bc-hoeken svg:nth-child(4) { right: .9rem; bottom: .9rem; transform: scale(-1); }
+
+.bc-intro { padding-block: clamp(5.5rem, 18vw, 10rem); }
+.bc-intro__tagline { margin: 0 auto; max-width: 30rem; font: italic 500 clamp(1.7rem, 7vw, 2.6rem)/1.35 var(--bc-serif); color: var(--bc-t); text-wrap: balance; text-shadow: 0 2px 22px rgba(0, 0, 0, .55); }
+
+/* de datum: een boogvenster met de zonsondergang uit de scène en een enorm cijfer van goudfolie */
+.bc-boogvenster { position: relative; width: min(64vw, 16.5rem); aspect-ratio: 4 / 5; margin: 0 auto; padding: .5rem; border-radius: 999px 999px .8rem .8rem; overflow: hidden;
+  background: linear-gradient(145deg, #7e5c20, #f3dda3 28%, #b98d4d 58%, #7e5c20); box-shadow: 0 0 0 1px #2c1d08, 0 34px 90px -24px rgba(235, 208, 143, .4), 0 0 70px rgba(235, 208, 143, .2); }
+.bc-boogvenster img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 999px 999px .4rem .4rem; }
+.bc-boogvenster::after { content: ""; position: absolute; inset: .5rem; border-radius: 999px 999px .4rem .4rem; background: linear-gradient(transparent 45%, rgba(29, 20, 10, .94)); }
+.bc-datum-groot { position: relative; display: grid; justify-items: center; margin-top: -6.4rem; line-height: .9; }
+.bc-weekdag, .bc-jaar { font: 600 .8rem var(--bc-ui); letter-spacing: .44em; text-indent: .44em; text-transform: uppercase; color: var(--bc-tg); }
+.bc-dag { font: 300 clamp(7.5rem, 36vw, 13rem)/.86 var(--bc-serif); filter: drop-shadow(0 8px 20px rgba(0, 0, 0, .55)); }
+.bc-maand { margin-top: -.3rem; font: 400 clamp(3.2rem, 14vw, 5.4rem)/1 var(--bc-script); color: var(--bc-t); text-shadow: 0 3px 24px rgba(0, 0, 0, .6); }
+.bc-date__tijd { margin: 1.6rem 0 0; font: italic 500 1.4rem var(--bc-serif); color: var(--bc-t2); }
+
+/* welkom */
+.bc-letter .bc-hoeken svg { color: var(--bc-gold); opacity: .85; }
+.bc-foto figure, figure.bc-foto { margin: 0; }
+.bc-letter__photo { position: relative; width: min(76vw, 22rem); margin: 0 auto 2.6rem; padding: .7rem; border-radius: 999px 999px .6rem .6rem;
+  background: linear-gradient(145deg, #7e5c20, #f3dda3 28%, #b98d4d 58%, #7e5c20); box-shadow: 0 36px 70px -30px rgba(60, 40, 10, .65), 0 0 0 1px #5a4015; }
+.bc-letter__photo::before { content: ""; position: absolute; inset: .38rem; z-index: 2; border: 1px solid rgba(255, 244, 214, .9); border-radius: inherit; pointer-events: none; }
+.bc-letter__photo .ph { aspect-ratio: 3 / 4; border-radius: 999px 999px .3rem .3rem; overflow: hidden; }
+.bc-letter__text { max-width: 28rem; margin: 0 auto; line-height: 1.7; font-size: 1.22rem; }
+.bc-letter__text p { margin: 0 0 1rem; }
+.bc-letter__text p:first-child { font: 400 clamp(2.4rem, 10vw, 3.6rem)/1.15 var(--bc-script); color: var(--bc-accent); }
+
+/* verhaal */
+.bc-story__text { max-width: 30rem; margin: 0 auto; line-height: 1.75; font-size: 1.24rem; }
+.bc-story__text p { margin: 0 0 1.1rem; }
+.bc-story__text p:first-child { font: italic 500 clamp(1.5rem, 6vw, 1.9rem)/1.5 var(--bc-serif); color: var(--bc-accent); }
+
+/* programma: een gouden lijn met gloeiende ruiten */
+.bc-tijdlijn { position: relative; list-style: none; margin: 2.4rem auto 0; padding: 0; max-width: 28rem; display: grid; gap: 2.6rem; text-align: left; }
+.bc-tijdlijn::before { content: ""; position: absolute; left: 1.4rem; top: .4rem; bottom: .4rem; width: 2px; background: linear-gradient(transparent, var(--bc-tg) 8%, var(--bc-tg) 92%, transparent); box-shadow: 0 0 14px rgba(235, 208, 143, .7); }
+.bc-tl { position: relative; display: grid; grid-template-columns: 2.9rem 1fr; gap: 1.1rem; align-items: start; }
+.bc-tl__ruit { width: 1rem; height: 1rem; margin: 1rem .45rem; rotate: 45deg; background: var(--bc-nacht); border: 2px solid var(--bc-tg); box-shadow: 0 0 0 5px var(--bc-nacht), 0 0 18px rgba(235, 208, 143, .85); }
+.bc-tl__tijd { margin: 0; font: 300 clamp(2.4rem, 11vw, 3.6rem)/1 var(--bc-serif); letter-spacing: .02em; }
+.bc-tl__titel { margin: .25rem 0 0; font: italic 600 clamp(1.5rem, 6vw, 1.9rem)/1.2 var(--bc-serif); color: var(--bc-t); }
+.bc-tl__desc { margin: .3rem 0 0; color: var(--bc-t2); line-height: 1.5; }
+@media (min-width: 860px) {
+  .bc-tijdlijn { max-width: 52rem; gap: 3.2rem; }
+  .bc-tijdlijn::before { left: 50%; translate: -50% 0; }
+  .bc-tl { grid-template-columns: 1fr 3rem 1fr; gap: 0; }
+  .bc-tl__ruit { grid-column: 2; grid-row: 1; justify-self: center; margin: 1.3rem 0; }
+  .bc-tl__tekst { grid-row: 1; }
+  .bc-tl:nth-child(odd) .bc-tl__tekst { grid-column: 1; text-align: right; padding-right: 2.2rem; }
+  .bc-tl:nth-child(even) .bc-tl__tekst { grid-column: 3; padding-left: 2.2rem; }
+}
+
+/* aftellen: gouden band met ronde medaillons */
+.bc-count .cd { flex-wrap: nowrap; gap: clamp(.45rem, 2.4vw, 1.8rem); margin: 2rem 0 1.6rem; }  /* vier medaillons naast elkaar, ook op een smalle telefoon */
+.bc-count .cd__unit { width: clamp(3.9rem, 19.4vw, 7.4rem); min-width: 0; aspect-ratio: 1; justify-content: center; border-radius: 50%;
+  background: radial-gradient(circle at 35% 26%, #4a3414, #1D140A 72%); box-shadow: 0 0 0 3px #f8e8bd, 0 0 0 5px #8a6420, 0 0 0 7px #f3dda3, 0 20px 34px -14px rgba(50, 32, 6, .75), inset 0 0 26px rgba(235, 208, 143, .2); }
+.bc-count .cd__num { font: 300 clamp(1.9rem, 8.2vw, 3.3rem)/1 var(--bc-serif); color: #FFF1C9; }
+.bc-count .cd__label { margin-top: .2rem; font: 600 .6rem var(--bc-ui); letter-spacing: .2em; color: #E8D49E; }
+.bc-count .inv-actions { margin-top: 1.4rem; }
+.bc-goud .inv-btn { border-color: #5b4210; color: #2F2108; background: rgba(255, 250, 235, .45); }
+
+/* locatie en knoppen op donker */
+.bc-place__venue { margin: 0; font: italic 600 clamp(1.9rem, 8vw, 2.8rem)/1.2 var(--bc-serif); color: var(--bc-tg); text-shadow: 0 2px 20px rgba(0, 0, 0, .5); }
+.bc-place__address { margin: .7rem 0 0; font-style: normal; line-height: 1.6; color: var(--bc-t); }
+.bc-place__when { margin: 1.2rem 0 1.8rem; color: var(--bc-t2); }
+.bc-nacht .inv-btn { color: var(--bc-t); border-color: rgba(235, 208, 143, .6); background: rgba(255, 245, 215, .06); }
+.bc-nacht .inv-btn--primary { background: linear-gradient(180deg, #F6E3AE, #C99B49); color: #2A1C06; border-color: #8a6420; box-shadow: 0 10px 30px -10px rgba(235, 208, 143, .5); }
+.bc-nacht .inv-link { color: var(--bc-tg); }
+.bc-nacht .tz-note { color: var(--bc-t2); }
+
+/* dresscode, momenten, goed om te weten */
+.bc-kleuren { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem; margin: 0 0 1.5rem; padding: 0; }
+.bc-kleur { width: 3.8rem; height: 3.8rem; border-radius: 50%; background: radial-gradient(circle at 35% 28%, color-mix(in srgb, var(--c) 50%, #fff), var(--c) 62%);
+  box-shadow: 0 0 0 3px var(--bc-bg), 0 0 0 5px var(--bc-gold), 0 0 0 7px var(--bc-bg), 0 14px 22px -10px rgba(60, 40, 10, .55); }
+.bc-dress__text { max-width: 26rem; margin: 0 auto .6rem; font-size: 1.2rem; }
+.bc-photos { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; max-width: 40rem; margin: 2rem auto 0; padding: 0; }
+.bc-photos .bc-foto { padding: .5rem; background: linear-gradient(145deg, #7e5c20, #f3dda3 30%, #b98d4d 60%, #7e5c20); border-radius: 999px 999px .5rem .5rem; box-shadow: 0 24px 40px -22px rgba(60, 40, 10, .65); }
+.bc-photos li:nth-child(even) { margin-top: 2.4rem; }
+.bc-photos .ph { aspect-ratio: 4 / 5; border-radius: 999px 999px .25rem .25rem; overflow: hidden; }
+.bc-photos figcaption { padding: .5rem .4rem .2rem; font: italic 500 1rem var(--bc-serif); color: #3A2808; }
+.bc-practical__list { display: grid; gap: 1.5rem; max-width: 28rem; margin: 2rem auto 0; }
+.bc-practical__item { padding-top: 1.1rem; border-top: 1px solid var(--bc-gold); }
+.bc-practical__item dt { font: 600 .78rem var(--bc-ui); letter-spacing: .22em; text-transform: uppercase; color: var(--bc-gold-2); }
+.bc-practical__item dd { margin: .4rem 0 0; font-size: 1.15rem; }
+
+/* aanmelden: een ivoren kaart met gouden hoeken op de donkere vloer */
+.bc-card { position: relative; max-width: 30rem; margin: 2.2rem auto 0; padding: 2.8rem clamp(1.3rem, 6vw, 2.4rem) 2.4rem; text-align: left; color: var(--bc-ink); background: linear-gradient(180deg, #FFFDF6, #F8EFD9);
+  border-radius: 1.1rem; box-shadow: 0 0 0 1px #8a6420, 0 0 0 6px rgba(246, 227, 174, .9), 0 0 0 7px #8a6420, 0 44px 90px -28px rgba(0, 0, 0, .8), 0 0 90px rgba(235, 208, 143, .22); }
+.bc-card .bc-hoeken svg { width: clamp(2.2rem, 8vw, 3.2rem); }
+.bc-card .rsvp__deadline { font-style: italic; font-size: 1.12rem; }
+.bc-card a { color: var(--bc-accent); }
+.bc-contact__name { margin: .5rem 0 .3rem; font: 400 clamp(2.2rem, 9vw, 3rem) var(--bc-script); color: var(--bc-accent); }
+
+/* afsluiting */
+.bc-closing { padding-block: clamp(6rem, 20vw, 11rem); }
+.bc-closing__wish { margin: .3rem 0 0; font: 400 clamp(3.4rem, 15vw, 6.4rem)/1.05 var(--bc-script); filter: drop-shadow(0 4px 22px rgba(0, 0, 0, .55)); }
+.bc-closing__text { max-width: 26rem; margin: 1rem auto 0; font-size: 1.25rem; color: var(--bc-t); }
+.bc-closing .inv-share { margin-top: 2.2rem; }
+.bc-closing .inv-share__status { color: var(--bc-t2); }
+.inv-gouden-avond .music__toggle, .inv-gouden-avond .fx-toggle { box-shadow: 0 8px 22px -6px rgba(40, 25, 10, .4), inset 0 1px 0 rgba(255, 255, 255, .6); }
+.inv-gouden-avond .music__toggle { background: linear-gradient(180deg, #FFF6E2, #E4C88E); }
+
+@media (prefers-reduced-motion: reduce) {
+  .bc-folie, .bc-stralen { animation: none !important; }
+}
+
+/* breed scherm: grotere letters, vier foto's naast elkaar, welkom in twee kolommen */
+@media (min-width: 900px) {
+  .bc-sec { padding-block: clamp(6rem, 10vw, 9.5rem); }
+  .bc-in { width: min(100%, 46rem); }
+  .bc-in--breed { width: min(100%, 70rem); }
+  .bc-h2 { font-size: clamp(4rem, 5.6vw, 6rem); }
+  .bc-intro__tagline { max-width: 46rem; font-size: clamp(2.4rem, 3.4vw, 3.4rem); }
+  .bc-boogvenster { width: 21rem; }
+  .bc-dag { font-size: clamp(12rem, 15vw, 16rem); }
+  .bc-datum-groot { margin-top: -8.4rem; }
+  .bc-letter .bc-in { display: grid; grid-template-columns: auto 1fr; gap: clamp(3rem, 6vw, 6rem); align-items: center; width: min(100%, 62rem); text-align: left; }
+  .bc-letter__photo { margin: 0; }
+  .bc-letter__text { max-width: none; font-size: 1.35rem; }
+  .bc-story__text { max-width: 36rem; font-size: 1.35rem; }
+  .bc-tl__tijd { font-size: 4.2rem; }
+  .bc-count .cd { gap: 2.2rem; }
+  .bc-count .cd__unit { width: 9.4rem; }
+  .bc-count .cd__num { font-size: 4rem; }
+  .bc-count .cd__label { font-size: .72rem; }
+  .bc-place__venue { font-size: clamp(2.8rem, 4vw, 3.8rem); }
+  .bc-kleur { width: 4.8rem; height: 4.8rem; }
+  .bc-photos { grid-template-columns: repeat(4, 1fr); max-width: 66rem; gap: 1.8rem; }
+  .bc-photos li:nth-child(even) { margin-top: 3.2rem; }
+  .bc-closing .bc-in { width: min(100%, 64rem); }
+  .bc-closing__wish { font-size: clamp(5.4rem, 8.4vw, 9rem); }
+  .bc-card { max-width: 34rem; }
+}
+
+/* ================================================================ computer */
+@media (min-width: 600px) {
+  body { background: var(--bc-page); }
+}
+@media print {
+  .bc-hero { height: auto; min-height: 0; } .bc-feest, .bc-skip, .bc-key, .bc-hint, .bc-replay { display: none; }
+}

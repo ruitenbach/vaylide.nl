@@ -34,6 +34,7 @@ async function pay(p, uid, outcome, name, pkg = "essentieel") {
   await p.goto(`${base}/maken/${uid}/bestellen/?package=${pkg}`);
   await p.check("input[name=terms]");
   await p.check("input[name=direct_leveren]");
+  await p.check("input[name=online_dienst]");
   await Promise.all([p.waitForURL("**/betalen/test/**"), p.click("button[name=actie][value=betalen]")]);
   await shot(p, `${name}-betaalpagina`);
   await p.check(`input[name=uitkomst][value=${outcome}]`, { force: true });
@@ -70,7 +71,7 @@ async function pay(p, uid, outcome, name, pkg = "essentieel") {
   // Foto uploaden: een echte foto en een nepbestand.
   const jpg = path.join(out, "foto.jpg");
   const fake = path.join(out, "geen-foto.jpg");
-  fs.copyFileSync(path.join(__dirname, "..", "static", "img", "site", "maatwerk-700.webp"), path.join(out, "foto.webp"));
+  fs.copyFileSync(path.join(__dirname, "..", "static", "img", "demo", "rozen-1000.webp"), path.join(out, "foto.webp"));
   fs.writeFileSync(fake, "dit is geen afbeelding");
   await pa.goto(`${base}/maken/${data.paid}/fotos/`);
   // De keuze 'geen hoofdfoto' telt niet mee; alleen echte foto's.

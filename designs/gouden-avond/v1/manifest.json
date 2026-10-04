@@ -1,0 +1,72 @@
+{
+  "slug": "gouden-avond",
+  "version": 1,
+  "name": "Gouden Avond",
+  "tagline": "Gesloten balzaaldeuren, een messing sleutel, en daarachter jullie dans",
+  "description": "Je ziet eerst twee ivoor-gouden balzaaldeuren met rijk ornamentwerk en een losse messing sleutel. De sleutel lijnt uit, het getande uiteinde verdwijnt in het slot en de sleutel draait om. De deuren slaan langzaam open op een korte filmscène van een dansend bruidspaar, terwijl champagnegouden en ivoren hartjes en confetti zich uitspreiden en vervagen, met kleine fonkelende lichtpuntjes. Daarna staan jullie namen en de datum in beeld en loopt de uitnodiging door met aftellen, programma, locatie en aanmelden. De opening is over te slaan en rustig bij minder beweging. De dansscène is een gegenereerde voorbeeldvideo met fictieve personen.",
+  "style_notes": "Balzaaldeuren in ivoor en messing, sleutel, filmscène van een dansend bruidspaar, champagnegoud; filmisch en luxe",
+  "occasions": [
+    "bruiloft",
+    "verloving"
+  ],
+  "sort_order": 9,
+  "special": true,
+  "opening": "deuren",
+  "envelope_mode": "built_in",
+  "opening_label": "Balzaaldeuren met een sleutel, een filmische opening",
+  "demo_melody": "canon",
+  "kaartbeeld": "open",
+  "palettes": [
+    {
+      "key": "ivoor",
+      "name": "Ivoor en champagnegoud",
+      "swatch": [
+        "#F6EEDF",
+        "#FFFCF4",
+        "#BE9B61"
+      ],
+      "vars": {
+        "--bc-page": "#EFE6D6",
+        "--bc-bg": "#FFFCF4",
+        "--bc-bg-2": "#F6EEDF",
+        "--bc-ink": "#3A3023",
+        "--bc-muted": "#5C4F3B",
+        "--bc-accent": "#7A5A2E",
+        "--bc-accent-ink": "#FFFFFF",
+        "--bc-gold": "#BE9B61",
+        "--bc-gold-2": "#74551C",
+        "--bc-line": "#E4D8C0",
+        "--bc-hero-ink": "#534533",
+        "--fx-1": "#FFFFFF",
+        "--fx-2": "#E4C58B",
+        "--fx-3": "#F8E7C5",
+        "--fx-4": "#FFF1D4",
+        "--fx-bg": "#FFFCF4",
+        "--bc-nacht": "#1D140A",
+        "--bc-nacht-2": "#2E2112"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "goudstof",
+    "knal": "geen",
+    "viering": "harten",
+    "namen": "zacht",
+    "onthul": "zacht",
+    "extra": []
+  },
+  "changelog": "Eerste versie: balzaaldeuren met sleutel, filmscène van het dansende bruidspaar, hartjes, confetti en fonkelende lichtpuntjes die uitspreiden en vervagen, een knop om de opening over te slaan."
+}

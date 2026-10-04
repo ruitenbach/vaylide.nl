@@ -1,0 +1,243 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Gouden Avond v1 — twee ivoor-gouden balzaaldeuren, een messing sleutel en daarachter de dans van het bruidspaar (video). Opening, kop en feest zijn één
+   scène (.bc-hero) in het eigen script (gouden-avond.js): geen openingsscherm van invite.js, want de deuren onthullen dezelfde video die daarna de kop is.
+   Namen, datum en alle onderdelen daaronder komen uit de gedeelde onderdelen (aftellen, programma, locatie, aanmelden). Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" as="image" href="{% static 'designs/gouden-avond/v1/media/poster.jpg' %}">
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<script src="{% static 'vendor/gsap/gsap.min.js' %}" defer></script>
+<script src="{% static 'vendor/gsap/ScrollTrigger.min.js' %}" defer></script>
+<script src="{% static 'designs/gouden-avond/v1/gouden-avond.js' %}" defer></script>{% endblock %}
+
+{% block content %}
+<header class="bc-hero{% if not v.opening_enabled %} bc-klaar{% endif %}" id="bc-hero" data-bc{% if v.opening_enabled %} data-bc-opening{% endif %} aria-label="De balzaaldeuren">
+  <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
+    <linearGradient id="bc-ivory" x1="0" y1="0" x2="1" y2=".2"><stop stop-color="#d5c8ad"/><stop offset=".27" stop-color="#f6edda"/><stop offset=".65" stop-color="#e9ddc4"/><stop offset="1" stop-color="#c4b28e"/></linearGradient>
+    <linearGradient id="bc-gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#765421"/><stop offset=".23" stop-color="#d2ae6e"/><stop offset=".45" stop-color="#fae4b0"/><stop offset=".68" stop-color="#ba9253"/><stop offset="1" stop-color="#805d2c"/></linearGradient>
+    <linearGradient id="bc-recess" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#c9b999"/><stop offset=".15" stop-color="#efe5cf"/><stop offset=".82" stop-color="#e5d7b9"/><stop offset="1" stop-color="#bbab89"/></linearGradient>
+    <radialGradient id="bc-metal"><stop stop-color="#fff1c5"/><stop offset=".42" stop-color="#d9b779"/><stop offset=".85" stop-color="#a17a3c"/><stop offset="1" stop-color="#6d4e27"/></radialGradient>
+    <symbol id="bc-leaf" viewBox="0 0 240 780">
+      <rect width="240" height="780" fill="url(#bc-ivory)"/><rect x="5" y="6" width="230" height="768" rx="2" fill="none" stroke="url(#bc-gold)" stroke-width="7"/><rect x="13" y="15" width="214" height="750" fill="none" stroke="#fff5dc" stroke-width="1.5"/>
+      <path d="M30 326V91Q30 43 120 34Q210 43 210 91V326Z" fill="url(#bc-gold)"/><path d="M38 317V94Q38 53 120 44Q202 53 202 94V317Z" fill="url(#bc-recess)" stroke="#785825" stroke-width="1.2"/><path d="M43 310V97Q43 61 120 52Q197 61 197 97V310Z" fill="none" stroke="#fff1d3" stroke-width="2"/>
+      <path d="M28 359H212V698H28Z" fill="url(#bc-gold)"/><path d="M38 370H202V687H38Z" fill="url(#bc-recess)" stroke="#8b6b35"/><rect x="44" y="376" width="152" height="304" fill="none" stroke="#fff2d3" stroke-width="2"/>
+      <path d="M26 724H214V750H26Z" fill="url(#bc-gold)"/><path d="M33 730H207V744H33Z" fill="#e4d3b0"/>
+      <g fill="none" stroke="url(#bc-gold)" stroke-width="2.5"><path d="M120 72C96 76 96 100 110 106C89 113 86 134 102 145C80 147 72 168 84 180C92 189 100 184 100 179C99 174 94 173 91 177M120 72C144 76 144 100 130 106C151 113 154 134 138 145C160 147 168 168 156 180C148 189 140 184 140 179C141 174 146 173 149 177"/><path d="M120 89V273M120 185C101 172 86 203 96 213C102 219 108 213 105 208M120 185C139 172 154 203 144 213C138 219 132 213 135 208M120 251C100 250 82 272 67 286M120 251C140 250 158 272 173 286"/>
+      <path d="M120 417V643M120 458C95 423 65 459 86 476C100 487 109 477 104 470M120 458C145 423 175 459 154 476C140 487 131 477 136 470M120 603C95 638 65 602 86 585C100 574 109 584 104 591M120 603C145 638 175 602 154 585C140 574 131 584 136 591"/></g>
+      <g fill="url(#bc-gold)"><path d="M120 115Q94 107 101 91Q117 94 120 115M120 115Q146 107 139 91Q123 94 120 115M120 159Q96 161 99 144Q118 143 120 159M120 159Q144 161 141 144Q122 143 120 159M120 228Q92 224 100 208Q117 211 120 228M120 228Q148 224 140 208Q123 211 120 228"/><path d="M120 520Q93 501 104 485Q121 497 120 520M120 520Q147 501 136 485Q119 497 120 520M120 551Q97 570 105 588Q121 578 120 551M120 551Q143 570 135 588Q119 578 120 551"/></g>
+      <g fill="url(#bc-metal)"><circle cx="120" cy="336" r="10"/><circle cx="120" cy="712" r="6"/><circle cx="120" cy="531" r="8"/><circle cx="25" cy="22" r="4"/><circle cx="215" cy="22" r="4"/></g>
+      <g fill="none" stroke="#fff6df" stroke-opacity=".48"><path d="M18 17V762M24 359V697M34 85Q35 44 120 39"/></g>
+      <g fill="url(#bc-gold)" stroke="#b3955c" stroke-width=".6">
+        <path d="M22 28H218V38H22Z M25 342H215V352H25Z M23 705H217V715H23Z"/>
+        <path d="M120 55C100 53 84 58 80 69C76 82 88 90 97 86C103 82 101 74 96 74C104 67 113 71 120 82C127 71 136 67 144 74C139 74 137 82 143 86C152 90 164 82 160 69C156 58 140 53 120 55Z"/>
+        <path d="M120 282C99 286 83 291 72 304C67 312 55 306 56 297C58 287 71 292 67 299C79 293 83 280 94 275C105 269 114 277 120 282C126 277 135 269 146 275C157 280 161 293 173 299C169 292 182 287 184 297C185 306 173 312 168 304C157 291 141 286 120 282Z"/>
+        <path d="M56 390C83 385 103 398 120 412C137 398 157 385 184 390C185 409 177 418 168 413C160 406 167 399 173 403C156 399 140 410 120 428C100 410 84 399 67 403C73 399 80 406 72 413C63 418 55 409 56 390Z"/>
+        <path d="M56 675C83 680 103 667 120 653C137 667 157 680 184 675C185 656 177 647 168 652C160 659 167 666 173 662C156 666 140 655 120 637C100 655 84 666 67 662C73 666 80 659 72 652C63 647 55 656 56 675Z"/>
+      </g><g fill="none" stroke="url(#bc-gold)" stroke-width="4"><path d="M56 100C48 155 50 250 56 275M184 100C192 155 190 250 184 275M53 429V634M187 429V634"/></g>
+      <g fill="url(#bc-metal)"><circle cx="120" cy="59" r="7"/><circle cx="120" cy="291" r="7"/><circle cx="120" cy="400" r="6"/><circle cx="120" cy="665" r="6"/></g>
+    </symbol>
+    <symbol id="bc-krul" viewBox="0 0 220 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 14H84M136 14H216"/><path d="M84 14C92 14 94 6 102 6C108 6 108 12 104 12M136 14C128 14 126 6 118 6C112 6 112 12 116 12"/><path d="M84 14C92 14 94 22 102 22C108 22 108 16 104 16M136 14C128 14 126 22 118 22C112 22 112 16 116 16"/></g><path d="M110 7L117 14L110 21L103 14Z" fill="currentColor"/></symbol>
+    <symbol id="bc-hoek" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 60V18C4 10 10 4 18 4H60"/><path d="M12 60V24C12 17 17 12 24 12H60" opacity=".6"/><path d="M4 18C14 18 18 14 18 4"/></g><circle cx="18" cy="18" r="3" fill="currentColor"/></symbol>
+    <linearGradient id="bc-key-metal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#79541d"/><stop offset=".28" stop-color="#ffe9ad"/><stop offset=".52" stop-color="#d4ad60"/><stop offset=".77" stop-color="#b0843e"/><stop offset="1" stop-color="#765224"/></linearGradient>
+  </defs></svg>
+
+  <i class="bc-stralen bc-stralen--hero" aria-hidden="true"></i>
+  <p class="bc-heading">Een deur naar jullie verhaal.</p>
+  <div class="bc-portal" data-bc-portal>
+    <div class="bc-scene">
+      <video id="bc-video" muted playsinline preload="metadata" poster="{% static 'designs/gouden-avond/v1/media/poster.jpg' %}" width="720" height="1280" aria-label="Het bruidspaar danst (voorbeeldvideo, fictieve personen)" data-bc-video>
+        <source src="{% static 'designs/gouden-avond/v1/media/dans.mp4' %}" type="video/mp4">
+      </video>
+      <div class="bc-caption" data-bc-caption>
+        <p class="bc-eyebrow">{{ v.kicker }}</p>
+        <h1 class="bc-names" id="bc-namen" tabindex="-1">{% if v.is_couple %}{{ v.names.0 }} <span class="bc-names__amp" aria-label="en">&amp;</span> {{ v.names.1 }}{% else %}{{ v.names.0 }}{% endif %}</h1>
+        {% if v.date_display %}<p class="bc-datum">{{ v.date_display|capfirst }}{% if v.time_display %} · {{ v.time_display }}{% endif %}</p>{% endif %}
+        <button type="button" class="bc-view" data-bc-bekijk>Bekijk de uitnodiging</button>
+      </div>
+    </div>
+    <div class="bc-schaduw"></div>
+    <div class="bc-door bc-door--l" aria-hidden="true"><div class="bc-face"><svg class="bc-art" viewBox="0 0 240 780" preserveAspectRatio="none"><use href="#bc-leaf"/></svg><span class="bc-handle"></span><span class="bc-lockplate"><span class="bc-keyhole"></span></span></div><div class="bc-face bc-face--rug"></div></div>
+    <div class="bc-door bc-door--r" aria-hidden="true"><div class="bc-face"><svg class="bc-art" viewBox="0 0 240 780" preserveAspectRatio="none"><use href="#bc-leaf"/></svg><span class="bc-handle"></span></div><div class="bc-face bc-face--rug"></div></div>
+    <div class="bc-feest" data-bc-feest aria-hidden="true"></div>
+    <div class="bc-frame"></div>
+    <div class="bc-crown" aria-hidden="true">{{ v.monogram|default:"&" }}</div>
+    {% if v.opening_enabled %}<button type="button" class="bc-key" data-bc-sleutel data-fx-origin aria-label="Open de balzaaldeuren met de sleutel"><svg class="bc-key-art" viewBox="0 0 130 60" aria-hidden="true" focusable="false"><g fill="url(#bc-key-metal)" stroke="#674415" stroke-width="1.1"><path fill-rule="evenodd" d="M47 28.5A22 22 0 1 1 3 28.5A22 22 0 1 1 47 28.5ZM39 28.5A14 14 0 1 0 11 28.5A14 14 0 1 0 39 28.5Z"/><rect x="40" y="25" width="82" height="7" rx="2"/><rect x="47" y="22" width="5" height="13" rx="1"/><rect x="53" y="22" width="5" height="13" rx="2"/><path d="M103 31V46H111V38H118V46H125V29H103Z"/></g><path d="M46 27H121" stroke="#fff0b9" stroke-width="1"/></svg></button>{% endif %}
+  </div>
+  <p class="bc-flank bc-flank--l bc-folie" aria-hidden="true">{{ v.names.0 }}</p>
+  <p class="bc-flank bc-flank--r bc-folie" aria-hidden="true">{% if v.is_couple %}{{ v.names.1 }}{% endif %}</p>
+  {% if v.opening_enabled %}<p class="bc-hint" data-bc-hint>TIK OP DE SLEUTEL</p>
+  <button type="button" class="bc-skip" data-bc-skip data-open>Opening overslaan</button>{% endif %}
+  <button type="button" class="bc-replay" data-bc-replay hidden>Speel de scène af ▷</button>
+  <p class="bc-status" role="status" aria-live="polite" data-bc-status></p>
+</header>
+
+<div class="bc-body" id="bc-verder">
+{% if v.tagline %}
+<section class="bc-sec bc-nacht bc-foto-sec bc-intro" aria-label="Welkom">
+  <img class="bc-bg" src="{% static 'designs/gouden-avond/v1/media/kroonluchter.webp' %}" alt="" width="1080" height="640" loading="lazy" decoding="async" data-bc-parallax>
+  <i class="bc-stralen" aria-hidden="true"></i>
+  <div class="bc-in" data-reveal>
+    <svg class="bc-krul" viewBox="0 0 220 28" aria-hidden="true" focusable="false"><use href="#bc-krul"/></svg>
+    <p class="bc-intro__tagline">{{ v.tagline }}</p>
+    <svg class="bc-krul" viewBox="0 0 220 28" aria-hidden="true" focusable="false"><use href="#bc-krul"/></svg>
+  </div>
+</section>
+{% endif %}
+
+{% if v.has_event and v.date %}
+<section class="bc-sec bc-nacht bc-date" aria-labelledby="bc-date-title">
+  <i class="bc-stralen" aria-hidden="true"></i>
+  <div class="bc-in" data-reveal>
+    <h2 id="bc-date-title" class="bc-h2 bc-folie">Save the date</h2>
+    <p class="visually-hidden">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>
+    <div class="bc-boogvenster" aria-hidden="true"><img src="{% static 'designs/gouden-avond/v1/media/boog.webp' %}" alt="" width="530" height="530" loading="lazy" decoding="async"></div>
+    <div class="bc-datum-groot" aria-hidden="true">
+      <span class="bc-weekdag">{{ v.weekday }}</span>
+      <strong class="bc-dag bc-folie">{{ v.day }}</strong>
+      <span class="bc-maand">{{ v.month_name }}</span>
+      <span class="bc-jaar">{{ v.year }}</span>
+    </div>
+    {% if v.time_display %}<p class="bc-date__tijd">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.welcome or v.hero %}
+<section class="bc-sec bc-ivoor bc-letter" aria-label="Welkom">
+  <span class="bc-hoeken" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#bc-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#bc-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#bc-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#bc-hoek"/></svg></span>
+  <div class="bc-in" data-reveal>
+    {% if v.hero %}<figure class="bc-foto bc-letter__photo"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 380px, 76vw" %}</div></figure>{% endif %}
+    {% if v.welcome %}<div class="bc-letter__text">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="bc-sec bc-ivoor2 bc-story" aria-labelledby="bc-story-title">
+  <div class="bc-in" data-reveal>
+    <svg class="bc-krul" viewBox="0 0 220 28" aria-hidden="true" focusable="false"><use href="#bc-krul"/></svg>
+    <h2 id="bc-story-title" class="bc-h2">{{ v.story_title }}</h2>
+    <div class="bc-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="bc-sec bc-nacht bc-foto-sec bc-program" aria-labelledby="bc-program-title">
+  <img class="bc-bg" src="{% static 'designs/gouden-avond/v1/media/vloer.webp' %}" alt="" width="1080" height="670" loading="lazy" decoding="async" data-bc-parallax>
+  <div class="bc-in bc-in--breed" data-reveal>
+    <h2 id="bc-program-title" class="bc-h2 bc-folie">Het programma</h2>
+    <ol class="bc-tijdlijn" data-fx-stagger>
+      {% for item in v.program %}
+      <li class="bc-tl">
+        <span class="bc-tl__ruit" aria-hidden="true"></span>
+        <div class="bc-tl__tekst">
+          {% if item.time %}<p class="bc-tl__tijd bc-folie">{{ item.time }}</p>{% endif %}
+          <h3 class="bc-tl__titel">{{ item.title }}</h3>
+          {% if item.description %}<p class="bc-tl__desc">{{ item.description }}</p>{% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="bc-sec bc-goud bc-count" aria-labelledby="bc-count-title">
+  <i class="bc-stralen bc-stralen--licht" aria-hidden="true"></i>
+  <div class="bc-in" data-reveal>
+    <h2 id="bc-count-title" class="bc-h2">{% if v.is_past %}Dank je wel{% else %}Nog even en het is zover{% endif %}</h2>
+    {% include "invitations/partials/countdown.html" %}
+    {% include "invitations/partials/calendar_buttons.html" %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="bc-sec bc-nacht bc-foto-sec bc-place" aria-labelledby="bc-place-title">
+  <img class="bc-bg bc-bg--spiegel" src="{% static 'designs/gouden-avond/v1/media/kroonluchter.webp' %}" alt="" width="1080" height="640" loading="lazy" decoding="async" data-bc-parallax>
+  <i class="bc-stralen" aria-hidden="true"></i>
+  <div class="bc-in" data-reveal>
+    <h2 id="bc-place-title" class="bc-h2 bc-folie">Locatie</h2>
+    {% if v.venue %}<p class="bc-place__venue">{{ v.venue }}</p>{% endif %}
+    {% if v.address_lines %}<address class="bc-place__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+    {% if v.date_display %}<p class="bc-place__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+    {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="bc-sec bc-ivoor bc-dress" aria-labelledby="bc-dress-title">
+  <div class="bc-in" data-reveal>
+    <h2 id="bc-dress-title" class="bc-h2">Dresscode</h2>
+    {% if v.dresscode_colors %}<ul class="bc-kleuren" aria-label="Kleuren voor de dresscode">
+      {% for c in v.dresscode_colors %}<li class="bc-kleur" style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+    </ul>{% endif %}
+    {% for p in v.dresscode_text %}<p class="bc-dress__text">{{ p|linebreaksbr }}</p>{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="bc-sec bc-ivoor2 bc-gallery" aria-labelledby="bc-gallery-title">
+  <div class="bc-in bc-in--breed" data-reveal>
+    <h2 id="bc-gallery-title" class="bc-h2">Momenten</h2>
+    <ul class="bc-photos">
+      {% for photo in v.gallery %}<li class="bc-foto"><figure><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 600px) 250px, 44vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="bc-sec bc-ivoor bc-practical" aria-labelledby="bc-practical-title">
+  <div class="bc-in" data-reveal>
+    <h2 id="bc-practical-title" class="bc-h2">Goed om te weten</h2>
+    <dl class="bc-practical__list" data-fx-stagger>
+      {% for item in v.practical %}<div class="bc-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+    </dl>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="bc-sec bc-nacht bc-foto-sec bc-rsvp" id="aanmelden" aria-labelledby="bc-rsvp-title">
+  <img class="bc-bg" src="{% static 'designs/gouden-avond/v1/media/vloer.webp' %}" alt="" width="1080" height="670" loading="lazy" decoding="async" data-bc-parallax>
+  <i class="bc-stralen" aria-hidden="true"></i>
+  <div class="bc-in" data-reveal>
+    <h2 id="bc-rsvp-title" class="bc-h2 bc-folie">{% if v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+    <div class="bc-card">
+      <span class="bc-hoeken" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#bc-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#bc-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#bc-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#bc-hoek"/></svg></span>
+      {% include "invitations/partials/rsvp.html" %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="bc-sec bc-ivoor bc-contact" aria-labelledby="bc-contact-title">
+  <div class="bc-in" data-reveal>
+    <h2 id="bc-contact-title" class="bc-h2">Vragen?</h2>
+    {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+    <p class="bc-contact__name">{{ v.contact.name }}</p>
+    <p class="bc-contact__links">
+      {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+      {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+      {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+    </p>
+  </div>
+</section>
+{% endif %}
+
+<section class="bc-sec bc-nacht bc-foto-sec bc-closing" aria-label="Afsluiting">
+  <img class="bc-bg" src="{% static 'designs/gouden-avond/v1/media/kroonluchter.webp' %}" alt="" width="1080" height="640" loading="lazy" decoding="async" data-bc-parallax>
+  <i class="bc-stralen" aria-hidden="true"></i>
+  <div class="bc-in" data-reveal>
+    <svg class="bc-krul" viewBox="0 0 220 28" aria-hidden="true" focusable="false"><use href="#bc-krul"/></svg>
+    <p class="bc-closing__wish bc-folie">Wij kijken ernaar uit</p>
+    {% if v.show.closing %}{% for p in v.closing %}<p class="bc-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+    {% include "invitations/partials/share_buttons.html" %}
+  </div>
+</section>
+</div>
+{% endblock %}
