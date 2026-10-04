@@ -1,0 +1,211 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Kerstbol v1 — een gesloten rood kerstcadeau in een smaragdgroene kamer; na een tik speelt één video (strik los, deksel open, sneeuwbol omhoog), beeldvullend. Opening, kop en feest zijn
+   één scène (.kb-hero) in het eigen script (kerstbol.js), net als Gouden Avond: geen openingsscherm van invite.js. De kaart daaronder gebruikt alleen wat de klant heeft ingevuld;
+   datum, programma, locatie, aftellen en aanmelden verschijnen alleen bij een kerstdiner (een datum). Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" as="image" href="{% static 'designs/kerstbol/v1/media/poster.webp' %}" fetchpriority="high">
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<script src="{% static 'designs/kerstbol/v1/kerstbol.js' %}" defer></script>{% endblock %}
+
+{% block content %}
+<header class="kb-hero{% if not v.opening_enabled %} kb-eind kb-finished kb-klaar{% endif %}" id="kb-hero" data-kb{% if v.opening_enabled %} data-kb-opening{% endif %} aria-label="Het kerstcadeau">
+  <canvas class="kb-ambient" data-kb-ambient width="32" height="57" aria-hidden="true"></canvas>
+  <div class="kb-scene" data-kb-scene>
+    <video id="kb-video" muted playsinline preload="metadata" poster="{% static 'designs/kerstbol/v1/media/poster.webp' %}" width="720" height="1280" aria-label="Een gesloten kerstcadeau opent zich en onthult een sneeuwbol met een kerstboom" data-kb-video>
+      <source src="{% static 'designs/kerstbol/v1/media/opening.mp4' %}" type="video/mp4">
+    </video>
+    <img class="kb-eindbeeld" src="{% static 'designs/kerstbol/v1/media/eind.webp' %}" alt="Het geopende kerstcadeau met een sneeuwbol" width="720" height="1280" loading="lazy" decoding="async">
+    <div class="kb-sparkles" data-kb-sparkles aria-hidden="true"></div>
+    {% if v.opening_enabled %}<button type="button" class="kb-open" data-kb-open data-fx-origin aria-label="Tik om je kerstcadeau te openen"></button>
+    <p class="kb-hint" data-kb-hint>TIK OM JE KERSTCADEAU TE OPENEN</p>{% endif %}
+    <button type="button" class="kb-fallback" data-kb-fallback hidden>Speel de opening af ▷</button>
+    <div class="kb-caption" data-kb-caption>
+      <p class="kb-eyebrow">{% if v.kicker %}{{ v.kicker }}{% else %}Een magische kerst gewenst{% endif %}</p>
+      <h1 class="kb-groet" id="kb-groet" tabindex="-1">{% if v.names.0 %}{{ v.names.0 }}{% else %}Fijne feestdagen{% endif %}</h1>
+      <p class="kb-tekst">{% if v.tagline %}{{ v.tagline }}{% else %}Vol warmte, liefde en bijzondere momenten.{% endif %}</p>
+      {% if v.subnames %}<p class="kb-namen">Liefs, {{ v.subnames }}</p>{% endif %}
+      <button type="button" class="kb-replay" data-kb-replay hidden>Opnieuw beleven ↻</button>
+    </div>
+  </div>
+  {% if v.opening_enabled %}<button type="button" class="kb-skip" data-kb-skip data-open>Opening overslaan</button>{% endif %}
+  <a class="kb-scroll" href="#kb-verder" data-kb-scroll>Naar de kaart <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  <p class="kb-status" role="status" aria-live="polite" data-kb-status></p>
+</header>
+
+<div class="kb-body" id="kb-verder">
+  <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
+    <symbol id="kb-krul" viewBox="0 0 220 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 14H84M136 14H216"/><path d="M84 14C92 14 94 6 102 6C108 6 108 12 104 12M136 14C128 14 126 6 118 6C112 6 112 12 116 12"/><path d="M84 14C92 14 94 22 102 22C108 22 108 16 104 16M136 14C128 14 126 22 118 22C112 22 112 16 116 16"/></g><path d="M110 7L117 14L110 21L103 14Z" fill="currentColor"/></symbol>
+    <symbol id="kb-hoek" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 60V18C4 10 10 4 18 4H60"/><path d="M12 60V24C12 17 17 12 24 12H60" opacity=".6"/><path d="M4 18C14 18 18 14 18 4"/></g><circle cx="18" cy="18" r="3" fill="currentColor"/></symbol>
+    <symbol id="kb-ster" viewBox="0 0 24 24"><path d="m12 1 2.8 7.6L23 12l-8.2 3.4L12 23l-2.8-7.6L1 12l8.2-3.4Z" fill="currentColor"/></symbol>
+  </defs></svg>
+
+  {% include "kerstbol/v1/_slinger.html" %}
+
+{% if v.welcome or v.hero %}
+  <section class="kb-sec kb-brief" aria-label="Kerstgroet">
+    <i class="kb-stralen" aria-hidden="true"></i><i class="kb-lichtjes" aria-hidden="true"></i>
+    <div class="kb-in" data-reveal>
+      <svg class="kb-krul" viewBox="0 0 220 28" aria-hidden="true" focusable="false"><use href="#kb-krul"/></svg>
+      <div class="kb-papier">
+        <span class="kb-hoeken" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#kb-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#kb-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#kb-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#kb-hoek"/></svg></span>
+        {% if v.hero %}<figure class="kb-bol"><div class="ph">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 380px, 76vw" %}</div></figure>{% endif %}
+        {% if v.welcome %}<div class="kb-brief__tekst">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>{% endif %}
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+{% if v.show.story and v.story %}
+  <section class="kb-sec kb-jaar kb-fotosec" aria-labelledby="kb-jaar-titel">
+    <img class="kb-bg" src="{% static 'designs/kerstbol/v1/media/raam.webp' %}" alt="" width="900" height="712" loading="lazy" decoding="async">
+    <i class="kb-lichtjes" aria-hidden="true"></i>
+    <div class="kb-in" data-reveal>
+      <h2 id="kb-jaar-titel" class="kb-h2 kb-folie">{{ v.story_title }}</h2>
+      <svg class="kb-krul" viewBox="0 0 220 28" aria-hidden="true" focusable="false"><use href="#kb-krul"/></svg>
+      <div class="kb-jaar__tekst">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+    </div>
+  </section>
+{% endif %}
+
+{% if v.show.gallery and v.gallery %}
+  <section class="kb-sec kb-momenten" aria-labelledby="kb-momenten-titel">
+    <i class="kb-stralen kb-stralen--zacht" aria-hidden="true"></i>
+    <div class="kb-in kb-in--breed" data-reveal>
+      <h2 id="kb-momenten-titel" class="kb-h2 kb-folie">Momenten</h2>
+      <ul class="kb-ballen">
+        {% for photo in v.gallery %}<li class="kb-bal" style="--i:{{ forloop.counter0 }}"><span class="kb-bal__dop" aria-hidden="true"></span><figure><div class="ph">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 600px) 250px, 44vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+      </ul>
+    </div>
+  </section>
+{% endif %}
+
+{% if v.has_event and v.date %}
+  <section class="kb-sec kb-datum" aria-labelledby="kb-datum-titel">
+    <i class="kb-stralen" aria-hidden="true"></i><i class="kb-lichtjes" aria-hidden="true"></i>
+    <div class="kb-in" data-reveal>
+      <h2 id="kb-datum-titel" class="kb-h2 kb-folie">Kerstdiner</h2>
+      <p class="visually-hidden">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>
+      <div class="kb-medaillon" aria-hidden="true">
+        <img class="kb-medaillon__bol" src="{% static 'designs/kerstbol/v1/media/bol.webp' %}" alt="" width="480" height="480" loading="lazy" decoding="async">
+        <span class="kb-weekdag">{{ v.weekday }}</span>
+        <strong class="kb-dag kb-folie">{{ v.day }}</strong>
+        <span class="kb-maand">{{ v.month_name }}</span>
+        <span class="kb-jaartal">{{ v.year }}</span>
+      </div>
+      {% if v.time_display %}<p class="kb-datum__tijd">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+    </div>
+  </section>
+
+  {% if v.show.program and v.program %}
+  <section class="kb-sec kb-programma kb-rood" aria-labelledby="kb-programma-titel">
+    <i class="kb-stralen kb-stralen--zacht" aria-hidden="true"></i><i class="kb-lichtjes" aria-hidden="true"></i>
+    <div class="kb-in kb-in--breed" data-reveal>
+      <h2 id="kb-programma-titel" class="kb-h2 kb-folie">Het programma</h2>
+      <ol class="kb-tijdlijn" data-fx-stagger>
+        {% for item in v.program %}
+        <li class="kb-tl">
+          <span class="kb-tl__ruit" aria-hidden="true"></span>
+          <div class="kb-tl__tekst">
+            {% if item.time %}<p class="kb-tl__tijd kb-folie">{{ item.time }}</p>{% endif %}
+            <h3 class="kb-tl__titel">{{ item.title }}</h3>
+            {% if item.description %}<p class="kb-tl__desc">{{ item.description }}</p>{% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if v.show.countdown %}
+  <section class="kb-sec kb-aftellen kb-goud" aria-labelledby="kb-aftellen-titel">
+    <i class="kb-stralen kb-stralen--licht" aria-hidden="true"></i>
+    <div class="kb-in" data-reveal>
+      <h2 id="kb-aftellen-titel" class="kb-h2">{% if v.is_past %}Dank je wel{% else %}Nog even en het is zover{% endif %}</h2>
+      {% include "invitations/partials/countdown.html" %}
+      {% include "invitations/partials/calendar_buttons.html" %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if v.show.location %}
+  <section class="kb-sec kb-plaats kb-fotosec" aria-labelledby="kb-plaats-titel">
+    <img class="kb-bg kb-bg--spiegel" src="{% static 'designs/kerstbol/v1/media/raam.webp' %}" alt="" width="900" height="712" loading="lazy" decoding="async">
+    <i class="kb-stralen kb-stralen--zacht" aria-hidden="true"></i>
+    <div class="kb-in" data-reveal>
+      <h2 id="kb-plaats-titel" class="kb-h2 kb-folie">Locatie</h2>
+      {% if v.venue %}<p class="kb-plaats__naam">{{ v.venue }}</p>{% endif %}
+      {% if v.address_lines %}<address class="kb-plaats__adres">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+      {% if v.date_display %}<p class="kb-plaats__wanneer">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+      {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+    </div>
+  </section>
+  {% endif %}
+{% endif %}
+
+{% if v.show.dresscode and v.dresscode_text %}
+  <section class="kb-sec kb-kleding" aria-labelledby="kb-kleding-titel">
+    <i class="kb-lichtjes" aria-hidden="true"></i>
+    <div class="kb-in" data-reveal>
+      <h2 id="kb-kleding-titel" class="kb-h2 kb-folie">Dresscode</h2>
+      {% if v.dresscode_colors %}<ul class="kb-kleuren" aria-label="Kleuren voor de dresscode">
+        {% for c in v.dresscode_colors %}<li class="kb-kleur" style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+      </ul>{% endif %}
+      {% for p in v.dresscode_text %}<p class="kb-kleding__tekst">{{ p|linebreaksbr }}</p>{% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+{% if v.show.practical and v.practical %}
+  <section class="kb-sec kb-praktisch" aria-labelledby="kb-praktisch-titel">
+    <div class="kb-in" data-reveal>
+      <h2 id="kb-praktisch-titel" class="kb-h2 kb-folie">Goed om te weten</h2>
+      <dl class="kb-praktisch__lijst" data-fx-stagger>
+        {% for item in v.practical %}<div class="kb-praktisch__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+      </dl>
+    </div>
+  </section>
+{% endif %}
+
+{% if v.has_event and v.date and v.show.rsvp %}
+  <section class="kb-sec kb-aanmelden kb-rood" id="aanmelden" aria-labelledby="kb-aanmelden-titel">
+    <i class="kb-stralen" aria-hidden="true"></i><i class="kb-lichtjes" aria-hidden="true"></i>
+    <div class="kb-in" data-reveal>
+      <h2 id="kb-aanmelden-titel" class="kb-h2 kb-folie">{% if v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+      <div class="kb-papier kb-kaart">
+        <span class="kb-hoeken" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#kb-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#kb-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#kb-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#kb-hoek"/></svg></span>
+        {% include "invitations/partials/rsvp.html" %}
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+{% if v.show.contact and v.contact.name %}
+  <section class="kb-sec kb-contact" aria-labelledby="kb-contact-titel">
+    <div class="kb-in" data-reveal>
+      <h2 id="kb-contact-titel" class="kb-h2 kb-folie">Vragen?</h2>
+      {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+      <p class="kb-contact__naam">{{ v.contact.name }}</p>
+      <p class="kb-contact__links">
+        {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+        {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+        {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+      </p>
+    </div>
+  </section>
+{% endif %}
+
+  {% include "kerstbol/v1/_slinger.html" %}
+  <section class="kb-sec kb-afsluiting kb-fotosec" aria-label="Afsluiting">
+    <img class="kb-bg" src="{% static 'designs/kerstbol/v1/media/raam.webp' %}" alt="" width="900" height="712" loading="lazy" decoding="async">
+    <i class="kb-stralen" aria-hidden="true"></i><i class="kb-lichtjes" aria-hidden="true"></i>
+    <div class="kb-in" data-reveal>
+      <svg class="kb-sterretje" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#kb-ster"/></svg>
+      <p class="kb-afsluiting__naam kb-folie">{% if v.names.0 %}{{ v.names.0 }}{% else %}Fijne feestdagen{% endif %}</p>
+      {% if v.subnames %}<p class="kb-afsluiting__leden">{{ v.subnames }}</p>{% endif %}
+      {% if v.show.closing %}{% for p in v.closing %}<p class="kb-afsluiting__tekst">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+      <svg class="kb-krul" viewBox="0 0 220 28" aria-hidden="true" focusable="false"><use href="#kb-krul"/></svg>
+      {% include "invitations/partials/share_buttons.html" %}
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{
+  "slug": "kerstbol",
+  "version": 1,
+  "name": "Kerstbol",
+  "tagline": "Een rood cadeau in een smaragdgroene kerstkamer: tik, het lint valt open en een sneeuwbol stijgt op",
+  "description": "Je ziet eerst een realistisch, gesloten rood cadeau met een gouden lint in een smaragdgroene kerstkamer, met warme gouden fonkelingen eromheen. Na een tik gaat de strik los, het lint glijdt weg en het deksel opent. Een sneeuwbol met een verlichte kerstboom stijgt uit de doos, terwijl buiten het raam rendieren en een slee voorbijvliegen en de fonkelingen overgaan in fijne witgouden glinsteringen. Daarna staat jullie kerstgroet in beeld en loopt de kaart door in dezelfde wereld: diep smaragdgroen, champagnegoud en zacht vallende sneeuw, met jullie foto, jullie jaar en jullie persoonlijke tekst. Heb je ook een kerstdiner? Dan komen datum, programma, locatie, aftellen en aanmelden erbij. De opening is over te slaan en rustig bij minder beweging. De video is een gegenereerde voorbeeldscène zonder personen.",
+  "style_notes": "Smaragdgroene kerstkamer, rood cadeau met gouden lint, sneeuwbol, champagnegoud, rendieren en slee; filmisch en luxe; één video",
+  "occasions": [
+    "kerst"
+  ],
+  "sort_order": 7,
+  "special": true,
+  "opening": "cadeau",
+  "envelope_mode": "built_in",
+  "opening_label": "Gesloten kerstcadeau met een sneeuwbol, een filmische opening",
+  "demo_melody": "we-wish-you",
+  "kaartbeeld": "open",
+  "palettes": [
+    {
+      "key": "smaragd",
+      "name": "Smaragd en champagnegoud",
+      "swatch": [
+        "#102B23",
+        "#D8B46A",
+        "#F7E7C7"
+      ],
+      "vars": {
+        "--kb-nacht": "#0A1F18",
+        "--kb-bos": "#102B23",
+        "--kb-bos-2": "#17382C",
+        "--kb-bos-3": "#215140",
+        "--kb-goud": "#D8B46A",
+        "--kb-goud-lt": "#F3DDA0",
+        "--kb-goud-donker": "#8D6A27",
+        "--kb-creme": "#F7E7C7",
+        "--kb-creme-2": "#E4D2A8",
+        "--kb-papier": "#FBF3DE",
+        "--kb-papier-2": "#EBD8A9",
+        "--kb-ink": "#2A1F10",
+        "--kb-ink-2": "#54442A",
+        "--kb-accent": "#215140",
+        "--fx-1": "#FFFFFF",
+        "--fx-2": "#F3DDA0",
+        "--fx-3": "#D8B46A",
+        "--fx-4": "#F7E7C7",
+        "--fx-bg": "#102B23",
+        "--kb-rood": "#4A0E18",
+        "--kb-rood-2": "#2D0710"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "sneeuw",
+    "knal": "geen",
+    "viering": "sterren",
+    "namen": "zacht",
+    "onthul": "zacht",
+    "extra": []
+  },
+  "changelog": "Eerste versie: gesloten kerstcadeau, één doorlopende video met een sneeuwbol, gouden en witgouden fonkelingen, opening overslaan, daarna een kerstkaart in smaragd en champagnegoud."
+}

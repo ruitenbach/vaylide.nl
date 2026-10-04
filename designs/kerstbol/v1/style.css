@@ -1,0 +1,317 @@
+/* Kerstbol v1: een gesloten rood kerstcadeau in een smaragdgroene kamer. Na een tik speelt één video, beeldvullend (strik los, deksel open, sneeuwbol omhoog), met
+   twee soorten fonkelingen: warm goud vóór en tijdens de eerste fase, witgouden kristal rond de sneeuwbol vanaf 6,5 s. Daarna een kerstkaart in dezelfde wereld:
+   diep smaragdgroen, bordeauxrood en champagnegoud, goudfolie, stralenkransen, een lichtsnoer, een sneeuwbol voor de foto en kerstballen voor de momenten.
+   Opening, kop en feest zijn één scène (.kb-hero) die kerstbol.js timet. Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Pinyon Script"; src: url("../../../fonts/pinyon-script-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../../../fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 300 800; font-display: swap; }
+
+body {
+  --kb-script: "Pinyon Script", "Great Vibes", cursive;
+  --kb-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --kb-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --inv-bg: var(--kb-bos);
+  --inv-text: var(--kb-creme);
+  --inv-muted: var(--kb-creme-2);
+  --inv-accent: var(--kb-goud);
+  --inv-accent-contrast: #1B1405;
+  --inv-focus: var(--kb-goud-lt);
+  --inv-font-body: var(--kb-serif);
+  --inv-font-ui: var(--kb-ui);
+  --inv-radius: 14px;
+  --inv-surface-2: var(--kb-bos-2);
+  --inv-btn-border: color-mix(in srgb, var(--kb-goud) 65%, transparent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--kb-goud) 14%, transparent);
+  --inv-field-bg: #FFFDF6;
+  --inv-field-text: var(--kb-ink);
+  --inv-field-border: color-mix(in srgb, var(--kb-ink) 32%, transparent);
+  --inv-music-bg: linear-gradient(180deg, #FFF6E2, #E4C88E);
+  --inv-music-text: #2B2010;
+  --inv-music-border: rgba(120, 90, 30, .35);
+  --inv-photo-bg: var(--kb-bos-2);
+  --fx-pulse: var(--kb-goud);
+  background: var(--kb-bos);
+  color: var(--kb-creme);
+  font-family: var(--kb-serif);
+  font-size: 1.16rem;
+  font-weight: 500;
+}
+
+/* ================================================================ de scène: beeldvullend cadeau, video en fonkelingen */
+/* De video (9:16) vult het scherm: op een telefoon van rand tot rand; op een breder scherm over de volle hoogte, met aan weerszijden een zachte
+   gloed in de kleuren van de video zelf (kerstbol.js tekent die uit de video). Zonder JavaScript, met 'minder beweging' of als de opening al gezien
+   is, staat het eindbeeld met de groet er direct. De teksten en kleuren van de opening komen uit het goedgekeurde prototype. */
+.kb-hero {
+  --kb-h: 100vh; --kb-h: 100svh;
+  position: relative; isolation: isolate; overflow: hidden; height: var(--kb-h); min-height: 420px; color: #f7e7c7; background: #0a1f18; font-family: Georgia, "Cormorant Garamond", serif;
+}
+html:not(.inv-embed) body:has(.inv-banner) .kb-hero { --kb-h: calc(100svh - var(--inv-banner-h, 3.9rem)); }
+html.kb-bezig, html.kb-bezig body { overflow: hidden; overscroll-behavior: none; }
+html.kb-bezig { scrollbar-gutter: stable; }
+.kb-ambient { display: none; position: absolute; inset: -4%; z-index: 0; width: 108%; height: 108%; filter: blur(22px) saturate(1.3) brightness(.8); opacity: .95; }
+.kb-hero::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  /* de onderrand van de kop loopt zacht over in de smaragdgroene kaart (geen harde naad tussen de warme gloed en de groene band) */
+  background: linear-gradient(to bottom, transparent 62%, #102b23 100%), radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(5, 16, 12, .6) 100%); }
+@media (min-aspect-ratio: 3/5) { .kb-ambient { display: block; } }
+.kb-scene {
+  position: absolute; top: 0; bottom: 0; left: 50%; z-index: 1; translate: -50% 0; overflow: hidden; background: #152e24;
+  width: min(100%, calc(var(--kb-h) * .5625));
+}
+@media (min-aspect-ratio: 3/5) {
+  .kb-scene { -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent), linear-gradient(180deg, #000 93%, transparent); -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent), linear-gradient(180deg, #000 93%, transparent); mask-composite: intersect; }
+}
+.kb-scene video, .kb-eindbeeld { display: block; width: 100%; height: 100%; object-fit: cover; }
+.kb-eindbeeld { position: absolute; inset: 0; display: none; }
+.kb-eind .kb-eindbeeld { display: block; }
+.kb-sparkles { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
+
+/* het cadeau is zelf de knop; de tekst hieronder is de hint */
+.kb-open { position: absolute; left: 15%; top: 48%; z-index: 3; width: 73%; height: 35%; padding: 0; border: 0; border-radius: 12px; background: transparent; color: #f9e8c5; cursor: pointer; }
+.kb-open:focus-visible, .kb-fallback:focus-visible, .kb-replay:focus-visible, .kb-skip:focus-visible, .kb-scroll:focus-visible { outline: 3px solid #ffe3a0; outline-offset: -5px; }
+.kb-skip:focus-visible, .kb-scroll:focus-visible { outline-offset: 3px; }
+.kb-hint { position: absolute; left: 7%; bottom: 8%; z-index: 3; width: 86%; margin: 0; padding: 15px 10px; text-align: center; font: 600 clamp(10px, calc(var(--kb-h) * .0135), 14px)/1.3 Arial, "DM Sans", sans-serif; letter-spacing: .14em; color: #f9e8c5;
+  background: #10241b9e; border: 1px solid #d3b77955; border-radius: 30px; pointer-events: none; transition: opacity .5s; }
+.kb-playing .kb-open, .kb-playing .kb-hint, .kb-finished .kb-open, .kb-finished .kb-hint, .kb-eind .kb-hint { opacity: 0; pointer-events: none; visibility: hidden; }
+
+.kb-fallback, .kb-replay { padding: 10px 17px; min-height: 44px; border: 1px solid #c3a36580; border-radius: 25px; background: #143725c9; color: #f9e8c5; font: 600 11px Arial, "DM Sans", sans-serif; letter-spacing: .04em; cursor: pointer; }
+.kb-fallback { position: absolute; left: 50%; top: 65%; z-index: 4; transform: translateX(-50%); }
+.kb-fallback[hidden], .kb-replay[hidden] { display: none; }
+
+/* de groet over het eindbeeld */
+.kb-caption { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 90px 18px 64px; text-align: center; color: #f7e7c7;
+  background: linear-gradient(to bottom, rgba(7, 23, 14, 0), rgba(7, 23, 14, .8) 42%, rgba(7, 23, 14, .93));
+  opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity 1.2s, transform 1.2s, visibility 0s 1.2s; }
+.kb-finished .kb-caption { opacity: 1; visibility: visible; transform: none; transition: opacity 1.2s, transform 1.2s, visibility 0s; }
+.kb-eyebrow { margin: 0; font: 600 clamp(10px, calc(var(--kb-h) * .0135), 13px)/1.3 Arial, "DM Sans", sans-serif; letter-spacing: .22em; text-transform: uppercase; color: #ecd9b3; }
+.kb-groet { margin: 12px 0; font: normal clamp(24px, calc(var(--kb-h) * .04), 42px)/1.15 Georgia, "Cormorant Garamond", serif; overflow-wrap: anywhere; text-wrap: balance; color: #fff4d8; }
+.kb-tekst { margin: 0 0 6px; font: clamp(14px, calc(var(--kb-h) * .0185), 19px)/1.55 Georgia, "Cormorant Garamond", serif; }
+.kb-namen { margin: 0 0 8px; font: italic clamp(14px, calc(var(--kb-h) * .0185), 19px)/1.5 Georgia, "Cormorant Garamond", serif; color: #ecd9b3; }
+.kb-replay { margin-top: 6px; }
+
+.kb-skip { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 20; min-height: 44px; padding: 8px 15px; border: 1px solid #d3b77966; border-radius: 30px; background: #10241bcc;
+  color: #f9e8c5; font: 600 11px Arial, "DM Sans", sans-serif; letter-spacing: .08em; cursor: pointer; backdrop-filter: blur(3px); transition: opacity .5s; }
+.kb-klaar .kb-skip, html:not(.js) .kb-skip { opacity: 0; pointer-events: none; visibility: hidden; }
+.kb-scroll { position: absolute; left: 50%; bottom: max(8px, env(safe-area-inset-bottom)); z-index: 4; translate: -50% 0; display: none; align-items: center; gap: .4rem; min-height: 44px; padding: 0 1rem;
+  font: 600 11px Arial, "DM Sans", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: #f3dda3; text-decoration: none; }
+.kb-klaar .kb-scroll, html:not(.js) .kb-scroll { display: inline-flex; }
+.kb-status { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.kb-resetting, .kb-resetting * { transition: none !important; }
+
+/* fonkelingen: warm goud rond het gesloten cadeau en in de eerste fase, witgouden kristal rond de sneeuwbol vanaf 6,5 s.
+   Ze fonkelen en vervagen op hun plek; er valt niets. De deeltjes worden door kerstbol.js gemaakt en weer verwijderd. */
+.kb-glint { position: absolute; left: var(--x); top: var(--y); width: var(--size); height: var(--size); opacity: 0; pointer-events: none; }
+.kb-glint--goud { color: #f5c775; }
+.kb-glint--goud::before, .kb-glint--goud::after { content: ""; position: absolute; background: currentColor; border-radius: 50%; box-shadow: 0 0 5px #ffe6a2, 0 0 11px #e8af4c; }
+.kb-glint--goud::before { width: 100%; height: 18%; top: 41%; }
+.kb-glint--goud::after { height: 100%; width: 18%; left: 41%; }
+.fx-motion .kb-glint--goud { animation: kb-goud var(--duur) ease-in-out var(--vertraging) infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kb-goud { 0%, 100% { opacity: 0; transform: scale(.25) rotate(0); } 45% { opacity: .95; transform: scale(1.3) rotate(12deg); } }
+.kb-glint--kristal { background: #fff6df; border-radius: 50%; box-shadow: 0 0 5px #fff, 0 0 11px #c6e8ed; }
+.kb-glint--ster { clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); border-radius: 0; box-shadow: none; }
+.fx-motion .kb-glint--kristal { animation: kb-kristal var(--duur) ease-in-out var(--vertraging) 2; animation-play-state: var(--fx-play, running); }
+@keyframes kb-kristal { 0%, 100% { opacity: 0; transform: scale(.2) translateY(0); } 35% { opacity: .85; transform: scale(1) translateY(-5px); } 70% { opacity: .2; transform: scale(.6) translateY(-9px); } }
+
+@media (max-height: 620px) {
+  .kb-caption { padding-top: 50px; padding-bottom: 54px; }
+  .kb-groet { margin: 6px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kb-hero *, .kb-hero *::before, .kb-hero *::after { transition: none !important; animation: none !important; }
+  .kb-glint { display: none; }
+}
+
+/* ================================================================ de kaart: een kerstavond in smaragd, bordeaux en goud */
+/* Alleen wat de klant heeft ingevuld. Banden in diep smaragd, bordeaux en champagnegoud met goudfolie, stralenkransen, een lichtsnoer, een sneeuwbol voor
+   de foto en kerstballen voor de momenten. Achtergronden zijn uitsneden uit dezelfde goedgekeurde video. De sneeuw komt van het gedeelde effect. */
+.inv-kerstbol .inv-main { position: relative; z-index: 1; }
+.kb-body { position: relative; z-index: 1; overflow-x: clip; background: linear-gradient(180deg, #102b23, #0d241c 40%, #0a1f18); }
+.kb-sec { position: relative; isolation: isolate; overflow: hidden; padding: clamp(4.6rem, 15vw, 8.5rem) 1.25rem; text-align: center; }
+.kb-in { position: relative; z-index: 2; width: min(100%, 40rem); margin-inline: auto; }
+.kb-in--breed { width: min(100%, 62rem); }
+.kb-h2 { margin: 0 0 1.4rem; font: 400 clamp(3rem, 13vw, 5rem)/1.05 var(--kb-script); color: var(--kb-goud-lt); text-wrap: balance; }
+.kb-krul { display: block; width: 11.5rem; height: auto; margin: 1.1rem auto; color: var(--kb-goud); filter: drop-shadow(0 0 7px rgba(243, 221, 160, .4)); }
+
+/* de lichtsnoeren: een gouden draad met warme lampjes die om de beurt twinkelen */
+.kb-slinger { display: block; width: 100%; height: clamp(3.4rem, 9vw, 5.6rem); margin-bottom: -1px; }
+.kb-lamp { opacity: .55; }
+.fx-motion .kb-lamp { animation: kb-lamp 3.2s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.kb-lamp--b { animation-delay: -.8s; } .kb-lamp--c { animation-delay: -1.6s; } .kb-lamp--d { animation-delay: -2.4s; }
+@keyframes kb-lamp { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+
+/* banden */
+.kb-rood { background: linear-gradient(160deg, var(--kb-rood), var(--kb-rood-2)); box-shadow: inset 0 1px 0 rgba(243, 221, 160, .35), inset 0 -1px 0 rgba(243, 221, 160, .35); }
+.kb-goud { background: linear-gradient(135deg, #F6E7BC, #E3C37F 48%, #F2DCA4); color: #2F2108; }
+.kb-goud .kb-h2 { color: #3A2808; }
+.kb-fotosec::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, #0d241c 0%, rgba(10, 31, 24, .78) 26%, rgba(10, 31, 24, .82) 74%, #0a1f18 100%); }
+.kb-bg { position: absolute; inset: -6% 0; z-index: -1; width: 100%; height: 112%; object-fit: cover; opacity: .55; }
+.kb-bg--spiegel { scale: -1 1; }
+@supports (animation-timeline: view()) {
+  .kb-bg { animation: kb-parallax linear both; animation-timeline: view(); animation-range: cover; }
+  @keyframes kb-parallax { from { translate: 0 -5%; } to { translate: 0 5%; } }
+}
+
+/* goudfolie op koppen en tijden */
+.kb-folie { background: linear-gradient(100deg, #c9a255 0%, #f0d796 20%, #fff7dc 38%, #e2bf72 56%, #fbeabd 78%, #cfa95b 100%) 0 0 / 220% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; padding-inline: .14em; }
+.fx-motion .kb-zichtbaar .kb-folie { animation: kb-glans 8s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kb-glans { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
+
+/* stralenkrans achter de tekst: draait zeer langzaam en alleen als de band in beeld is */
+.kb-stralen { position: absolute; left: 50%; top: 50%; z-index: 0; width: max(150vw, 1300px); aspect-ratio: 1; translate: -50% -50%; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, rgba(243, 221, 160, .16) 0 3deg, transparent 3deg 10deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0, rgba(0, 0, 0, .55) 32%, transparent 64%); mask-image: radial-gradient(circle, #000 0, rgba(0, 0, 0, .55) 32%, transparent 64%); }
+.kb-stralen--zacht { opacity: .55; }
+.kb-stralen--licht { background: repeating-conic-gradient(from 0deg, rgba(255, 250, 230, .5) 0 3deg, transparent 3deg 10deg); opacity: 1; }
+.fx-motion .kb-zichtbaar .kb-stralen { animation: kb-draai 150s linear infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kb-draai { to { rotate: 360deg; } }
+
+/* zachte lichtpuntjes in de band: vijf glimmertjes */
+.kb-lichtjes { position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 22%, rgba(255, 233, 181, .95) 0 1.5px, transparent 3px), radial-gradient(circle at 84% 16%, rgba(255, 233, 181, .8) 0 1.5px, transparent 3px),
+    radial-gradient(circle at 70% 58%, rgba(255, 233, 181, .9) 0 1.6px, transparent 3.4px), radial-gradient(circle at 26% 76%, rgba(255, 233, 181, .85) 0 1.4px, transparent 3px),
+    radial-gradient(circle at 92% 84%, rgba(255, 233, 181, .75) 0 1.4px, transparent 3px), radial-gradient(60% 40% at 50% 0%, rgba(216, 180, 106, .16), transparent 70%); }
+.fx-motion .kb-zichtbaar .kb-lichtjes { animation: kb-twinkel 5s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kb-twinkel { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+
+.kb-hoeken { position: absolute; inset: 0; pointer-events: none; }
+.kb-hoeken svg { position: absolute; z-index: 1; width: clamp(2.4rem, 8vw, 3.6rem); height: auto; color: var(--kb-goud-donker); }
+.kb-hoeken svg:nth-child(1) { left: .8rem; top: .8rem; }
+.kb-hoeken svg:nth-child(2) { right: .8rem; top: .8rem; transform: scaleX(-1); }
+.kb-hoeken svg:nth-child(3) { left: .8rem; bottom: .8rem; transform: scaleY(-1); }
+.kb-hoeken svg:nth-child(4) { right: .8rem; bottom: .8rem; transform: scale(-1); }
+
+/* de champagnekleurige brief en kaart */
+.kb-papier { --inv-text: var(--kb-ink); --inv-muted: var(--kb-ink-2); --inv-accent: var(--kb-accent); --inv-accent-contrast: #fff; --inv-focus: var(--kb-accent);
+  --inv-btn-border: color-mix(in srgb, var(--kb-accent) 60%, transparent); --inv-btn-hover-bg: color-mix(in srgb, var(--kb-accent) 10%, transparent);
+  position: relative; padding: clamp(2.6rem, 8vw, 3.6rem) clamp(1.3rem, 6vw, 2.6rem); text-align: left; color: var(--kb-ink);
+  background: linear-gradient(160deg, var(--kb-papier), var(--kb-papier-2)); border-radius: 1rem;
+  box-shadow: 0 0 0 1px var(--kb-goud-donker), 0 0 0 6px rgba(243, 221, 160, .85), 0 0 0 7px var(--kb-goud-donker), 0 40px 80px -28px rgba(0, 0, 0, .8), 0 0 90px rgba(216, 180, 106, .22); }
+.kb-papier a { color: var(--kb-accent); }
+.kb-papier .inv-btn { color: var(--kb-ink); border-color: color-mix(in srgb, var(--kb-accent) 60%, transparent); background: transparent; }
+.kb-papier .inv-btn--primary { color: #fff; background: var(--kb-accent); border-color: var(--kb-accent); box-shadow: none; }
+
+/* de foto in een sneeuwbol: glas, een gouden voet en zachte sneeuw */
+.kb-bol { position: relative; width: min(78vw, 19rem); margin: .4rem auto 3.4rem; }
+.kb-bol .ph { aspect-ratio: 1; width: 100%; border-radius: 50%; overflow: hidden; position: relative; box-shadow: inset 0 0 50px rgba(0, 0, 0, .35), 0 0 0 5px rgba(255, 255, 255, .6), 0 0 0 7px #b98d4d, 0 28px 50px -20px rgba(40, 25, 5, .75); }
+.kb-bol::before { content: ""; position: absolute; inset: 0; z-index: 2; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(ellipse 38% 22% at 30% 18%, rgba(255, 255, 255, .7), transparent 72%), radial-gradient(circle at 74% 82%, rgba(255, 255, 255, .2), transparent 42%); }
+.kb-bol::after { content: ""; position: absolute; left: 13%; right: 13%; bottom: -2.2rem; height: 3rem; z-index: 1; border-radius: 0 0 1.6rem 1.6rem / 0 0 1.1rem 1.1rem;
+  background: linear-gradient(180deg, #f6e3ae, #b98d4d 48%, #6f5120); box-shadow: 0 14px 22px -10px rgba(40, 25, 5, .7), inset 0 2px 0 rgba(255, 255, 255, .55); }
+.kb-bol .ph::after { content: ""; position: absolute; inset: -10% 0; z-index: 1; pointer-events: none; opacity: .75;
+  background-image: radial-gradient(circle, #fff 0 1.4px, transparent 2.4px), radial-gradient(circle, #fff 0 1px, transparent 2px); background-size: 46px 52px, 31px 37px; background-position: 0 0, 14px 20px; }
+.fx-motion .kb-zichtbaar .kb-bol .ph::after { animation: kb-sneeuw 14s linear infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kb-sneeuw { to { background-position: 0 52px, 14px 57px; } }
+/* de eerste sectie na de kop begint zacht: de stralen lopen uit het lichtsnoer, niet uit een harde rand */
+.kb-brief::before { content: ""; position: absolute; inset: 0 0 auto 0; z-index: 1; height: 8rem; pointer-events: none; background: linear-gradient(#102b23, transparent); }
+.kb-brief__tekst { font-size: 1.24rem; line-height: 1.7; }
+.kb-brief__tekst p { margin: 0 0 1rem; }
+.kb-brief__tekst p:first-child { font: 400 clamp(2.3rem, 9vw, 3.2rem)/1.15 var(--kb-script); color: var(--kb-accent); }
+
+.kb-jaar__tekst { max-width: 30rem; margin: 0 auto; font-size: 1.28rem; line-height: 1.75; color: var(--kb-creme); text-shadow: 0 2px 18px rgba(0, 0, 0, .55); }
+.kb-jaar__tekst p { margin: 0 0 1.1rem; }
+.kb-jaar__tekst p:first-child { font: italic 500 clamp(1.6rem, 6.4vw, 2.1rem)/1.45 var(--kb-serif); color: var(--kb-goud-lt); }
+.kb-jaar__tekst p:first-child::before { content: "\201C"; display: block; height: .5em; font: 400 4.6em/1 var(--kb-script); color: var(--kb-goud); opacity: .85; }
+
+/* de momenten als kerstballen aan een draad */
+.kb-ballen { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4.4rem 1.2rem; max-width: 40rem; margin: 3rem auto 0; padding: 0; align-items: start; }
+.kb-bal { position: relative; display: grid; justify-items: center; transform-origin: 50% -3.6rem; }
+.kb-bal::before { content: ""; position: absolute; top: -3.6rem; left: 50%; width: 1px; height: 3.6rem; background: linear-gradient(#b98d4d, #f3dda3); box-shadow: 0 0 6px rgba(243, 221, 160, .5); }
+.kb-bal:nth-child(even) { margin-top: 2.6rem; }
+.kb-bal__dop { position: relative; z-index: 2; width: 24%; height: .95rem; margin-bottom: -.25rem; border-radius: .35rem .35rem .1rem .1rem; background: linear-gradient(90deg, #8d6a27, #f6e3ae 45%, #b98d4d 70%, #7a5a20); box-shadow: 0 2px 4px rgba(0, 0, 0, .5); }
+.kb-bal__dop::before { content: ""; position: absolute; left: 50%; top: -.55rem; width: .7rem; height: .7rem; translate: -50% 0; border: 2px solid #d8b46a; border-radius: 50%; }
+.kb-bal figure { position: relative; width: 100%; margin: 0; }
+.kb-bal .ph { aspect-ratio: 1; width: 100%; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 4px #f3dda3, 0 0 0 6px #8d6a27, 0 24px 36px -16px rgba(0, 0, 0, .85), 0 0 40px rgba(216, 180, 106, .2); }
+.kb-bal figure::after { content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; background: radial-gradient(ellipse 36% 22% at 30% 18%, rgba(255, 255, 255, .6), transparent 72%); }
+.kb-bal figcaption { padding-top: .8rem; font: italic 500 1.05rem var(--kb-serif); color: var(--kb-creme-2); }
+.fx-motion .kb-zichtbaar .kb-bal { animation: kb-zwaai 6s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -1.4s); animation-play-state: var(--fx-play, running); }
+@keyframes kb-zwaai { from { rotate: -2.2deg; } to { rotate: 2.2deg; } }
+
+/* kerstdiner: een sneeuwbol-medaillon met een enorm cijfer */
+.kb-medaillon { position: relative; display: grid; justify-items: center; align-content: center; width: min(76vw, 19rem); aspect-ratio: 1; margin: 0 auto; border-radius: 50%; overflow: hidden; line-height: .95; isolation: isolate;
+  box-shadow: 0 0 0 3px #f3dda3, 0 0 0 6px #8d6a27, 0 0 0 9px #f3dda3, 0 30px 60px -18px rgba(0, 0, 0, .85), 0 0 80px rgba(216, 180, 106, .3); }
+.kb-medaillon__bol { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+.kb-medaillon::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle, rgba(8, 26, 20, .78) 20%, rgba(8, 26, 20, .5) 70%, rgba(8, 26, 20, .7)); }
+.kb-weekdag, .kb-jaartal { font: 600 .74rem var(--kb-ui); letter-spacing: .4em; text-indent: .4em; text-transform: uppercase; color: var(--kb-goud-lt); }
+.kb-dag { font: 300 clamp(5.4rem, 24vw, 8rem)/.9 var(--kb-serif); filter: drop-shadow(0 6px 16px rgba(0, 0, 0, .6)); }
+.kb-maand { margin-top: -.1rem; font: 400 clamp(2.6rem, 11vw, 3.6rem)/1 var(--kb-script); color: var(--kb-creme); text-shadow: 0 3px 20px rgba(0, 0, 0, .7); }
+.kb-datum__tijd { margin: 1.8rem 0 0; font: italic 500 1.4rem var(--kb-serif); color: var(--kb-creme-2); }
+
+.kb-tijdlijn { position: relative; list-style: none; margin: 2.2rem auto 0; padding: 0; max-width: 28rem; display: grid; gap: 2.4rem; text-align: left; }
+.kb-tijdlijn::before { content: ""; position: absolute; left: 1.4rem; top: .4rem; bottom: .4rem; width: 2px; background: linear-gradient(transparent, var(--kb-goud) 8%, var(--kb-goud) 92%, transparent); box-shadow: 0 0 14px rgba(243, 221, 160, .6); }
+.kb-tl { position: relative; display: grid; grid-template-columns: 2.9rem 1fr; gap: 1.1rem; align-items: start; }
+.kb-tl__ruit { width: 1rem; height: 1rem; margin: 1rem .45rem; rotate: 45deg; background: var(--kb-rood-2); border: 2px solid var(--kb-goud); box-shadow: 0 0 0 5px var(--kb-rood), 0 0 18px rgba(243, 221, 160, .8); }
+.kb-tl__tijd { margin: 0; font: 300 clamp(2.3rem, 10vw, 3.4rem)/1 var(--kb-serif); letter-spacing: .02em; }
+.kb-tl__titel { margin: .25rem 0 0; font: italic 600 clamp(1.5rem, 6vw, 1.9rem)/1.2 var(--kb-serif); color: var(--kb-creme); }
+.kb-tl__desc { margin: .3rem 0 0; color: var(--kb-creme-2); line-height: 1.5; }
+@media (min-width: 860px) {
+  .kb-tijdlijn { max-width: 52rem; gap: 3rem; }
+  .kb-tijdlijn::before { left: 50%; translate: -50% 0; }
+  .kb-tl { grid-template-columns: 1fr 3rem 1fr; gap: 0; }
+  .kb-tl__ruit { grid-column: 2; grid-row: 1; justify-self: center; margin: 1.3rem 0; }
+  .kb-tl__tekst { grid-row: 1; }
+  .kb-tl:nth-child(odd) .kb-tl__tekst { grid-column: 1; text-align: right; padding-right: 2.2rem; }
+  .kb-tl:nth-child(even) .kb-tl__tekst { grid-column: 3; padding-left: 2.2rem; }
+}
+
+/* aftellen: gouden band met ronde medaillons */
+.kb-aftellen .cd { gap: clamp(.45rem, 2.4vw, 1.6rem); margin: 2rem 0 1.6rem; flex-wrap: nowrap; }
+.kb-aftellen .cd__unit { width: clamp(3.9rem, 19.4vw, 7rem); min-width: 0; aspect-ratio: 1; justify-content: center; border-radius: 50%;
+  background: radial-gradient(circle at 35% 26%, #2a5a46, #0d241c 72%); box-shadow: 0 0 0 3px #f8e8bd, 0 0 0 5px #8d6a27, 0 0 0 7px #f3dda3, 0 20px 34px -14px rgba(50, 32, 6, .8), inset 0 0 26px rgba(216, 180, 106, .2); }
+.kb-aftellen .cd__num { font: 300 clamp(1.8rem, 8vw, 3.1rem)/1 var(--kb-serif); color: #fff1c9; }
+.kb-aftellen .cd__label { margin-top: .2rem; font: 600 .6rem var(--kb-ui); letter-spacing: .2em; color: #e8d49e; }
+
+.kb-plaats__naam { margin: 0; font: italic 600 clamp(1.9rem, 8vw, 2.9rem)/1.2 var(--kb-serif); color: var(--kb-goud-lt); text-shadow: 0 2px 20px rgba(0, 0, 0, .6); }
+.kb-plaats__adres { margin: .7rem 0 0; font-style: normal; line-height: 1.6; }
+.kb-plaats__wanneer { margin: 1.2rem 0 1.8rem; color: var(--kb-creme-2); }
+
+.kb-kleuren { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem; margin: 0 0 1.5rem; padding: 0; }
+.kb-kleur { width: 3.6rem; height: 3.6rem; border-radius: 50%; background: radial-gradient(circle at 35% 28%, color-mix(in srgb, var(--c) 50%, #fff), var(--c) 62%); box-shadow: 0 0 0 3px var(--kb-bos), 0 0 0 5px var(--kb-goud), 0 0 0 7px var(--kb-bos), 0 12px 20px -8px rgba(0, 0, 0, .7); }
+.kb-kleding__tekst { max-width: 26rem; margin: 0 auto .6rem; font-size: 1.2rem; }
+.kb-praktisch__lijst { display: grid; gap: 1.5rem; max-width: 28rem; margin: 2rem auto 0; }
+.kb-praktisch__item { padding-top: 1.1rem; border-top: 1px solid rgba(216, 180, 106, .6); }
+.kb-praktisch__item dt { font: 600 .78rem var(--kb-ui); letter-spacing: .22em; text-transform: uppercase; color: var(--kb-goud); }
+.kb-praktisch__item dd { margin: .4rem 0 0; font-size: 1.15rem; }
+.kb-kaart { max-width: 30rem; margin: 2.2rem auto 0; }
+.kb-kaart .rsvp__deadline { font-style: italic; font-size: 1.12rem; }
+.kb-contact__naam { margin: .5rem 0 .3rem; font: 400 clamp(2.2rem, 9vw, 3rem) var(--kb-script); color: var(--kb-goud-lt); }
+
+.kb-afsluiting { padding-block: clamp(6rem, 20vw, 11rem); }
+.kb-sterretje { display: block; width: 2.6rem; height: 2.6rem; margin: 0 auto .8rem; color: var(--kb-goud-lt); filter: drop-shadow(0 0 12px rgba(243, 221, 160, .7)); }
+.fx-motion .kb-zichtbaar .kb-sterretje { animation: kb-puls 3.4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kb-puls { 0%, 100% { scale: .85; opacity: .8; } 50% { scale: 1.15; opacity: 1; } }
+.kb-afsluiting__naam { margin: 0; font: 400 clamp(3.2rem, 15vw, 6rem)/1.1 var(--kb-script); filter: drop-shadow(0 4px 20px rgba(0, 0, 0, .55)); }
+.kb-afsluiting__leden { margin: .4rem 0 0; font: italic 500 1.3rem var(--kb-serif); color: var(--kb-creme-2); }
+.kb-afsluiting__tekst { max-width: 26rem; margin: 1rem auto 0; font-size: 1.25rem; text-shadow: 0 2px 16px rgba(0, 0, 0, .6); }
+.kb-afsluiting .inv-share { margin-top: 1.8rem; }
+.kb-body .inv-btn { color: var(--kb-creme); border-color: rgba(216, 180, 106, .65); background: rgba(255, 245, 215, .06); }
+.kb-body .inv-btn--primary { background: linear-gradient(180deg, #F6E3AE, #C99B49); color: #2A1C06; border-color: #8d6a27; box-shadow: 0 10px 30px -10px rgba(216, 180, 106, .5); }
+.kb-body .inv-link, .kb-body a:not(.inv-btn) { color: var(--kb-goud-lt); }
+.kb-body .kb-goud .inv-btn { border-color: #5b4210; color: #2F2108; background: rgba(255, 250, 235, .55); }
+.kb-body .tz-note, .kb-body .inv-share__status { color: var(--kb-creme-2); }
+.kb-papier a:not(.inv-btn), .kb-papier .inv-link { color: var(--kb-accent); }
+.inv-kerstbol .music__toggle, .inv-kerstbol .fx-toggle { box-shadow: 0 8px 22px -6px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .6); }
+.inv-kerstbol .music__toggle { background: linear-gradient(180deg, #FFF6E2, #E4C88E); }
+
+@media (min-width: 900px) {
+  .kb-sec { padding-block: clamp(6rem, 10vw, 9.5rem); }
+  .kb-in { width: min(100%, 46rem); }
+  .kb-in--breed { width: min(100%, 68rem); }
+  .kb-h2 { font-size: clamp(4rem, 5.6vw, 6rem); }
+  .kb-brief .kb-in { width: min(100%, 60rem); }
+  .kb-brief .kb-papier { display: grid; grid-template-columns: auto 1fr; gap: clamp(2.4rem, 5vw, 4.4rem); align-items: center; padding-inline: clamp(3rem, 6vw, 5rem); }
+  .kb-bol { margin: 0 0 2rem; width: 21rem; }
+  .kb-jaar__tekst { max-width: 36rem; font-size: 1.4rem; }
+  .kb-ballen { grid-template-columns: repeat(4, 1fr); max-width: 66rem; gap: 4.4rem 1.8rem; }
+  .kb-aftellen .cd { gap: 2rem; }
+  .kb-aftellen .cd__unit { width: 8.6rem; }
+  .kb-aftellen .cd__num { font-size: 3.6rem; }
+  .kb-afsluiting__naam { font-size: clamp(5rem, 8vw, 8rem); }
+  .kb-medaillon { width: 22rem; }
+}
+@media (prefers-reduced-motion: reduce) { .kb-folie, .kb-lichtjes, .kb-stralen, .kb-bal, .kb-lamp, .kb-sterretje, .kb-bol .ph::after { animation: none !important; } }
+@media print { .kb-hero { height: auto; min-height: 0; } .kb-sparkles, .kb-skip, .kb-open, .kb-hint, .kb-replay, .kb-scroll, .kb-ambient { display: none; } }

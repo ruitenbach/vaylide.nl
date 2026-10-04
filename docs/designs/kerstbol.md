@@ -14,11 +14,17 @@ Kerstbol
 
 ## 3. Categorie
 
-Kerst (het pakket zegt: "gebruik de bestaande categorie Kerst").
+Kerst, en een **Special** (besluit van de eigenaar, 4 oktober 2026): hij staat onder Specials, in groep A van de collectie (`sort_order` 7, direct na Golden Noël). Er is **geen meerprijs bedacht**: zolang er geen optie `special-kerstbol` in Beheer → Prijzen bestaat, is Kerstbol niet te bestellen en valt de bestaande prijslogica veilig terug (net als bij de andere Specials).
 
 ## 4. Status
 
-On hold / interactieve preview bestaat, nog niet als definitieve VAYLIDE-kaart ingebouwd. Het pakket bevat een door de gebruiker goedgekeurd standalone prototype, nog geen Django-integratie. (Stand 4 oktober 2026.)
+**Gebouwd** (4 oktober 2026): Kerstbol is als echte VAYLIDE-kaart gebouwd in `designs/kerstbol/v1/` en gecommit op de lokale werkbranch `claude/kerstbol` (vanaf `8c429a7`). Hij is een **Special** (categorie Kerst, groep A van de collectie). De **prijs voor `special-kerstbol` is nog niet bepaald**: zolang er geen optie `special-kerstbol` in Beheer → Prijzen staat, is Kerstbol niet te bestellen en valt de bestaande prijslogica veilig terug, net als bij de andere Specials. Niet gepusht, niet op staging, niet current/live.
+
+**Vastgelegde keuzes (eigenaar, 4 oktober 2026):**
+
+- **Desktop toont de verticale video bewust volledig, over de volle hoogte, met dynamische zijgloed.** Op een breed scherm wordt de video niet bijgesneden tot volledige breedte: de eigenaar wil geen belangrijke delen van het cadeau, de opening of de sneeuwbol verliezen. Aan weerszijden staat een gloed die uit de video zelf wordt getekend. Op een telefoon loopt de video van rand tot rand.
+- **De goedgekeurde opening is inhoudelijk afgerond en moet niet meer worden gewijzigd** (gesloten cadeau, tik, lint los, deksel open, sneeuwbol omhoog, gouden en witgouden fonkelingen, één video). Technische verbeteringen of een v2 alleen na uitdrukkelijk akkoord van de eigenaar.
+- "Uitbundig" betekent hoogwaardig, gelaagd en bijzonder; iedere kaart houdt een eigen identiteit (zie de ontwerpregel in `docs/designs/README.md`).
 
 ## 5. Concept / verhaal
 
@@ -62,6 +68,16 @@ Nog niet bepaald. De sneeuwbol/opening moet uiteindelijk onderdeel worden van ee
 
 Uit het pakket: de persoonlijke groet wordt na het einde van de video getoond; titel/kerstgroet en namen/afzender komen uit de bestaande studio-personalisatie; RSVP alleen wanneer het bestaande kerstkaarttype dat ondersteunt; geen trouwprogramma, trouwdatum of countdown forceren op deze kerstgroet. De opbouw van de pagina zelf: nog niet bepaald.
 
+**Zoals gebouwd (4 oktober 2026, besluit van de eigenaar):** de kaart na de video gaat door in dezelfde wereld (diep smaragdgroen, warm champagnegoud, zachte lichtpuntjes en sneeuw, geen witte kaart direct na de opening) en toont alleen wat de klant heeft ingevuld:
+
+- de persoonlijke kerstgroet (champagnekleurige brief met gouden hoeken; de foto van de klant **in een sneeuwbol** met een gouden voet en zachte sneeuw);
+- "Ons jaar" (de studiotitel) met een groot citaat op de achtergrond van het raam met het dorp, "Momenten" als **kerstballen aan een draad** (de foto's van de klant) en de persoonlijke tekst;
+- een luxe afsluiting met de afzender in goudfolie, de namen eronder, de afsluitende tekst van de klant en de deelknoppen;
+- de uitbundige laag eromheen (op verzoek van de eigenaar, 4 oktober 2026): banden in diep smaragd, **bordeaux** (programma, aanmelden) en één **champagnegouden band** (aftellen); goudfolie met een langzame glans op koppen en cijfers; draaiende stralenkransen; **lichtsnoeren** met twinkelende lampjes; gouden hoeken; achtergronden die uit dezelfde goedgekeurde video zijn gesneden (het raam met het dorp, de sneeuwbol) en bij het scrollen zacht meebewegen (alleen met CSS scroll-gedreven animatie, geen JavaScript);
+- alleen **bij een kerstdiner (een ingevulde datum)**: datum, programma, aftellen, locatie en aanmelden. Zonder datum verdwijnen die onderdelen, ook het aftellen.
+- Dresscode, "Goed om te weten" en contact verschijnen alleen als de klant ze heeft ingevuld.
+- Er wordt geen inhoud verzonnen; vaste woorden in de kaart zijn alleen kopjes ("Momenten", "Kerstdiner", "Het programma", "Locatie", "Kom je ook?").
+
 ## 8. Assets en waar ze staan
 
 **In de repository (draagbare referentiebronnen, geen definitieve product-assets), `tools/design-references/kerstbol/`:**
@@ -75,6 +91,21 @@ Uit het pakket: de persoonlijke groet wordt na het einde van de video getoond; t
 | `tools/design-references/kerstbol/README.md` | herkomst, checksums en wat bewust ontbreekt | |
 
 Een toekomstige sessie kan het prototype dus openen met `tools/design-references/kerstbol/preview-standalone.html` en de video afspelen zonder de Downloads-map van de eigenaar. Bewust niet in de repository: het ZIP zelf, `kerst-opening-master.mp4` (16,7 MB) en `preview-assets.html`.
+
+
+**In het product (`designs/kerstbol/v1/`, gebouwd op 4 oktober 2026):**
+
+| Pad | Wat | Grootte |
+|---|---|---|
+| `designs/kerstbol/v1/media/opening.mp4` | de goedgekeurde webvideo (uit `tools/design-references/kerstbol/kerst-opening-web.mp4`, ongewijzigd) | 1 704 604 bytes |
+| `designs/kerstbol/v1/media/poster.webp` | gesloten cadeau, 1080 breed, uit `kerst-gesloten.webp` | 262 772 bytes |
+| `designs/kerstbol/v1/media/eind.webp` | eindposter: het laatste beeld van dezelfde video | 178 598 bytes |
+| `static/img/designs/kerstbol.webp` | kaartbeeld voor de collectie (800 × 1000), uit dat eindbeeld | 143 436 bytes |
+| `designs/kerstbol/v1/media/raam.webp` | uitsnede van het raam met het dorp (achtergrond van "Ons jaar", locatie en afsluiting) | 59 044 bytes |
+| `designs/kerstbol/v1/media/bol.webp` | uitsnede van de sneeuwbol (achtergrond van het datumsmedaillon) | 48 476 bytes |
+| `designs/kerstbol/v1/{manifest.json, invitation.html, style.css, kerstbol.js, _slinger.html}` | het ontwerp | |
+
+Er is geen nieuw AI-beeld of -video gemaakt. Het masterbestand (16,7 MB) is niet gebruikt.
 
 **Lokaal bij de eigenaar (bronnen, niet in Git).** Gezocht en onderzocht op 4 oktober 2026; het pakket is voor het onderzoek uitgepakt naar een tijdelijke werkmap buiten de repository.
 
@@ -112,6 +143,16 @@ Nog niet definitief bepaald. Wel behouden:
 
 **Het losse bestand `Vaylide-Kerst-Sneeuwbol-opening.html` (Downloads) is een andere variant dan het goedgekeurde prototype in het ZIP.** Titel "Vaylide · Kerstmagie". Het bevat een in SVG getekend rood cadeau met CSS-animatie (strik, lint en deksel gaan los), een stilstaande sneeuwbol-afbeelding die omhoog komt (1520 × 2688, ook als poster), daarna een ingebedde video van 5,04 s (720 × 1280, 24 fps, H.264, 1 487 388 bytes) waarin de doos al open is en de strik op het geopende deksel ligt, 30 stofdeeltjes, een knop "Opening overslaan" en "Opnieuw beleven", en een tijdpad via timers (0 s losmaken, 0,9 s openen, 1,45 s bol komt op, 4,3 s video, 8,4 s klaar). Het werkt zelfstandig en offline (3 base64-media, geen externe verzoeken; getest in een browser zonder netwerk: geen fouten, de video speelt tot het einde, geen horizontale scroll op 390 px). De video en poster zijn niet dezelfde bestanden als in het ZIP. Het ZIP noemt `preview-standalone.html` (in het ZIP) als het goedgekeurde prototype en verbiedt een getekend SVG-cadeau en een strik op het geopende deksel. Dit losse bestand is daarom hoogstens een eerdere iteratie (niet bevestigd) en geen bron om 1-op-1 te volgen.
 
+**Zoals gebouwd (4 oktober 2026):**
+
+- Opening, kop en feest zijn één scène (`.kb-hero`) met een eigen script, net als Gouden Avond: geen openingsscherm van `invite.js`, geen tweede video, geen GSAP.
+- **De video is beeldvullend** (op verzoek van de eigenaar): geen klein kader meer. Op een telefoon loopt hij van rand tot rand; op een breder scherm staat hij over de volle hoogte met aan weerszijden een gloed die uit de video zelf wordt getekend (een canvas van 32 × 57 pixels, ±15 keer per seconde, alleen op een breed scherm en alleen terwijl de video speelt). De video wordt niet bijgesneden: het hele beeld blijft zichtbaar. `envelope_mode` is `built_in` (geen extra envelop ervoor).
+- Eén `<video>` (stil, `playsinline`, `preload="metadata"`, poster); een echte knop over het cadeau start hem rechtstreeks vanuit de tik; de video herhaalt niet. De video wordt pas voorgeladen (`preload="auto"`) als de pagina rustig is of de gast het cadeau aanraakt, niet bij Data-besparing of 2G.
+- Fonkelingen: 40 gouden (vóór en in de eerste fase), vanaf 6,5 s in de video 55 witgouden kristallen; ze worden pas aangemaakt als ze nodig zijn en daarna verwijderd. Vallen niet. Het prototype gebruikte een `drop-shadow` per deeltje; dat is een lichte `box-shadow` geworden.
+- Bediening: **Opening overslaan** (toont direct het eindbeeld met de groet, zonder te wachten op de video), **Opnieuw beleven**, **Speel de opening af** (bij minder beweging, stilgezette beweging, opening al gezien in dezelfde sessie, geblokkeerde autoplay of een laadfout), een statusmelding voor schermlezers en toetsenbordbediening met focus op "Naar de kaart" na afloop. Tijdens de opening is de pagina niet scrolbaar en de rest van de kaart `inert`.
+- Teksten: studiovelden zijn altijd leidend (afzender, kop, tagline, namen eronder). De prototypeteksten zijn alleen een terugval als het veld leeg is ("Een magische kerst gewenst", "Fijne feestdagen", "Vol warmte, liefde en bijzondere momenten.").
+- De collectie: `catalog/collectie.py` (A en Specials, `sort_order` 7), tests aangepast (aantal ontwerpen 47), `tests/test_kerstbol.py`, `e2e/kerstbol.cjs`.
+
 ## 11. Wat al afgerond is
 
 - basisconcept;
@@ -120,20 +161,30 @@ Nog niet definitief bepaald. Wel behouden:
 - lint/deksel/sneeuwbol-sequence;
 - onderscheid tussen sparkle vóór en na;
 - HTML-preview;
-- een door de gebruiker goedgekeurd standalone prototype met de goedgekeurde video (webversie en master) en poster (alles in het overdrachtspakket).
+- een door de gebruiker goedgekeurd standalone prototype met de goedgekeurde video (webversie en master) en poster (alles in het overdrachtspakket);
+- de echte VAYLIDE-kaart `kerstbol` (lokaal, ter beoordeling): opening, overslaan, minder beweging, kaart met brief, "Ons jaar", momenten en afsluiting, het kerstdiner alleen bij een datum, collectie-registratie en tests (4 oktober 2026).
 
 ## 12. Wat nog moet gebeuren
 
 - [x] bestaande preview/assets terugvinden (HTML-preview en het overdrachtspakket zijn gevonden en onderzocht; het cadeau-beginbeeld is `kerst-gesloten.webp`);
-- [ ] definitieve pagina na de opening bepalen;
-- [ ] VAYLIDE-integratie (zie de instructies hierboven), inclusief "Opening overslaan", 'minder beweging', focus/aria en opruimen van timers en listeners;
-- [ ] bepalen hoe de sneeuwbol overgaat naar de eigenlijke uitnodiging;
-- [ ] een lokaal opgeslagen eindposter uit het masterbestand (alleen als dat nodig is voor "Opening overslaan");
+- [x] pagina na de opening: gebouwd volgens het besluit van de eigenaar (4 oktober 2026), nog te beoordelen;
+- [x] VAYLIDE-integratie, inclusief "Opening overslaan", 'minder beweging', focus/aria en opruimen van timers en listeners (lokaal gebouwd);
+- [x] overgang van de sneeuwbol naar de kaart: groet over het eindbeeld, daarna "Naar de kaart";
+- [x] eindposter: het laatste beeld van de webvideo (`media/eind.webp`);
+- [ ] eigenaar beoordeelt de lokale preview; daarna commit, staging en een prijs voor de Special (Beheer → Prijzen, `special-kerstbol`);
 - [ ] responsive/motion/performance later testen.
 
 ## 13. Besluiten die niet opnieuw ter discussie hoeven
 
 - naam `Kerstbol`, slug `kerstbol` (niet `kerstmagie-sneeuwbol`);
+- Kerstbol is een Special (categorie Kerst); geen prijs of meerprijs zelf bedenken;
+- de kaart na de opening is rijk in dezelfde wereld (smaragd, champagnegoud, lichtpunten, sneeuw), geen standaard witte kaart; datum, locatie, programma, aanmelden en aftellen alleen bij een kerstdiner; geen verzonnen inhoud;
+- studiovelden zijn altijd leidend, de prototypeteksten alleen als terugval;
+- eindposter en kaartbeeld komen uit de goedgekeurde video; geen nieuwe AI-beelden;
+- geen GSAP alleen om GSAP te gebruiken;
+- desktop toont de verticale video volledig over de volle hoogte met dynamische zijgloed (niet croppen tot volledige breedte);
+- de goedgekeurde opening wordt inhoudelijk niet meer gewijzigd;
+- de prijs voor `special-kerstbol` is nog niet bepaald; er wordt geen prijs bedacht;
 - start met een gesloten cadeau;
 - de tekst is "Tik om je kerstcadeau te openen";
 - het lint komt los;
@@ -146,8 +197,8 @@ Nog niet definitief bepaald. Wel behouden:
 
 ## 14. Laatste relevante commit
 
-Nog niet bepaald / nog niet in Git aangetroffen.
+Het commit "Kerstbol: nieuwe Special met een beeldvullende cadeau-opening en een kerstkaart in smaragd, bordeaux en goud" is het eerste commit op de lokale branch `claude/kerstbol` na `8c429a7` (`git log claude/kerstbol`). Niet gepusht.
 
 ## 15. Volgende stap
 
-Beslis (door de eigenaar) over de pagina na de opening; daarna kan de integratie in VAYLIDE gebouwd worden op basis van `tools/design-references/kerstbol/` (`preview-standalone.html`, de webvideo en de poster). Nog niets gebouwd.
+De eigenaar bepaalt de prijs voor `special-kerstbol` (Beheer → Prijzen) en geeft aan wanneer de branch `claude/kerstbol` naar de remote mag en of er een stagingtest komt. Tot die tijd: niet pushen, niet deployen, niet current maken.

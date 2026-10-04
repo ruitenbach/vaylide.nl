@@ -13,7 +13,7 @@ bestaande databases krijgen ze één keer via migratie 0006 (daarna beslist Behe
 from __future__ import annotations
 
 A = (
-    "aurora-nocturne", "midnight-emeraude", "rose-royale", "balzaal", "golden-noel", "gouden-avond",      # specials
+    "aurora-nocturne", "midnight-emeraude", "rose-royale", "balzaal", "golden-noel", "gouden-avond", "kerstbol",      # specials
     "liefde-op-papier", "voor-altijd", "avondgoud", "puur-moment",                         # bruiloft en alle gelegenheden
     "winterlicht", "gloria",                                                               # kerst
 )
@@ -31,13 +31,13 @@ C = (
 )
 
 # Specials: bijzondere ontwerpen onder Specials, met een eigen meerprijs (catalog/specials.py). Winterlicht is bewust geen special.
-SPECIALS = ("aurora-nocturne", "midnight-emeraude", "rose-royale", "balzaal", "golden-noel", "gouden-avond")
+SPECIALS = ("aurora-nocturne", "midnight-emeraude", "rose-royale", "balzaal", "golden-noel", "gouden-avond", "kerstbol")
 NIEUWE_SPECIALS = ("midnight-emeraude", "rose-royale")      # kregen de vlag pas bij de samenstelling van de collectie (migratie 0006)
 
 # Volgorde (sort_order) van de ontwerpen waarvan het nummer voor de collectie is veranderd. Alle andere ontwerpen houden hun nummer.
 # A staat vóór B; geen twee ontwerpen hebben hetzelfde nummer (tests/test_collectie.py bewaakt dit en de overeenkomst met de manifesten).
 SORT_ORDER = {
-    "aurora-nocturne": 1, "midnight-emeraude": 2, "rose-royale": 3, "balzaal": 4, "golden-noel": 6, "gouden-avond": 9,
+    "aurora-nocturne": 1, "midnight-emeraude": 2, "rose-royale": 3, "balzaal": 4, "golden-noel": 6, "kerstbol": 7, "gouden-avond": 9,
     "eerste-dans": 100, "aan-tafel": 101, "middernacht": 102,
 }
 

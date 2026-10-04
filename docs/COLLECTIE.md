@@ -13,7 +13,7 @@ de eigenaar en is bewust klein gehouden: er zijn geen ontwerpen opnieuw gebouwd,
 
 De indeling staat op één plek: `catalog/collectie.py` (met de redenen per groep). Een nieuw ontwerp dat daar niet staat, is B.
 
-- **A**: Aurora Nocturne, Midnight Émeraude, Rosé Royale, Balzaal, Golden Noël (de vijf Specials), Liefde op papier, Voor altijd, Avondgoud,
+- **A**: Aurora Nocturne, Midnight Émeraude, Rosé Royale, Balzaal, Golden Noël, Kerstbol (de zes Specials), Liefde op papier, Voor altijd, Avondgoud,
   Puur moment, Winterlicht en Gloria.
 - **B**: Eerste dans, Aan tafel, Middernacht en 23 Atelier-ontwerpen (zie het bestand).
 - **C**: Ho ho ho, Sneeuwpret, Wolkje, Stipjes, Door de jaren, Mijlpaal, Borrel, Congres en Lijnenspel.
@@ -26,7 +26,7 @@ Er is geen nieuwe databasekolom of schermonderdeel. De bestaande velden van een 
 - **C niet tonen**: `is_active` staat uit (Beheer → Ontwerpen → "Zichtbaar en bestelbaar"). Het ontwerp staat dan niet in de collectie, de
   zoekfunctie of de Studio. De map, de versies en **alle bestaande uitnodigingen blijven gewoon werken**. Aanzetten in Beheer brengt het
   ontwerp meteen terug.
-- **Specials**: `special` staat aan voor Aurora Nocturne, Midnight Émeraude, Rosé Royale, Balzaal en Golden Noël. Winterlicht is A maar
+- **Specials**: `special` staat aan voor Aurora Nocturne, Midnight Émeraude, Rosé Royale, Balzaal, Golden Noël en Kerstbol. Winterlicht is A maar
   bewust geen special. Specials staan onder Specials; een eigen meerprijs is een optie `special-<code>` in Beheer → Prijzen. Zonder die
   optie kost een special gewoon de prijs van het pakket (keuze van de eigenaar, zie `tests/test_specials.py`). Voor Midnight Émeraude en
   Rosé Royale is er nog geen meerprijs ingesteld; die verzin ik niet.

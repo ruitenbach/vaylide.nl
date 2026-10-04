@@ -12,11 +12,15 @@ Per ontwerp bestaat er **één document**: `docs/designs/<slug>.md`, gemaakt van
 - **Assets en bronnen** (onderdelen 8 en 9): grote bestanden en masters staan niet in Git; het document zegt waar ze wel staan. Prompts en referenties van externe AI- en videotools bewaren we in [`tools/design-references/`](../../tools/design-references/README.md).
 - Het ontwerp zelf blijft in `designs/<slug>/v1/` (zie `docs/HANDLEIDING.md`); een uitgebrachte versie wijzig je niet, je maakt een v2. Technische documentatie van een ontwerp die al in een eigen bestand staat (zoals `docs/GOUDEN-AVOND.md`) blijft bestaan en wordt vanuit het ontwerpdocument genoemd.
 
+## Ontwerpregel: uitbundig, met een eigen identiteit
+
+De eigenaar wil nieuwe kaarten altijd uitbundig. Dat betekent **hoogwaardig, gelaagd en bijzonder**, niet dat iedere kaart dezelfde hoeveelheid effecten of dezelfde stijl krijgt. Iedere nieuwe kaart houdt een eigen identiteit (eigen wereld, eigen kleuren, eigen materiaal, eigen beweging); de rijkdom zit in de afwerking en de lagen, niet in een vast recept. De goedgekeurde opening blijft intact; de uitbundigheid zit in de pagina eromheen. Beeldvullende media gaan boven kleine kaders, maar een video wordt nooit bijgesneden als daarmee belangrijke delen van de opening verloren gaan (zie Kerstbol).
+
 ## Overzicht
 
 | Ontwerp | Slug | Document | Status |
 |---|---|---|---|
 | Kerstkaart | `kerstkaart` | [kerstkaart.md](kerstkaart.md) | on hold: concept; preview-video en storyboard als referentie in `tools/design-references/kerstkaart/`, nog niet ingebouwd |
-| Kerstbol | `kerstbol` (definitief) | [kerstbol.md](kerstbol.md) | on hold: goedgekeurd prototype en assets als referentie in `tools/design-references/kerstbol/`, nog niet ingebouwd |
+| Kerstbol | `kerstbol` (definitief) | [kerstbol.md](kerstbol.md) | lokaal gebouwd als Special in `designs/kerstbol/v1/` (branch `claude/kerstbol`), ter beoordeling; niet gepusht |
 
 Voeg een regel toe zodra er een ontwerpdocument is. Bestaande ontwerpen worden hier pas ingevuld als de eigenaar daarom vraagt.
