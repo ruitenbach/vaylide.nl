@@ -779,6 +779,10 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
   .zweefkaart { width: clamp(7.5rem, 30vw, 10rem); --x: calc(var(--t) * 60%); }
   .zweefkaart__naam { font-size: .7rem; }
 }
+/* Telefoon: de vijf kaarten van de kerstwaaier iets smaller en verder uit elkaar, zodat elke kaart minstens ~44 px zichtbaar en tikbaar oppervlak houdt. */
+@media (max-width: 520px) {
+  .zweefkaart { width: clamp(5rem, 26vw, 8rem); --x: calc(var(--t) * 83%); }
+}
 
 /* ---------- Zo werkt het: stappen als zwevende kaartjes ---------- */
 .stappenrij { counter-reset: none; list-style: none; padding: 0; margin: 0; display: grid; gap: clamp(1rem, 2vw, 1.5rem); grid-template-columns: repeat(4, minmax(0, 1fr)); }
