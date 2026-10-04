@@ -45,8 +45,9 @@ class HomeTests(VaylideTestCase):
     def test_christmas_podium_steps_and_faq(self):
         html = Client().get("/").content.decode()
         self.assertIn('class="kerstpodium" aria-labelledby="kerst-titel" data-sparkles', html)
-        for slug in ("winterlicht", "gloria", "golden-noel"):
+        for slug in ("winterlicht", "gloria", "golden-noel", "kerstbol", "kerstkaart"):
             self.assertIn(f"/ontwerpen/{slug}/", html)
+        self.assertIn('class="kaartenwaaier" data-tilt3d style="--n:5"', html)
         for slug in ("kerstman", "sneeuwpop"):          # C: voorlopig niet in de collectie, dus ook niet op het kerstpodium
             self.assertNotIn(f"/ontwerpen/{slug}/", html)
         self.assertEqual(html.count('class="stapkaart"'), 4)

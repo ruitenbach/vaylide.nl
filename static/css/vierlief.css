@@ -749,11 +749,12 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .kerstpodium__badge { display: inline-block; padding: .25rem .8rem; border-radius: 999px; background: linear-gradient(135deg, #E9CB85, #F7E7B8); color: #3A2710; font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
 /* Waaier van lichte kerstkaarten; hero3d.js laat hem meekantelen (--tx, --ty). */
 .kaartenwaaier { --tx: 0deg; --ty: 0deg; position: relative; list-style: none; margin: 0; padding: 0; height: clamp(20rem, 32vw, 26rem); perspective: 1400px; transform-style: preserve-3d; }
+/* De waaier past zich aan het aantal kaarten (--n, zet de homepage) aan: --t loopt van -1,5 tot 1,5, de breedte van de waaier blijft gelijk. */
 .zweefkaart {
-  --r: calc((var(--i) - 1.5) * 8deg); --x: calc((var(--i) - 1.5) * 62%);
+  --t: calc((var(--i) - (var(--n, 4) - 1) / 2) * 3 / (var(--n, 4) - 1)); --r: calc(var(--t) * 8deg); --x: calc(var(--t) * 62%);
   position: absolute; left: 50%; top: 50%; width: clamp(9rem, 15vw, 12.5rem); aspect-ratio: 4 / 5;
-  transform: translate(-50%, -50%) translateX(var(--x)) translateY(calc((var(--i) - 1.5) * (var(--i) - 1.5) * 10px)) rotate(var(--r)) rotateX(var(--ty)) rotateY(var(--tx));
-  transition: transform .6s cubic-bezier(.2, .8, .2, 1); z-index: calc(4 - var(--i));
+  transform: translate(-50%, -50%) translateX(var(--x)) translateY(calc(var(--t) * var(--t) * 10px)) rotate(var(--r)) rotateX(var(--ty)) rotateY(var(--tx));
+  transition: transform .6s cubic-bezier(.2, .8, .2, 1); z-index: calc(var(--n, 4) - var(--i));
 }
 .zweefkaart a { display: block; height: 100%; border-radius: var(--radius); overflow: hidden; background: var(--paper); text-decoration: none; color: var(--ink);
   box-shadow: 0 0 0 1px rgba(255, 240, 210, .6), 0 30px 50px -22px rgba(20, 5, 5, .7); transition: transform .45s cubic-bezier(.2, .8, .2, 1), box-shadow .45s; }
@@ -775,7 +776,7 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
   .kerstpodium p { margin-left: auto; margin-right: auto; }
   .kerstpodium .btn-row { justify-content: center; }
   .kaartenwaaier { height: clamp(15rem, 62vw, 20rem); }
-  .zweefkaart { width: clamp(7.5rem, 30vw, 10rem); --x: calc((var(--i) - 1.5) * 52%); }
+  .zweefkaart { width: clamp(7.5rem, 30vw, 10rem); --x: calc(var(--t) * 60%); }
   .zweefkaart__naam { font-size: .7rem; }
 }
 
