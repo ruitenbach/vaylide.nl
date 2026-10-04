@@ -4,7 +4,7 @@ Vaylide is een Django-platform (Django 5.2 LTS, Python 3.11+) waarop klanten zel
 
 Het merk heette eerst Vierlief (werknaam) en daarna kort Vaylide. Technische namen die bezoekers niet zien zijn bewust gebleven: de instellingen `VIERLIEF_…`, cookie-, sessie- en opslagnamen (`vierlief_…`, `vierlief-…`) en `static/css/vierlief.css`. Zie `docs/OVERDRACHT.md`.
 
-Lees bij de start eerst `docs/OVERDRACHT.md` (stand van zaken en open punten). Daarna, als het nodig is: `docs/AANPAK.md` (keuzes en aannames), `docs/HANDLEIDING.md` (beheer, ontwerpen toevoegen), `docs/CONTROLES.md` (wat getest is), `docs/ONLINE.md` (op het eigen domein zetten) en `docs/LIVEGANG.md` (nodig voor livegang).
+Lees bij de start eerst `docs/OVERDRACHT.md` (stand van zaken en open punten). Per ontwerp is er één vast document in `docs/designs/` (sjabloon: `docs/designs/_sjabloon.md`, afspraken: `docs/designs/README.md`; prompts en bronnen van externe tools: `tools/design-references/`): lees dat document vóór je aan een ontwerp werkt en houd het bij. Daarna, als het nodig is: `docs/AANPAK.md` (keuzes en aannames), `docs/HANDLEIDING.md` (beheer, ontwerpen toevoegen), `docs/CONTROLES.md` (wat getest is), `docs/ONLINE.md` (op het eigen domein zetten) en `docs/LIVEGANG.md` (nodig voor livegang).
 
 ## Commando's
 
