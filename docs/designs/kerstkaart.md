@@ -16,7 +16,9 @@ Kerst
 
 ## 4. Status
 
-On hold / concept en preview bestaan, nog niet technisch ingebouwd in VAYLIDE. (Stand 4 oktober 2026.)
+**Gebouwd, lokaal** (4 oktober 2026): Kerstkaart is als VAYLIDE-kaart gebouwd in `designs/kerstkaart/v1/` op de lokale werkbranch `claude/kerstkaart` (vanaf `8c429a7`). Hij is een **Special** (categorie Kerst, groep A van de collectie, sort_order 8). De **prijs voor `special-kerstkaart` is nog niet bepaald**: zonder die optie in Beheer, Prijzen is de kaart niet te bestellen. Nog niet gecommit, niet gepusht, niet op staging, niet current/live.
+
+**Besluit van de eigenaar (4 oktober 2026): geen nieuwe Higgsfield-generaties.** De bestaande video `Vaylide-Chocoladehuis-Elfjes-preview.mp4` is goed genoeg en is de definitieve videobasis. Er is dus geen eindbeeld F, geen nieuwe Shot 1 en geen nieuwe Shot 2 gemaakt en er zijn geen Higgsfield-credits gebruikt. Bewust aanvaard, en geen blockers meer: er zijn 3 elfjes zichtbaar in de video; het huis wordt niet letterlijk door zichtbare happen opgegeten (het lost op en valt uiteen); de lolly springt maar kort; de camera zoomt aan het eind in.
 
 ## 5. Concept / verhaal
 
@@ -62,9 +64,26 @@ Sneeuw, kerstbomen en maan moeten gedurende de scène als wereld behouden blijve
 
 Verschillen met de definitieve verhaallijn (alleen vastgesteld uit de steekproef): er is in de beelden geen duidelijk kloppen te zien (de deur gaat open); het huis lost op met vonken in plaats van dat de elfjes het zichtbaar opeten; de lolly lijkt te rijzen en groter te worden in plaats van naar voren te springen; het eindbeeld heeft 3 in plaats van 4–5 elfjes. Of er een klopgeluid in het audiospoor zit: niet onderzocht.
 
+**Aanvullende waarnemingen uit de dichte analyse van de referentievideo** (beelden per 0,25 tot 0,5 s, geluid per halve seconde, 4 oktober 2026; alleen feiten, geen besluiten):
+
+- 0 tot 1,75 s: het beeld staat bijna stil (gesloten deur met kerstkrans, lantaarns en verlichte ramen). De **gouden deurklopper** zit midden op de deur, ongeveer op 54 % van de breedte en 61 % van de hoogte van het beeld; links ervan zit een gouden handgreep. Er beweegt niets aan de klopper: geen klopbeweging.
+- 1,75 tot 2,25 s: de deur zwaait open (scharnier links); vanaf 2,25 s verschijnt een elfje in de opening. De camera begint dan langzaam uit te zoomen en is rond 6 s in een brede stand (maan, bomen met lichtjes, bergen).
+- 3 tot 6,5 s: er zijn gelijktijdig hooguit 2 à 3 elfjes zichtbaar (met bewegingsonscherpte en gouden sporen); ze vliegen om en langs het huis.
+- 6,5 tot 7 s: een rood-witte lolly verschijnt in de deuropening, vóór het huis wordt aangetast. Vanaf 7,25 s staan er donkere **happen** (gaten) in de muren naast de deur; 8,5 tot 9,5 s breekt het huis open en valt uiteen, met stukken chocolade en opstijgende gouden vonken. Er is geen beeld waarin een elf zichtbaar in de chocolade bijt.
+- 10 tot 12,5 s: de lolly staat op een stok midden in de sneeuw; de elfjes (3) staan eerst klein op de achtergrond en rennen/springen naar voren.
+- 13 tot 13,5 s: de lolly beweegt kort omhoog en omlaag (onscherp, een klein sprongetje), daarna komt hij groter in beeld: de camera **zoomt aan het eind juist in** (de lolly en de 3 elfjes worden groter), niet uit. Het eindbeeld (14 tot 15 s) is een halve close-up met 3 zittende, zwaaiende elfjes.
+- Geluid: het audiospoor bevat geluid met weinig energie tot 2 s (waaronder bij ±0,5 en ±1,5 s iets zachts), en duidelijk meer energie van 7 tot 10,5 s (piek ±9,5 s, passend bij het afbrokkelen van het huis). Welk geluid het precies is, is niet beluisterd.
+
 ## 7. Pagina na de opening
 
-Nog niet bepaald. De opening is wel bedoeld als start van een volledige VAYLIDE-uitnodiging, niet alleen als losse video.
+De opening, de kop en het begin van de kaart zijn één scène (`.kk-hero`) met een eigen script (`kerstkaart.js`); er is geen openingsscherm van `invite.js`. De kaart eronder heeft een eigen identiteit en kopieert Kerstbol niet:
+
+- **Wereld:** nachtblauw met sneeuw, chocoladebruin, rood-wit snoep, warm kerstlicht en de maan als terugkerend element (in het raam van de brief, in de afsluiting).
+- **Banden:** een sneeuwrand (witte sneeuwlaag) tussen de video en de eerste lichte band; de brief in een gewelfd, warm verlicht raam van het chocoladehuis met een foto in een maan; Ons jaar op een nachtlucht; Momenten als chocoladetabletten met een hoekje goudfolie; een snoepstok als scheiding; de datum op een lolly (uitsnede uit de video, draait langzaam) met een stilstaand cijfer; het programma als tabletten langs een snoepstok; aftellen als pepermuntjes; aanmelden op een kaart met een snoeprand; locatie en afsluiting op nachtbeelden uit dezelfde video.
+- **Typografie:** Fraunces voor koppen (zacht, warm), Nunito voor tekst.
+- **Inhoud:** alleen wat de klant heeft ingevuld (studiovelden zijn leidend; prototypeteksten zijn alleen een terugval). Datum, programma, locatie, aftellen en aanmelden verschijnen alleen bij een kerstdiner (een datum).
+
+**Opening, technisch:** het startbeeld is het eerste videobeeld zonder klopper; de gouden klopper is een uitsnede uit datzelfde beeld in twee delen (plaat en ring) die pixel voor pixel op hun plek staan, zodat de ring los kan bewegen en de overgang naar de video naadloos is. Een tik op de klopper geeft drie klopjes (de ring wordt omhoog getild en valt terug, een lichtflits in het raam, gouden vonken, een zacht gesynthetiseerd klopgeluid zonder geluidsbestand), daarna start de video. De video start nooit vanzelf. Daarnaast: Opening overslaan, Opnieuw beleven, minder beweging (direct het eindbeeld met een knop "Speel de opening af"), geblokkeerde autoplay (knop), sessie-onthouden, scroll-vergrendeling tijdens de opening. Op een breed scherm staat de verticale video volledig over de volle hoogte met dynamische zijgloed (niet croppen).
 
 ## 8. Assets en waar ze staan
 
@@ -128,10 +147,10 @@ Nog niet definitief bepaald. Wel belangrijk:
 
 - [ ] originele HTML-preview terugvinden (de mp4 is gevonden, `Vaylide-Chocoladehuis-opening.html` niet);
 - [ ] controleren waarom de HTML-preview eerder niet opende;
-- [ ] juiste 4–5 elfjes in het eindbeeld (en een zichtbaar klopmoment);
-- [ ] de video verkleinen/geschikt maken voor het web, zodra bepaald is welke video definitief wordt;
-- [ ] volledige VAYLIDE-integratie;
-- [ ] pagina na de opening ontwerpen;
+- [x] klopmoment toegevoegd in de webopening (drie klopjes); 4–5 elfjes vervallen: bewust 3 aanvaard;
+- [x] de video verkleinen/geschikt maken voor het web (720 x 1280, zonder geluid, 2,4 MB);
+- [x] volledige VAYLIDE-integratie (lokaal);
+- [x] pagina na de opening ontwerpen;
 - [ ] responsive/motion/performance later testen.
 
 ## 13. Besluiten die niet opnieuw ter discussie hoeven
@@ -140,18 +159,20 @@ Nog niet definitief bepaald. Wel belangrijk:
 - de gouden deurklopper is het klikpunt;
 - de tekst is "Tik op de deurklopper";
 - de deur gaat daarna open;
-- 4–5 groene elfjes;
-- de elfjes eten het chocoladehuis;
+- groene elfjes (de bestaande video toont er 3; bewust aanvaard);
+- de elfjes eten het chocoladehuis (in de video lost het huis op; bewust aanvaard);
 - een rood-witte lolly blijft over;
 - de lolly springt naar voren;
 - de elfjes eindigen naast de lolly en zwaaien;
-- de camera zoomt uit;
-- sneeuw, kerstbomen en maan blijven onderdeel van de wereld.
+- de camera zoomt uit (in de bestaande video zoomt hij aan het eind in; bewust aanvaard);
+- sneeuw, kerstbomen en maan blijven onderdeel van de wereld;
+- **geen nieuwe Higgsfield-generaties:** de bestaande video is de definitieve videobasis (4 oktober 2026);
+- de pagina na de opening houdt een eigen Chocoladehuis-identiteit en kopieert Kerstbol niet.
 
 ## 14. Laatste relevante commit
 
-Nog niet bepaald / nog niet in Git aangetroffen.
+Nog niet gecommit. De bouw staat lokaal op `claude/kerstkaart` (vanaf `8c429a7`); niet gepusht.
 
 ## 15. Volgende stap
 
-Het ontbrekende `Vaylide-Chocoladehuis-opening.html` laten aanleveren (of bevestigen dat het niet meer bestaat), en door de eigenaar laten bepalen of de bestaande video bijgewerkt wordt (4–5 elfjes, klopmoment) voordat er technisch gebouwd wordt in VAYLIDE.
+De eigenaar beoordeelt de lokale voorvertoning, bepaalt de prijs voor `special-kerstkaart` (Beheer, Prijzen) en geeft aan wanneer er gecommit en naar de remote gepusht mag worden. Tot die tijd: niet committen, niet pushen, niet deployen, niet current maken. Let op bij het samenvoegen met Kerstbol: beide branches passen `catalog/collectie.py`, `tests/test_collectie.py` en `tests/test_effects.py` aan (tellingen 12/26/9 en 47 worden dan 13/26/9 en 48).

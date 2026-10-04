@@ -24,8 +24,8 @@ class IndelingTests(VaylideTestCase):
         indeling = list(collectie.A) + list(collectie.B) + list(collectie.C)
         self.assertEqual(len(indeling), len(set(indeling)), "een ontwerp staat in meer dan één groep")
         self.assertEqual(set(indeling), set(MANIFESTEN), "elk ontwerp in designs/ staat in precies één groep, en andersom")
-        self.assertEqual((len(collectie.A), len(collectie.B), len(collectie.C)), (13, 26, 9))
-        self.assertEqual(len(MANIFESTEN), 48)
+        self.assertEqual((len(collectie.A), len(collectie.B), len(collectie.C)), (14, 26, 9))
+        self.assertEqual(len(MANIFESTEN), 49)
 
     def test_unknown_design_defaults_to_b_and_c_is_the_only_hidden_group(self):
         self.assertEqual(collectie.groep("nieuw-ontwerp"), "B")
@@ -71,7 +71,7 @@ class IndelingTests(VaylideTestCase):
 
 class CatalogusTests(VaylideTestCase):
     def test_database_follows_the_collection(self):
-        self.assertEqual(Template.objects.count(), 48)
+        self.assertEqual(Template.objects.count(), 49)
         verborgen = set(Template.objects.filter(is_active=False).values_list("slug", flat=True))
         self.assertEqual(verborgen, set(collectie.C))
         specials = set(Template.objects.filter(special=True).values_list("slug", flat=True))

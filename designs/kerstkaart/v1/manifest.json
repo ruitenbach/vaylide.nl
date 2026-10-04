@@ -1,0 +1,76 @@
+{
+  "slug": "kerstkaart",
+  "version": 1,
+  "name": "Kerstkaart",
+  "tagline": "Een chocoladehuis in een besneeuwde kerstnacht: klop op de gouden deurklopper en de elfjes komen naar buiten",
+  "description": "Je ziet een huis van echte chocolade onder een grote maan, met een gouden deurklopper op de voordeur. Tik op de klopper: er wordt drie keer aangeklopt, de deur zwaait open en de elfjes vliegen naar buiten. Het chocoladehuis lost op in gouden vonken, een rood-witte lolly blijft over en de elfjes zwaaien naar je. Daarna staat jullie kerstgroet in beeld en loopt de kaart door in dezelfde wereld: nachtblauw, sneeuw, chocoladebruin en rood-wit snoep, met een maan die steeds terugkomt, warme ramen en jullie foto, jullie jaar en jullie persoonlijke tekst. Heb je ook een kerstdiner? Dan komen datum, programma, locatie, aftellen en aanmelden erbij. De opening start pas na een tik, is over te slaan en rustig bij minder beweging. De video is een gegenereerde voorbeeldscène.",
+  "style_notes": "Nachtblauw met sneeuw, chocoladebruin en rood-wit snoep, maan, warm kerstlicht, gouden deurklopper; speels, lekker en rijk; één video",
+  "occasions": [
+    "kerst"
+  ],
+  "sort_order": 8,
+  "special": true,
+  "opening": "deurklopper",
+  "envelope_mode": "built_in",
+  "opening_label": "Gouden deurklopper op een chocoladehuis, een filmische opening",
+  "demo_melody": "we-wish-you",
+  "kaartbeeld": "open",
+  "palettes": [
+    {
+      "key": "nacht",
+      "name": "Kerstnacht, chocolade en snoep",
+      "swatch": [
+        "#0B1A3A",
+        "#E0B455",
+        "#C8283B"
+      ],
+      "vars": {
+        "--kk-nacht": "#0B1A3A",
+        "--kk-nacht-2": "#122551",
+        "--kk-nacht-3": "#1B3569",
+        "--kk-sneeuw": "#F4F8FF",
+        "--kk-ijs": "#CFE0F5",
+        "--kk-choco": "#3B1B12",
+        "--kk-choco-2": "#52271B",
+        "--kk-choco-3": "#6E3624",
+        "--kk-room": "#FBF0DD",
+        "--kk-room-2": "#F0DCBB",
+        "--kk-ink": "#3B1B12",
+        "--kk-ink-2": "#5E3A2C",
+        "--kk-rood": "#C8283B",
+        "--kk-rood-donker": "#8E1C2B",
+        "--kk-accent": "#8E1C2B",
+        "--kk-goud": "#E0B455",
+        "--kk-goud-lt": "#FFE2A0",
+        "--kk-licht": "#FFD08A",
+        "--fx-1": "#FFFFFF",
+        "--fx-2": "#CFE0F5",
+        "--fx-3": "#FFE2A0",
+        "--fx-4": "#F4F8FF",
+        "--fx-bg": "#0B1A3A"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "sneeuw",
+    "knal": "geen",
+    "viering": "sterren",
+    "namen": "zacht",
+    "onthul": "zacht",
+    "extra": []
+  },
+  "changelog": "Eerste versie: chocoladehuis met een gouden deurklopper (drie klopjes en een zacht klopgeluid), één doorlopende video met elfjes en een lolly, opening overslaan, daarna een kerstkaart in nachtblauw, chocolade en rood-wit snoep."
+}

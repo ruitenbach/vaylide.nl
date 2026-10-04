@@ -1,0 +1,331 @@
+/* Kerstkaart v1: een chocoladehuis in een besneeuwde kerstnacht. Eerst een gesloten huis met een gouden deurklopper; een tik geeft drie klopjes en daarna speelt één video,
+   beeldvullend (deur open, elfjes, het huis lost op, een rood-witte lolly, zwaaiende elfjes). Daarna een kaart in dezelfde wereld: nachtblauw met sneeuw, chocoladebruin met
+   tabletten en rood-wit snoep, en een maan die steeds terugkomt. Opening, kop en feest zijn één scène (.kk-hero) die kerstkaart.js aanstuurt. Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Fraunces"; src: url("../../../fonts/fraunces-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Fraunces"; src: url("../../../fonts/fraunces-latin-wght-italic.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
+@font-face { font-family: "Nunito"; src: url("../../../fonts/nunito-latin-wght-normal.woff2") format("woff2"); font-weight: 200 1000; font-display: swap; }
+@font-face { font-family: "Caveat"; src: url("../../../fonts/caveat-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+
+body {
+  --kk-kop: "Fraunces", Georgia, "Times New Roman", serif;
+  --kk-ui: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --kk-hand: "Caveat", "Segoe Print", cursive;
+  --inv-bg: var(--kk-nacht);
+  --inv-text: var(--kk-sneeuw);
+  --inv-muted: var(--kk-ijs);
+  --inv-accent: var(--kk-goud);
+  --inv-accent-contrast: #2A1209;
+  --inv-focus: var(--kk-goud-lt);
+  --inv-font-body: var(--kk-ui);
+  --inv-font-ui: var(--kk-ui);
+  --inv-radius: 16px;
+  --inv-surface-2: var(--kk-nacht-2);
+  --inv-btn-border: color-mix(in srgb, var(--kk-goud) 70%, transparent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--kk-goud) 16%, transparent);
+  --inv-field-bg: #FFFDF8;
+  --inv-field-text: var(--kk-ink);
+  --inv-field-border: color-mix(in srgb, var(--kk-ink) 34%, transparent);
+  --inv-music-bg: linear-gradient(180deg, #FFF6E2, #F0DCBB);
+  --inv-music-text: #2A1209;
+  --inv-music-border: rgba(110, 54, 36, .4);
+  --inv-photo-bg: var(--kk-nacht-2);
+  --fx-pulse: var(--kk-goud);
+  background: var(--kk-nacht);
+  color: var(--kk-sneeuw);
+  font-family: var(--kk-ui);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* ================================================================ de scène: het chocoladehuis, de klopper, de video */
+/* De video (9:16) vult het scherm: op een telefoon van rand tot rand; op een breder scherm over de volle hoogte, met aan weerszijden een zachte gloed in de kleuren
+   van de video zelf (kerstkaart.js tekent die). Startbeeld, klopper, video en eindbeeld liggen in één vak (.kk-bild) met de verhouding van de video, zodat de
+   klopper altijd precies op de deur staat. Zonder JavaScript, met 'minder beweging' of als de opening al gezien is, staat het eindbeeld met de groet er direct. */
+.kk-hero {
+  --kk-h: 100vh; --kk-h: 100svh;
+  position: relative; isolation: isolate; overflow: hidden; height: var(--kk-h); min-height: 420px; color: #f4f8ff; background: #0b1a3a; font-family: var(--kk-ui);
+}
+html:not(.inv-embed) body:has(.inv-banner) .kk-hero { --kk-h: calc(100svh - var(--inv-banner-h, 3.9rem)); }
+html.kk-bezig, html.kk-bezig body { overflow: hidden; overscroll-behavior: none; }
+html.kk-bezig { scrollbar-gutter: stable; }
+.kk-ambient { display: none; position: absolute; inset: -4%; z-index: 0; width: 108%; height: 108%; filter: blur(22px) saturate(1.25) brightness(.85); opacity: .95; }
+.kk-hero::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  /* de onderrand van de kop loopt zacht over in de nachtblauwe kaart */
+  background: linear-gradient(to bottom, transparent 66%, #0b1a3a 100%), radial-gradient(ellipse at 50% 50%, transparent 42%, rgba(4, 9, 26, .6) 100%); }
+@media (min-aspect-ratio: 3/5) { .kk-ambient { display: block; } }
+.kk-scene {
+  position: absolute; top: 0; bottom: 0; left: 50%; z-index: 1; translate: -50% 0; overflow: hidden; background: #2a1209;
+  width: min(100%, calc(var(--kk-h) * .5625));
+}
+@media (min-aspect-ratio: 3/5) {
+  .kk-scene { -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent), linear-gradient(180deg, #000 93%, transparent); -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent), linear-gradient(180deg, #000 93%, transparent); mask-composite: intersect; }
+}
+.kk-bild { position: absolute; top: 0; left: 50%; translate: -50% 0; width: calc(var(--kk-h) * .5625); height: 100%; }
+.kk-poster, .kk-bild video, .kk-eindbeeld { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.kk-bild video { opacity: 0; }
+.kk-playing video, .kk-finished:not(.kk-eind) video { opacity: 1; }
+.kk-playing .kk-poster, .kk-finished .kk-poster { visibility: hidden; }
+.kk-eindbeeld { display: none; }
+.kk-eind .kk-eindbeeld { display: block; }
+.kk-sparkles { position: absolute; inset: 0; z-index: 4; overflow: hidden; pointer-events: none; }
+
+/* de deurklopper: twee uitsneden uit het eerste videobeeld (plaat en ring), pixel voor pixel op hun plek; de ring beweegt los van de plaat */
+.kk-deur { position: absolute; z-index: 2; left: 43.5185%; top: 56.7708%; width: 15.7407%; height: 9.375%; pointer-events: none; }
+.kk-plaat, .kk-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
+.kk-ring { transform-origin: 50.6% 48.9%; }
+.kk-halo { position: absolute; left: 50.6%; top: 52.8%; width: 230%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; border: 2px solid #ffe2a0; opacity: 0; pointer-events: none; }
+.kk-lichtschijn { position: absolute; left: 50.6%; top: 52.8%; width: 520%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; opacity: 0; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(255, 208, 138, .75) 0, rgba(255, 190, 110, .28) 34%, transparent 66%); }
+.fx-motion .kk-hero:not(.kk-kloppen) .kk-halo { animation: kk-halo 2.6s ease-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .kk-hero:not(.kk-kloppen) .kk-ring { animation: kk-wiebel 3.4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kk-halo { 0% { opacity: .85; scale: .35; } 70%, 100% { opacity: 0; scale: 1; } }
+@keyframes kk-wiebel { 0%, 100% { rotate: 0deg; } 30% { rotate: -3.5deg; } 62% { rotate: 2.5deg; } }
+.kk-klop .kk-ring { animation: kk-ringklop .42s cubic-bezier(.2, .7, .3, 1) both; }
+.kk-klop .kk-lichtschijn { animation: kk-flits .5s ease-out both; }
+.kk-klop .kk-halo { animation: kk-halo .6s ease-out both; }
+/* de ring wordt omhoog getild naar de kijker (korter en iets groter) en valt terug op de deur */
+@keyframes kk-ringklop { 0% { transform: none; } 34% { transform: translateY(-4%) scaleY(.8) scaleX(1.04) rotate(-5deg); } 62% { transform: translateY(1%) scaleY(1.04) rotate(2deg); } 100% { transform: none; } }
+@keyframes kk-flits { 0% { opacity: 0; } 22% { opacity: 1; } 100% { opacity: 0; } }
+.kk-dreun .kk-poster, .kk-dreun .kk-deur { animation: kk-dreun .3s ease-out; }
+@keyframes kk-dreun { 0% { translate: 0 0; } 30% { translate: 0 1.5px; scale: 1.003; } 100% { translate: 0 0; scale: 1; } }
+.kk-playing .kk-deur, .kk-finished .kk-deur, .kk-eind .kk-deur { visibility: hidden; }
+
+/* de klopper is zelf de knop; de tekst eronder is de hint */
+.kk-open { position: absolute; left: 51.5%; top: 61.7%; z-index: 3; width: max(5.2rem, 17%); aspect-ratio: 1; translate: -50% -50%; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #ffe2a0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.kk-open:focus-visible, .kk-fallback:focus-visible, .kk-replay:focus-visible, .kk-skip:focus-visible, .kk-scroll:focus-visible { outline: 3px solid #ffe2a0; outline-offset: 2px; }
+.kk-hint { position: absolute; left: 50%; top: 70.5%; z-index: 3; translate: -50% 0; margin: 0; padding: 11px 18px 10px; white-space: nowrap; text-align: center;
+  font: 800 clamp(11px, calc(var(--kk-h) * .0145), 14px)/1.2 var(--kk-ui); letter-spacing: .13em; text-transform: uppercase; color: #fff0c7;
+  background: rgba(42, 18, 9, .78); border: 1px solid rgba(255, 226, 160, .6); border-radius: 30px; box-shadow: 0 8px 24px -8px rgba(0, 0, 0, .7); pointer-events: none; transition: opacity .5s; }
+.kk-hint span { display: inline-block; margin-right: .35em; color: #ffd08a; }
+.fx-motion .kk-hint span { animation: kk-pijl 1.4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kk-pijl { 0%, 100% { translate: 0 0; } 50% { translate: 0 -3px; } }
+.kk-kloppen .kk-hint, .kk-playing .kk-open, .kk-playing .kk-hint, .kk-finished .kk-open, .kk-finished .kk-hint, .kk-eind .kk-hint { opacity: 0; pointer-events: none; visibility: hidden; }
+.kk-kloppen .kk-open { pointer-events: none; }
+
+.kk-fallback, .kk-replay { padding: 10px 18px; min-height: 44px; border: 1px solid rgba(255, 226, 160, .6); border-radius: 25px; background: rgba(42, 18, 9, .82); color: #fff0c7; font: 800 12px var(--kk-ui); letter-spacing: .06em; cursor: pointer; }
+.kk-fallback { position: absolute; left: 50%; top: 52%; z-index: 5; transform: translateX(-50%); }
+.kk-fallback[hidden], .kk-replay[hidden] { display: none; }
+
+/* de groet over het eindbeeld: een nachtblauwe band onderin, de elfjes en de lolly blijven vrij in beeld */
+.kk-caption { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 56px 16px 54px; text-align: center; color: #f4f8ff;
+  background: linear-gradient(to bottom, rgba(8, 18, 45, 0), rgba(8, 18, 45, .72) 34%, rgba(8, 18, 45, .93));
+  opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity 1.2s, transform 1.2s, visibility 0s 1.2s; }
+.kk-finished .kk-caption { opacity: 1; visibility: visible; transform: none; transition: opacity 1.2s, transform 1.2s, visibility 0s; }
+.kk-eyebrow { margin: 0; font: 800 clamp(10px, calc(var(--kk-h) * .0125), 12px)/1.3 var(--kk-ui); letter-spacing: .24em; text-transform: uppercase; color: #ffe2a0; }
+.kk-groet { margin: 6px 0 4px; font: 700 clamp(26px, calc(var(--kk-h) * .045), 46px)/1.1 var(--kk-kop); overflow-wrap: anywhere; text-wrap: balance; color: #fff; text-shadow: 0 2px 18px rgba(0, 0, 0, .55); }
+.kk-tekst { margin: 0 auto; max-width: 30rem; font: 600 clamp(14px, calc(var(--kk-h) * .0175), 18px)/1.45 var(--kk-ui); color: #e6efff; }
+.kk-namen { margin: 4px 0 0; font: italic 500 clamp(14px, calc(var(--kk-h) * .0185), 19px)/1.4 var(--kk-kop); color: #ffe2a0; }
+.kk-replay { margin-top: 8px; }
+
+.kk-skip { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 20; min-height: 44px; padding: 8px 15px; border: 1px solid rgba(255, 226, 160, .5); border-radius: 30px; background: rgba(8, 18, 45, .78);
+  color: #fff0c7; font: 800 11px var(--kk-ui); letter-spacing: .08em; cursor: pointer; backdrop-filter: blur(3px); transition: opacity .5s; }
+.kk-klaar .kk-skip, html:not(.js) .kk-skip { opacity: 0; pointer-events: none; visibility: hidden; }
+.kk-scroll { position: absolute; left: 50%; bottom: max(8px, env(safe-area-inset-bottom)); z-index: 4; translate: -50% 0; display: none; align-items: center; gap: .4rem; min-height: 44px; padding: 0 1rem;
+  font: 800 11px var(--kk-ui); letter-spacing: .16em; text-transform: uppercase; color: #ffe2a0; text-decoration: none; }
+.kk-klaar .kk-scroll, html:not(.js) .kk-scroll { display: inline-flex; }
+.kk-status { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.kk-resetting, .kk-resetting * { transition: none !important; }
+
+/* gouden vonken bij een klopje: ze stuiven kort uit elkaar en verdwijnen; het script maakt ze en ruimt ze op */
+.kk-vonk { position: absolute; left: var(--x); top: var(--y); width: var(--size); height: var(--size); border-radius: 50%; background: #ffe6a2; box-shadow: 0 0 6px #ffe6a2, 0 0 12px #e8af4c; opacity: 0; pointer-events: none;
+  animation: kk-vonk var(--duur) ease-out forwards; }
+@keyframes kk-vonk { 0% { opacity: 0; translate: 0 0; scale: .4; } 15% { opacity: 1; } 100% { opacity: 0; translate: var(--dx) var(--dy); scale: .15; } }
+
+@media (max-height: 620px) {
+  .kk-caption { padding-top: 40px; padding-bottom: 50px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kk-hero *, .kk-hero *::before, .kk-hero *::after { transition: none !important; animation: none !important; }
+  .kk-vonk { display: none; }
+}
+
+/* ================================================================ de kaart: een kerstnacht rond een chocoladehuis */
+/* Alleen wat de klant heeft ingevuld. Banden in nachtblauw met sneeuw, chocoladebruin met tabletten, room en rood-wit snoep; de maan komt steeds terug. Achtergronden zijn
+   uitsneden uit dezelfde video. De sneeuw komt van het gedeelde effect. */
+.inv-kerstkaart .inv-main { position: relative; z-index: 1; }
+.kk-body { position: relative; z-index: 1; overflow-x: clip; background: linear-gradient(180deg, #0b1a3a, #0d1f48 50%, #0b1a3a); }
+.kk-sec { position: relative; isolation: isolate; overflow: hidden; padding: clamp(4.6rem, 15vw, 8.5rem) 1.25rem; text-align: center; }
+.kk-in { position: relative; z-index: 2; width: min(100%, 40rem); margin-inline: auto; }
+.kk-in--breed { width: min(100%, 62rem); }
+.kk-h2 { margin: 0 0 1.2rem; font: 700 clamp(2.4rem, 10vw, 3.9rem)/1.08 var(--kk-kop); letter-spacing: -.01em; color: var(--kk-sneeuw); text-wrap: balance; }
+.kk-snoep { display: block; width: 8.5rem; height: auto; margin: 1rem auto; color: var(--kk-goud); }
+
+/* de sneeuwrand: een witte sneeuwlaag waaruit de eerste lichte band oprijst */
+.kk-rand { display: block; width: 100%; height: clamp(3rem, 8vw, 5.4rem); margin-top: calc(clamp(3rem, 8vw, 5.4rem) * -.55); position: relative; z-index: 3; }
+.kk-streep { height: 1.1rem; background: repeating-linear-gradient(135deg, #c8283b 0 16px, #fff 16px 32px); box-shadow: 0 -6px 20px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .4); position: relative; z-index: 3; }
+
+/* banden */
+.kk-brief { padding-top: clamp(3rem, 9vw, 5rem); background: linear-gradient(180deg, #f4f8ff, #e2edfb); color: var(--kk-ink); }
+.kk-room { background: linear-gradient(180deg, #fbf0dd, #f1dfc0); color: var(--kk-ink);
+  --inv-text: var(--kk-ink); --inv-muted: var(--kk-ink-2); --inv-accent: var(--kk-accent); --inv-accent-contrast: #fff; --inv-focus: var(--kk-accent);
+  --inv-btn-border: color-mix(in srgb, var(--kk-accent) 60%, transparent); --inv-btn-hover-bg: color-mix(in srgb, var(--kk-accent) 10%, transparent); }
+.kk-room .kk-h2 { color: var(--kk-choco); }
+.kk-room a:not(.inv-btn), .kk-room .inv-link { color: var(--kk-accent); }
+.kk-room .inv-btn { color: var(--kk-ink); border-color: color-mix(in srgb, var(--kk-accent) 60%, transparent); background: transparent; }
+.kk-room .inv-btn--primary { color: #fff; background: var(--kk-accent); border-color: var(--kk-accent); box-shadow: none; }
+.kk-room .tz-note { color: var(--kk-ink-2); }
+
+/* chocoladebanden: tabletten met een reliëf van groeven */
+.kk-momenten, .kk-programma, .kk-praktisch {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .05), transparent 24%, rgba(0, 0, 0, .18)),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, .3) 0 2px, rgba(255, 255, 255, .06) 2px 4px, transparent 4px 92px),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .3) 0 2px, rgba(255, 255, 255, .06) 2px 4px, transparent 4px 70px),
+    linear-gradient(160deg, #52271b, #3b1b12 60%, #2c130d);
+  color: #fbf0dd; box-shadow: inset 0 3px 0 rgba(255, 226, 160, .22), inset 0 -3px 0 rgba(0, 0, 0, .35); }
+.kk-fotosec::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, #0b1a3a 0%, rgba(11, 26, 58, .66) 24%, rgba(11, 26, 58, .74) 76%, #0b1a3a 100%); }
+.kk-bg { position: absolute; inset: -6% 0; z-index: -1; width: 100%; height: 112%; object-fit: cover; opacity: .75; }
+@supports (animation-timeline: view()) {
+  .kk-bg { animation: kk-parallax linear both; animation-timeline: view(); animation-range: cover; }
+  @keyframes kk-parallax { from { translate: 0 -5%; } to { translate: 0 5%; } }
+}
+
+/* gouden folie op koppen en tijden (op nacht en chocolade) */
+.kk-folie { background: linear-gradient(100deg, #d6a94a 0%, #f6dc98 20%, #fff8de 38%, #e6c070 56%, #fbe9b8 78%, #d8ad52 100%) 0 0 / 220% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; padding-inline: .1em; }
+.fx-motion .kk-zichtbaar .kk-folie { animation: kk-glans 8s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kk-glans { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
+
+/* sterren in de nachtbanden */
+.kk-sterren { position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 10% 18%, rgba(255, 255, 255, .95) 0 1.4px, transparent 3px), radial-gradient(circle at 86% 12%, rgba(255, 255, 255, .8) 0 1.4px, transparent 3px),
+    radial-gradient(circle at 72% 54%, rgba(255, 244, 214, .9) 0 1.6px, transparent 3.4px), radial-gradient(circle at 24% 72%, rgba(255, 255, 255, .85) 0 1.3px, transparent 3px),
+    radial-gradient(circle at 93% 82%, rgba(255, 244, 214, .75) 0 1.4px, transparent 3px), radial-gradient(circle at 48% 8%, rgba(255, 255, 255, .7) 0 1.2px, transparent 2.6px),
+    radial-gradient(60% 40% at 50% 0%, rgba(120, 160, 230, .2), transparent 70%); }
+.kk-brief .kk-sterren { display: none; }
+.fx-motion .kk-zichtbaar .kk-sterren { animation: kk-twinkel 5s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kk-twinkel { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+
+/* de maan: de uitsnede uit de video, met een zachte gloed */
+.kk-maan { display: block; width: 7rem; height: auto; filter: drop-shadow(0 0 22px rgba(190, 215, 255, .7)); }
+.kk-maan--groot { width: min(48vw, 12rem); margin: 0 auto 1rem; }
+
+/* de brief: een gewelfd raam van het chocoladehuis met warm licht */
+.kk-venster { position: relative; margin-top: 3.2rem; padding: 5.2rem clamp(1.3rem, 6vw, 2.6rem) 2.6rem; text-align: left; color: var(--kk-ink);
+  background: radial-gradient(ellipse at 50% 12%, #fff4d8, #fbe3b4 55%, #f1cf92); border: 14px solid var(--kk-choco-2); border-radius: 999px 999px 1.2rem 1.2rem / 11rem 11rem 1.2rem 1.2rem;
+  box-shadow: inset 0 0 0 3px rgba(255, 226, 160, .55), inset 0 0 60px rgba(255, 190, 110, .55), 0 0 0 3px #6e3624, 0 30px 70px -26px rgba(59, 27, 18, .8), 0 0 90px rgba(255, 190, 110, .45); }
+.kk-venster .kk-maan { position: absolute; left: 50%; top: -3.6rem; translate: -50% 0; width: 6.4rem; }
+.fx-motion .kk-zichtbaar .kk-venster .kk-maan { animation: kk-maanpuls 6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kk-maanpuls { 0%, 100% { filter: drop-shadow(0 0 14px rgba(190, 215, 255, .55)); } 50% { filter: drop-shadow(0 0 30px rgba(205, 225, 255, .95)); } }
+.kk-maanfoto { position: relative; width: min(66vw, 17rem); margin: 0 auto 1.8rem; }
+.kk-maanfoto .ph { aspect-ratio: 1; width: 100%; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 5px #fff, 0 0 0 8px #cfe0f5, 0 0 40px 6px rgba(190, 215, 255, .8), 0 22px 40px -18px rgba(59, 27, 18, .8); }
+.kk-brief__tekst { font-size: 1.2rem; line-height: 1.7; }
+.kk-brief__tekst p { margin: 0 0 1rem; }
+.kk-brief__tekst p:first-child { font: italic 600 clamp(1.6rem, 6.4vw, 2.1rem)/1.3 var(--kk-kop); color: var(--kk-accent); }
+
+.kk-jaar__tekst { max-width: 30rem; margin: 0 auto; font-size: 1.22rem; line-height: 1.75; color: var(--kk-sneeuw); text-shadow: 0 2px 18px rgba(0, 0, 0, .6); }
+.kk-jaar__tekst p { margin: 0 0 1.1rem; }
+.kk-jaar__tekst p:first-child { font: italic 600 clamp(1.5rem, 6vw, 2rem)/1.4 var(--kk-kop); color: var(--kk-goud-lt); }
+
+/* de momenten als chocoladetabletten met een hoekje goudfolie */
+.kk-tabletten { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.4rem 1rem; max-width: 40rem; margin: 2.4rem auto 0; padding: 0; align-items: start; }
+.kk-tablet { position: relative; rotate: -1.2deg; }
+.kk-tablet:nth-child(even) { rotate: 1.3deg; margin-top: 1.6rem; }
+.kk-tablet figure { position: relative; margin: 0; padding: .6rem .6rem .5rem; border-radius: .5rem; background: linear-gradient(160deg, #7a3d29, #5a2a1b);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .14), inset 0 0 0 5px rgba(0, 0, 0, .28), 0 18px 28px -14px rgba(0, 0, 0, .85); }
+.kk-tablet .ph { aspect-ratio: 4 / 5; width: 100%; border-radius: .3rem; overflow: hidden; box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .35); }
+.kk-tablet figure::after { content: ""; position: absolute; right: -1px; top: -1px; width: 2.6rem; height: 2.6rem; clip-path: polygon(0 0, 100% 0, 100% 100%); border-radius: 0 .5rem 0 0;
+  background: linear-gradient(135deg, #fff3c9, #e0b455 55%, #9a6f1f); }
+.kk-tablet figcaption { padding: .55rem .2rem .1rem; font: italic 600 1rem/1.3 var(--kk-kop); color: var(--kk-goud-lt); }
+.fx-motion .kk-zichtbaar .kk-tablet { animation: kk-wieg 7s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -1.3s); animation-play-state: var(--fx-play, running); }
+@keyframes kk-wieg { from { translate: 0 0; } to { translate: 0 -5px; } }
+
+/* kerstdiner: de datum op een lolly (de lolly uit de video draait, het cijfer staat stil) */
+.kk-lollydatum { position: relative; width: min(74vw, 18rem); aspect-ratio: 1; margin: .6rem auto 5rem; }
+.kk-lollydatum__lolly { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 0 4px #fff, 0 0 0 7px #c8283b, 0 24px 50px -16px rgba(0, 0, 0, .85), 0 0 70px rgba(255, 208, 138, .25); }
+.fx-motion .kk-zichtbaar .kk-lollydatum__lolly { animation: kk-draai 80s linear infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kk-draai { to { rotate: 360deg; } }
+.kk-lollydatum::after { content: ""; position: absolute; left: 50%; top: 100%; width: .9rem; height: 4rem; translate: -50% -4px; border-radius: 0 0 .5rem .5rem;
+  background: linear-gradient(90deg, #cfe0f5, #fff 40%, #b9cde6); box-shadow: 0 6px 12px -4px rgba(0, 0, 0, .6); }
+.kk-lollydatum__naam { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 62%; aspect-ratio: 1; border-radius: 50%; display: grid; justify-items: center; align-content: center; line-height: .95;
+  background: radial-gradient(circle at 35% 26%, #fffaf0, #fbf0dd 70%, #f0dcbb); box-shadow: 0 0 0 3px #8e1c2b, 0 8px 22px rgba(59, 27, 18, .55); color: var(--kk-choco); }
+.kk-weekdag, .kk-jaartal { font: 800 .64rem var(--kk-ui); letter-spacing: .3em; text-indent: .3em; text-transform: uppercase; color: var(--kk-accent); }
+.kk-dag { font: 800 clamp(3.4rem, 15vw, 4.8rem)/.95 var(--kk-kop); color: var(--kk-choco); }
+.kk-maand { font: italic 600 clamp(1.2rem, 5.4vw, 1.6rem)/1.1 var(--kk-kop); color: var(--kk-choco-3); }
+.kk-datum__tijd { margin: 0; font: italic 600 1.45rem var(--kk-kop); color: var(--kk-goud-lt); }
+
+/* het programma: tabletten langs een snoepstok */
+.kk-tijdlijn { position: relative; list-style: none; margin: 2.2rem auto 0; padding: 0; max-width: 28rem; display: grid; gap: 1.6rem; text-align: left; }
+.kk-tijdlijn::before { content: ""; position: absolute; left: .7rem; top: 0; bottom: 0; width: .55rem; border-radius: .3rem; background: repeating-linear-gradient(135deg, #c8283b 0 9px, #fff 9px 18px); box-shadow: 0 0 0 1px rgba(0, 0, 0, .35), 0 0 16px rgba(255, 226, 160, .25); }
+.kk-tl { position: relative; display: grid; grid-template-columns: 1.95rem 1fr; gap: 1rem; align-items: start; }
+.kk-tl__snoep { width: 1.95rem; height: 1.95rem; margin-top: 1.1rem; border-radius: 50%; background: repeating-conic-gradient(#c8283b 0 22.5deg, #fff 22.5deg 45deg); box-shadow: 0 0 0 3px #3b1b12, 0 0 0 4px #ffe2a0, 0 4px 10px rgba(0, 0, 0, .5); }
+.kk-tl__tekst { padding: .9rem 1.1rem 1rem; border-radius: .5rem; background: linear-gradient(160deg, #7a3d29, #5a2a1b); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .12), inset 0 0 0 5px rgba(0, 0, 0, .25), 0 14px 22px -12px rgba(0, 0, 0, .8); }
+.kk-tl__tijd { margin: 0; font: 800 clamp(1.7rem, 7.4vw, 2.3rem)/1 var(--kk-kop); color: var(--kk-goud-lt); }
+.kk-tl__titel { margin: .2rem 0 0; font: italic 600 clamp(1.25rem, 5vw, 1.5rem)/1.25 var(--kk-kop); color: #fff7e6; }
+.kk-tl__desc { margin: .3rem 0 0; color: #f4dfc0; line-height: 1.5; }
+@media (min-width: 860px) {
+  .kk-tijdlijn { max-width: 56rem; gap: 2rem; }
+  .kk-tijdlijn::before { left: 50%; translate: -50% 0; }
+  .kk-tl { grid-template-columns: 1fr 2rem 1fr; gap: 0; }
+  .kk-tl__snoep { grid-column: 2; grid-row: 1; justify-self: center; }
+  .kk-tl__tekst { grid-row: 1; }
+  .kk-tl:nth-child(odd) .kk-tl__tekst { grid-column: 1; text-align: right; margin-right: 2rem; }
+  .kk-tl:nth-child(even) .kk-tl__tekst { grid-column: 3; margin-left: 2rem; }
+}
+
+/* aftellen: pepermuntjes */
+.kk-aftellen .cd { gap: clamp(.45rem, 2.4vw, 1.5rem); margin: 2rem 0 1.6rem; flex-wrap: nowrap; }
+.kk-aftellen .cd__unit { position: relative; isolation: isolate; width: clamp(3.9rem, 19.4vw, 7rem); min-width: 0; aspect-ratio: 1; justify-content: center; border-radius: 50%;
+  background: repeating-conic-gradient(#c8283b 0 15deg, #fff 15deg 30deg); box-shadow: 0 0 0 3px #fff, 0 0 0 5px #8e1c2b, 0 18px 30px -14px rgba(59, 27, 18, .7); }
+.kk-aftellen .cd__unit::before { content: ""; position: absolute; inset: 11%; z-index: -1; border-radius: 50%; background: radial-gradient(circle at 35% 26%, #fffaf0, #fbf0dd 72%); box-shadow: inset 0 0 0 2px rgba(142, 28, 43, .35); }
+.kk-aftellen .cd__num { font: 800 clamp(1.6rem, 7.4vw, 2.9rem)/1 var(--kk-kop); color: var(--kk-choco); }
+.kk-aftellen .cd__label { margin-top: .1rem; font: 800 .58rem var(--kk-ui); letter-spacing: .14em; color: var(--kk-accent); }
+
+.kk-plaats__naam { margin: 0; font: italic 700 clamp(1.8rem, 7.6vw, 2.8rem)/1.2 var(--kk-kop); color: var(--kk-goud-lt); text-shadow: 0 2px 20px rgba(0, 0, 0, .6); }
+.kk-plaats__adres { margin: .7rem 0 0; font-style: normal; line-height: 1.6; }
+.kk-plaats__wanneer { margin: 1.2rem 0 1.8rem; color: var(--kk-ijs); }
+
+.kk-kleuren { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem; margin: 0 0 1.5rem; padding: 0; }
+.kk-kleur { width: 3.6rem; height: 3.6rem; border-radius: 50%; background: radial-gradient(circle at 35% 28%, color-mix(in srgb, var(--c) 50%, #fff), var(--c) 62%); box-shadow: 0 0 0 3px #0b1a3a, 0 0 0 5px var(--kk-goud), 0 0 0 7px #0b1a3a, 0 12px 20px -8px rgba(0, 0, 0, .7); }
+.kk-kleding__tekst { max-width: 26rem; margin: 0 auto .6rem; font-size: 1.15rem; }
+.kk-praktisch__lijst { display: grid; gap: 1.2rem; max-width: 28rem; margin: 2rem auto 0; text-align: left; }
+.kk-praktisch__item { padding: .9rem 1.1rem 1rem; border-radius: .5rem; background: linear-gradient(160deg, #7a3d29, #5a2a1b); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .12), inset 0 0 0 5px rgba(0, 0, 0, .25); }
+.kk-praktisch__item dt { font: 800 .76rem var(--kk-ui); letter-spacing: .22em; text-transform: uppercase; color: var(--kk-goud-lt); }
+.kk-praktisch__item dd { margin: .35rem 0 0; font-size: 1.1rem; color: #fff7e6; }
+
+/* aanmelden: een kaart met een snoeprand */
+.kk-kaart { max-width: 30rem; margin: 2rem auto 0; padding: clamp(1.4rem, 6vw, 2.2rem); text-align: left; background: #fffaf0; color: var(--kk-ink); border: 10px solid transparent;
+  border-image: repeating-linear-gradient(135deg, #c8283b 0 14px, #fff 14px 28px) 10; box-shadow: 0 30px 60px -26px rgba(59, 27, 18, .7), 0 0 0 1px rgba(142, 28, 43, .35); }
+.kk-kaart .rsvp__deadline { font-style: italic; font-size: 1.1rem; }
+.kk-contact__naam { margin: .5rem 0 .3rem; font: 700 clamp(1.9rem, 8vw, 2.6rem)/1.1 var(--kk-kop); color: var(--kk-goud-lt); }
+
+.kk-afsluiting { padding-block: clamp(6rem, 20vw, 11rem); }
+.fx-motion .kk-zichtbaar .kk-afsluiting .kk-maan, .fx-motion .kk-afsluiting.kk-zichtbaar .kk-maan { animation: kk-maanpuls 6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.kk-afsluiting__naam { margin: 0; font: 700 clamp(2.8rem, 13vw, 5.4rem)/1.08 var(--kk-kop); filter: drop-shadow(0 4px 20px rgba(0, 0, 0, .55)); }
+.kk-afsluiting__leden { margin: .4rem 0 0; font: italic 600 1.3rem var(--kk-kop); color: var(--kk-ijs); }
+.kk-afsluiting__tekst { max-width: 26rem; margin: 1rem auto 0; font-size: 1.2rem; text-shadow: 0 2px 16px rgba(0, 0, 0, .6); }
+.kk-afsluiting .inv-share { margin-top: 1.8rem; }
+.kk-body .inv-btn { color: var(--kk-sneeuw); border-color: rgba(255, 226, 160, .65); background: rgba(255, 255, 255, .06); }
+.kk-body .inv-btn--primary { background: linear-gradient(180deg, #ffe9b0, #e0b455); color: #2a1209; border-color: #9a6f1f; box-shadow: 0 10px 30px -10px rgba(224, 180, 85, .55); }
+.kk-body .inv-link, .kk-body a:not(.inv-btn) { color: var(--kk-goud-lt); }
+.kk-body .tz-note, .kk-body .inv-share__status { color: var(--kk-ijs); }
+.kk-body .kk-room .inv-btn { border-color: color-mix(in srgb, var(--kk-accent) 60%, transparent); color: var(--kk-ink); background: transparent; }
+.kk-body .kk-room .inv-btn--primary { color: #fff; background: var(--kk-accent); border-color: var(--kk-accent); box-shadow: none; }
+.kk-body .kk-room a:not(.inv-btn), .kk-body .kk-kaart a:not(.inv-btn), .kk-body .kk-kaart .inv-link { color: var(--kk-accent); }
+.kk-body .kk-room .tz-note, .kk-body .kk-kaart .tz-note { color: var(--kk-ink-2); }
+.inv-kerstkaart .music__toggle, .inv-kerstkaart .fx-toggle { box-shadow: 0 8px 22px -6px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .6); }
+.inv-kerstkaart .music__toggle { background: linear-gradient(180deg, #FFF6E2, #F0DCBB); }
+
+@media (min-width: 900px) {
+  .kk-sec { padding-block: clamp(6rem, 10vw, 9.5rem); }
+  .kk-in { width: min(100%, 46rem); }
+  .kk-in--breed { width: min(100%, 68rem); }
+  .kk-h2 { font-size: clamp(3.4rem, 5vw, 5rem); }
+  .kk-brief .kk-in { width: min(100%, 56rem); }
+  .kk-venster { display: grid; grid-template-columns: auto 1fr; gap: clamp(2rem, 4vw, 3.4rem); align-items: center; padding: 6.4rem clamp(2.6rem, 5vw, 4rem) 3.4rem; border-radius: 999px 999px 1.4rem 1.4rem / 13rem 13rem 1.4rem 1.4rem; }
+  .kk-venster .kk-maan { width: 7.6rem; top: -4.2rem; }
+  .kk-maanfoto { width: 18rem; margin: 0; }
+  .kk-jaar__tekst { max-width: 36rem; font-size: 1.36rem; }
+  .kk-tabletten { grid-template-columns: repeat(4, 1fr); max-width: 66rem; gap: 2rem 1.4rem; }
+  .kk-aftellen .cd { gap: 2rem; }
+  .kk-aftellen .cd__unit { width: 8.6rem; }
+  .kk-aftellen .cd__num { font-size: 3.4rem; }
+  .kk-afsluiting__naam { font-size: clamp(4.6rem, 7vw, 7rem); }
+  .kk-lollydatum { width: 21rem; }
+}
+@media (prefers-reduced-motion: reduce) { .kk-folie, .kk-sterren, .kk-tablet, .kk-maan, .kk-lollydatum__lolly { animation: none !important; } }
+@media print { .kk-hero { height: auto; min-height: 0; } .kk-sparkles, .kk-skip, .kk-open, .kk-hint, .kk-replay, .kk-scroll, .kk-ambient, .kk-deur { display: none; } }
