@@ -107,3 +107,19 @@ class SocialLinksTests(VaylideTestCase):
 
         self.assertEqual(seo.organization()["sameAs"], [url for _naam, url in self.URLS])
         self.assertEqual(social.same_as(), [l["url"] for l in social.social_links()])
+
+    def test_officiele_merktekens_even_groot_en_ongewijzigd_aangeleverd(self):
+        from pathlib import Path
+
+        from django.conf import settings
+        from PIL import Image
+
+        html = Client().get("/").content.decode()
+        blok = html.split('class="sociale-links"')[1].split("</ul>")[0]
+        plaatjes = re.findall(r'<img src="(/static/img/social/[a-z]+(?:\.[0-9a-f]+)?\.png)" alt="" width="(\d+)" height="(\d+)"', blok)
+        self.assertEqual(len(plaatjes), 4)
+        self.assertEqual({(w, h) for _src, w, h in plaatjes}, {("28", "28")})   # alle vier dezelfde afmeting
+        for naam in ("instagram", "facebook", "tiktok", "linkedin"):
+            self.assertTrue(any(f"/social/{naam}" in src for src, _w, _h in plaatjes), naam)
+            with Image.open(Path(settings.BASE_DIR) / "static/img/social" / f"{naam}.png") as im:
+                self.assertEqual(im.size, (96, 96), naam)   # vierkant, zonder marge, dus even groot als de rest

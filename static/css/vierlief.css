@@ -982,7 +982,9 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .sociale-links { display: flex; gap: .6rem; list-style: none; margin: 0; padding: 0; }
 .sociale-links a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--paper); color: var(--ink); box-shadow: 0 0 0 1px var(--line-strong); transition: color .2s, box-shadow .2s, transform .2s; }
 .sociale-links a:hover { color: var(--accent-text); box-shadow: 0 0 0 1px var(--accent); transform: translateY(-2px); }
-.sociale-links .icon { width: 1.35rem; height: 1.35rem; }
+/* Officiële merktekens in hun eigen kleuren (aangeleverd door de eigenaar, ongewijzigd van vorm en kleur): alle vier even groot, rustig in de VAYLIDE-knop. */
+.sociale-links img { display: block; width: 1.75rem; height: 1.75rem; transition: transform .25s; }
+.sociale-links a:hover img { transform: scale(1.06); }
 /* Echte logo's van de betaalmethoden, op een wit tegeltje. */
 .betaalmiddel--logo { min-height: 0; padding: .35rem .55rem; }
 .betaalmiddel--logo img { display: block; width: auto; height: 2.3rem; }

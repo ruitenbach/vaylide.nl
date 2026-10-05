@@ -26,6 +26,8 @@ Production heeft dat niet en blijft indexeerbaar. De basis-url voor canonical, O
 
 De vier officiële profielen staan op één plek: `core/social.py` (Instagram, Facebook, TikTok, LinkedIn). De voettekst en `sameAs` in de `Organization`-gegevens lezen dezelfde lijst, dus ze kunnen niet uit elkaar lopen. Een profiel erbij of eraf: alleen daar aanpassen. Uitsluitend echte, door de eigenaar opgegeven profielen.
 
+De iconen in de voettekst zijn de officiële merktekens in hun eigen kleuren (Instagram-gradient, Facebook-blauw, TikTok-multicolor, LinkedIn-blauw), door de eigenaar aangeleverd en alleen bijgesneden en verkleind tot 96 × 96 px (`static/img/social/`); vorm, verhouding en kleur zijn niet aangepast. Op de pagina staan ze alle vier op 28 px in de ronde VAYLIDE-knop.
+
 ## Bewust niet gedaan
 
 Geen `lastmod` in de sitemap (geen betrouwbare wijzigingsdatum), geen `Product`/`Offer` (prijzen horen niet in gestructureerde gegevens zolang ze voorlopig zijn),
