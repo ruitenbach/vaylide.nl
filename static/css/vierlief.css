@@ -291,6 +291,16 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
   .goudkaart { left: -30%; top: -34%; width: 50%; }
   .hero__checks { margin-top: 1.75rem; gap: .55rem 1.25rem; }
 }
+/* Telefoon (< 768 px): eerst de kaart (gouden kaart en envelop), direct onder de kop, daarna kop, tekst, knoppen en voordelen. */
+@media (max-width: 767px) {
+  .hero { display: flex; flex-direction: column; }
+  .hero__media { order: -1; margin-top: 0; height: 19.5rem; }
+  .card-stage { --w: min(17.5rem, 68vw); left: 62%; bottom: 2.5rem; }
+  /* de foto vervloeit ook onderaan in de achtergrond, nu de tekst eronder staat */
+  .hero__foto { -webkit-mask-image: radial-gradient(ellipse 90% 70% at 55% 55%, #000 35%, transparent 85%), linear-gradient(180deg, #000 55%, transparent 97%); -webkit-mask-composite: source-in;
+    mask-image: radial-gradient(ellipse 90% 70% at 55% 55%, #000 35%, transparent 85%), linear-gradient(180deg, #000 55%, transparent 97%); mask-composite: intersect; }
+  .hero__inner { padding-top: 0; }
+}
 
 /* ---------- Gelegenheden: boogvormige themakaarten met diepte ---------- */
 .sectie-kop { text-align: center; max-width: 40rem; margin: 0 auto clamp(1.75rem, 4vw, 2.75rem); }
