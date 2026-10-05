@@ -66,7 +66,9 @@ class HomepageSeoTests(VaylideTestCase):
         organisatie = [b for b in blokken if b["@type"] == "Organization"][0]
         self.assertEqual(organisatie["name"], "VAYLIDE")
         self.assertTrue(organisatie["logo"].startswith(settings.BASE_URL + "/static/img/merk/vaylide-logo"))
-        self.assertEqual(set(organisatie), {"@context", "@type", "@id", "name", "url", "logo"})   # geen adres, telefoon, kvk of beoordelingen
+        self.assertEqual(set(organisatie), {"@context", "@type", "@id", "name", "url", "logo", "sameAs"})   # geen adres, telefoon, kvk of beoordelingen
+        self.assertEqual(organisatie["sameAs"], ["https://www.instagram.com/vaylidenl/", "https://www.facebook.com/profile.php?id=61594950397795",
+                                                 "https://www.tiktok.com/@vaylidenl", "https://www.linkedin.com/company/vaylide/"])
         tekst = json.dumps(blokken)
         for woord in ("aggregateRating", "Review", "Offer", "price", "address", "telephone", "vatID"):
             self.assertNotIn(woord, tekst)

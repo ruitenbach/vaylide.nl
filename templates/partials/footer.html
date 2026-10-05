@@ -27,7 +27,7 @@
       </div>{% endif %}{% endwith %}
       {% with links=SOCIAL_LINKS %}{% if links %}<div class="site-footer__social">
         <p class="site-footer__kop">Volg ons</p>
-        <ul class="sociale-links">{% for l in links %}<li><a href="{{ l.url }}" target="_blank" rel="noopener me" aria-label="VAYLIDE op {{ l.label }}">{% icon l.icon 22 %}</a></li>{% endfor %}</ul>
+        <ul class="sociale-links">{% for l in links %}<li><a href="{{ l.url }}" target="_blank" rel="noopener noreferrer" aria-label="VAYLIDE op {{ l.label }} (opent in een nieuw tabblad)">{% icon l.icon 22 %}</a></li>{% endfor %}</ul>
       </div>{% endif %}{% endwith %}
     </div>
     <p class="site-footer__copy">&copy; {{ CURRENT_YEAR }} VAYLIDE{% if KVK %} · KvK {{ KVK }}{% endif %}{% if BTW %} · btw-id {{ BTW }}{% endif %}</p>

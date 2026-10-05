@@ -1,5 +1,6 @@
-"""Voettekst: betaalmethoden (uit Mollie of de instelling) en links naar Instagram en TikTok (alleen als ingevuld)."""
+"""Voettekst: betaalmethoden (uit Mollie of de instelling) en de links naar de officiële profielen (Instagram, Facebook, TikTok, LinkedIn)."""
 import json
+import re
 from unittest import mock
 
 from django.core.cache import cache
@@ -68,26 +69,41 @@ class PaymentMethodsTests(VaylideTestCase):
 
 
 class SocialLinksTests(VaylideTestCase):
-    def test_instagram_of_vaylide_is_set_by_default(self):
+    URLS = [
+        ("Instagram", "https://www.instagram.com/vaylidenl/"),
+        ("Facebook", "https://www.facebook.com/profile.php?id=61594950397795"),
+        ("TikTok", "https://www.tiktok.com/@vaylidenl"),
+        ("LinkedIn", "https://www.linkedin.com/company/vaylide/"),
+    ]
+
+    def test_voettekst_toont_de_vier_officiele_profielen_in_vaste_volgorde(self):
+        for pad in ("/", "/prijzen/"):
+            html = Client().get(pad).content.decode()
+            blok = html.split('class="sociale-links"')[1].split("</ul>")[0]
+            links = re.findall(r'<a href="([^"]+)"[^>]*>', blok)
+            self.assertEqual(links, [url for _naam, url in self.URLS], pad)
+            self.assertNotIn("utm_", blok)
+
+    def test_elke_link_opent_in_een_nieuw_tabblad_veilig_en_met_duidelijk_label(self):
+        html = Client().get("/").content.decode()
+        for naam, url in self.URLS:
+            tag = re.search(rf'<a href="{re.escape(url)}"[^>]*>', html).group(0)
+            self.assertIn('target="_blank"', tag, naam)
+            self.assertIn('rel="noopener noreferrer"', tag, naam)
+            self.assertIn(f'aria-label="VAYLIDE op {naam} (opent in een nieuw tabblad)"', tag, naam)
+
+    def test_beheer_instellingen_veranderen_de_officiele_links_niet(self):
+        config = SiteConfig.get()
+        config.instagram_url = "https://www.instagram.com/ergens-anders/"
+        config.tiktok_url = ""
+        config.save()
         html = Client().get("/").content.decode()
         self.assertIn('href="https://www.instagram.com/vaylidenl/"', html)
-        self.assertNotIn("utm_source", html)
+        self.assertIn('href="https://www.tiktok.com/@vaylidenl"', html)
+        self.assertNotIn("ergens-anders", html)
 
-    def test_no_icons_without_a_link(self):
-        config = SiteConfig.get()
-        config.instagram_url = ""
-        config.save()
-        html = Client().get("/").content.decode()
-        self.assertNotIn("sociale-links", html)
+    def test_zelfde_lijst_staat_in_de_gestructureerde_gegevens(self):
+        from core import seo, social
 
-    def test_instagram_and_tiktok_icons_when_filled_in(self):
-        config = SiteConfig.get()
-        config.instagram_url = "https://www.instagram.com/voorbeeldaccount/"
-        config.tiktok_url = "https://www.tiktok.com/@voorbeeldaccount"
-        config.save()
-        html = Client().get("/prijzen/").content.decode()
-        self.assertIn('href="https://www.instagram.com/voorbeeldaccount/"', html)
-        self.assertIn('aria-label="VAYLIDE op Instagram"', html)
-        self.assertIn('href="https://www.tiktok.com/@voorbeeldaccount"', html)
-        self.assertIn('aria-label="VAYLIDE op TikTok"', html)
-        self.assertIn('rel="noopener me"', html)
+        self.assertEqual(seo.organization()["sameAs"], [url for _naam, url in self.URLS])
+        self.assertEqual(social.same_as(), [l["url"] for l in social.social_links()])

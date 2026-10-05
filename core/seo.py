@@ -12,6 +12,7 @@ from django.templatetags.static import static
 from django.utils.safestring import mark_safe
 
 from .content import OCCASION_TILE_NOTES
+from .social import same_as
 
 MERK = "VAYLIDE"
 SLOGAN_LANG = "digitale uitnodigingen die je beleeft"
@@ -74,6 +75,7 @@ def organization() -> dict:
         "name": MERK,
         "url": f"{settings.BASE_URL}/",
         "logo": absolute(static("img/merk/vaylide-logo.png")),
+        "sameAs": same_as(),
     }
 
 

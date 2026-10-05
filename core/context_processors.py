@@ -5,15 +5,7 @@ from orders.methods import available_methods
 
 from .ai import ai_configured
 from .company import company
-
-
-def social_links() -> list[dict]:
-    """Instagram en TikTok uit de instellingen (Beheer → Instellingen); alleen wat is ingevuld."""
-    from .models import SiteConfig
-
-    config = SiteConfig.get()
-    links = [("instagram", "Instagram", config.instagram_url), ("tiktok", "TikTok", config.tiktok_url)]
-    return [{"icon": icon, "label": label, "url": url} for icon, label, url in links if url]
+from .social import social_links
 
 
 def test_banner() -> str:

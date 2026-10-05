@@ -56,5 +56,4 @@ niets afgeschreven", en in Beheer → Instellingen staat bij Betalingen "Mollie 
   bij Mollie, een uur bewaard). Zet PayPal dus aan in Mollie (Instellingen → Betaalmethoden, ook voor
   testmodus); anders toont de site alleen iDEAL. Zonder Mollie of als Mollie even niet antwoordt:
   `VIERLIEF_PAYMENT_METHODS` (standaard `ideal,paypal`). iDEAL en PayPal staan er met hun logo (aangeleverd door de eigenaar, in `static/img/betalen/`); andere methoden met hun naam.
-- Instagram en TikTok: Beheer → Instellingen. Een icoon verschijnt alleen als er een link is ingevuld.
-  Instagram staat standaard op https://www.instagram.com/vaylidenl/.
+- Sociale media: de vier officiële profielen (Instagram, Facebook, TikTok, LinkedIn) staan in `core/social.py` en worden in de voettekst en in `sameAs` (SEO) gebruikt; ze staan niet meer in Beheer → Instellingen.
