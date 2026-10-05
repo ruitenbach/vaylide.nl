@@ -757,8 +757,10 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .kerstpodium h2 { color: #FFF6E6; font-size: clamp(2.4rem, 5vw, 3.4rem); margin: .6rem 0 .8rem; }
 .kerstpodium p { color: #F6E3CE; font-size: 1.08rem; max-width: 28rem; margin-bottom: 1.6rem; }
 .kerstpodium__badge { display: inline-block; padding: .25rem .8rem; border-radius: 999px; background: linear-gradient(135deg, #E9CB85, #F7E7B8); color: #3A2710; font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
-/* Waaier van lichte kerstkaarten; hero3d.js laat hem meekantelen (--tx, --ty). */
-.kaartenwaaier { --tx: 0deg; --ty: 0deg; position: relative; list-style: none; margin: 0; padding: 0; height: clamp(20rem, 32vw, 26rem); perspective: 1400px; transform-style: preserve-3d; }
+/* Waaier van lichte kerstkaarten; hero3d.js laat hem meekantelen (--tx, --ty).
+   Bewust geen transform-style: preserve-3d: dan sorteert de browser de gekantelde kaarten op diepte, terwijl de muis-hit-test niet meekomt; een klik op het zichtbare deel van een kaart
+   deed dan niets of opende de buurkaart. Zonder preserve-3d beslist z-index (links boven), voor het oog en voor de klik. */
+.kaartenwaaier { --tx: 0deg; --ty: 0deg; position: relative; list-style: none; margin: 0; padding: 0; height: clamp(20rem, 32vw, 26rem); perspective: 1400px; }
 /* De waaier past zich aan het aantal kaarten (--n, zet de homepage) aan: --t loopt van -1,5 tot 1,5, de breedte van de waaier blijft gelijk. */
 .zweefkaart {
   --t: calc((var(--i) - (var(--n, 4) - 1) / 2) * 3 / (var(--n, 4) - 1)); --r: calc(var(--t) * 8deg); --x: calc(var(--t) * 62%);
@@ -766,11 +768,13 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
   transform: translate(-50%, -50%) translateX(var(--x)) translateY(calc(var(--t) * var(--t) * 10px)) rotate(var(--r)) rotateX(var(--ty)) rotateY(var(--tx));
   transition: transform .6s cubic-bezier(.2, .8, .2, 1); z-index: calc(var(--n, 4) - var(--i));
 }
-.zweefkaart a { display: block; height: 100%; border-radius: var(--radius); overflow: hidden; background: var(--paper); text-decoration: none; color: var(--ink);
+.zweefkaart a { display: block; height: 100%; text-decoration: none; color: var(--ink); }
+.zweefkaart__kaart { position: relative; display: block; height: 100%; border-radius: var(--radius); overflow: hidden; background: var(--paper);
   box-shadow: 0 0 0 1px rgba(255, 240, 210, .6), 0 30px 50px -22px rgba(20, 5, 5, .7); transition: transform .45s cubic-bezier(.2, .8, .2, 1), box-shadow .45s; }
 .zweefkaart img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 .zweefkaart__naam { position: absolute; left: 50%; bottom: .6rem; translate: -50% 0; white-space: nowrap; padding: .25rem .75rem; border-radius: 999px; background: rgba(255, 253, 249, .94); font-size: .8rem; font-weight: 600; box-shadow: 0 6px 14px -8px rgba(0, 0, 0, .5); }
-.zweefkaart a:hover, .zweefkaart a:focus-visible { transform: translateY(-14px) scale(1.04); box-shadow: 0 0 0 1.5px var(--gold), 0 40px 60px -24px rgba(20, 5, 5, .75); }
+/* De hover-lift zit op de kaart ín de link: het klikgebied (de link) blijft staan, dus een kaart die opstijgt glipt niet onder de muis weg. */
+.zweefkaart a:hover .zweefkaart__kaart, .zweefkaart a:focus-visible .zweefkaart__kaart { transform: translateY(-14px) scale(1.04); box-shadow: 0 0 0 1.5px var(--gold), 0 40px 60px -24px rgba(20, 5, 5, .75); }
 .zweefkaart:hover { z-index: 9; }
 @media (prefers-reduced-motion: no-preference) {
   .kerstpodium__licht span { animation: licht-twinkel 5s ease-in-out infinite; }
