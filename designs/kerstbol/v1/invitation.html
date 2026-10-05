@@ -10,7 +10,7 @@
 <header class="kb-hero{% if not v.opening_enabled %} kb-eind kb-finished kb-klaar{% endif %}" id="kb-hero" data-kb{% if v.opening_enabled %} data-kb-opening{% endif %} aria-label="Het kerstcadeau">
   <canvas class="kb-ambient" data-kb-ambient width="32" height="57" aria-hidden="true"></canvas>
   <div class="kb-scene" data-kb-scene>
-    <video id="kb-video" muted playsinline preload="metadata" poster="{% static 'designs/kerstbol/v1/media/poster.webp' %}" width="720" height="1280" aria-label="Een gesloten kerstcadeau opent zich en onthult een sneeuwbol met een kerstboom" data-kb-video>
+    <video id="kb-video" muted playsinline controlslist="nodownload noplaybackrate" disablepictureinpicture disableremoteplayback preload="metadata" poster="{% static 'designs/kerstbol/v1/media/poster.webp' %}" width="720" height="1280" aria-label="Een gesloten kerstcadeau opent zich en onthult een sneeuwbol met een kerstboom" data-kb-video>
       <source src="{% static 'designs/kerstbol/v1/media/opening.mp4' %}" type="video/mp4">
     </video>
     <img class="kb-eindbeeld" src="{% static 'designs/kerstbol/v1/media/eind.webp' %}" alt="Het geopende kerstcadeau met een sneeuwbol" width="720" height="1280" loading="lazy" decoding="async">

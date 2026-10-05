@@ -126,6 +126,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "core.middleware.MediaHotlinkMiddleware",   # vóór WhiteNoise: anders komt een statisch bestand er nooit langs
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "core.middleware.PreviewPasswordMiddleware",
     "core.middleware.CompressTextMiddleware",

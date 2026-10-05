@@ -27,6 +27,7 @@
 <link rel="stylesheet" href="{% static 'css/vierlief.css' %}">
 {% block extra_css %}{% endblock %}
 <script src="{% static 'js/site.js' %}" defer></script>
+<script src="{% static 'js/media-bescherming.js' %}" defer></script>
 {% block extra_js %}{% endblock %}
 {% for item in jsonld %}{{ item|json_ld }}
 {% endfor %}</head>

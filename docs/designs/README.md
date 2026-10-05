@@ -24,3 +24,9 @@ De eigenaar wil nieuwe kaarten altijd uitbundig. Dat betekent **hoogwaardig, gel
 | Kerstbol | `kerstbol` (definitief) | [kerstbol.md](kerstbol.md) | lokaal gebouwd als Special in `designs/kerstbol/v1/` (branch `claude/kerstbol`), ter beoordeling; niet gepusht |
 
 Voeg een regel toe zodra er een ontwerpdocument is. Bestaande ontwerpen worden hier pas ingevuld als de eigenaar daarom vraagt.
+
+## Merkhandtekening: de officiële VAYLIDE-V
+
+Nieuwe eigen cinematic VAYLIDE-scènes krijgen waar passend een zeer subtiele officiële VAYLIDE-V als brand signature in de wereld verwerkt.
+Bijvoorbeeld in een brug, ornament, hekwerk, zegel, gevel of decoratief object. Gebruik daarbij altijd de echte V uit het officiële VAYLIDE-logo (`static/img/merk/vaylide-v.png`), nooit een willekeurige letter V.
+Dit hoeft niet achteraf in alle bestaande kaarten te worden toegevoegd. Zie ook [`../MEDIA-BESCHERMING.md`](../MEDIA-BESCHERMING.md): een zichtbare herkomst helpt waar technische bescherming niet kan.

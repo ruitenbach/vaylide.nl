@@ -1101,3 +1101,8 @@ mark.invulveld { background: var(--warning-bg); color: var(--warning); padding: 
   .voorwaarden { max-width: none; }
 }
 .order-status__hervatten p { margin: .3rem 0 .8rem; }
+
+/* Eigen media: niet slepen, geen langdrukmenu (iOS) en geen selectie van het beeld zelf. Tekst blijft gewoon selecteerbaar.
+   Een afbeelding in een link geeft het klikken en het linkmenu aan de link (zonder "afbeelding opslaan"). */
+img[src^="/static/"], video { -webkit-user-drag: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+a[href] img[src^="/static/"] { pointer-events: none; }

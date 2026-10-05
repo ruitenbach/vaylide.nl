@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="{% static 'css/envelop-cover.css' %}">{% endif %}
 <link rel="stylesheet" href="{% static v.stylesheet %}">
 <script src="{% static 'invitations/invite.js' %}" defer></script>
+<script src="{% static 'js/media-bescherming.js' %}" defer></script>
 {% if v.effects %}<script src="{% static 'invitations/effects.js' %}" defer></script>{% endif %}
 {% if v.opening_enabled and v.envelop_collectie %}{% if v.envelop_collectie.beweging == "gsap" %}<script src="{% static 'vendor/gsap/gsap.min.js' %}" defer></script>
 <script src="{% static 'js/envelop-signature.js' %}" defer></script>

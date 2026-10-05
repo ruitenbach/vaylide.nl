@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import base64
 import hmac
+from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -78,6 +79,52 @@ class SecurityHeadersMiddleware:
         elif path.startswith("/u/") and "Cache-Control" not in response:
             response["Cache-Control"] = "private, no-cache"
         return response
+
+
+class MediaHotlinkMiddleware:
+    """Eigen VAYLIDE-beelden en -video's laden alleen op onze eigen pagina's, niet als insluiting op een andere website.
+
+    Staat vóór WhiteNoise, anders komt een statisch bestand nooit langs de middleware. Wat het wel en niet doet:
+    - Een verzoek met een Referer van een vreemde website krijgt 403. Zonder Referer (typen van het adres, zoekmachines, deelkaarten,
+      mailprogramma's) en met een eigen Referer gaat het gewoon door.
+    - `Sec-Fetch-Site: cross-site` bij een afbeelding of video vangt wie zijn Referer onderdrukt (moderne browsers).
+    - `Cross-Origin-Resource-Policy: same-site` laat de browser het insluiten door een andere website zelf weigeren.
+    Beperkt tot media in de ontwerpen en in de afbeeldingen van de site; logo, mailafbeeldingen en deelbeelden blijven buiten schot.
+    Dit stopt hotlinken, geen kopiëren: wie de pagina opent kan het bestand altijd uit het netwerkverkeer halen.
+    """
+
+    PROTECTED_PREFIXES = ("/static/designs/", "/static/img/designs/", "/static/img/site/", "/static/img/demo/", "/static/img/envelop/")
+    MEDIA_EXTENSIONS = (".webp", ".jpg", ".jpeg", ".png", ".gif", ".avif", ".mp4", ".webm")
+    EMBED_DESTINATIONS = {"image", "video", "audio", "embed", "object", "iframe", "frame"}
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        path = request.path_info
+        if not (path.startswith(self.PROTECTED_PREFIXES) and path.lower().endswith(self.MEDIA_EXTENSIONS)):
+            return self.get_response(request)
+        if self._is_foreign(request):
+            return HttpResponse("Niet beschikbaar buiten VAYLIDE.", status=403, content_type="text/plain; charset=utf-8", headers={"Cache-Control": "no-store"})
+        response = self.get_response(request)
+        if response.status_code < 400:
+            response["Cross-Origin-Resource-Policy"] = "same-site"
+        return response
+
+    def _own_hosts(self, request) -> set[str]:
+        hosts = {h.lower().lstrip(".") for h in settings.ALLOWED_HOSTS if h and h != "*"}
+        hosts.add((urlsplit(settings.BASE_URL).hostname or "").lower())
+        hosts.add(request.get_host().split(":")[0].lower())
+        return hosts
+
+    def _is_foreign(self, request) -> bool:
+        referer = request.headers.get("Referer", "")
+        if referer:
+            host = (urlsplit(referer).hostname or "").lower()
+            if host and host not in self._own_hosts(request):
+                return True
+        return (request.headers.get("Sec-Fetch-Site") == "cross-site"
+                and request.headers.get("Sec-Fetch-Dest", "") in self.EMBED_DESTINATIONS)
 
 
 class RequestSizeLimitMiddleware:
