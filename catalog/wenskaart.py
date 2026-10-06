@@ -35,8 +35,8 @@ KOP = {
 
 
 def is_wenskaart(content: dict | None) -> bool:
-    """Alleen op de uitdrukkelijke keuze van de klant. Anders dan de weergave (invitations.content.card_kind) leidt dit niets af uit
-    wat er is ingevuld: een oudere kerstkaart zonder datum blijft een uitnodiging in de prijs."""
+    """Alleen op de uitdrukkelijke, opgeslagen keuze van de klant (soort = "wenskaart"); dezelfde regel als invitations.content.card_kind.
+    Er wordt niets afgeleid uit de gelegenheid of uit ontbrekende gegevens: een kerstkaart zonder datum is een uitnodiging."""
     return (content or {}).get("soort") == "wenskaart"
 
 

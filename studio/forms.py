@@ -183,8 +183,6 @@ class DetailsForm(StepForm):
         if not self.fields["soort"].disabled:
             if d.get("soort") in SOORTEN:
                 content["soort"] = d["soort"]
-            elif self.event_optional:
-                content["soort"] = card_kind(content, self.occasion)
         return content
 
     def missing(self) -> dict[str, str]:
@@ -197,10 +195,7 @@ class DetailsForm(StepForm):
         soort = d.get("soort")
         if soort == "wenskaart":
             return errors
-        # Bij een kerstkaart is het evenement optioneel. Zonder keuze (oudere formulieren) geldt: leeg laten is een wenskaart.
-        if self.event_optional:
-            if soort != "uitnodiging" and not any(_s(d.get(k)) for k in ("date", "start_time", "end_time", "venue_name", "address")):
-                return errors
+        # Zonder keuze is het een uitnodiging: leeg laten van datum en locatie maakt er nooit een wenskaart van.
         if not d.get("date"):
             errors["date"] = "Vul de datum in."
         if not d.get("start_time"):

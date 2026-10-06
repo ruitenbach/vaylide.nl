@@ -16,10 +16,9 @@ Alles hieronder staat in de code; de pakketten en opties van de uitnodigingen zi
 
 ## Wanneer is een kaart een wenskaart
 
-Alleen op de **uitdrukkelijke keuze** van de klant (`content["soort"] == "wenskaart"`): `catalog.wenskaart.is_wenskaart()` bepaalt de prijs en de inhoud.
-Een bestaande uitnodiging wordt daardoor nooit vanzelf een wenskaart: zonder keuze is elke kaart een uitnodiging (met de pakketprijzen), bij elke gelegenheid.
-Alleen de weergave van een oudere kerstkaart zonder datum en zonder keuze blijft zoals vroeger (getoond als wenskaart, maar in de prijs een uitnodiging).
-Na betaling ligt de keuze vast (de radioknoppen in Gegevens zijn dan uitgeschakeld).
+Alleen op de **uitdrukkelijke, opgeslagen keuze** van de klant (`content["soort"] == "wenskaart"`), bij elke gelegenheid. `invitations.content.card_kind()` en `catalog.wenskaart.is_wenskaart()` volgen dezelfde regel en leiden niets af: geen datum, geen locatie, de gelegenheid Kerst of lege eventgegevens maken van een kaart nooit een wenskaart.
+Elke bestaande kaart zonder `soort` (ook een oude kerstkaart zonder datum) is volledig een uitnodiging: weergave, formulieren (datum, tijd en locatie verplicht), aanmelden, prijs en mails.
+Na betaling ligt de keuze vast (de radioknoppen in Gegevens zijn dan uitgeschakeld en worden niet verwerkt).
 
 ## De flow
 
@@ -35,4 +34,4 @@ De kop en regel per gelegenheid ("Gefeliciteerd · met jullie bruiloft", …) st
 
 ## Controle
 
-`tests/test_wenskaart_prijs.py` (prijzen, special, bestelling, bestaande uitnodiging blijft uitnodiging, studio-flow, Snel afronden, weergave van elk ontwerp als wenskaart, portal, mails, pagina's).
+`tests/test_wenskaart_regressie.py` (geen automatische detectie, oude kerstkaart, nieuwe kerst-wenskaart, betaalde uitnodiging, betaalde wenskaart blijft vast) en `tests/test_wenskaart_prijs.py` (prijzen, special, bestelling, bestaande uitnodiging blijft uitnodiging, studio-flow, Snel afronden, weergave van elk ontwerp als wenskaart, portal, mails, pagina's).

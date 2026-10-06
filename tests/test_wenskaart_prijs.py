@@ -107,9 +107,9 @@ class BestaandeUitnodigingTests(VaylideTestCase):
         for occasion in OCCASIES:
             self.assertEqual(card_kind({"soort": "wenskaart"}, occasion), "wenskaart", occasion)
             self.assertEqual(card_kind({"soort": "uitnodiging"}, occasion), "uitnodiging", occasion)
-        # Een oudere kerstkaart zonder datum en zonder keuze wordt getoond als wenskaart (zoals vroeger), maar blijft in de prijs een uitnodiging.
+        # Ook een oude kerstkaart zonder datum en zonder keuze is een uitnodiging, in weergave én prijs.
         oud = default_content("kerst")
-        self.assertEqual(card_kind(oud, "kerst"), "wenskaart")
+        self.assertEqual(card_kind(oud, "kerst"), "uitnodiging")
         self.assertFalse(wenskaart.is_wenskaart(oud))
         template = Template.objects.get(slug="aan-tafel")
         prijzen = [q.package.code for q in compare_packages(oud, template_version=template.current_version)]

@@ -325,7 +325,7 @@ def build_view(
     with_event = event_expected(content, occasion)
     # Kerstkaart zonder evenement: aftellen naar eerste kerstdag (van juli tot en met kerstavond).
     countdown_target, countdown_label = start, ""
-    if start is None and cfg.get("event_optional"):
+    if start is None and not with_event and cfg.get("event_optional"):
         countdown_target, countdown_label = christmas_target(times.zone, now), "kerst"
     days_until = None
     countdown = None
@@ -423,7 +423,7 @@ def build_view(
     }
     # Een wenskaart is alleen een groet: geen dresscode, 'Goed om te weten' of 'Vragen' (programma, locatie en
     # aanmelden vallen al weg omdat er geen evenement is).
-    if wenskaart or (not with_event and cfg.get("event_optional")):
+    if wenskaart:
         for key in ("dresscode", "practical", "contact"):
             show[key] = False
     # Een wenskaart met de vaste prijs heeft geen verhaal, galerij of muziek: dat zijn betaalde extra's van de uitnodiging.

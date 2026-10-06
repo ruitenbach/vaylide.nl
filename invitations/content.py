@@ -74,8 +74,8 @@ def default_content(occasion: str, palette_key: str = "") -> dict:
         "schema": SCHEMA_VERSION,
         "names": {key: "" for key, *_ in cfg["name_fields"]},
         "headline": "",
-        # Soort kaart bij gelegenheden met een optioneel evenement (Kerst): "uitnodiging" of "wenskaart".
-        # Leeg = zoals vroeger: een uitnodiging zodra er een datum of locatie is ingevuld.
+        # Soort kaart: "uitnodiging" of "wenskaart", bij elke gelegenheid. Alleen de uitdrukkelijke keuze "wenskaart" maakt er een
+        # wenskaart van; leeg (en elke bestaande kaart) is een uitnodiging.
         "soort": "",
         "date": "",
         "start_time": "",
@@ -202,26 +202,14 @@ def event_times(content: dict) -> EventTimes:
     return EventTimes(start=start, end=end, rsvp_deadline=deadline, zone=zone)
 
 
-def has_event_details(content: dict) -> bool:
-    """Of er iets over een evenement is ingevuld (datum, tijd of locatie)."""
-    return any(str(content.get(key) or "").strip() for key in ("date", "start_time", "end_time", "venue_name", "address"))
-
-
 SOORTEN = ("uitnodiging", "wenskaart")
 
 
 def card_kind(content: dict, occasion: str) -> str:
-    """'uitnodiging' of 'wenskaart'. Een wenskaart ontstaat alleen door de uitdrukkelijke keuze van de klant (soort = "wenskaart"),
-    bij elke gelegenheid. Alleen bij een optioneel evenement (Kerst) geldt zonder keuze wat er is ingevuld (oudere concepten);
-    elke andere kaart zonder keuze is een uitnodiging, ook als er nog niets is ingevuld."""
-    soort = content.get("soort")
-    if soort == "wenskaart":
-        return "wenskaart"
-    if not occasion_config(occasion).get("event_optional"):
-        return "uitnodiging"
-    if soort in SOORTEN:
-        return soort
-    return "uitnodiging" if has_event_details(content) else "wenskaart"
+    """'uitnodiging' of 'wenskaart'. Een wenskaart is een kaart alleen als de klant dat uitdrukkelijk koos en het is opgeslagen
+    (soort = "wenskaart"), bij elke gelegenheid. Er wordt niets afgeleid: geen datum, geen locatie, de gelegenheid Kerst of lege
+    evenementgegevens maken van een kaart nooit een wenskaart. Zonder keuze is elke kaart een uitnodiging."""
+    return "wenskaart" if content.get("soort") == "wenskaart" else "uitnodiging"
 
 
 def event_expected(content: dict, occasion: str) -> bool:

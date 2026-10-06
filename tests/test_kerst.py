@@ -30,10 +30,11 @@ EVENT_KEYS = ("date", "start_time", "end_time", "venue_name", "address")
 
 
 def greeting_only(content: dict) -> dict:
-    """Maakt van voorbeeldinhoud een kerstgroet zonder evenement."""
+    """Maakt van voorbeeldinhoud een kerstgroet zonder evenement: uitdrukkelijk gekozen als wenskaart (alleen dan is het er een)."""
     content = json.loads(json.dumps(content))
     for key in EVENT_KEYS:
         content[key] = ""
+    content["soort"] = "wenskaart"
     return content
 
 
@@ -137,12 +138,15 @@ class KerstRenderTests(VaylideTestCase):
         content = greeting_only(demo_content("winterlicht", "kerst"))
         blocking = [i for i in publish_issues(content, "kerst", first_publication=True) if i.blocking]
         self.assertEqual(blocking, [])
-        # Wie toch een datum invult, nodigt mensen uit: dan zijn begintijd en locatie wel nodig.
+        # Wie kiest voor een uitnodiging en een datum invult, nodigt mensen uit: dan zijn begintijd en locatie wel nodig.
+        content["soort"] = "uitnodiging"
         content["date"] = future_date(60)
         fields = {i.field for i in publish_issues(content, "kerst", first_publication=True) if i.blocking}
         self.assertEqual(fields, {"start_time", "venue_name", "deadline"})
-        # Bij andere gelegenheden blijft een datum altijd verplicht.
+        # Bij een uitnodiging voor een andere gelegenheid blijft een datum altijd verplicht; alleen een uitdrukkelijke wenskaart heeft er geen nodig.
         other = greeting_only(demo_content("liefde-op-papier", "bruiloft"))
+        self.assertEqual([i for i in publish_issues(other, "bruiloft", first_publication=True) if i.blocking], [])
+        other["soort"] = "uitnodiging"
         fields = {i.field for i in publish_issues(other, "bruiloft", first_publication=True) if i.blocking}
         self.assertTrue({"date", "start_time", "venue_name"} <= fields)
 
@@ -150,23 +154,23 @@ class KerstRenderTests(VaylideTestCase):
 class KerstStudioTests(VaylideTestCase):
     def test_greeting_card_needs_no_date_venue_or_deadline(self):
         c = Client()
-        response = c.post("/maken/", {"occasion": "kerst", "template": "winterlicht"})
+        response = c.post("/maken/", {"occasion": "kerst", "template": "winterlicht", "soort": "wenskaart"})
         self.assertEqual(response.status_code, 302)
         uid = response["Location"].split("/")[2]
         inv = Invitation.objects.get(uid=uid)
         page = c.get(f"/maken/{uid}/gegevens/")
         self.assertContains(page, "Van wie komt de kerstkaart?")
         self.assertContains(page, "Wat voor kaart wordt het?")
-        self.assertContains(page, 'name="soort" value="wenskaart" checked')  # nog niets ingevuld: een wenskaart
+        self.assertContains(page, 'name="soort" value="wenskaart" checked')  # uitdrukkelijk gekozen aan het begin
         response = c.post(f"/maken/{uid}/gegevens/", {
-            "rev": inv.draft_rev, "actie": "volgende", "name_family": "Familie Jansen", "name_members": "Eva, Tom en Noor",
+            "rev": inv.draft_rev, "actie": "volgende", "soort": "wenskaart", "name_family": "Familie Jansen", "name_members": "Eva, Tom en Noor",
             "timezone": "Europe/Amsterdam", "welcome_text": "Fijne feestdagen!",
         })
         self.assertRedirects(response, f"/maken/{uid}/programma/", fetch_redirect_response=False)
         inv.refresh_from_db()
         self.assertEqual(inv.title, "Familie Jansen")
         # Aanmelden staat standaard aan, maar zonder evenement is er geen deadline nodig.
-        # Zonder datum en locatie wordt het een wenskaart: de stap Aanmelden valt weg.
+        # Uitdrukkelijk een wenskaart: de stap Aanmelden valt weg.
         self.assertRedirects(c.get(f"/maken/{uid}/aanmelden/"), f"/maken/{uid}/fotos/", fetch_redirect_response=False)
 
     def test_partial_event_still_asks_for_time_and_venue(self):
@@ -183,7 +187,7 @@ class KerstStudioTests(VaylideTestCase):
 
     def test_published_greeting_card(self):
         owner = self.make_customer()
-        inv = create_draft(occasion="kerst", template=Template.objects.get(slug="winterlicht"), owner=owner)
+        inv = create_draft(occasion="kerst", template=Template.objects.get(slug="winterlicht"), owner=owner, soort="wenskaart")
         content = dict(inv.draft_content)
         content["names"] = {"family": "Familie Jansen", "members": "Eva, Tom en Noor"}
         content["welcome_text"] = "Lieve allemaal, fijne feestdagen!"
