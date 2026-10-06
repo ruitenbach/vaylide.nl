@@ -16,7 +16,7 @@
       <p class="onthulling__kicker"><span class="onthulling__vink" aria-hidden="true"></span>Betaald · bestelling {{ order.number }}</p>
       <h1 class="onthulling__titel" id="onthulling-titel"><span class="onthulling__hoera">Gefeliciteerd!</span> <span class="onthulling__sub">Je {{ doc_kind }} staat online</span></h1>
       {% if inv.title %}<p class="onthulling__namen">{{ inv.title }}</p>{% endif %}
-      <p class="onthulling__lead">Het is zover: je gasten kunnen je {{ doc_kind }} nu openen. Deel je link of laat ze de QR-code scannen.</p>
+      <p class="onthulling__lead">Het is zover: {% if wenskaart %}de ontvanger kan{% else %}je gasten kunnen{% endif %} je {{ doc_kind }} nu openen. Deel je link of laat ze de QR-code scannen.</p>
       <div class="onthulling__acties">
         <a class="onthulling__knop onthulling__knop--goud" href="{{ state.public_url }}" target="_blank" rel="noopener">Bekijk je {{ doc_kind }}<span class="visually-hidden"> (opent in nieuw venster)</span></a>
         <a class="onthulling__knop" href="https://wa.me/?text={{ state.public_url|urlencode:'' }}" target="_blank" rel="noopener">Delen via WhatsApp<span class="visually-hidden"> (opent in nieuw venster)</span></a>
@@ -26,7 +26,7 @@
         <label class="onthulling__link"><span class="visually-hidden">Jouw link</span><input type="text" readonly value="{{ state.public_url }}" data-select-all></label>
         {% if inv %}<a class="onthulling__qr" href="{% url 'portal:qr' inv.uid 'png' %}?download=1" title="QR-code downloaden"><img src="{% url 'portal:qr' inv.uid 'svg' %}" alt="QR-code naar je {{ doc_kind }}" width="96" height="96"><span>QR-code downloaden</span></a>{% endif %}
       </div>
-      <p class="onthulling__verder"><a href="{% if inv %}{% url 'portal:invitation' inv.uid %}{% else %}{% url 'portal:home' %}{% endif %}">Naar Mijn VAYLIDE</a> · gastenlijst, wijzigingen en je QR-code staan daar ook.</p>
+      <p class="onthulling__verder"><a href="{% if inv %}{% url 'portal:invitation' inv.uid %}{% else %}{% url 'portal:home' %}{% endif %}">Naar Mijn VAYLIDE</a> · {% if not wenskaart %}gastenlijst, {% endif %}wijzigingen en je QR-code staan daar ook.</p>
       <button type="button" class="onthulling__opnieuw" data-onthulling-opnieuw hidden>Nog een keer vieren</button>
     </div>
   </div>

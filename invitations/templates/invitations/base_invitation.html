@@ -31,7 +31,7 @@
 <body style="{{ v.palette_style }}" data-palette="{{ v.palette_key }}"{% if v.opening_enabled %} data-has-cover{% endif %}>
 {% if v.effects %}<div class="fx-slot fx-slot--page" data-fx-slot="page" aria-hidden="true"></div>{% endif %}
 {% include "invitations/partials/mode_banner.html" %}
-<a class="skip-link" href="#uitnodiging">Direct naar de uitnodiging</a>
+<a class="skip-link" href="#uitnodiging">Direct naar de {% if v.card_kind == "wenskaart" %}wenskaart{% else %}uitnodiging{% endif %}</a>
 {% if v.opening_enabled %}{% if v.envelop_collectie %}{% include "invitations/partials/envelop_cover.html" %}{% else %}{% block cover %}{% endblock %}{% endif %}{% endif %}
 <main id="uitnodiging" class="inv-main" tabindex="-1">
 {% if v.notice %}<p class="inv-notice">{{ v.notice }}</p>{% endif %}

@@ -2,16 +2,16 @@
 {% block title %}Foto's en verhaal{% endblock %}
 {% block studio %}
 <div class="studio-intro">
-  <h1>Foto's, verhaal en muziek</h1>
-  <p class="lead">Kies per foto welk deel in beeld komt. Locatiegegevens halen we automatisch weg.</p>
+  <h1>{% if wenskaart_vast %}Een foto op je wenskaart{% else %}Foto's, verhaal en muziek{% endif %}</h1>
+  <p class="lead">{% if wenskaart_vast %}Een foto is optioneel. Kies welk deel in beeld komt. Locatiegegevens halen we automatisch weg.{% else %}Kies per foto welk deel in beeld komt. Locatiegegevens halen we automatisch weg.{% endif %}</p>
 </div>
 <section class="waar-komt-wat" aria-labelledby="waar-titel">
   <h2 class="waar-komt-wat__title" id="waar-titel">Waar komt wat op je kaart?</h2>
   <ol class="waar-komt-wat__lijst">
     <li><strong>Hoofdfoto</strong> <span>De grote foto op je kaart, bij jullie namen of welkomsttekst (dat verschilt per ontwerp). Je kiest er één.</span></li>
-    <li><strong>Fotogalerij</strong> <span>Een fotoblok verderop op de kaart, tot 12 foto's, elk met een eigen onderschrift.</span></li>
+    {% if not wenskaart_vast %}<li><strong>Fotogalerij</strong> <span>Een fotoblok verderop op de kaart, tot 12 foto's, elk met een eigen onderschrift.</span></li>
     <li><strong>Verhaal</strong> <span>Een eigen blok met de titel die je kiest, onder de foto's.</span></li>
-    <li><strong>Muziek</strong> <span>Een knop op de kaart. Speelt pas als een gast erop tikt.</span></li>
+    <li><strong>Muziek</strong> <span>Een knop op de kaart. Speelt pas als een gast erop tikt.</span></li>{% endif %}
   </ol>
   <p class="small muted">Geüploade foto's komen pas op je kaart als je ze hieronder kiest als hoofdfoto of voor de galerij. Op je kaart ernaast (op een telefoon: "Bekijk je kaart") zie je met een gouden rand waar ze staan.</p>
 </section>
@@ -54,8 +54,8 @@
           </div>
           <button type="button" class="link-button small photo-card__auto" data-focus-auto hidden>Automatisch uitlijnen</button>
           <label class="check"><input type="radio" name="hero" value="{{ row.uid }}"{% if form.hero.value == row.uid %} checked{% endif %}><span>Hoofdfoto</span></label>
-          <label class="check">{{ row.gallery }}<span>In de fotogalerij</span></label>
-          {% include "studio/_field.html" with field=row.caption %}
+          {% if not wenskaart_vast %}<label class="check">{{ row.gallery }}<span>In de fotogalerij</span></label>
+          {% include "studio/_field.html" with field=row.caption %}{% endif %}
           <button type="submit" class="btn btn--danger btn--sm" form="delete-{{ row.uid }}">Verwijderen</button>
         </div>
         {% endfor %}
@@ -67,7 +67,7 @@
     {% endif %}
   </section>
 
-  <section class="studio-block" aria-labelledby="blok-verhaal">
+  {% if not wenskaart_vast %}<section class="studio-block" aria-labelledby="blok-verhaal">
     <h2 class="studio-block__title" id="blok-verhaal">Jullie verhaal <span class="badge">{{ feature_badges.story }}</span></h2>
     {% include "studio/_field.html" with field=form.story_title %}
     {% include "studio/_field.html" with field=form.story_text %}
@@ -90,7 +90,7 @@
       <button type="submit" class="btn btn--secondary btn--sm" form="upload-muziek-form" formnovalidate>Muziek uploaden</button>
     </div>
     {% for a in audio %}<p class="small">{{ a.original_name }} · <button type="submit" class="link-button" form="delete-{{ a.uid }}">verwijderen</button></p>{% endfor %}
-  </section>
+  </section>{% endif %}
   {% include "studio/_actions.html" %}
 </form>
 

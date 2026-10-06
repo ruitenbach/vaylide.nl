@@ -22,7 +22,7 @@
         <div><dt>Geschikt voor</dt><dd>{{ template.occasion_labels|join:", "|lower }}</dd></div>
         {% if soorten %}<div><dt>Soort kaart</dt><dd>
           <ul class="segmented" aria-label="Toon het voorbeeld als uitnodiging of als wenskaart">{% for s in soorten %}<li><a class="segmented__item" href="{{ s.url }}" data-soort-link data-soort="{{ s.key }}"{% if s.current %} aria-current="true"{% endif %}>{{ s.label }}</a></li>{% endfor %}</ul>
-          <p class="segmented__hint">{% if soort == "wenskaart" %}Alleen een kerstgroet, zonder datum, locatie of aanmelden.{% else %}Met datum, locatie en aanmelden, bijvoorbeeld voor het kerstdiner.{% endif %}</p>
+          <p class="segmented__hint">{% if soort == "wenskaart" %}Alleen een persoonlijke groet, zonder datum, locatie of aanmelden. {{ wenskaart_prijs }} incl. btw{% if wenskaart_special %} (special-ontwerp){% endif %}.{% else %}Met datum, locatie en aanmelden{% if occasion == "kerst" %}, bijvoorbeeld voor het kerstdiner{% endif %}.{% endif %}</p>
         </dd></div>{% endif %}
         <div><dt>Kleur</dt><dd class="kleurkeuze">
           {# Per kleurvariant een knop met drie kleurbolletjes en de naam; de gekozen variant heeft een donkere rand. #}

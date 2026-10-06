@@ -10,16 +10,15 @@
 <form method="post" class="form studio-form" data-once data-dirty-check novalidate>
   {% csrf_token %}
   {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors.0 }}</div>{% endif %}
-  {% if cfg.event_optional %}
   <fieldset class="studio-block" data-soort-keuze>
     <legend class="studio-block__title">Wat voor kaart wordt het?</legend>
+    {% if form.soort.field.disabled %}<p class="hint">Dit ligt vast, want je kaart is al besteld. Je kunt de inhoud wel aanpassen.</p>{% endif %}
     <div class="radio-cards">
-      <label class="radio-card"><input type="radio" name="soort" value="uitnodiging"{% if form.soort.value == "uitnodiging" %} checked{% endif %}><strong>Uitnodiging</strong><span class="hint">Nodig mensen uit, bijvoorbeeld voor het kerstdiner, een borrel of brunch: met datum, locatie en aanmelden.</span></label>
-      <label class="radio-card"><input type="radio" name="soort" value="wenskaart"{% if form.soort.value == "wenskaart" %} checked{% endif %}><strong>Wenskaart</strong><span class="hint">Alleen een warme kerstgroet, zonder datum, locatie of aanmelden. De kaart telt af naar kerst.</span></label>
+      <label class="radio-card"><input type="radio" name="soort" value="uitnodiging"{% if form.soort.value == "uitnodiging" %} checked{% endif %}{% if form.soort.field.disabled %} disabled{% endif %}><strong>Uitnodiging</strong><span class="hint">Nodig mensen uit{% if cfg.event_optional %}, bijvoorbeeld voor het kerstdiner, een borrel of brunch{% endif %}: met datum, locatie en aanmelden.</span></label>
+      <label class="radio-card"><input type="radio" name="soort" value="wenskaart"{% if form.soort.value == "wenskaart" %} checked{% endif %}{% if form.soort.field.disabled %} disabled{% endif %}><strong>Wenskaart</strong><span class="hint">{% if cfg.event_optional %}Alleen een warme kerstgroet, zonder datum, locatie of aanmelden. De kaart telt af naar kerst.{% else %}Alleen een persoonlijke groet, zonder datum, locatie of aanmelden. Een vaste prijs: {{ wenskaart_prijs }} incl. btw.{% endif %}</span></label>
     </div>
-    <p class="hint">Je kunt dit later nog wijzigen. Wat je al hebt ingevuld, blijft bewaard.</p>
+    {% if not form.soort.field.disabled %}<p class="hint">Je kunt dit later nog wijzigen. Wat je al hebt ingevuld, blijft bewaard.</p>{% endif %}
   </fieldset>
-  {% endif %}
   <section class="studio-block" aria-labelledby="blok-namen">
     <h2 class="studio-block__title" id="blok-namen">{% if inv.occasion == "zakelijk" %}Evenement{% elif inv.occasion == "kerst" %}Afzender{% else %}Namen{% endif %}</h2>
     <div class="form-row">
@@ -27,9 +26,9 @@
     </div>
     {% include "studio/_field.html" with field=form.headline %}
   </section>
-  <section class="studio-block" aria-labelledby="blok-wanneer" data-alleen-uitnodiging>
+  <section class="studio-block" aria-labelledby="blok-wanneer" data-alleen-uitnodiging{% if wenskaart %} hidden{% endif %}>
     <h2 class="studio-block__title" id="blok-wanneer">Wanneer</h2>
-    {% if cfg.event_optional %}<p class="hint">Alleen nodig bij een uitnodiging. Bij een wenskaart worden 'Wanneer' en 'Waar' niet getoond.</p>{% endif %}
+    <p class="hint">Alleen nodig bij een uitnodiging. Bij een wenskaart worden 'Wanneer' en 'Waar' niet getoond.</p>
     <div class="form-row">
       {% include "studio/_field.html" with field=form.date req=cfg.event_optional|yesno:",1" %}
       {% include "studio/_field.html" with field=form.start_time req=cfg.event_optional|yesno:",1" %}
@@ -37,14 +36,14 @@
     </div>
     {% include "studio/_field.html" with field=form.timezone %}
   </section>
-  <section class="studio-block" aria-labelledby="blok-waar" data-alleen-uitnodiging>
+  <section class="studio-block" aria-labelledby="blok-waar" data-alleen-uitnodiging{% if wenskaart %} hidden{% endif %}>
     <h2 class="studio-block__title" id="blok-waar">Waar</h2>
     {% include "studio/_field.html" with field=form.venue_name req=cfg.event_optional|yesno:",1" %}
     {% include "studio/_field.html" with field=form.address %}
     <details class="studio-more"><summary>Eigen routelink gebruiken</summary>{% include "studio/_field.html" with field=form.route_url %}</details>
   </section>
   <section class="studio-block" aria-labelledby="blok-welkom">
-    <h2 class="studio-block__title" id="blok-welkom">Welkomsttekst</h2>
+    <h2 class="studio-block__title" id="blok-welkom">{% if wenskaart %}Je persoonlijke boodschap{% else %}Welkomsttekst{% endif %}</h2>
     {% include "studio/_field.html" with field=form.welcome_text %}
     {% include "studio/_ai.html" with ai_field="welcome_text" %}
   </section>

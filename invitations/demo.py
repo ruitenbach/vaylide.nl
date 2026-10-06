@@ -105,6 +105,17 @@ IMAGE_SIZES = {
 }
 
 
+# Persoonlijke boodschap en afsluiting van het voorbeeld als wenskaart, per gelegenheid.
+WENSKAART_DEMO = {
+    "bruiloft": ("Lieve Sanne en Daan,\n\nwat een mooie dag was dit. Dank dat we erbij mochten zijn, en dat jullie zo veel liefde delen. We wensen jullie een prachtig leven samen.", "Met heel veel liefs, Mila"),
+    "verloving": ("Lieve Noor en Jesse,\n\nwat fijn om jullie zo gelukkig te zien. Gefeliciteerd met jullie verloving, we kijken uit naar alles wat nog komt.", "Liefs, Mila"),
+    "verjaardag": ("Lieve Lotte,\n\nde allerbeste wensen voor jouw verjaardag. Dat het een dag vol taart, lachen en lieve mensen mag worden.", "Een dikke knuffel, Mila"),
+    "jubileum": ("Lieve Ria en Kees,\n\nveertig jaar samen: wat een prachtig verhaal. Gefeliciteerd, en op nog heel veel mooie jaren.", "Met een glimlach, Mila"),
+    "babyshower": ("Lieve Emma en Thijs,\n\nwat een bijzonder nieuws. Gefeliciteerd met jullie kleintje, we kunnen niet wachten om hem of haar te ontmoeten.", "Liefs, Mila"),
+    "zakelijk": ("Beste team,\n\ndank voor de fijne samenwerking en het vertrouwen. We kijken uit naar het vervolg.", "Met vriendelijke groet, Mila"),
+}
+
+
 def _demo_date(weeks_ahead: int = 30) -> date:
     target = timezone.localdate() + timedelta(weeks=weeks_ahead)
     # Altijd op een zaterdag.
@@ -295,4 +306,8 @@ def demo_content(design_slug: str, occasion: str, palette_key: str = "", soort: 
         content["rsvp"]["questions"] = [
             vraag("parkeren", formal=True),
         ]
+    if soort == "wenskaart" and occasion != "kerst":
+        # Dezelfde kaart als wenskaart: alleen een groet, geen datum, locatie of aanmelden (Kerst heeft zijn eigen wenskaart hierboven).
+        content["soort"] = "wenskaart"
+        content["welcome_text"], content["closing_text"] = WENSKAART_DEMO.get(occasion, WENSKAART_DEMO["zakelijk"])
     return content

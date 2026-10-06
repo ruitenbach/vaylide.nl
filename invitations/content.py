@@ -211,11 +211,14 @@ SOORTEN = ("uitnodiging", "wenskaart")
 
 
 def card_kind(content: dict, occasion: str) -> str:
-    """'uitnodiging' of 'wenskaart'. Alleen gelegenheden met een optioneel evenement (Kerst) kennen een wenskaart;
-    zonder expliciete keuze geldt wat er is ingevuld (oudere concepten)."""
+    """'uitnodiging' of 'wenskaart'. Een wenskaart ontstaat alleen door de uitdrukkelijke keuze van de klant (soort = "wenskaart"),
+    bij elke gelegenheid. Alleen bij een optioneel evenement (Kerst) geldt zonder keuze wat er is ingevuld (oudere concepten);
+    elke andere kaart zonder keuze is een uitnodiging, ook als er nog niets is ingevuld."""
+    soort = content.get("soort")
+    if soort == "wenskaart":
+        return "wenskaart"
     if not occasion_config(occasion).get("event_optional"):
         return "uitnodiging"
-    soort = content.get("soort")
     if soort in SOORTEN:
         return soort
     return "uitnodiging" if has_event_details(content) else "wenskaart"
@@ -305,7 +308,10 @@ def referenced_assets(content: dict) -> set[str]:
 
 
 def required_features(content: dict) -> set[str]:
-    """Welke betaalde functies deze inhoud gebruikt."""
+    """Welke betaalde functies deze inhoud gebruikt. Een wenskaart heeft een vaste prijs en gebruikt er geen (verhaal, galerij,
+    muziek en extra vragen horen niet bij een wenskaart en worden niet getoond)."""
+    if content.get("soort") == "wenskaart":
+        return set()
     sections = content.get("sections") or {}
     needed = set()
     if sections.get("story") and ((content.get("story") or {}).get("text") or "").strip():

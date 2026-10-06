@@ -21,7 +21,7 @@ Zonder GSAP, bij 'minder beweging' of stilgezette beweging werkt alles gewoon: t
   <div class="me-cover__licht" aria-hidden="true"></div>
   <i class="me-glimp" aria-hidden="true"></i>
   <div class="me-cover__stage">
-    <p class="me-cover__aan">{% if v.formal %}Een uitnodiging voor u{% else %}Een uitnodiging voor jou{% endif %}</p>
+    <p class="me-cover__aan">{% if v.card_kind == "wenskaart" %}Een wenskaart voor {% if v.formal %}u{% else %}jou{% endif %}{% elif v.formal %}Een uitnodiging voor u{% else %}Een uitnodiging voor jou{% endif %}</p>
     {% vx_envelop "midnight-emeraude" uid="me" monogram=v.monogram kicker=v.kicker title=v.title date=v.date_short as env %}
     {% include "partials/envelop/collectie.html" %}
     {% if v.show.music %}<button type="button" class="me-cover__music" data-open data-open-music><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor"/></svg>Openen met muziek</button>{% endif %}

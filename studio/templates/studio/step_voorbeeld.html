@@ -3,7 +3,7 @@
 {% block studio %}
 <div class="studio-intro">
   <h1>Je persoonlijke voorbeeld</h1>
-  <p class="lead">Zo ziet je uitnodiging eruit.</p>
+  <p class="lead">Zo ziet je {% if wenskaart %}wenskaart{% else %}uitnodiging{% endif %} eruit.</p>
 </div>
 <div class="preview-layout">
   <div class="preview-stage" data-preview>
@@ -24,8 +24,8 @@
       {% if wenskaart %}<li><a href="{% url 'studio:step' inv.uid 'programma' %}">Afsluiting</a></li>{% else %}
       <li><a href="{% url 'studio:step' inv.uid 'programma' %}">Programma en info</a></li>
       <li><a href="{% url 'studio:step' inv.uid 'aanmelden' %}">Aanmelden</a></li>{% endif %}
-      <li><a href="{% url 'studio:step' inv.uid 'fotos' %}">Foto's en verhaal</a></li>
-      <li><a href="{% url 'studio:step' inv.uid 'stijl' %}">Stijl en onderdelen</a></li>
+      <li><a href="{% url 'studio:step' inv.uid 'fotos' %}">{% if wenskaart_vast %}Foto{% else %}Foto's en verhaal{% endif %}</a></li>
+      <li><a href="{% url 'studio:step' inv.uid 'stijl' %}">{% if wenskaart_vast %}Stijl{% else %}Stijl en onderdelen{% endif %}</a></li>
     </ul>
     {% if paid %}
       {% if unpaid_features %}<p class="notice notice--warning"><strong>Niet in je pakket</strong>{{ unpaid_features|join:", " }} staat aan, maar zit niet in je bestelling. Dit onderdeel wordt niet getoond. <a href="{% url 'portal:wish_new' %}?uitnodiging={{ inv.uid }}">Vraag naar de mogelijkheden</a>.</p>{% endif %}
@@ -37,7 +37,7 @@
       </form>
       {% else %}<p class="notice"><strong>Geen nieuwe wijzigingen</strong>Wat je hier ziet, staat al online.</p>{% endif %}
     {% else %}
-      <a class="btn btn--primary btn--block{% if blocking %} is-disabled{% endif %}" href="{% url 'studio:step' inv.uid 'bestellen' %}"{% if blocking %} aria-disabled="true"{% endif %}>Alles klopt, verder naar bestellen &rarr;</a>
+      <a class="btn btn--primary btn--block{% if blocking %} is-disabled{% endif %}" href="{% url 'studio:step' inv.uid 'bestellen' %}"{% if blocking %} aria-disabled="true"{% endif %}>{% if wenskaart_vast %}Doorgaan naar betalen &middot; {{ wenskaart_prijs }} incl. btw{% else %}Alles klopt, verder naar bestellen{% endif %} &rarr;</a>
       {% if blocking %}<p class="small muted">Vul eerst de punten met 'Nodig' aan.</p>{% endif %}
     {% endif %}
   </aside>

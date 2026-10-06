@@ -221,7 +221,10 @@ def send_draft_saved(invitation, user) -> OutboundEmail:
 def _kind(invitation) -> dict:
     """'uitnodiging voor …' of, bij een kerstkaart, 'kerstkaart van …'."""
     cfg = occasion_config(invitation.occasion if invitation else "")
-    return {"doc_kind": cfg.get("doc_kind", "uitnodiging"), "title_prep": cfg.get("title_prep", "voor")}
+    doc_kind = cfg.get("doc_kind", "uitnodiging")
+    if invitation is not None and invitation.occasion != "kerst" and (invitation.draft_content or {}).get("soort") == "wenskaart":
+        return {"doc_kind": "wenskaart", "title_prep": "van"}
+    return {"doc_kind": doc_kind, "title_prep": cfg.get("title_prep", "voor")}
 
 
 def send_order_confirmation(order) -> OutboundEmail:

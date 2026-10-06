@@ -41,8 +41,8 @@ def create_draft(*, occasion: str, template, owner=None, palette: str = "", soor
     # Een onbekende kleur valt terug op de standaardkleur van het ontwerp.
     keys = [p.get("key") for p in version.palettes]
     content = default_content(occasion, palette if palette in keys else version.default_palette_key)
-    # Uitnodiging of wenskaart (alleen waar de gelegenheid dat kent, zoals Kerst).
-    if soort in SOORTEN and occasion_config(occasion).get("event_optional"):
+    # Uitnodiging of wenskaart: de keuze aan het begin van het samenstellen, bij elke gelegenheid. Zonder keuze blijft het een uitnodiging.
+    if soort in SOORTEN:
         content["soort"] = soort
     return Invitation.objects.create(
         owner=owner,

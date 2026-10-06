@@ -10,7 +10,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from catalog.assets import design_image_url
-from catalog.models import AddOn, Package, Template
+from catalog import wenskaart
+from catalog.models import AddOn, Package, Template, format_euro
+from catalog.specials import is_special
 from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, occasion_config
 from catalog.effects import effect_card_label, effect_summary
 from invitations.demo import DEFAULT_DEMO_OCCASION
@@ -122,17 +124,15 @@ def design_detail(request, slug):
     kleur = request.GET.get("kleur", "")
     if kleur not in palette_keys:
         kleur = version.default_palette_key
-    # Uitnodiging of wenskaart: alleen bij gelegenheden waar het evenement optioneel is (Kerst).
-    soorten = []
-    soort = ""
-    if occasion_config(occasion).get("event_optional"):
-        soort = request.GET.get("soort", "")
-        if soort not in ("uitnodiging", "wenskaart"):
-            soort = "uitnodiging"
-        soorten = [
-            {"key": key, "label": label, "url": f"?gelegenheid={occasion}&kleur={kleur}&soort={key}", "current": key == soort}
-            for key, label in (("uitnodiging", "Uitnodiging"), ("wenskaart", "Wenskaart"))
-        ]
+    # Uitnodiging of wenskaart, bij elke gelegenheid: het voorbeeld toont de kaart als uitnodiging of als wenskaart.
+    soort = request.GET.get("soort", "")
+    if soort not in ("uitnodiging", "wenskaart"):
+        soort = "uitnodiging"
+    soorten = [
+        {"key": key, "label": label, "url": f"?gelegenheid={occasion}&kleur={kleur}&soort={key}", "current": key == soort}
+        for key, label in (("uitnodiging", "Uitnodiging"), ("wenskaart", "Wenskaart"))
+    ]
+    wenskaart_prijs = format_euro(wenskaart.prijs_cents(template))
     extra = f"&soort={soort}" if soort else ""
     palettes = [
         {**p, "url": f"?gelegenheid={occasion}&kleur={p.get('key')}{extra}", "current": p.get("key") == kleur}
@@ -149,6 +149,8 @@ def design_detail(request, slug):
             "palettes": palettes,
             "soort": soort,
             "soorten": soorten,
+            "wenskaart_prijs": wenskaart_prijs,
+            "wenskaart_special": is_special(template),
             "occasion_choices": [(k, OCCASION_LABELS[k]) for k in template.occasions if k in OCCASION_LABELS],
             "demo_url": f"{reverse('invitations:demo', args=[slug])}?gelegenheid={occasion}&kleur={kleur}{extra}",
             "start_url": f"{reverse('studio:start')}?ontwerp={slug}&gelegenheid={occasion}&kleur={kleur}{extra}",
@@ -177,6 +179,9 @@ def pricing(request):
             "packages": Package.objects.filter(is_active=True),
             "addons": AddOn.objects.filter(is_active=True),
             "config": SiteConfig.get(),
+            "wenskaart_prijs": format_euro(wenskaart.PRIJS_CENTS),
+            "wenskaart_prijs_special": format_euro(wenskaart.PRIJS_SPECIAL_CENTS),
+            "wenskaart_punten": wenskaart.HIGHLIGHTS,
         },
     )
 

@@ -16,6 +16,7 @@ from django.utils import timezone
 
 from catalog.effects import effect_view
 from catalog import envelop, envelop_collectie
+from catalog import wenskaart as wenskaart_tekst
 from catalog.occasions import display_title, doc_kind, monogram, occasion_config
 from catalog.paar import view as paar_view
 
@@ -299,6 +300,10 @@ def build_view(
         kicker = organization or "Uitnodiging"
         tagline = f"{organization} nodigt u graag uit" if organization else "Graag nodigen wij u uit"
     names = [n for n in names if n] or [title]
+    # Wenskaart bij een andere gelegenheid dan Kerst: een felicitatie in plaats van een uitnodiging (Kerst heeft eigen teksten in de ontwerpen).
+    wenskaart = card_kind(content, occasion) == "wenskaart"
+    if wenskaart and occasion in wenskaart_tekst.KOP:
+        kicker, tagline = wenskaart_tekst.KOP[occasion]
     # Groot getal voor ontwerpen die de leeftijd of het aantal jaren uitlichten.
     number = ""
     if occasion == "verjaardag":
@@ -418,8 +423,12 @@ def build_view(
     }
     # Een wenskaart is alleen een groet: geen dresscode, 'Goed om te weten' of 'Vragen' (programma, locatie en
     # aanmelden vallen al weg omdat er geen evenement is).
-    if not with_event and cfg.get("event_optional"):
+    if wenskaart or (not with_event and cfg.get("event_optional")):
         for key in ("dresscode", "practical", "contact"):
+            show[key] = False
+    # Een wenskaart met de vaste prijs heeft geen verhaal, galerij of muziek: dat zijn betaalde extra's van de uitnodiging.
+    if content.get("soort") == "wenskaart":
+        for key in ("story", "gallery", "music"):
             show[key] = False
 
     # Aanmelden: deadline, verstreken datum en maximale capaciteit.
@@ -504,8 +513,8 @@ def build_view(
         "occasion": occasion,
         "occasion_label": cfg["label"],
         "title": title,
-        "page_title": f"{title} · {doc_kind(occasion)}",
-        "doc_kind": doc_kind(occasion),
+        "page_title": f"{title} · {'wenskaart' if wenskaart and occasion != 'kerst' else doc_kind(occasion)}",
+        "doc_kind": "wenskaart" if wenskaart and occasion != "kerst" else doc_kind(occasion),
         "names": names,
         # Kleine regel onder de namen (bij een kerstkaart: de namen van het gezin).
         "subnames": (names_raw.get("members") or "").strip() if occasion == "kerst" else "",

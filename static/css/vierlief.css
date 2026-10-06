@@ -886,7 +886,7 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .prijskaart__kop { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .prijskaart h2 { margin: 0; font-size: 1.7rem; }
 .prijskaart__soort { display: inline-flex; padding: .22rem .7rem; border-radius: 999px; font-size: .74rem; font-weight: 700; letter-spacing: .06em; white-space: nowrap; }
-.prijskaart__soort--vast { background: var(--success-bg); color: var(--success); }
+.prijskaart__soort--vast, .prijskaart__soort--wens { background: var(--success-bg); color: var(--success); }
 .prijskaart__soort--aanvraag { background: var(--warning-bg); color: var(--warning); }
 .prijskaart__lint { position: absolute; top: -.8rem; left: 50%; translate: -50% 0; padding: .25rem .9rem; border-radius: 999px; background: var(--accent); color: #fff; font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
 .prijskaart .price { font-size: 2.7rem; }
@@ -979,6 +979,7 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .betaalmiddelen--inline { display: inline-flex; vertical-align: middle; gap: .35rem; margin-left: .25rem; }
 .betaalmiddelen--inline .betaalmiddel { min-height: 1.8rem; padding: .1rem .6rem; font-size: .86rem; }
 .betaal-uitleg { color: var(--ink-2); font-size: .95rem; line-height: 2; }
+.prijskaart--wens { max-width: 34rem; margin-inline: auto; }
 .sociale-links { display: flex; gap: .6rem; list-style: none; margin: 0; padding: 0; }
 .sociale-links a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--paper); color: var(--ink); box-shadow: 0 0 0 1px var(--line-strong); transition: color .2s, box-shadow .2s, transform .2s; }
 .sociale-links a:hover { color: var(--accent-text); box-shadow: 0 0 0 1px var(--accent); transform: translateY(-2px); }

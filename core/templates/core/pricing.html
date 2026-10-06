@@ -59,6 +59,18 @@
   </div>
 </section>
 
+<section class="section section--flush" aria-labelledby="wens-titel">
+  <div class="container container--mid">
+    <article class="prijskaart prijskaart--wens">
+      <div class="prijskaart__kop"><h2 id="wens-titel">Wenskaart</h2><span class="prijskaart__soort prijskaart__soort--wens">Vaste prijs</span></div>
+      <p class="price">{{ wenskaart_prijs }} <small>incl. btw, eenmalig</small></p>
+      <p class="muted">Alleen een persoonlijke groet, zonder datum, locatie of aanmelden. In een special-ontwerp {{ wenskaart_prijs_special }} incl. btw.</p>
+      <ul class="checklist">{% for h in wenskaart_punten %}<li>{{ h }}</li>{% endfor %}</ul>
+      <a class="btn btn--secondary" href="{% url 'studio:start' %}?soort=wenskaart">Maak een wenskaart</a>
+    </article>
+  </div>
+</section>
+
 <section class="section" aria-labelledby="opties-titel">
   <div class="container container--mid">
     <div class="sectie-kop">

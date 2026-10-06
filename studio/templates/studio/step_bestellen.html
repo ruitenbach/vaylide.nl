@@ -4,7 +4,7 @@
 <div class="studio-intro studio-intro--bijna">
   <p class="studio-intro__kicker">Laatste stap</p>
   <h1>Je bent er bijna voor je unieke kaart!</h1>
-  <p class="lead">Nog één klik en je uitnodiging is klaar om te delen. Je betaalt eenmalig; zodra je betaling is bevestigd, staat je kaart automatisch online met je eigen link en QR-code.</p>
+  <p class="lead">Nog één klik en je {% if wenskaart_vast %}wenskaart{% else %}uitnodiging{% endif %} is klaar om te delen. Je betaalt eenmalig; zodra je betaling is bevestigd, staat je kaart automatisch online met je eigen link en QR-code.</p>
 </div>
 {% if error %}<div class="form-errors" role="alert">{{ error }}</div>{% endif %}
 {% include "studio/_controle.html" with issues=issues alleen_nodig=True %}
@@ -14,12 +14,12 @@
   {% if quote %}
   <input type="hidden" name="package" value="{{ quote.package.code }}">
   <section class="studio-block" aria-labelledby="pakket-titel">
-    <h2 class="studio-block__title" id="pakket-titel">Jouw pakket</h2>
+    <h2 class="studio-block__title" id="pakket-titel">{% if wenskaart_vast %}Jouw wenskaart{% else %}Jouw pakket{% endif %}</h2>
     <div class="pakket-keuze{% if upgrade %} pakket-keuze--met-upgrade{% endif %}">
       <article class="pakket-kaart pakket-kaart--gekozen" aria-label="Gekozen pakket: {{ quote.package.name }}">
         <p class="pakket-kaart__label">Jouw keuze</p>
         <h3 class="pakket-kaart__naam">{{ quote.package.name }}</h3>
-        <p class="pakket-kaart__prijs">{{ quote.package.price_cents|euro }}</p>
+        <p class="pakket-kaart__prijs">{{ quote.package.price_cents|euro }}{% if wenskaart_vast %} <span class="bon__btw">incl. btw</span>{% endif %}</p>
         <ul class="pakket-kaart__lijst">{% for h in quote.package.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
         {% if downgrade %}<button type="submit" class="link-plain small" name="wissel" value="{{ downgrade.package.code }}" formnovalidate>Liever {{ downgrade.package.name }} ({{ downgrade.package.price_cents|euro }})?</button>{% endif %}
       </article>
@@ -73,7 +73,7 @@
       <tbody>{% for line in quote.lines %}<tr><td>{{ line.description }}{% if line.reason %}<span class="bon__reden">{{ line.reason }}</span>{% endif %}</td><td class="num">{{ line.total_display }}</td></tr>{% endfor %}</tbody>
       <tfoot><tr><th>Totaal <span class="bon__btw">incl. btw</span></th><th class="num">{{ quote.total_display }}</th></tr></tfoot>
     </table>
-    <p class="small muted">Je uitnodiging blijft {{ quote.availability_months }} maanden online vanaf de aankoopdatum: de dag waarop je betaling is bevestigd.{% if looptijd %} Betaal je vandaag, dan staat hij online tot en met {{ looptijd.end|date:"j F Y" }}.{% endif %} Er is geen automatische verlenging.</p>
+    <p class="small muted">Je {% if wenskaart_vast %}wenskaart{% else %}uitnodiging{% endif %} blijft {{ quote.availability_months }} maanden online vanaf de aankoopdatum: de dag waarop je betaling is bevestigd.{% if looptijd %} Betaal je vandaag, dan staat hij online tot en met {{ looptijd.end|date:"j F Y" }}.{% endif %} Er is geen automatische verlenging.</p>
     {% if looptijd.before_event %}<p class="notice notice--warning"><strong>Let op</strong>Je evenement is op {{ looptijd.event|date:"j F Y" }}, na het einde van de online periode ({{ looptijd.end|date:"j F Y" }}). Je kunt later bestellen, of kiezen voor een langere looptijd.</p>{% endif %}
   </section>
   {% endif %}

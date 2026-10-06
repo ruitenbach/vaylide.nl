@@ -15,6 +15,18 @@
   {% csrf_token %}
   {% if kleur %}<input type="hidden" name="kleur" value="{{ kleur }}">{% endif %}
   {% if soort %}<input type="hidden" name="soort" value="{{ soort }}">{% endif %}
+  <fieldset class="studio-block" id="soort">
+    <legend class="studio-block__title">Wat wil je maken?</legend>
+    <div class="soort-grid">
+      <a class="soort-card{% if not wenskaart %} is-gekozen{% endif %}" href="?soort=uitnodiging{% if occasion %}&amp;gelegenheid={{ occasion }}{% endif %}{% if chosen %}&amp;ontwerp={{ chosen }}{% endif %}{% if kleur %}&amp;kleur={{ kleur }}{% endif %}#soort"{% if not wenskaart %} aria-current="true"{% endif %}>
+        <strong>Uitnodiging</strong><span class="small">Met datum, locatie, programma en aanmelden.</span>
+      </a>
+      <a class="soort-card{% if wenskaart %} is-gekozen{% endif %}" href="?soort=wenskaart{% if occasion %}&amp;gelegenheid={{ occasion }}{% endif %}{% if chosen %}&amp;ontwerp={{ chosen }}{% endif %}{% if kleur %}&amp;kleur={{ kleur }}{% endif %}#soort"{% if wenskaart %} aria-current="true"{% endif %}>
+        <strong>Wenskaart</strong><span class="small">Een persoonlijke groet: naam, boodschap en eventueel een foto. Snel klaar.</span>
+        <span class="soort-card__prijs">{{ wenskaart_prijs }} <span class="small">incl. btw</span> &middot; Special {{ wenskaart_prijs_special }} <span class="small">incl. btw</span></span>
+      </a>
+    </div>
+  </fieldset>
   <fieldset class="studio-block">
     <legend class="studio-block__title"><span class="studio-block__num">1</span> Gelegenheid</legend>
     <div class="occasion-grid">
@@ -22,7 +34,7 @@
       <label class="radio-card occasion-card">
         <input type="radio" name="occasion" value="{{ key }}"{% if key == occasion %} checked{% endif %} required data-occasion-radio>
         <strong>{{ label }}</strong><span class="small muted">{{ intro }}</span>
-        <a class="occasion-card__link" href="?gelegenheid={{ key }}{% if chosen %}&amp;ontwerp={{ chosen }}{% endif %}#ontwerpen">Kies</a>
+        <a class="occasion-card__link" href="?gelegenheid={{ key }}{% if chosen %}&amp;ontwerp={{ chosen }}{% endif %}{% if soort %}&amp;soort={{ soort }}{% endif %}#ontwerpen">Kies</a>
       </label>
       {% endfor %}
     </div>
@@ -37,13 +49,19 @@
         <img src="{% design_image t.slug %}" alt="" width="400" height="500" loading="lazy">
         <strong>{{ t.name }}</strong>
         <span class="small muted">{{ t.tagline }}</span>
+        {% if wenskaart %}<span class="design-pick__prijs">{% if t.special %}{{ wenskaart_prijs_special }}{% else %}{{ wenskaart_prijs }}{% endif %} <span class="small">incl. btw</span></span>{% endif %}
         <a class="design-pick__demo" href="{% url 'invitations:demo' t.slug %}{% if occasion %}?gelegenheid={{ occasion }}{% endif %}" target="_blank" rel="noopener">Bekijk voorbeeld<span class="visually-hidden"> van {{ t.name }} (opent in nieuw venster)</span></a>
       </label>
       {% endfor %}
     </div>
     {% if form.template.errors %}<p class="field__error">{{ form.template.errors.0 }}</p>{% endif %}
   </fieldset>
-  {% if packages %}
+  {% if wenskaart %}
+  <fieldset class="studio-block" id="prijs">
+    <legend class="studio-block__title"><span class="studio-block__num">3</span> Prijs</legend>
+    <p>Een wenskaart kost <strong>{{ wenskaart_prijs }}</strong> incl. btw, een wenskaart in een special-ontwerp <strong>{{ wenskaart_prijs_special }}</strong> incl. btw. Je betaalt pas aan het eind, eenmalig, zonder pakket of extra's.</p>
+  </fieldset>
+  {% elif packages %}
   <fieldset class="studio-block" id="pakket">
     <legend class="studio-block__title"><span class="studio-block__num">3</span> Pakket</legend>
     <p class="hint">Je betaalt pas aan het eind. De online periode telt vanaf de dag waarop je betaling is bevestigd. Kies je Essentieel, dan kun je bij het bestellen nog upgraden of losse onderdelen toevoegen.</p>

@@ -108,17 +108,19 @@ class DetailsForm(StepForm):
                                    widget=forms.Textarea(attrs={"rows": 5, "data-ai-field": "welcome_text"}),
                                    help_text="Een persoonlijke tekst bovenaan je uitnodiging.")
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, soort_vergrendeld: bool = False, **kwargs):
         super().__init__(*args, **kwargs)
         cfg = occasion_config(self.occasion)
         self.event_optional = bool(cfg.get("event_optional"))
         if self.event_optional:
             self.fields["venue_name"].help_text = "Bijvoorbeeld 'Bij ons thuis' of de naam van het restaurant."
-            # Uitnodiging (met datum, locatie en aanmelden) of wenskaart (alleen een groet).
-            self.fields["soort"] = forms.ChoiceField(
-                label="Wat voor kaart wordt het?", choices=[(s, s) for s in SOORTEN], required=False, widget=forms.RadioSelect)
-            if not self.is_bound:
-                self.initial["soort"] = card_kind(self.content, self.occasion)
+        # Uitnodiging (met datum, locatie en aanmelden) of wenskaart (alleen een groet), bij elke gelegenheid. Na betaling ligt de keuze
+        # vast: het is een ander product met een andere prijs.
+        self.fields["soort"] = forms.ChoiceField(
+            label="Wat voor kaart wordt het?", choices=[(s, s) for s in SOORTEN], required=False, widget=forms.RadioSelect,
+            disabled=soort_vergrendeld)
+        self.initial["soort"] = card_kind(self.content, self.occasion)
+        self.soort_vergrendeld = soort_vergrendeld
         self.name_keys = []
         new_fields = {}
         for key, label, required, max_len, help_text in cfg["name_fields"]:
@@ -178,8 +180,11 @@ class DetailsForm(StepForm):
         content["start_time"] = d["start_time"].strftime("%H:%M") if d.get("start_time") else ""
         content["end_time"] = d["end_time"].strftime("%H:%M") if d.get("end_time") else ""
         content["timezone"] = d.get("timezone") or "Europe/Amsterdam"
-        if self.event_optional:
-            content["soort"] = d.get("soort") if d.get("soort") in SOORTEN else card_kind(content, self.occasion)
+        if not self.fields["soort"].disabled:
+            if d.get("soort") in SOORTEN:
+                content["soort"] = d["soort"]
+            elif self.event_optional:
+                content["soort"] = card_kind(content, self.occasion)
         return content
 
     def missing(self) -> dict[str, str]:
@@ -188,12 +193,12 @@ class DetailsForm(StepForm):
         for name, key, label, required in self.name_keys:
             if required and not _s(d.get(name)):
                 errors[name] = f"Vul '{label.lower()}' in."
-        # Bij een kerstkaart is het evenement optioneel: een wenskaart heeft geen datum of locatie nodig.
-        # Zonder keuze (oudere formulieren) geldt: leeg laten is een wenskaart.
+        # Een wenskaart heeft geen datum of locatie nodig, bij elke gelegenheid.
+        soort = d.get("soort")
+        if soort == "wenskaart":
+            return errors
+        # Bij een kerstkaart is het evenement optioneel. Zonder keuze (oudere formulieren) geldt: leeg laten is een wenskaart.
         if self.event_optional:
-            soort = d.get("soort")
-            if soort == "wenskaart":
-                return errors
             if soort != "uitnodiging" and not any(_s(d.get(k)) for k in ("date", "start_time", "end_time", "venue_name", "address")):
                 return errors
         if not d.get("date"):
@@ -446,6 +451,8 @@ class PhotosForm(StepForm):
         self.audio = list(audio)
         super().__init__(*args, **kwargs)
         c = self.content
+        # Een wenskaart heeft alleen een hoofdfoto: geen galerij, verhaal of muziek (die blijven ongewijzigd bewaard).
+        self.wenskaart = c.get("soort") == "wenskaart"
         self.fields["hero"].choices = [("", "Geen hoofdfoto")] + [(str(p.uid), p.original_name or "Foto") for p in self.photos]
         self.fields["music_asset"].choices = [("", "Geen muziek")] + [(str(a.uid), a.original_name or "Muziek") for a in self.audio]
         hero = (c.get("photos") or {}).get("hero") or {}
@@ -501,6 +508,9 @@ class PhotosForm(StepForm):
     def apply(self, content: dict) -> dict:
         d = self.cleaned_data
         hero_uid = d.get("hero") or ""
+        if self.wenskaart:
+            content.setdefault("photos", {"hero": None, "gallery": []})["hero"] = self._ref(hero_uid) if hero_uid else None
+            return content
         gallery = []
         for p in self.photos:
             uid = str(p.uid)
@@ -638,6 +648,11 @@ class StyleForm(StepForm):
         super().__init__(*args, **kwargs)
         self.template_version = template_version
         self.hidden_sections = self.WENSKAART_HIDDEN if card_kind(self.content, self.occasion) == "wenskaart" else frozenset()
+        if self.content.get("soort") == "wenskaart":
+            # Een wenskaart met de vaste prijs: ook geen verhaal, galerij of muziek, en buiten Kerst geen afteller (er is geen datum).
+            self.hidden_sections = self.hidden_sections | {"story", "gallery", "music"}
+            if not occasion_config(self.occasion).get("event_optional"):
+                self.hidden_sections = self.hidden_sections | {"countdown"}
         self.fields["palette"].choices = [(p["key"], p["name"]) for p in template_version.palettes]
         # Bij een ontwerp met de keuze uit de Envelope Collection staat de opening bij Envelop & zegel ('geen envelop' = geen opening).
         self.opening_hier = not (envelop_collectie.modus(template_version) == "optional" and envelop_collectie.beschikbaar(self.occasion))

@@ -7,7 +7,7 @@
 <section class="cover lp-cover" data-cover data-duration="2700" data-fx-delay="160" aria-label="Openingsscherm">
   <div class="fx-slot" data-fx-slot="cover" aria-hidden="true"></div>
   <div class="lp-cover__inner">
-    <p class="lp-cover__to">Een uitnodiging voor jou</p>
+    <p class="lp-cover__to">{% if v.card_kind == "wenskaart" %}Een wenskaart voor jou{% else %}Een uitnodiging voor jou{% endif %}</p>
     <div class="lp-env-wrap" data-fx-tilt>
     <div class="lp-env" aria-hidden="true">
       <div class="lp-env__back"></div>

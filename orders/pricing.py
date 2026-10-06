@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from catalog import wenskaart
 from catalog.features import feature_label
 from catalog.specials import is_special, special_addon
 from catalog.models import AddOn, Package, format_euro
@@ -62,7 +63,17 @@ def optional_addons() -> list[AddOn]:
     return list(AddOn.objects.filter(is_active=True, extra_months__gt=0).order_by("sort_order"))
 
 
+def build_wenskaart_quote(content: dict, template_version=None) -> Quote:
+    """Een wenskaart: één vaste prijs (€ 14,95, bij een special-ontwerp € 24,95, incl. btw), geen pakketten, opties of meerprijzen."""
+    package = wenskaart.package(template_version)
+    quote = Quote(package=package, features=set(), max_gallery_photos=0, availability_months=package.availability_months)
+    quote.lines.append(QuoteLine(code=f"pakket:{package.code}", description=package.name, unit_price_cents=package.price_cents))
+    return quote
+
+
 def build_quote(content: dict, package: Package, optional_codes: list[str] | None = None, template_version=None) -> Quote:
+    if wenskaart.is_wenskaart(content):
+        return build_wenskaart_quote(content, template_version)
     if not package.is_active:
         raise PricingError("Dit pakket is niet meer beschikbaar.")
     quote = Quote(
@@ -111,6 +122,8 @@ def build_quote(content: dict, package: Package, optional_codes: list[str] | Non
 
 
 def compare_packages(content: dict, optional_codes: list[str] | None = None, template_version=None) -> list[Quote]:
+    if wenskaart.is_wenskaart(content):
+        return [build_wenskaart_quote(content, template_version)]
     quotes = []
     for package in Package.objects.filter(is_active=True).order_by("sort_order", "price_cents"):
         try:

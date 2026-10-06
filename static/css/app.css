@@ -47,13 +47,23 @@
 
 .step-actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin-top: .5rem; }
 .step-actions__next { margin-left: auto; }
+.step-actions__snel { white-space: nowrap; }
 .step-actions--start { justify-content: space-between; }
 .step-actions--start p { max-width: 32rem; margin: 0; }
-@media (max-width: 480px) { .step-actions .btn { flex: 1 1 100%; } .step-actions__next { order: -1; margin-left: 0; } }
+@media (max-width: 480px) { .step-actions .btn { flex: 1 1 100%; } .step-actions__next { order: -1; margin-left: 0; } .step-actions__snel { order: -2; } }
 
 .occasion-grid { display: grid; gap: .7rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
 .occasion-grid--compact { grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); }
 .occasion-card__link { font-size: .85rem; font-weight: 600; }
+/* Keuze aan het begin: uitnodiging of wenskaart (gewone links, dus ook zonder JavaScript). */
+.soort-grid { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); }
+.soort-card { display: grid; gap: .3rem; align-content: start; padding: 1rem 1.1rem; border: 1px solid var(--line-strong); border-radius: var(--radius); background: #fff; color: var(--ink); text-decoration: none; }
+.soort-card strong { font-size: 1.1rem; }
+.soort-card:hover { border-color: var(--accent); }
+.soort-card.is-gekozen { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: color-mix(in srgb, var(--gold-soft) 22%, #fff); }
+.soort-card:focus-visible { outline: 3px solid var(--gold-deep); outline-offset: 2px; }
+.soort-card__prijs { margin-top: .2rem; font-weight: 600; color: var(--accent-text); }
+.design-pick__prijs { font-weight: 600; color: var(--accent-text); }
 .js-enabled .occasion-card__link { display: none; }
 .design-pick-grid { display: grid; gap: .9rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); }
 .design-pick img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; margin-bottom: .4rem; }

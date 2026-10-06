@@ -6,7 +6,7 @@ envelop is dan klaar. Alles hierna (aanmelden, aftellen, muziek, delen) werkt zo
 {% endcomment %}{% with ec=v.envelop_collectie %}
 <section class="cover vxc vxc--{{ ec.achtergrond }}" data-cover data-duration="{{ ec.duur }}" data-fx-delay="520" data-fx-intro="{{ ec.intro }}" aria-label="Openingsscherm" style="--vxc-duur: {{ ec.duur }}ms">
   <div class="vxc__stage">
-    <p class="vxc__aan">{% if v.formal %}Een uitnodiging voor u{% else %}Een uitnodiging voor jou{% endif %}</p>
+    <p class="vxc__aan">{% if v.card_kind == "wenskaart" %}Een wenskaart voor {% if v.formal %}u{% else %}jou{% endif %}{% elif v.formal %}Een uitnodiging voor u{% else %}Een uitnodiging voor jou{% endif %}</p>
     {% vx_envelop ec.stijl uid="cv" zegel=ec.zegel monogram=ec.monogram kicker=v.kicker title=v.title date=v.date_short as env %}
     {% include "partials/envelop/collectie.html" %}
     {% if v.show.music %}<button type="button" class="vxc__muziek" data-open data-open-music data-vx-open-for="cv-env"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor"/></svg>Openen met muziek</button>{% endif %}

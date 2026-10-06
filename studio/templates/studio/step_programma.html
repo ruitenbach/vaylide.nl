@@ -3,11 +3,11 @@
 {% block studio %}
 <div class="studio-intro">
   {% if wenskaart %}<h1>Je afsluitende wens</h1>
-  <p class="lead">Sluit je kerstkaart af met een persoonlijke wens. Dit is optioneel.</p>
+  <p class="lead">Sluit je {% if inv.occasion == "kerst" %}kerstkaart{% else %}wenskaart{% endif %} af met een persoonlijke wens. Dit is optioneel.</p>
   {% else %}<h1>Programma en praktische informatie</h1>
   <p class="lead">Alles is optioneel; lege onderdelen worden niet getoond.</p>{% endif %}
 </div>
-{% if wenskaart %}<p class="notice">Je maakt een wenskaart: een warme kerstwens, zonder programma, dresscode, praktische informatie of contact. Hier schrijf je alleen je afsluitende wens.</p>{% endif %}
+{% if wenskaart %}<p class="notice">Je maakt een wenskaart: {% if inv.occasion == "kerst" %}een warme kerstwens, {% endif %}zonder programma, dresscode, praktische informatie of contact. Hier schrijf je alleen je afsluitende wens.</p>{% endif %}
 {% include "studio/_conflict.html" %}
 <form method="post" class="form studio-form" data-once data-dirty-check novalidate>
   {% csrf_token %}

@@ -16,6 +16,7 @@ from django.db import IntegrityError, transaction
 from django.urls import reverse
 from django.utils import timezone
 
+from catalog import wenskaart
 from catalog.models import Package
 from core.voorwaarden import CURRENT as TERMS_VERSION, DELIVERY_CONSENT, SERVICE_CONSENT
 from invitations.content import publish_issues
@@ -24,7 +25,7 @@ from invitations.services import snapshot
 from processing.jobs import enqueue
 
 from .models import Order, OrderLine, Payment, PaymentEvent
-from .pricing import build_quote
+from .pricing import build_quote, build_wenskaart_quote
 from .providers import ProviderError, RemoteStatus, get_provider
 
 log = logging.getLogger(__name__)
@@ -77,10 +78,15 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
         blocking = [i for i in publish_issues(invitation.draft_content, invitation.occasion, first_publication=True) if i.blocking]
         if blocking:
             raise CheckoutError("Je uitnodiging is nog niet compleet: " + " ".join(i.message for i in blocking))
-        package = Package.objects.filter(code=package_code, is_active=True).first()
-        if package is None:
-            raise CheckoutError("Kies een pakket.")
-        quote = build_quote(invitation.draft_content, package, optional_codes, template_version=invitation.template_version)
+        if wenskaart.is_wenskaart(invitation.draft_content):
+            # Een wenskaart heeft één vaste prijs; een meegestuurd pakket of extra optie telt niet.
+            quote = build_wenskaart_quote(invitation.draft_content, invitation.template_version)
+            package = quote.package
+        else:
+            package = Package.objects.filter(code=package_code, is_active=True).first()
+            if package is None:
+                raise CheckoutError("Kies een pakket.")
+            quote = build_quote(invitation.draft_content, package, optional_codes, template_version=invitation.template_version)
         # Eerdere, onbetaalde bestellingen voor deze uitnodiging vervallen.
         Order.objects.filter(invitation=invitation, kind=Order.Kind.INVITATION, status__in=[Order.Status.PENDING, Order.Status.FAILED]).update(
             status=Order.Status.CANCELLED

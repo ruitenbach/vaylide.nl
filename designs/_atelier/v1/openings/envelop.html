@@ -1,7 +1,7 @@
 <section class="cover a-cover a-cover--envelop a-names-{{ a.names }}" data-cover data-duration="2600" data-fx-delay="120" aria-label="Openingsscherm">
   <div class="fx-slot" data-fx-slot="cover" aria-hidden="true"></div>
   <div class="a-cover__inner">
-    <p class="a-cover__kicker">Een uitnodiging voor jou</p>
+    <p class="a-cover__kicker">{% if v.card_kind == "wenskaart" %}Een wenskaart voor jou{% else %}Een uitnodiging voor jou{% endif %}</p>
     <div class="a-env-wrap" data-fx-tilt>
       <div class="a-env" aria-hidden="true">
         <div class="a-env__back"></div>

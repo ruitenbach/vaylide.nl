@@ -17,8 +17,10 @@ class CardKindTests(VaylideTestCase):
         content["soort"] = "wenskaart"
         self.assertEqual(card_kind(content, "kerst"), "wenskaart")
         self.assertFalse(event_expected(content, "kerst"))
-        # Andere gelegenheden kennen geen wenskaart.
-        self.assertEqual(card_kind({"soort": "wenskaart"}, "bruiloft"), "uitnodiging")
+        # Andere gelegenheden: een wenskaart alleen op uitdrukkelijke keuze; zonder keuze (of "uitnodiging") altijd een uitnodiging.
+        self.assertEqual(card_kind({"soort": "wenskaart"}, "bruiloft"), "wenskaart")
+        self.assertEqual(card_kind({"soort": ""}, "bruiloft"), "uitnodiging")
+        self.assertEqual(card_kind({"soort": "uitnodiging"}, "bruiloft"), "uitnodiging")
 
     def test_greeting_card_can_be_published_without_event_even_with_old_details(self):
         content = demo_content("aan-tafel", "kerst")
@@ -80,14 +82,15 @@ class StudioChoiceTests(VaylideTestCase):
 
 
 class DesignPageAndDemoTests(VaylideTestCase):
-    def test_toggle_on_christmas_designs_only(self):
+    def test_toggle_on_every_design(self):
         toon_verborgen_ontwerpen()
         for slug in KERST:
             html = Client().get(f"/ontwerpen/{slug}/", {"soort": "wenskaart"}).content.decode()
             self.assertIn('data-soort="wenskaart" aria-current="true"', html, slug)
             self.assertRegex(html, r'<iframe src="[^"]*soort=wenskaart', slug)
             self.assertRegex(html, r'href="/maken/[^"]*soort=wenskaart[^"]*" data-kleur-link', slug)
-        self.assertNotContains(Client().get("/ontwerpen/liefde-op-papier/"), "data-soort-link")
+        html = Client().get("/ontwerpen/liefde-op-papier/", {"soort": "wenskaart"}).content.decode()
+        self.assertIn('data-soort="wenskaart" aria-current="true"', html)
 
     def test_demo_as_greeting_card(self):
         toon_verborgen_ontwerpen()

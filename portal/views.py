@@ -18,6 +18,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST
 
+from catalog import wenskaart
 from core.privacy import anonymize_user, delete_invitation
 from invitations.models import GuestResponse, Invitation
 from invitations.qr import qr_png, qr_svg
@@ -107,7 +108,8 @@ def invitation_detail(request, uid):
             "has_changes": invitation.has_unpublished_changes,
             "processing_order": orders.filter(status=Order.Status.PAID).exclude(fulfilment_status=Order.Fulfilment.DONE).first(),
             "wishes": invitation.custom_requests.order_by("-updated_at")[:5],
-            "envelop_stap": heeft_envelopstap(invitation),
+            "envelop_stap": heeft_envelopstap(invitation) and not wenskaart.is_wenskaart(invitation.draft_content),
+            "wenskaart": wenskaart.is_wenskaart(invitation.draft_content),
         },
     )
 

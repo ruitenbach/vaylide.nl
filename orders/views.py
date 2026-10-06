@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
 
+from catalog import wenskaart
 from catalog.occasions import doc_kind
 from processing.models import OutboundEmail
 
@@ -91,11 +92,14 @@ def status(request, uid):
     order.refresh_from_db()
     state = _state(order)
     kind = doc_kind(order.invitation.occasion) if order.invitation else "uitnodiging"
+    greeting = bool(order.invitation) and order.package_code in (wenskaart.CODE, wenskaart.CODE_SPECIAL)
+    if greeting and order.invitation.occasion != "kerst":
+        kind = "wenskaart"
     payment = order.latest_payment
     from .methods import LABELS
 
     method_label = LABELS.get((payment.method or "").lower(), "") if payment else ""
-    return render(request, "orders/status.html", {"order": order, "state": state, "payment": payment, "doc_kind": kind, "method_label": method_label})
+    return render(request, "orders/status.html", {"order": order, "state": state, "payment": payment, "doc_kind": kind, "wenskaart": greeting, "method_label": method_label})
 
 
 @require_http_methods(["GET", "HEAD", "POST"])  # HEAD: controlerobots (zoals die van Mollie) vragen soms alleen de kop op

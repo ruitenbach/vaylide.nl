@@ -17,13 +17,13 @@ STEP_LABELS = dict(STEPS)
 FORM_STEPS = ["ontwerp", "envelop", "gegevens", "programma", "aanmelden", "fotos", "stijl"]
 
 
-# Bij een wenskaart (Kerst zonder evenement) is er niets aan te melden, en van 'Programma & info' blijft alleen de
-# afsluitende tekst over.
-WENSKAART_SKIP = frozenset({"aanmelden"})
+# Bij een wenskaart is er niets aan te melden en kiest de klant geen envelop (het ontwerp heeft zijn eigen opening): de route blijft kort.
+# Van 'Programma & info' blijft alleen de afsluitende tekst over.
+WENSKAART_SKIP = frozenset({"aanmelden", "envelop"})
 
 # Bij een ontwerp zonder keuze uit de Envelope Collection (envelope_mode is niet "optional") bestaat de stap Envelop & zegel niet.
 ENVELOP_SKIP = frozenset({"envelop"})
-WENSKAART_LABELS = {"programma": "Afsluiting"}
+WENSKAART_LABELS = {"programma": "Afsluiting", "fotos": "Foto", "stijl": "Stijl"}
 
 
 def heeft_envelopstap(inv) -> bool:

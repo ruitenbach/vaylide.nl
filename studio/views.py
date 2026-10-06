@@ -18,6 +18,7 @@ from catalog.models import Package, Template, format_euro
 from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, occasion_config
 from catalog import envelop_collectie
 from catalog.envelop import choice as envelop_choice
+from catalog import wenskaart
 from catalog.specials import is_special, special_addon
 from studio import pakket
 from core.ai import AIUnavailable, suggest_text
@@ -90,8 +91,8 @@ def _eigen_opening(inv: Invitation) -> dict | None:
 
 
 def _na_ontwerp(inv: Invitation) -> str:
-    """De stap na het kiezen van een ontwerp: Envelop & zegel als dat ontwerp die keuze heeft, anders Gegevens."""
-    return "envelop" if _envelop_stap(inv) else "gegevens"
+    """De stap na het kiezen van een ontwerp: Envelop & zegel als dat ontwerp die keuze heeft (niet bij een wenskaart), anders Gegevens."""
+    return "envelop" if _envelop_stap(inv) and not _wenskaart(inv) else "gegevens"
 
 
 def _context(request, inv: Invitation, step: str, **extra) -> dict:
@@ -104,6 +105,9 @@ def _context(request, inv: Invitation, step: str, **extra) -> dict:
         "step": step,
         "step_label": (WENSKAART_LABELS if wens else {}).get(step, STEP_LABELS.get(step, "")),
         "wenskaart": wens,
+        "snel_afronden": wens and not paid,
+        "wenskaart_vast": wenskaart.is_wenskaart(inv.draft_content),
+        "wenskaart_prijs": format_euro(wenskaart.prijs_cents(inv.template_version)),
         "progress": items,
         "progress_current": current,
         "progress_pct": round(100 * current["number"] / len(items)),
@@ -141,7 +145,8 @@ def start(request):
             inv = create_draft(occasion=form.cleaned_data["occasion"], template=form.cleaned_data["template_obj"], owner=owner,
                                palette=request.POST.get("kleur", "")[:40], soort=request.POST.get("soort", "")[:20])
             package_code = request.POST.get("pakket", "")
-            if package_code in {p.code for p in pakket.active_packages()}:
+            # Een wenskaart heeft geen pakket: de prijs staat vast (catalog/wenskaart.py).
+            if not _wenskaart(inv) and package_code in {p.code for p in pakket.active_packages()}:
                 inv.package_code = package_code
                 inv.save(update_fields=["package_code"])
             remember_draft(request, inv)
@@ -151,6 +156,9 @@ def start(request):
     shown = by_occasion([t for t in templates if not occasion or t.supports(occasion)], occasion)
     if chosen and occasion and chosen not in [t.slug for t in shown]:
         chosen = ""
+    soort = request.GET.get("soort") or request.POST.get("soort") or ""
+    soort = soort if soort in ("uitnodiging", "wenskaart") else ""
+    wens_start = soort == "wenskaart"
     packages = pakket.active_packages()
     wanted = request.GET.get("pakket") or request.POST.get("pakket") or ""
     chosen_pkg = next((p for p in packages if p.code == wanted), None) or pakket.default_package(packages)
@@ -170,7 +178,11 @@ def start(request):
             "templates": shown,
             "chosen": chosen,
             "kleur": (request.GET.get("kleur") or request.POST.get("kleur") or "")[:40],
-            "soort": s if (s := request.GET.get("soort") or request.POST.get("soort") or "") in ("uitnodiging", "wenskaart") else "",
+            "soort": soort,
+            "wenskaart": wens_start,
+            "wenskaart_prijs": format_euro(wenskaart.PRIJS_CENTS),
+            "wenskaart_prijs_special": format_euro(wenskaart.PRIJS_SPECIAL_CENTS),
+            "special_slugs": [t.slug for t in shown if t.special],
             "existing": existing,
             "packages": packages,
             "chosen_package": chosen_pkg.code if chosen_pkg else "",
@@ -233,12 +245,15 @@ def step(request, uid, step):
             posted_rev = 0
         if form.is_valid():
             new_content = form.apply(copy.deepcopy(content))
-            missing = form.missing() if action == "volgende" else {}
+            # 'Snel afronden' (alleen bij een wenskaart): bewaar wat er staat en ga direct naar het voorbeeld.
+            snel = action == "snel" and card_kind(new_content, inv.occasion) == "wenskaart" and not invitation_is_paid(inv)
+            verder = action == "volgende" or snel
+            missing = form.missing() if verder else {}
             paid = invitation_is_paid(inv)
-            target = next_step(step, paid=paid, skip=_skip(inv, new_content)) if action == "volgende" and not missing else step
+            target = ("voorbeeld" if snel else next_step(step, paid=paid, skip=_skip(inv, new_content))) if verder and not missing else step
             try:
                 inv = save_draft(inv, expected_rev=posted_rev, content=new_content, user=request.user, source=_source(request),
-                                 step=target if action == "volgende" and not missing else None)
+                                 step=target if verder and not missing else None)
             except DraftConflict as exc:
                 conflict = _conflict_info(exc.invitation, new_content, step)
                 rev = exc.invitation.draft_rev
@@ -345,6 +360,8 @@ def _form_kwargs(inv: Invitation, step: str) -> dict:
                 "audio": list(inv.assets.filter(kind=MediaAsset.Kind.AUDIO))}
     if step in ("stijl", "envelop"):
         return {"template_version": inv.template_version}
+    if step == "gegevens":
+        return {"soort_vergrendeld": invitation_is_paid(inv)}
     return {}
 
 
@@ -705,8 +722,9 @@ def checkout_step(request, inv: Invitation):
         return redirect("portal:invitation", uid=inv.uid)
     content = _content(inv)
     issues = [i for i in publish_issues(content, inv.occasion, first_publication=True) if i.blocking]
-    packages = list(Package.objects.filter(is_active=True))
-    optional = optional_addons()
+    wens = wenskaart.is_wenskaart(content)    # een wenskaart (uitdrukkelijk gekozen): één vaste prijs, geen pakketten, upgrade of extra opties
+    packages = [] if wens else list(Package.objects.filter(is_active=True))
+    optional = [] if wens else optional_addons()
     selected_extras = request.POST.getlist("extras") if request.method == "POST" else request.GET.getlist("extras")
     selected_extras = [code for code in selected_extras if code in {a.code for a in optional}]
     try:
@@ -720,11 +738,11 @@ def checkout_step(request, inv: Invitation):
                    if c and c in codes), best.package.code if best else "")
     quote = next((q for q in quotes if q.package.code == chosen), best)
     owner_here = request.user.is_authenticated and inv.owner_id == request.user.id
-    if quote and quote.package.code != inv.package_code and (owner_here or inv.owner_id is None):
+    if quote and not wens and quote.package.code != inv.package_code and (owner_here or inv.owner_id is None):
         inv.package_code = quote.package.code  # een upgrade of ander pakket onthouden
         inv.save(update_fields=["package_code"])
     upgrade = downgrade = None
-    if quote:
+    if quote and not wens:
         target = pakket.upgrade_target(quote.package, packages)
         upgrade_quote = next((q for q in quotes if target and q.package.code == target.code), None)
         if upgrade_quote:
@@ -733,7 +751,7 @@ def checkout_step(request, inv: Invitation):
             upgrade["diff_display"] = format_euro(abs(upgrade["diff_cents"]))
         smaller = [q for q in quotes if q.package.price_cents < quote.package.price_cents]
         downgrade = max(smaller, key=lambda q: q.package.price_cents) if smaller else None
-    form = CheckoutForm(request.POST or None, packages=packages, optional=optional,
+    form = CheckoutForm(request.POST or None, packages=[q.package for q in quotes] if wens else packages, optional=optional,
                         initial={"package": chosen, "extras": selected_extras})
     error = ""
     if request.method == "POST" and request.POST.get("actie") == "betalen":
@@ -760,6 +778,6 @@ def checkout_step(request, inv: Invitation):
         _context(request, inv, "bestellen", form=form, quotes=quotes, quote=quote, best=best, optional=optional,
                  selected_extras=selected_extras, issues=issues, error=error, test_payments=settings.PAYMENT_PROVIDER == "test",
                  upgrade=upgrade, downgrade=downgrade, nieuwsbrief_tekst=_newsletter_text(),
-                 voorwaarden=_terms_info(), **_consent_texts(), looptijd=_availability_hint(content, quote), losse_extras=pakket.extras_for(quote.package, quote) if quote else [],
+                 voorwaarden=_terms_info(), **_consent_texts(), looptijd=_availability_hint({**content, "date": ""} if wens else content, quote), losse_extras=pakket.extras_for(quote.package, quote) if quote and not wens else [],
                  login_url=f"{reverse('accounts:login')}?doel=bewaren&next={reverse('studio:step', args=[inv.uid, 'bestellen'])}"),
     )
