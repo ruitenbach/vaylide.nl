@@ -7,6 +7,13 @@
   var params = new URLSearchParams(location.search);
   var labels = { hoofdfoto: "Hoofdfoto", galerij: "Fotogalerij" };
 
+  /* De live kaart in de Studio staat stil voor de muis: geen kantelen, parallax of meebewegen met de aanwijzer, ook niet als het ontwerp dat
+     wel doet. Alles anders blijft live (animaties, effecten, tikken en klikken). De gepubliceerde kaart en het voorbeeld (/maken/<id>/voorbeeld)
+     laden dit bestand niet en houden hun beweging. Een luisteraar in de vangstfase op window loopt vóór alle andere. */
+  function negeerAanwijzer(e) { e.stopImmediatePropagation(); }
+  window.addEventListener("pointermove", negeerAanwijzer, true);
+  window.addEventListener("mousemove", negeerAanwijzer, true);
+
   if (part === "fotos") {
     document.querySelectorAll("[data-foto]").forEach(function (img) {
       var box = img.closest(".ph") || img.parentElement;

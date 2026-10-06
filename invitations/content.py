@@ -239,9 +239,16 @@ def publish_issues(content: dict, occasion: str, *, first_publication: bool, now
     issues: list[Issue] = []
     cfg = OCCASIONS.get(occasion) or occasion_config(occasion)
     names = content.get("names") or {}
+    # Bij een wenskaart is één naam genoeg: alleen het eerste verplichte naamveld telt (bij een uitnodiging alle verplichte namen).
+    wens = card_kind(content, occasion) == "wenskaart"
+    gezien = 0
     for key, label, required, *_ in cfg["name_fields"]:
-        if required and not str(names.get(key) or "").strip():
-            issues.append(Issue("gegevens", key, f"Vul '{label}' in."))
+        if required:
+            gezien += 1
+            if wens and gezien > 1:
+                continue
+            if not str(names.get(key) or "").strip():
+                issues.append(Issue("gegevens", key, f"Vul '{label}' in."))
     # Een kerstkaart zonder datum en locatie is een groet: dan hoort er geen evenement bij.
     with_event = event_expected(content, occasion)
     if with_event:

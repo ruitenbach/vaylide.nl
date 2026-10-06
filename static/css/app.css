@@ -21,6 +21,23 @@
 .studio-block__title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 400; margin: 0; padding: 0; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
 .studio-block__num { display: inline-grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--accent); color: #fff; font-family: var(--font-body); font-size: .95rem; }
 .studio-block .hint { margin: -.3rem 0 0; }
+/* Velden naast elkaar (Naam partner 1 en 2, datum en tijd): label, helptekst en invoerveld staan op dezelfde rijen (subgrid), ook als maar één veld
+   een helptekst heeft. Zonder subgrid-ondersteuning blijven de velden bovenaan uitgelijnd en rekt het invoerveld niet meer. */
+.studio-form .form-row { align-items: start; }
+.studio-form .form-row > .field { align-content: start; }
+.studio-form .form-row > .field > input, .studio-form .form-row > .field > select { height: auto; }
+@supports (grid-template-rows: subgrid) {
+  .studio-form .form-row > .field { display: grid; grid-template-rows: subgrid; grid-row: span 4; row-gap: .35rem; align-content: normal; }
+  .studio-form .form-row > .field > label { grid-row: 1; }
+  .studio-form .form-row > .field > .hint { grid-row: 2; }
+  .studio-form .form-row > .field > input, .studio-form .form-row > .field > select, .studio-form .form-row > .field > textarea { grid-row: 3; }
+  .studio-form .form-row > .field > .field__error { grid-row: 4; }
+  /* De lege foutenrij telt .35rem mee: daar gaat het van af, zodat de ruimte tussen velden overal 1rem is. */
+  .studio-form .form-row { row-gap: .65rem; margin-bottom: -.35rem; }
+}
+.studio-form .field { align-content: start; }
+.studio-form .radio-cards .radio-card { align-content: start; }
+.studio-form .field > label { line-height: 1.35; }
 .studio-more summary { cursor: pointer; color: var(--accent-text); font-weight: 600; font-size: .95rem; }
 .studio-more[open] summary { margin-bottom: .8rem; }
 .field--check { gap: .2rem; }
@@ -342,10 +359,10 @@ pre.error-body { white-space: pre-wrap; font-size: .8rem; background: var(--fore
 .live-kaart__ster--3 { bottom: 70px; left: 0; transform: scale(.7); }
 .live-kaart__ster--4 { top: 36px; right: 30%; transform: scale(.6); }
 /* bij elke wijziging komt de kaart even omhoog uit de envelop, met een extra glans */
-.live-kaart__card.is-updating { transform: translateY(-10px); box-shadow: 0 1px 0 rgba(255, 255, 255, .9) inset, 0 0 0 1px rgba(122, 90, 46, .45), 0 36px 56px -26px rgba(55, 38, 18, .7), 0 0 60px -6px rgba(233, 200, 119, .75); }
+.live-kaart__card.is-updating { box-shadow: 0 1px 0 rgba(255, 255, 255, .9) inset, 0 0 0 1px rgba(122, 90, 46, .45), 0 36px 56px -26px rgba(55, 38, 18, .7), 0 0 60px -6px rgba(233, 200, 119, .75); }
 @media (prefers-reduced-motion: no-preference) {
   .live-kaart__badge::before { animation: live-puls 2.4s ease-in-out infinite; }
-  .live-kaart__card { animation: live-folie 9s ease-in-out infinite alternate, live-zweef 6s ease-in-out infinite; }
+  .live-kaart__card { animation: live-folie 9s ease-in-out infinite alternate; }
   .live-kaart__card.is-updating { animation: live-folie 9s ease-in-out infinite alternate; }
   .live-kaart__glans::before { animation: live-glans 7s ease-in-out 1.2s infinite; }
   .live-kaart__card.is-updating .live-kaart__glans::before { animation: live-glans-nu .9s ease-out; }
@@ -356,11 +373,14 @@ pre.error-body { white-space: pre-wrap; font-size: .8rem; background: var(--fore
 }
 @keyframes live-puls { 50% { opacity: .35; } }
 @keyframes live-folie { from { background-position: 0% 30%; } to { background-position: 100% 70%; } }
-@keyframes live-zweef { 50% { transform: translateY(-4px); } }
 @keyframes live-glans { 0%, 72% { transform: skewX(-18deg) translateX(0); opacity: 0; } 74% { opacity: 1; } 100% { transform: skewX(-18deg) translateX(420%); opacity: 0; } }
 @keyframes live-glans-nu { from { transform: skewX(-18deg) translateX(0); opacity: 1; } to { transform: skewX(-18deg) translateX(420%); opacity: 0; } }
 @keyframes live-twinkel { 0%, 100% { opacity: .25; filter: drop-shadow(0 0 2px rgba(243, 217, 141, .5)); } 50% { opacity: 1; filter: drop-shadow(0 0 7px rgba(243, 217, 141, 1)); } }
-@media (prefers-reduced-motion: reduce) { .live-kaart__card { transition: none; } .live-kaart__card.is-updating { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .live-kaart__card { transition: none; } }
+/* Het telefoonframe zelf staat vast: geen beweging met de muis, geen verspringen als de pagina een schuifbalk krijgt of kwijtraakt tijdens het typen. */
+.live-kaart, .live-kaart__stage, .live-kaart__card { transform: none; }
+.live-kaart__card { will-change: auto; }
+html:has(body.studio-page) { scrollbar-gutter: stable; }
 
 @media (min-height: 760px) { .live-kaart { --s: .68; } }
 @media (min-width: 1100px) {

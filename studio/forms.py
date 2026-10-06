@@ -123,8 +123,14 @@ class DetailsForm(StepForm):
         self.soort_vergrendeld = soort_vergrendeld
         self.name_keys = []
         new_fields = {}
+        # Bij een wenskaart is één naam genoeg: alleen het eerste verplichte naamveld blijft verplicht (bij een bruiloft Naam partner 1; een
+        # wenskaart voor één persoon hoeft geen tweede naam). Een uitnodiging vraagt alle verplichte namen, zoals altijd.
+        eerste_verplicht = next((k for k, _l, req, *_ in cfg["name_fields"] if req), None)
+        self.wenskaart = self._soort_nu() == "wenskaart"
         for key, label, required, max_len, help_text in cfg["name_fields"]:
             name = f"name_{key}"
+            extra_verplicht = bool(required) and key != eerste_verplicht
+            required = bool(required) and not (self.wenskaart and extra_verplicht)
             self.name_keys.append((name, key, label, required))
             if key in ("age", "years"):
                 field = forms.IntegerField(label=label, required=False, min_value=1, max_value=150, help_text=help_text,
@@ -133,6 +139,8 @@ class DetailsForm(StepForm):
             else:
                 field = forms.CharField(label=label, required=False, max_length=max_len, help_text=help_text)
             field.widget.attrs["data-required"] = "1" if required else ""
+            if extra_verplicht:
+                field.widget.attrs["data-alleen-uitnodiging-verplicht"] = "1"    # studio.js: verplicht alleen bij een uitnodiging
             if "names" in self.locked:
                 field.disabled = True
             new_fields[name] = field
@@ -149,6 +157,12 @@ class DetailsForm(StepForm):
             self.initial["start_time"] = c.get("start_time") or None
             self.initial["end_time"] = c.get("end_time") or None
             self.initial["timezone"] = c.get("timezone") or "Europe/Amsterdam"
+
+    def _soort_nu(self) -> str:
+        """De soort kaart waar dit formulier nu over gaat: de keuze in het verzonden formulier (als die kan wijzigen), anders de opgeslagen."""
+        if self.is_bound and "soort" in self.fields and not self.fields["soort"].disabled and self.data.get("soort") in SOORTEN:
+            return self.data.get("soort")
+        return card_kind(self.content, self.occasion)
 
     def clean_date(self):
         value = self.cleaned_data.get("date")

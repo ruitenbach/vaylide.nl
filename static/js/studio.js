@@ -12,6 +12,12 @@
       var checked = group.querySelector("input[name=soort]:checked");
       var wens = checked && checked.value === "wenskaart";
       form.querySelectorAll("[data-alleen-uitnodiging]").forEach(function (el) { el.hidden = wens; });
+      // Een tweede verplichte naam (Naam partner 2) is alleen bij een uitnodiging verplicht; een wenskaart heeft aan één naam genoeg.
+      form.querySelectorAll("[data-alleen-uitnodiging-verplicht]").forEach(function (input) {
+        input.setAttribute("data-required", wens ? "" : "1");
+        var label = input.closest(".field") && input.closest(".field").querySelector("label");
+        if (label) label.querySelectorAll(".req, .visually-hidden").forEach(function (el) { el.hidden = wens; });
+      });
     }
     group.addEventListener("change", update);
     update();
