@@ -39,93 +39,6 @@
   function zetSprong(aan) { if (spiegel) spiegel.classList.toggle("ks-aan", aan); }
 
 
-  /* ---------- de levende laag: de V op de gevel en de figuurtjes op het plein, bij beide bronnen ---------- */
-  // Alles staat in beeldcoördinaten van het referentiebeeld van de gekozen bron (16,0 s; liggend 960 x 540, staand 540 x 960) en gaat met de gemeten camerabeweging mee (kerststad-spoor.js). De V volgt de
-  // gevel van het huis naast de kerk, de figuurtjes de grond van het plein. Bij de sprong van de eindloop (en bij het oplossen van het eindbeeld) schuift alles mee met het kruisverloop. De figuurtjes
-  // lopen op hun eigen klok, niet op de tijd van de video, zodat hun beweging bij elke sprong van de lus gewoon doorloopt. De video's zelf zijn niet bewerkt.
-  var laag = q("[data-ks-laag]"), vEl = q("[data-ks-v]"), eindEl = q("[data-ks-eindbeeld]");
-  var SPOOR = window.KERSTSTAD_SPOOR, figuren = [], laagLus = 0, laatsteNu = 0, T_EIND = 19.95;
-  var LAAG = {   // per bron: de plek van de V (het midden van de krans onder het hartje), zijn breedte, het begin van de avondscène en de diepteschaal van de figuurtjes
-    breed: { vAnker: [319, 234.5], vBreedte: 30, tV: 12.5, tFig: 14.0, diepteY: 340, diepteK: 0.0035 },
-    smal: { vAnker: [159, 375], vBreedte: 44, tV: 12.5, tFig: 14.2, diepteY: 500, diepteK: 0.003 }
-  };
-  function klem(x, a, b) { return Math.max(a, Math.min(b, x)); }
-  function zacht(x) { x = klem(x, 0, 1); return x * x * (3 - 2 * x); }
-  function menging(a, b, p) { return a + (b - a) * p; }
-  function spoorOp(fm, naam, t) {
-    var rij = SPOOR[fm][naam], x = klem((t - SPOOR.van) / SPOOR.stap, 0, rij.length - 1), i = Math.min(rij.length - 2, Math.floor(x)), f = x - i, m = [];
-    for (var j = 0; j < 6; j++) m.push(menging(rij[i][j], rij[i + 1][j], f));
-    return m;
-  }
-  function pas(m, x, y) { return [m[0] * x + m[1] * y + m[2], m[3] * x + m[4] * y + m[5]]; }
-  function leesPad(tekst) {
-    if (!tekst) return null;
-    return tekst.split(" ").map(function (p) { var d = p.split(","); return [parseFloat(d[0]), parseFloat(d[1])]; });
-  }
-  if (laag) {
-    figuren = [].slice.call(laag.querySelectorAll("[data-ks-fig]")).map(function (el) {
-      var pad = { breed: leesPad(el.getAttribute("data-pad")), smal: leesPad(el.getAttribute("data-pad-smal")) };
-      var lengte = {};
-      ["breed", "smal"].forEach(function (fm) { var p = pad[fm]; lengte[fm] = p && p.length > 1 ? Math.hypot(p[1][0] - p[0][0], p[1][1] - p[0][1]) : 0; });
-      return { el: el, draai: el.querySelector(".ks-fig__draai"), pad: pad, lengte: lengte, v: parseFloat(el.getAttribute("data-snelheid")) || 6, gedrag: el.getAttribute("data-gedrag"),
-               fase: parseFloat(el.getAttribute("data-fase")) || 0, hoogte: { breed: parseFloat(el.getAttribute("data-hoogte")) || 28, smal: parseFloat(el.getAttribute("data-hoogte-smal")) || 38 }, kijk: 1, stil: false };
-    });
-  }
-  function figuurStand(f, nu, fm) {  // positie (referentiebeeld), kijkrichting en of hij loopt
-    var pad = f.pad[fm];
-    if (pad.length < 2) {
-      var wissel = Math.floor((nu + f.fase * 10) / 7) % 2;     // de zwaaier draait zich af en toe om
-      return { x: pad[0][0], y: pad[0][1], kijk: wissel ? -1 : 1, loopt: false, hop: 0 };
-    }
-    var pauze = 1.6, duur = f.lengte[fm] / f.v, cyclus = 2 * (duur + pauze), u = ((nu + f.fase * cyclus) % cyclus + cyclus) % cyclus, p, kijk, loopt = true;
-    if (u < duur) { p = u / duur; kijk = 1; }
-    else if (u < duur + pauze) { p = 1; kijk = -1; loopt = false; }
-    else if (u < 2 * duur + pauze) { p = 1 - (u - duur - pauze) / duur; kijk = -1; }
-    else { p = 0; kijk = 1; loopt = false; }
-    var x = menging(pad[0][0], pad[1][0], p), y = menging(pad[0][1], pad[1][1], p);
-    return { x: x, y: y, kijk: kijk, loopt: loopt, hop: f.gedrag === "kind" && loopt ? Math.abs(Math.sin(nu * 6.3 + f.fase * 5)) * 2.6 : 0 };
-  }
-  function laagStap(nu) {
-    laagLus = window.requestAnimationFrame(laagStap);
-    var klas = hero.classList;
-    if (!(klas.contains("ks-playing") || klas.contains("ks-lus") || klas.contains("ks-eind") || klas.contains("ks-finished")) || document.hidden || !inBeeld) return;
-    var fm = formaat, C = LAAG[fm], S = SPOOR[fm];
-    var dt = Math.min(0.1, (nu - laatsteNu) / 1000 || 0.016); laatsteNu = nu;
-    var scene = laag.parentNode, W = scene.clientWidth, H = scene.clientHeight;
-    var beeldverhouding = S.w / S.h, Wd = Math.max(W, H * beeldverhouding), k = Wd / S.w, offX = (W - Wd) / 2, offY = (H - Wd / beeldverhouding) / 2;
-    var opSpiegel = spiegel ? parseFloat(getComputedStyle(spiegel).opacity) || 0 : 0, opEind = eindEl ? parseFloat(getComputedStyle(eindEl).opacity) || 0 : 0;
-    var op = Math.max(opSpiegel, opEind);
-    var tOnder = opEind > 0.99 ? T_EIND : (video.currentTime || 0);
-    var aV = menging(zacht((tOnder - C.tV) / 1.0), 1, op), aF = menging(zacht((tOnder - C.tFig) / 1.0), 1, opSpiegel) * (1 - opEind);
-    function plaats(naam, tijd, x, y) { var m = spoorOp(fm, naam, tijd), a = pas(m, x, y); return { x: a[0], y: a[1], s: Math.sqrt(Math.abs(m[0] * m[4] - m[1] * m[3])) }; }
-    function gemengd(naam, x, y) {  // positie nu, zacht overgaand naar het eindbeeld tijdens het kruisverloop
-      var a = plaats(naam, tOnder, x, y);
-      if (op < 0.001) return a;
-      var b = plaats(naam, T_EIND, x, y);
-      return { x: menging(a.x, b.x, op), y: menging(a.y, b.y, op), s: menging(a.s, b.s, op) };
-    }
-    var g = gemengd("gevel", C.vAnker[0], C.vAnker[1]), vb = C.vBreedte * g.s * k;
-    vEl.style.opacity = aV.toFixed(3);
-    vEl.style.transform = "translate(" + (offX + g.x * k - 50).toFixed(2) + "px," + (offY + g.y * k - 45).toFixed(2) + "px) scale(" + (vb / 100).toFixed(4) + ")";
-    laag.style.setProperty("--ks-fig-licht", menging(0.94, 0.8, zacht((tOnder - 13.5) / 3)).toFixed(3));
-    for (var i = 0; i < figuren.length; i++) {
-      var f = figuren[i];
-      if (!f.pad[fm]) { f.el.style.opacity = "0"; continue; }
-      var st = figuurStand(f, nu / 1000, fm), p = gemengd("plein", st.x, st.y);
-      var maat = (f.hoogte[fm] * 1.1 / 60) * (1 + (st.y - C.diepteY) * C.diepteK) * p.s * k;
-      f.kijk += (st.kijk - f.kijk) * Math.min(1, dt * 7);                // omdraaien via een korte vernauwing
-      f.el.style.opacity = aF.toFixed(3);
-      f.el.style.transform = "translate(" + (offX + p.x * k - 22).toFixed(2) + "px," + (offY + p.y * k - 56 - st.hop * k).toFixed(2) + "px) scale(" + maat.toFixed(4) + ")";
-      f.el.style.zIndex = Math.round(p.y);
-      f.draai.style.transform = "scaleX(" + f.kijk.toFixed(3) + ")";
-      var stil = !st.loopt && f.gedrag !== "zwaai";
-      if (stil !== f.stil) { f.stil = stil; f.el.classList.toggle("ks-fig--stil", stil); }
-    }
-  }
-  function zetLaag() {  // de laag draait bij beide bronnen zodra de kaart start
-    if (laag && SPOOR && !laagLus) laagLus = window.requestAnimationFrame(laagStap);
-  }
-
   /* ---------- video ---------- */
   var geladen = false;
   function laadVoor() {  // alleen als de gast aanstalten maakt (aanraken, focus) en niet bij Data-besparing: dan pas bij de tik
@@ -145,7 +58,6 @@
     hero.setAttribute("data-ks-formaat", nieuw);
     lusStart = parseFloat(video.getAttribute(nieuw === "breed" ? "data-ks-lus-desktop" : "data-ks-lus")) || 16;
     video.setAttribute("src", nieuw === "breed" ? desktop : mobielBron);
-    zetLaag();
   }
   if (breedQuery.addEventListener) breedQuery.addEventListener("change", function () { if (!bezig && !lusAan && !afgelopen) kiesBron(); });
 
@@ -328,7 +240,6 @@
   /* ---------- begin ---------- */
   function start() {
     kiesBron();
-    zetLaag();
     var live = html.getAttribute("data-live");
     // Net als Kerstbol: het voorbeeldframe op de ontwerppagina en de live kaart bij Stijl en Envelop laten de dichte opening zien en klikbaar; de live kaart bij de andere stappen en de bedankpagina
     // (data-direct-open) tonen het eindbeeld zonder beweging, zodat de Studio rustig blijft.

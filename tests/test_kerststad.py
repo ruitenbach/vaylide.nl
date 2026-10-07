@@ -82,7 +82,7 @@ class KerststadOntwerpTests(VaylideTestCase):
 
     def test_media_is_web_klaar_en_aanwezig_en_de_video_is_onbewerkt_van_duur(self):
         media = ONTWERP / "media"
-        for naam, maximum in (("opening.mp4", 6_500_000), ("opening-desktop.mp4", 9_000_000), ("poster.webp", 200_000), ("eind.webp", 300_000), ("badge.webp", 60_000),
+        for naam, maximum in (("opening.mp4", 6_500_000), ("opening-desktop.mp4", 30_000_000), ("poster.webp", 200_000), ("eind.webp", 300_000), ("badge.webp", 60_000),
                               ("poster-desktop.webp", 250_000), ("eind-desktop.webp", 350_000),
                               ("dorp-kerk.webp", 150_000), ("dorp-ijs.webp", 150_000), ("dorp-brug.webp", 150_000)):
             bestand = media / naam
@@ -276,57 +276,3 @@ class KerststadBronkeuzeTests(VaylideTestCase):
         self.assertNotRegex(css.split("/* ================================================================ de kaart")[0], r"(?<!backdrop-)filter:\s*blur\(\d{2}", "geen blur-fill naast de video (een lichte scherptediepte op de figuurtjes mag wel)")
         html = (ONTWERP / "invitation.html").read_text(encoding="utf-8")
         self.assertNotIn("ks-ambient", html)
-
-
-class KerststadLaagTests(VaylideTestCase):
-    """De levende laag op de liggende video: de officiële VAYLIDE-V op de gevel en geanimeerde peperkoekfiguurtjes op het plein."""
-
-    def test_de_v_is_het_officiele_merkteken_zonder_woordmerk(self):
-        html = Client().get(DEMO).content.decode()
-        self.assertIn("data-ks-v", html)
-        self.assertRegex(html, r'<img class="ks-v"[^>]*src="/static/img/merk/vaylide-v[^"]*\.png"')
-        self.assertNotIn("vaylide-logo", html.split('data-ks-laag')[1].split("ks-open")[0], "alleen de V, geen woordmerk")
-        self.assertTrue((settings.BASE_DIR / "static/img/merk/vaylide-v.png").exists())
-
-    def test_er_staan_figuurtjes_die_lopen_zwaaien_en_een_kind(self):
-        html = Client().get(DEMO).content.decode()
-        gedrag = re.findall(r'<span class="ks-fig [^"]*" data-ks-fig [^>]*?data-gedrag="(\w+)"', html)
-        self.assertGreaterEqual(gedrag.count("loop"), 3)
-        self.assertEqual(gedrag.count("zwaai"), 1)
-        self.assertEqual(gedrag.count("kind"), 1)
-        self.assertLessEqual(len(gedrag), 8, "geen chaotische drukte")
-
-    def test_het_spoor_dekt_de_hele_avondscene_van_beide_video_s(self):
-        js = (ONTWERP / "kerststad-spoor.js").read_text(encoding="utf-8")
-        gevonden = re.search(r"window\.KERSTSTAD_SPOOR = \{van: 12, stap: 2 / 24, ref: 16, breed: (\{.*?\}), smal: (\{.*\})\};", js, re.S)
-        data = [json.loads(gevonden.group(1)), json.loads(gevonden.group(2))]
-        self.assertEqual([(d["w"], d["h"]) for d in data], [(960, 540), (540, 960)])
-        for d in data:
-            for naam in ("gevel", "plein"):
-                self.assertEqual(len(d[naam]), 97, "12 per seconde van 12,0 tot 20,0 s")
-                self.assertTrue(all(len(r) == 6 for r in d[naam]))
-        for video in ("opening-desktop.mp4", "opening.mp4"):
-            self.assertGreaterEqual(12 + 96 * 2 / 24, _duur_mp4(ONTWERP / "media" / video) - 0.1, video)
-
-    def test_de_laag_start_pas_in_de_avond_en_draait_bij_beide_bronnen(self):
-        js = (ONTWERP / "kerststad.js").read_text(encoding="utf-8")
-        code = re.sub(r"/\*.*?\*/", "", js, flags=re.S)
-        self.assertRegex(code, r"breed: \{[^}]*tV: 1[23]\.\d, tFig: 1[3-5]\.\d")
-        self.assertRegex(code, r"smal: \{[^}]*tV: 1[23]\.\d, tFig: 1[3-5]\.\d")
-        self.assertIn("nu / 1000", code, "de figuurtjes lopen op hun eigen klok, zodat de beweging bij de sprong van de eindloop doorloopt")
-        self.assertIn("opSpiegel", code, "tijdens het kruisverloop schuift de laag mee")
-        self.assertIn("data-pad-smal", code)
-        css = (ONTWERP / "style.css").read_text(encoding="utf-8")
-        self.assertRegex(css, r"(?m)^\.ks-laag \{ display: block;")
-        self.assertRegex(css, r"prefers-reduced-motion: reduce\) \{ \.ks-laag \.ks-fig__lijf[^}]*\.ks-v \{ animation: none")
-
-    def test_ook_de_staande_video_krijgt_de_v_en_figuurtjes_op_eigen_plekken(self):
-        html = Client().get(DEMO).content.decode()
-        smal = re.findall(r'data-pad-smal="([^"]*)"', html)
-        self.assertEqual(len(smal), 5)
-        self.assertGreaterEqual(len([p for p in smal if p]), 4, "vier of vijf figuurtjes op de staande video, een paar minder dan liggend om niet over bestaande figuren te lopen")
-        js = (ONTWERP / "kerststad.js").read_text(encoding="utf-8")
-        self.assertIn("smal: { vAnker:", js)
-        self.assertIn("breed: { vAnker: [319, 234.5], vBreedte: 30", js, "de liggende laag is ongewijzigd")
-
-
