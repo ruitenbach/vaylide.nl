@@ -6,7 +6,7 @@
     <span class="controle__icon" aria-hidden="true"></span>
     <div>
       <h2 class="controle__title" id="controle-titel">{% if not issues %}Alles klopt{% elif alleen_nodig %}Nog {{ open_count }} punt{{ open_count|pluralize:"en" }} voordat je kunt bestellen{% else %}Tips voor je kaart{% endif %}</h2>
-      <p class="controle__sub">{% if not issues %}Lees de teksten nog één keer door.{% elif alleen_nodig %}Pas {% if open_count == 1 %}dit punt{% else %}deze punten{% endif %} aan; je ontwerp blijft bewaard.{% else %}<strong>Nodig</strong> houdt bestellen tegen, een <strong>tip</strong> is een suggestie.{% endif %}</p>
+      <p class="controle__sub">{% if not issues %}Lees de teksten nog één keer door.{% elif alleen_nodig %}Pas {% if open_count == 1 %}dit punt{% else %}deze punten{% endif %} aan; je ontwerp blijft bewaard.{% else %}Tips helpen je kaart compleet te maken. Je kunt altijd doorgaan.{% endif %}</p>
     </div>
   </div>
   {% if issues %}
@@ -15,7 +15,7 @@
     <li class="controle__item controle__item--{% if i.blocking %}nodig{% else %}tip{% endif %}">
       <span class="controle__dot" aria-hidden="true"></span>
       <div class="controle__body">
-        <span class="controle__label">{% if i.blocking %}Nodig{% else %}Tip{% endif %}{% with label=step_labels|get_item:i.step %}{% if label %} · {{ label }}{% endif %}{% endwith %}</span>
+        <span class="controle__label">{% if i.blocking %}Let op{% else %}Tip{% endif %}{% with label=step_labels|get_item:i.step %}{% if label %} · {{ label }}{% endif %}{% endwith %}</span>
         <span class="controle__text">{{ i.message }}</span>
       </div>
       <a class="controle__fix" href="{% url 'studio:step' inv.uid i.step %}">Aanpassen<span class="visually-hidden">: {{ i.message }}</span></a>

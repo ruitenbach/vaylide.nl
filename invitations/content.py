@@ -275,13 +275,13 @@ def publish_issues(content: dict, occasion: str, *, first_publication: bool, now
     if with_event:
         day = parse_date(content.get("date"))
         if not day:
-            issues.append(Issue("gegevens", "date", "De datum is nog leeg: gasten zien geen datum.", blocking=False))
+            issues.append(Issue("gegevens", "date", "Zonder datum zien gasten geen datum op de kaart.", blocking=False))
         if not parse_time(content.get("start_time")):
-            issues.append(Issue("gegevens", "start_time", "De begintijd is nog leeg: gasten zien geen tijd.", blocking=False))
+            issues.append(Issue("gegevens", "start_time", "Zonder begintijd zien gasten geen tijd op de kaart.", blocking=False))
         if not str(content.get("venue_name") or "").strip():
-            issues.append(Issue("gegevens", "venue_name", "De locatie is nog leeg: gasten zien geen locatie.", blocking=False))
+            issues.append(Issue("gegevens", "venue_name", "Zonder locatie zien gasten geen locatie op de kaart.", blocking=False))
         if not str(content.get("address") or "").strip():
-            issues.append(Issue("gegevens", "address", "Vul het adres van de locatie in, zodat de routeknop werkt.", blocking=False))
+            issues.append(Issue("gegevens", "address", "Voeg een adres toe als je de routeknop wilt gebruiken.", blocking=False))
     times = event_times(content if with_event else without_event(content))
     if first_publication and times.start and times.start < now:
         issues.append(Issue("gegevens", "date", "De datum en begintijd liggen in het verleden."))
