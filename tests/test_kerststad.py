@@ -82,23 +82,30 @@ class KerststadOntwerpTests(VaylideTestCase):
 
     def test_media_is_web_klaar_en_aanwezig_en_de_video_is_onbewerkt_van_duur(self):
         media = ONTWERP / "media"
-        for naam, maximum in (("opening.mp4", 6_500_000), ("poster.webp", 200_000), ("eind.webp", 300_000), ("badge.webp", 60_000),
+        for naam, maximum in (("opening.mp4", 6_500_000), ("opening-desktop.mp4", 9_000_000), ("poster.webp", 200_000), ("eind.webp", 300_000), ("badge.webp", 60_000),
+                              ("poster-desktop.webp", 250_000), ("eind-desktop.webp", 350_000),
                               ("dorp-kerk.webp", 150_000), ("dorp-ijs.webp", 150_000), ("dorp-brug.webp", 150_000)):
             bestand = media / naam
             self.assertTrue(bestand.exists(), naam)
             self.assertLess(bestand.stat().st_size, maximum, naam)
         self.assertGreater((settings.BASE_DIR / "static/img/designs/kerststad.webp").stat().st_size, 10_000)
-        self.assertEqual([p.name for p in media.glob("*.mp4")], ["opening.mp4"], "één video; het masterbestand van 71 MB hoort niet in de repository")
+        self.assertEqual(sorted(p.name for p in media.glob("*.mp4")), ["opening-desktop.mp4", "opening.mp4"], "twee webvideo's (staand en liggend); de masters horen niet in de repository")
         duur = _duur_mp4(media / "opening.mp4")
-        self.assertAlmostEqual(duur, 20.04, delta=0.1, msg="de video is de goedgekeurde video van 20,04 s, niet bijgesneden")
+        self.assertAlmostEqual(duur, 20.04, delta=0.1, msg="de staande video is de goedgekeurde video van 20,04 s, niet bijgesneden")
         self.assertLess(LUS_START, duur - 3, "de eindloop is ongeveer de laatste vier à vijf seconden")
+        html = (ONTWERP / "invitation.html").read_text(encoding="utf-8")
+        lus_desktop = float(re.search(r'data-ks-lus-desktop="([\d.]+)"', html).group(1))
+        duur_desktop = _duur_mp4(media / "opening-desktop.mp4")
+        self.assertGreater(duur_desktop, 8)
+        self.assertLess(lus_desktop, duur_desktop - 2.5, "de eindloop van de liggende video begint ruim voor het einde")
 
     def test_loopstart_staat_op_een_plek_en_wordt_door_script_en_sjabloon_gelezen(self):
         html = (ONTWERP / "invitation.html").read_text(encoding="utf-8")
         self.assertIn(f'data-ks-lus="{LUS_START:g}"', html)
         js = (ONTWERP / "kerststad.js").read_text(encoding="utf-8")
-        self.assertIn('getAttribute("data-ks-lus")', js)
-        self.assertIn("LUS_START", js)
+        self.assertIn('"data-ks-lus"', js)
+        self.assertIn('"data-ks-lus-desktop"', js)
+        self.assertIn("lusStart", js)
 
 
 class KerststadWeergaveTests(VaylideTestCase):
@@ -115,8 +122,10 @@ class KerststadWeergaveTests(VaylideTestCase):
     def test_video_is_stil_speelt_niet_vanzelf_en_herhaalt_niet_in_de_html(self):
         html = Client().get(DEMO).content.decode()
         video = re.search(r"<video[^>]*>", html).group(0)
-        for woord in ("muted", "playsinline", 'preload="metadata"', "poster="):
+        for woord in ("muted", "playsinline", 'preload="metadata"', "data-ks-bron-desktop=", "data-ks-lus-desktop="):
             self.assertIn(woord, video)
+        self.assertIn('<picture class="ks-poster"', html, "het eerste beeld (staand en liggend) staat in een picture, zodat de juiste poster direct laadt")
+        self.assertIn("poster-desktop.webp", html)
         for woord in ("autoplay", "loop", "controls"):
             self.assertNotRegex(video, rf"\s{woord}(?:[\s>=]|$)", woord)
         self.assertEqual(html.count("<video"), 1, "één video, hergebruikt voor de eindloop en opnieuw beleven")
@@ -127,7 +136,7 @@ class KerststadWeergaveTests(VaylideTestCase):
         code = re.sub(r"/\*.*?\*/", "", js, flags=re.S)
         self.assertNotRegex(code, r"\.loop\s*=|\bautoplay\b", "de lus is een eigen sprong met kruisverloop, geen native loop")
         self.assertIn('video.addEventListener("ended", einde)', code)
-        self.assertIn("zoekNaar(LUS_START)", code)
+        self.assertIn("zoekNaar(lusStart)", code)
         # De opening begint alleen vanuit een tik (begin), de eerste keer vanaf 0 s en pas na een tik; een tweede bezoek slaat de opening over.
         self.assertIn('open.addEventListener("click", begin)', code)
         self.assertIn("zoekNaar(0)", code)
@@ -235,3 +244,79 @@ class ManifestPastInDeDatabaseTests(VaylideTestCase):
                 self.assertLessEqual(len(data.get(veld, "")), grens, f"{pad.parent.parent.name}: {veld} is {len(data.get(veld, ''))} tekens (maximaal {grens})")
             renderer = f"{pad.parent.parent.name}/{pad.parent.name}"
             self.assertLessEqual(len(renderer), TemplateVersion._meta.get_field("renderer").max_length)
+
+
+class KerststadBronkeuzeTests(VaylideTestCase):
+    def test_bronkeuze_gebeurt_in_het_script_vooraf_en_wisselt_niet_midden_in_het_afspelen(self):
+        js = (ONTWERP / "kerststad.js").read_text(encoding="utf-8")
+        code = re.sub(r"/\*.*?\*/", "", js, flags=re.S)
+        self.assertIn("function kiesBron()", code)
+        self.assertIn("(min-aspect-ratio: 6/5)", code)
+        # Tijdens de opening of de eindloop wordt nooit van bron gewisseld.
+        self.assertRegex(code, r"function kiesBron\(\) \{\s*if \(!video \|\| bezig \|\| lusAan\) return;")
+        # Gekozen vóór het afspelen: bij het begin, bij een tik en bij opnieuw beleven.
+        for plek in ("function start() {\n    kiesBron();", "lusLos(); kiesBron();" if False else "zetSprong(false); kiesBron();"):
+            self.assertIn(plek, code)
+
+    def test_staand_en_liggend_hebben_een_eigen_poster_eindbeeld_en_klikpuntgeometrie(self):
+        html = Client().get(DEMO).content.decode()
+        for naam in ("poster.webp", "poster-desktop.webp", "eind.webp", "eind-desktop.webp", "opening.mp4", "opening-desktop.mp4"):
+            self.assertIn(naam, html, naam)
+        css = (ONTWERP / "style.css").read_text(encoding="utf-8")
+        self.assertIn('[data-ks-formaat="breed"]', css)
+        self.assertIn("--ks-vr: 1.7778", css)
+        self.assertIn("--ks-vr: .5625", css)
+
+    def test_de_hero_vult_de_viewport_zonder_kolom_zijgloed_of_rand(self):
+        css = (ONTWERP / "style.css").read_text(encoding="utf-8")
+        scene = re.search(r"\.ks-scene \{[^}]*\}", css).group(0)
+        self.assertIn("inset: 0", scene)
+        self.assertNotRegex(scene, r"width:\s*min\(")
+        self.assertNotIn("ks-ambient", css)
+        self.assertNotRegex(css.split("/* ================================================================ de kaart")[0], r"(?<!backdrop-)filter:\s*blur\(\d{2}", "geen blur-fill naast de video (een lichte scherptediepte op de figuurtjes mag wel)")
+        html = (ONTWERP / "invitation.html").read_text(encoding="utf-8")
+        self.assertNotIn("ks-ambient", html)
+
+
+class KerststadLaagTests(VaylideTestCase):
+    """De levende laag op de liggende video: de officiële VAYLIDE-V op de gevel en geanimeerde peperkoekfiguurtjes op het plein."""
+
+    def test_de_v_is_het_officiele_merkteken_zonder_woordmerk(self):
+        html = Client().get(DEMO).content.decode()
+        self.assertIn("data-ks-v", html)
+        self.assertRegex(html, r'<img class="ks-v"[^>]*src="/static/img/merk/vaylide-v[^"]*\.png"')
+        self.assertNotIn("vaylide-logo", html.split('data-ks-laag')[1].split("ks-open")[0], "alleen de V, geen woordmerk")
+        self.assertTrue((settings.BASE_DIR / "static/img/merk/vaylide-v.png").exists())
+
+    def test_er_staan_figuurtjes_die_lopen_zwaaien_en_een_kind(self):
+        html = Client().get(DEMO).content.decode()
+        gedrag = re.findall(r'data-ks-fig data-pad="[^"]*" data-snelheid="[^"]*" data-gedrag="(\w+)"', html)
+        self.assertGreaterEqual(gedrag.count("loop"), 3)
+        self.assertEqual(gedrag.count("zwaai"), 1)
+        self.assertEqual(gedrag.count("kind"), 1)
+        self.assertLessEqual(len(gedrag), 8, "geen chaotische drukte")
+
+    def test_het_spoor_dekt_de_hele_avondscene_van_de_liggende_video(self):
+        js = (ONTWERP / "kerststad-spoor.js").read_text(encoding="utf-8")
+        data = json.loads(re.search(r"window\.KERSTSTAD_SPOOR = \{van: 12, stap: 2 / 24, ref: 16, gevel: (\[.*?\]\]), plein: (\[.*\]\])\};", js, re.S).expand(r"[\1,\2]"))
+        for rij in data:
+            self.assertEqual(len(rij), 97, "12 per seconde van 12,0 tot 20,0 s")
+            self.assertTrue(all(len(r) == 6 for r in rij))
+        duur = _duur_mp4(ONTWERP / "media" / "opening-desktop.mp4")
+        self.assertGreaterEqual(12 + 96 * 2 / 24, duur - 0.1)
+
+    def test_de_laag_start_pas_in_de_avond_en_draait_alleen_bij_de_liggende_bron(self):
+        js = (ONTWERP / "kerststad.js").read_text(encoding="utf-8")
+        code = re.sub(r"/\*.*?\*/", "", js, flags=re.S)
+        self.assertRegex(code, r"T_V = 1[23]\.\d, T_FIG = 1[3-5]\.\d")
+        self.assertIn('formaat !== "breed"', code)
+        self.assertIn("nu / 1000", code, "de figuurtjes lopen op hun eigen klok, zodat de beweging bij de sprong van de eindloop doorloopt")
+        self.assertIn("opSpiegel", code, "tijdens het kruisverloop schuift de laag mee")
+        css = (ONTWERP / "style.css").read_text(encoding="utf-8")
+        self.assertIn(".ks-laag { display: none;", css)
+        self.assertIn('.ks-hero[data-ks-formaat="breed"] .ks-laag { display: block; }', css)
+        self.assertRegex(css, r"prefers-reduced-motion: reduce\) \{ \.ks-laag \.ks-fig__lijf[^}]*\.ks-v \{ animation: none")
+
+    def test_de_mobiele_pagina_houdt_dezelfde_bron_en_de_laag_blijft_verborgen(self):
+        css = (ONTWERP / "style.css").read_text(encoding="utf-8")
+        self.assertNotRegex(css, r"(?m)^\.ks-laag \{[^}]*display: (block|flex)")

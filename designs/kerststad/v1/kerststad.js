@@ -1,8 +1,8 @@
 /* Kerststad v1: de opening van de peperkoekstad als één scène in de kop.
    Het eerste beeld is extreem dichtbij: de ronde gouden badge met de officiële VAYLIDE-V. De V is het klikpunt (een zachte lichtring en de tekst "Tik op de V om te openen").
-   Eén tik speelt de volledige video één keer, van 0 s tot het einde. Daarna valt de kaart niet stil: de laatste scène loopt door als levende eindloop, van LUS_START (16,0 s) tot het einde en weer
+   Eén tik speelt de volledige video één keer, van 0 s tot het einde. Daarna valt de kaart niet stil: de laatste scène loopt door als levende eindloop, van lusStart (16,0 s) tot het einde en weer
    terug, met sneeuw, twinkelende lichtjes en bewegende figuurtjes uit de video zelf. De opening start daarna nooit meer vanzelf; alleen "Opnieuw beleven" (een tik) begint opnieuw.
-   De sprong aan het eind van de lus is een kruisverloop: een stilstaand beeld van het laatste frame wordt in 1,4 s doorzichtig terwijl de video vanaf LUS_START verder speelt. De video zelf wordt
+   De sprong aan het eind van de lus is een kruisverloop: een stilstaand beeld van het laatste frame wordt in 1,4 s doorzichtig terwijl de video vanaf lusStart verder speelt. De video zelf wordt
    niet bewerkt. Er is één video; de lus pauzeert buiten beeld en in een verborgen tabblad. Zonder dit script, bij 'minder beweging', bij stilgezette beweging of in de Studio staat het eindbeeld met
    de groet er direct, met een knop om de opening af te spelen (eenmalig, zonder lus). */
 (function () {
@@ -12,12 +12,15 @@
   var html = document.documentElement;
   var q = function (sel) { return hero.querySelector(sel); };
   var video = q("[data-ks-video]"), open = q("[data-ks-open]"), fallback = q("[data-ks-fallback]"), overslaan = q("[data-ks-skip]");
-  var ambient = q("[data-ks-ambient]"), spiegel = q("[data-ks-spiegel]"), replay = q("[data-ks-replay]"), status = q("[data-ks-status]"), scroll = q("[data-ks-scroll]");
+  var spiegel = q("[data-ks-spiegel]"), replay = q("[data-ks-replay]"), status = q("[data-ks-status]"), scroll = q("[data-ks-scroll]");
   var inhoud = document.querySelector(".ks-body");
   var reduceQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
   var heeftOpening = hero.hasAttribute("data-ks-opening") && !!open;
   var opslagSleutel = "vierlief-open:" + location.pathname;  // dezelfde sleutel als invite.js: één keer per sessie
-  var LUS_START = parseFloat(video && video.getAttribute("data-ks-lus")) || 16;   // seconde in de video waar de levende eindloop begint
+  var lusStart = parseFloat(video && video.getAttribute("data-ks-lus")) || 16;    // seconde in de gekozen video waar de levende eindloop begint (per bron anders: data-ks-lus / data-ks-lus-desktop)
+  var breedQuery = window.matchMedia ? window.matchMedia("(min-aspect-ratio: 6/5)") : { matches: false };
+  var mobielBron = video && video.querySelector("source") ? video.querySelector("source").getAttribute("src") : "";
+  var formaat = "smal";
   var laadFout = false, bezig = false, afgelopen = false, afgespeeld = false, geblokkeerd = false, lusAan = false, hervatNaRust = false, inBeeld = true, waarnemer = null;
 
   function rustig() { return reduceQuery.matches || html.classList.contains("fx-paused"); }
@@ -35,37 +38,82 @@
   }
   function zetSprong(aan) { if (spiegel) spiegel.classList.toggle("ks-aan", aan); }
 
-  /* ---------- de gloed naast de video (alleen op een breder scherm) ---------- */
-  // De video is 9:16. Op een breed scherm staat hij over de volle hoogte; aan weerszijden tekent dit script een zeer klein, vervaagd beeld van de video zelf
-  // (32 x 57 pixels, ongeveer 15 keer per seconde, alleen zolang de video speelt). Op een telefoon is het canvas verborgen en gebeurt er niets.
-  var actx = ambient && ambient.getContext ? ambient.getContext("2d") : null, ambientBron = "poster", laatsteTeken = 0, ambientBezig = false;
-  function ambientZichtbaar() { return !!actx && window.getComputedStyle(ambient).display !== "none"; }
-  function teken(bron) { try { actx.drawImage(bron, 0, 0, 32, 57); } catch (e) { /* nog geen beeld */ } }
-  function tekenBeeld(naam, url) {
-    ambientBron = naam;
-    if (!ambientZichtbaar() || !url) return;
-    var im = new Image();
-    im.onload = function () { if (ambientBron === naam) teken(im); };
-    im.src = url;
+
+  /* ---------- de levende laag op de liggende video: de V op de gevel en de figuurtjes op het plein ---------- */
+  // Alleen bij de 16:9-bron. Alles staat in beeldcoördinaten van het referentiebeeld (16,0 s, 960 x 540) en gaat met de gemeten camerabeweging mee (kerststad-spoor.js); de V volgt de gevel van het huis
+  // naast de kerk, de figuurtjes de grond van het plein. Bij de sprong van de eindloop (en bij het oplossen van het eindbeeld) schuift alles mee met het kruisverloop. De figuurtjes lopen op hun
+  // eigen klok, niet op de tijd van de video, zodat hun beweging bij elke sprong van de lus gewoon doorloopt.
+  var laag = q("[data-ks-laag]"), vEl = q("[data-ks-v]"), eindEl = q("[data-ks-eindbeeld]");
+  var SPOOR = window.KERSTSTAD_SPOOR, figuren = [], laagLus = 0, laatsteNu = 0;
+  var V_ANKER = [319, 234.5], V_BREEDTE = 30, T_V = 12.5, T_FIG = 14.0, T_EIND = 19.95;
+  function klem(x, a, b) { return Math.max(a, Math.min(b, x)); }
+  function zacht(x) { x = klem(x, 0, 1); return x * x * (3 - 2 * x); }
+  function menging(a, b, p) { return a + (b - a) * p; }
+  function spoorOp(naam, t) {
+    var rij = SPOOR[naam], x = klem((t - SPOOR.van) / SPOOR.stap, 0, rij.length - 1), i = Math.min(rij.length - 2, Math.floor(x)), f = x - i, m = [];
+    for (var j = 0; j < 6; j++) m.push(menging(rij[i][j], rij[i + 1][j], f));
+    return m;
   }
-  function ambientLus() {
-    ambientBron = "video";
-    if (ambientBezig || !ambientZichtbaar() || !video.requestVideoFrameCallback) return;
-    ambientBezig = true;
-    video.requestVideoFrameCallback(function kijk(nu) {
-      if (video.paused || video.ended || ambientBron !== "video") { ambientBezig = false; return; }
-      if (nu - laatsteTeken > 60) { teken(video); laatsteTeken = nu; }
-      video.requestVideoFrameCallback(kijk);
+  function pas(m, x, y) { return [m[0] * x + m[1] * y + m[2], m[3] * x + m[4] * y + m[5]]; }
+  if (laag) {
+    figuren = [].slice.call(laag.querySelectorAll("[data-ks-fig]")).map(function (el) {
+      var punten = el.getAttribute("data-pad").split(" ").map(function (p) { var d = p.split(","); return [parseFloat(d[0]), parseFloat(d[1])]; });
+      var lengte = punten.length > 1 ? Math.hypot(punten[1][0] - punten[0][0], punten[1][1] - punten[0][1]) : 0;
+      return { el: el, draai: el.querySelector(".ks-fig__draai"), pad: punten, lengte: lengte, v: parseFloat(el.getAttribute("data-snelheid")) || 6, gedrag: el.getAttribute("data-gedrag"),
+               fase: parseFloat(el.getAttribute("data-fase")) || 0, hoogte: parseFloat(el.getAttribute("data-hoogte")) || 28, kijk: 1, stil: false };
     });
   }
-  function eindUrl() { var i = q(".ks-eindbeeld"); return i ? i.src : ""; }
-  if (window.matchMedia) {
-    var breed = window.matchMedia("(min-aspect-ratio: 3/5)");
-    var herteken = function () {
-      if (!breed.matches) return;
-      if (ambientBron === "video") teken(video); else tekenBeeld(ambientBron, ambientBron === "eind" ? eindUrl() : video.poster);
-    };
-    if (breed.addEventListener) breed.addEventListener("change", herteken);
+  function figuurStand(f, nu) {  // positie (referentiebeeld), kijkrichting en of hij loopt
+    if (f.pad.length < 2) {
+      var wissel = Math.floor((nu + f.fase * 10) / 7) % 2;     // de zwaaier draait zich af en toe om
+      return { x: f.pad[0][0], y: f.pad[0][1], kijk: wissel ? -1 : 1, loopt: false, hop: 0 };
+    }
+    var pauze = 1.6, duur = f.lengte / f.v, cyclus = 2 * (duur + pauze), u = ((nu + f.fase * cyclus) % cyclus + cyclus) % cyclus, p, kijk, loopt = true;
+    if (u < duur) { p = u / duur; kijk = 1; }
+    else if (u < duur + pauze) { p = 1; kijk = -1; loopt = false; }
+    else if (u < 2 * duur + pauze) { p = 1 - (u - duur - pauze) / duur; kijk = -1; }
+    else { p = 0; kijk = 1; loopt = false; }
+    var x = menging(f.pad[0][0], f.pad[1][0], p), y = menging(f.pad[0][1], f.pad[1][1], p);
+    return { x: x, y: y, kijk: kijk, loopt: loopt, hop: f.gedrag === "kind" && loopt ? Math.abs(Math.sin(nu * 6.3 + f.fase * 5)) * 2.6 : 0 };
+  }
+  function laagStap(nu) {
+    laagLus = window.requestAnimationFrame(laagStap);
+    var klas = hero.classList;
+    if (formaat !== "breed" || !(klas.contains("ks-playing") || klas.contains("ks-lus") || klas.contains("ks-eind") || klas.contains("ks-finished")) || document.hidden || !inBeeld) return;
+    var dt = Math.min(0.1, (nu - laatsteNu) / 1000 || 0.016); laatsteNu = nu;
+    var scene = laag.parentNode, W = scene.clientWidth, H = scene.clientHeight;
+    var Wd = Math.max(W, H * 16 / 9), k = Wd / 960, offX = (W - Wd) / 2, offY = (H - Wd * 9 / 16) / 2;
+    var opSpiegel = spiegel ? parseFloat(getComputedStyle(spiegel).opacity) || 0 : 0, opEind = eindEl ? parseFloat(getComputedStyle(eindEl).opacity) || 0 : 0;
+    var op = Math.max(opSpiegel, opEind);
+    var tOnder = opEind > 0.99 ? T_EIND : (video.currentTime || 0);
+    var aV = menging(zacht((tOnder - T_V) / 1.0), 1, op), aF = menging(zacht((tOnder - T_FIG) / 1.0), 1, opSpiegel) * (1 - opEind);
+    function plaats(naam, tijd, x, y) { var m = spoorOp(naam, tijd), a = pas(m, x, y); return { x: a[0], y: a[1], s: Math.sqrt(Math.abs(m[0] * m[4] - m[1] * m[3])) }; }
+    function gemengd(naam, x, y) {  // positie nu, zacht overgaand naar het eindbeeld tijdens het kruisverloop
+      var a = plaats(naam, tOnder, x, y);
+      if (op < 0.001) return a;
+      var b = plaats(naam, T_EIND, x, y);
+      return { x: menging(a.x, b.x, op), y: menging(a.y, b.y, op), s: menging(a.s, b.s, op) };
+    }
+    var g = gemengd("gevel", V_ANKER[0], V_ANKER[1]), vb = V_BREEDTE * g.s * k;
+    vEl.style.opacity = aV.toFixed(3);
+    vEl.style.transform = "translate(" + (offX + g.x * k - 50).toFixed(2) + "px," + (offY + g.y * k - 45).toFixed(2) + "px) scale(" + (vb / 100).toFixed(4) + ")";
+    laag.style.setProperty("--ks-fig-licht", menging(0.94, 0.8, zacht((tOnder - 13.5) / 3)).toFixed(3));
+    for (var i = 0; i < figuren.length; i++) {
+      var f = figuren[i], st = figuurStand(f, nu / 1000), p = gemengd("plein", st.x, st.y);
+      var maat = (f.hoogte * 1.1 / 60) * (1 + (st.y - 340) * 0.0035) * p.s * k;
+      f.kijk += (st.kijk - f.kijk) * Math.min(1, dt * 7);                // omdraaien via een korte vernauwing
+      f.el.style.opacity = aF.toFixed(3);
+      f.el.style.transform = "translate(" + (offX + p.x * k - 22).toFixed(2) + "px," + (offY + p.y * k - 56 - st.hop * k).toFixed(2) + "px) scale(" + maat.toFixed(4) + ")";
+      f.el.style.zIndex = Math.round(p.y);
+      f.draai.style.transform = "scaleX(" + f.kijk.toFixed(3) + ")";
+      var stil = !st.loopt && f.gedrag !== "zwaai";
+      if (stil !== f.stil) { f.stil = stil; f.el.classList.toggle("ks-fig--stil", stil); }
+    }
+  }
+  function zetLaag() {  // de laag draait alleen bij de liggende bron
+    if (!laag || !SPOOR) return;
+    if (formaat === "breed" && !laagLus) laagLus = window.requestAnimationFrame(laagStap);
+    else if (formaat !== "breed" && laagLus) { window.cancelAnimationFrame(laagLus); laagLus = 0; }
   }
 
   /* ---------- video ---------- */
@@ -76,6 +124,21 @@
     if (c && (c.saveData || /(^|-)2g$/.test(c.effectiveType || ""))) return;
     geladen = true; video.preload = "auto";
   }
+  // Twee bronnen: staand 9:16 (telefoon, staande tablet) en liggend 16:9 (brede schermen). De bron wordt gekozen vóór het afspelen begint en blijft daarna staan: tijdens de opening of de
+  // eindloop wisselt er nooit van bron, ook niet als het scherm draait of het venster verandert. Pas bij een nieuwe start (tik, overslaan, opnieuw beleven) kan een andere bron worden gekozen.
+  function kiesBron() {
+    if (!video || bezig || lusAan) return;
+    var desktop = video.getAttribute("data-ks-bron-desktop");
+    var nieuw = breedQuery.matches && desktop ? "breed" : "smal";
+    if (nieuw === formaat) return;
+    formaat = nieuw;
+    hero.setAttribute("data-ks-formaat", nieuw);
+    lusStart = parseFloat(video.getAttribute(nieuw === "breed" ? "data-ks-lus-desktop" : "data-ks-lus")) || 16;
+    video.setAttribute("src", nieuw === "breed" ? desktop : mobielBron);
+    zetLaag();
+  }
+  if (breedQuery.addEventListener) breedQuery.addEventListener("change", function () { if (!bezig && !lusAan && !afgelopen) kiesBron(); });
+
   function zoekNaar(t) { try { video.currentTime = t; } catch (e) { /* nog geen metadata */ } }
   function afspelen() {
     var belofte = video.play();
@@ -83,25 +146,28 @@
   }
 
   function kanZoeken() {  // een server zonder Range-verzoeken geeft een video die niet kan springen: dan geen eindloop (anders begint hij weer bij 0)
-    try { var z = video.seekable; return z.length > 0 && z.end(z.length - 1) >= LUS_START + 0.5; } catch (e) { return false; }
+    try { var z = video.seekable; return z.length > 0 && z.end(z.length - 1) >= lusStart + 0.5; } catch (e) { return false; }
   }
-  function springNaarLus(klaar) {  // naar LUS_START springen; lukt dat niet binnen 6 s, dan het stilstaande eindbeeld
+  function springNaarLus(klaar) {  // naar lusStart springen; lukt dat niet binnen 6 s, dan het stilstaande eindbeeld
     var wacht = window.setTimeout(function () { video.removeEventListener("seeked", gedaan); toonStatisch(false); }, 6000);
     var gedaan = function () {
       video.removeEventListener("seeked", gedaan); window.clearTimeout(wacht);
-      if (Math.abs(video.currentTime - LUS_START) > 1) { toonStatisch(false); return; }
+      if (Math.abs(video.currentTime - lusStart) > 1) { toonStatisch(false); return; }
       klaar();
     };
     video.addEventListener("seeked", gedaan);
-    zoekNaar(LUS_START);
+    zoekNaar(lusStart);
   }
 
-  // De levende eindloop: aan het eind van de video het laatste beeld stilzetten, naar LUS_START springen en dat beeld in 1,4 s laten verdwijnen.
+  // De levende eindloop: aan het eind van de video het laatste beeld stilzetten, naar lusStart springen en dat beeld in 1,4 s laten verdwijnen.
   function spring() {
     if (!lusAan) return;
     if (!kanZoeken()) { toonStatisch(false); return; }
-    var w = spiegel ? spiegel.width : 0, h = spiegel ? spiegel.height : 0;
-    if (spiegel) { try { spiegel.getContext("2d").drawImage(video, 0, 0, w, h); zetSprong(true); } catch (e) { /* geen beeld: dan zonder kruisverloop */ } }
+    if (spiegel && video.videoWidth) {   // het stilstaande beeld krijgt de beeldverhouding van de gekozen bron (staand of liggend), anders zou het scheef staan
+      var schaal = Math.min(1, 960 / Math.max(video.videoWidth, video.videoHeight));
+      spiegel.width = Math.round(video.videoWidth * schaal); spiegel.height = Math.round(video.videoHeight * schaal);
+      try { spiegel.getContext("2d").drawImage(video, 0, 0, spiegel.width, spiegel.height); zetSprong(true); } catch (e) { /* geen beeld: dan zonder kruisverloop */ }
+    }
     springNaarLus(function () {
       afspelen().then(function () {
         window.requestAnimationFrame(function () { window.requestAnimationFrame(function () { zetSprong(false); }); });
@@ -109,7 +175,8 @@
     });
   }
 
-  function naarLus(vanaf) {  // de scène staat open; de video loopt vanaf LUS_START door (vanaf=true: eerst naar die plek springen)
+  function naarLus(vanaf) {  // de scène staat open; de video loopt vanaf lusStart door (vanaf=true: eerst naar die plek springen)
+    if (vanaf) kiesBron();
     lusAan = true; afgelopen = true; bezig = false;
     hervatNaRust = false;
     hero.classList.remove("ks-playing");
@@ -136,7 +203,7 @@
   }
 
   function speel() {  // moet vanuit een tik of toets komen: de afspeelstart hoort bij het gebaar
-    lusAan = false; zetSprong(false);
+    lusAan = false; zetSprong(false); kiesBron();
     hero.classList.remove("ks-eind", "ks-finished", "ks-klaar", "ks-lus");
     zoekNaar(0);
     afspelen().then(function () {
@@ -155,7 +222,6 @@
     });
   }
   if (video) {
-    video.addEventListener("playing", ambientLus);
     video.addEventListener("ended", einde);
     video.addEventListener("error", function () {
       bezig = false; geblokkeerd = true; laadFout = true;
@@ -178,7 +244,6 @@
     if (waarnemer) { waarnemer.disconnect(); waarnemer = null; }
     vergrendel(false);
     knopTekst();
-    tekenBeeld("eind", eindUrl());
     if (metFocus && scroll) window.requestAnimationFrame(function () { scroll.focus({ preventScroll: true }); });
   }
   function overslaanNu() {  // de gast slaat de opening over: direct naar de levende eindloop (de tik is het gebaar dat afspelen toestaat)
@@ -199,6 +264,7 @@
     }
   }
   function opnieuw() {  // terug naar de gesloten badge: de gast moet opnieuw tikken
+    lusAan = false; bezig = false; kiesBron();
     video.pause(); zoekNaar(0); zetSprong(false);
     hero.classList.add("ks-resetting");
     hero.classList.remove("ks-playing", "ks-finished", "ks-klaar", "ks-eind", "ks-lus");
@@ -207,7 +273,6 @@
     open.disabled = false; if (replay) replay.hidden = true; if (fallback) fallback.hidden = true;
     vergrendel(true);
     window.scrollTo({ top: 0, behavior: "instant" });
-    tekenBeeld("poster", video.poster);
     open.focus({ preventScroll: true });
     zeg("De kerststad is weer dicht. Tik op de V om hem te openen.");
   }
@@ -252,6 +317,7 @@
 
   /* ---------- begin ---------- */
   function start() {
+    kiesBron();
     var live = html.getAttribute("data-live");
     // Net als Kerstbol: het voorbeeldframe op de ontwerppagina en de live kaart bij Stijl en Envelop laten de dichte opening zien en klikbaar; de live kaart bij de andere stappen en de bedankpagina
     // (data-direct-open) tonen het eindbeeld zonder beweging, zodat de Studio rustig blijft.
@@ -272,7 +338,6 @@
       return;
     }
     vergrendel(true);
-    tekenBeeld("poster", video.poster);
     if ("requestIdleCallback" in window) window.requestIdleCallback(laadVoor, { timeout: 4000 }); else window.setTimeout(laadVoor, 2500);
   }
   start();

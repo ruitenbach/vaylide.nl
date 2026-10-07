@@ -3,19 +3,29 @@
    (0 s tot het einde); daarna loopt de laatste scène door als levende eindloop (kerststad.js: vanaf 16,0 s tot het einde, met een zacht kruisverloop). De opening start nooit opnieuw vanzelf.
    Opening, kop en groet zijn één scène (.ks-hero) in het eigen script, net als Kerstbol: geen openingsscherm van invite.js. De kaart daaronder gebruikt alleen wat de klant heeft ingevuld;
    datum, programma, locatie, aftellen en aanmelden verschijnen alleen bij een kerstdiner (een datum). Wijzig een uitgebrachte versie niet: maak een v2. #}
-{% block preload %}<link rel="preload" as="image" href="{% static 'designs/kerststad/v1/media/poster.webp' %}" fetchpriority="high">
+{% block preload %}<link rel="preload" as="image" href="{% static 'designs/kerststad/v1/media/poster.webp' %}" media="(max-aspect-ratio: 119/100)" fetchpriority="high">
+<link rel="preload" as="image" href="{% static 'designs/kerststad/v1/media/poster-desktop.webp' %}" media="(min-aspect-ratio: 6/5)" fetchpriority="high">
 <link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<script src="{% static 'designs/kerststad/v1/kerststad-spoor.js' %}" defer></script>
 <script src="{% static 'designs/kerststad/v1/kerststad.js' %}" defer></script>{% endblock %}
 
 {% block content %}
 <header class="ks-hero{% if not v.opening_enabled %} ks-eind ks-klaar{% endif %}" id="ks-hero" data-ks{% if v.opening_enabled %} data-ks-opening{% endif %} aria-label="De kerststad">
-  <canvas class="ks-ambient" data-ks-ambient width="32" height="57" aria-hidden="true"></canvas>
   <div class="ks-scene" data-ks-scene>
-    <video id="ks-video" muted playsinline controlslist="nodownload noplaybackrate" disablepictureinpicture disableremoteplayback preload="metadata" poster="{% static 'designs/kerststad/v1/media/poster.webp' %}" width="720" height="1280" aria-label="Een peperkoekbrug met een gouden V-badge; de camera trekt terug en onthult een besneeuwde kerststad bij nacht" data-ks-video data-ks-lus="16">
+    <video id="ks-video" muted playsinline controlslist="nodownload noplaybackrate" disablepictureinpicture disableremoteplayback preload="metadata" width="720" height="1280" aria-label="Een peperkoekbrug met een gouden V-badge; de camera trekt terug en onthult een besneeuwde kerststad bij nacht" data-ks-video data-ks-lus="16" data-ks-bron-desktop="{% static 'designs/kerststad/v1/media/opening-desktop.mp4' %}" data-ks-lus-desktop="16">
       <source src="{% static 'designs/kerststad/v1/media/opening.mp4' %}" type="video/mp4">
     </video>
+    <picture class="ks-poster" data-ks-poster><source media="(min-aspect-ratio: 6/5)" srcset="{% static 'designs/kerststad/v1/media/poster-desktop.webp' %}" width="1280" height="720"><img src="{% static 'designs/kerststad/v1/media/poster.webp' %}" alt="" width="720" height="1280" decoding="async" fetchpriority="high"></picture>
     <canvas class="ks-spiegel" data-ks-spiegel width="540" height="960" aria-hidden="true"></canvas>
-    <img class="ks-eindbeeld" src="{% static 'designs/kerststad/v1/media/eind.webp' %}" alt="De kerststad bij nacht: peperkoekhuisjes, een verlichte kerstboom en schaatsers op het ijs" width="720" height="1280" loading="lazy" decoding="async">
+    <picture class="ks-eindbeeld" data-ks-eindbeeld><source media="(min-aspect-ratio: 6/5)" srcset="{% static 'designs/kerststad/v1/media/eind-desktop.webp' %}" width="1280" height="720"><img src="{% static 'designs/kerststad/v1/media/eind.webp' %}" alt="De kerststad bij nacht: peperkoekhuisjes, een verlichte kerstboom en schaatsers op het ijs" width="720" height="1280" loading="lazy" decoding="async"></picture>
+    <div class="ks-laag" data-ks-laag aria-hidden="true">
+      <img class="ks-v" data-ks-v src="{% static 'img/merk/vaylide-v.png' %}" alt="" width="178" height="160" decoding="async">
+      {% include "kerststad/v1/_figuur.html" with gedrag="loop" pad="452,352 505,352" snelheid="6" sjaal="rood" fase="0" %}
+      {% include "kerststad/v1/_figuur.html" with gedrag="loop" pad="548,354 590,354" snelheid="5.5" sjaal="groen" fase="0.45" %}
+      {% include "kerststad/v1/_figuur.html" with gedrag="loop" pad="266,344 322,344" snelheid="6.5" sjaal="blauw" fase="0.8" %}
+      {% include "kerststad/v1/_figuur.html" with gedrag="zwaai" pad="443,322" sjaal="groen" fase="0.2" %}
+      {% include "kerststad/v1/_figuur.html" with gedrag="kind" pad="296,356 318,356" snelheid="7" sjaal="rood" fase="0.6" hoogte="23" %}
+    </div>
     {% if v.opening_enabled %}<button type="button" class="ks-open" data-ks-open data-fx-origin aria-label="Tik op de V om de kerststad te openen"><span class="ks-golf" aria-hidden="true"></span><span class="ks-golf ks-golf--twee" aria-hidden="true"></span></button>
     <p class="ks-hint" data-ks-hint>TIK OP DE V OM TE OPENEN</p>{% endif %}
     <button type="button" class="ks-fallback" data-ks-fallback hidden>Speel de opening af ▷</button>
@@ -36,6 +46,7 @@
   <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
     <symbol id="ks-krul" viewBox="0 0 220 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 14H84M136 14H216"/><path d="M84 14C92 14 94 6 102 6C108 6 108 12 104 12M136 14C128 14 126 6 118 6C112 6 112 12 116 12"/><path d="M84 14C92 14 94 22 102 22C108 22 108 16 104 16M136 14C128 14 126 22 118 22C112 22 112 16 116 16"/></g><path d="M110 7L117 14L110 21L103 14Z" fill="currentColor"/></symbol>
     <symbol id="ks-ster" viewBox="0 0 24 24"><path d="m12 1 2.8 7.6L23 12l-8.2 3.4L12 23l-2.8-7.6L1 12l8.2-3.4Z" fill="currentColor"/></symbol>
+    <linearGradient id="ks-pk-koek" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b6733b"/><stop offset=".5" stop-color="#8f5127"/><stop offset="1" stop-color="#5d3014"/></linearGradient>
     <symbol id="ks-man" viewBox="0 0 62 74"><g stroke="var(--ks-glazuur)" stroke-width="2.2" stroke-linejoin="round" fill="var(--ks-koek-licht)"><circle cx="31" cy="13" r="11"/><path d="M19 29H43L57 31Q62 32 61 37Q60 43 54 41L43 39V51L48 65Q49 71 44 71Q40 71 39 66L31 53L23 66Q22 71 18 71Q13 71 14 65L19 51V39L8 41Q2 43 1 37Q0 32 5 31Z"/></g><g fill="var(--ks-koek-3)"><circle cx="27" cy="11" r="1.6"/><circle cx="35" cy="11" r="1.6"/></g><path d="M26.5 16.5Q31 20 35.5 16.5" fill="none" stroke="var(--ks-koek-3)" stroke-width="1.6" stroke-linecap="round"/><g fill="var(--ks-rood)" stroke="var(--ks-glazuur)" stroke-width="1"><circle cx="31" cy="33" r="2.2"/><circle cx="31" cy="42" r="2.2"/></g></symbol>
   </defs></svg>
 
