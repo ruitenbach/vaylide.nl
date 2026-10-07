@@ -128,11 +128,15 @@ _FAMILY_WORDS = {"familie", "fam", "fam.", "gezin", "het", "de", "van", "der", "
 
 def collectie_volgorde(designs) -> list:
     """De volgorde van de collectie, op één plek: eerst alle Specials, daarna de gewone ontwerpen; binnen elk deel het nieuwst toegevoegde
-    ontwerp eerst (op het moment van toevoegen aan de catalogus, `Template.created_at`), bij gelijke tijd de vaste volgorde (`sort_order`, naam).
+    ontwerp eerst, op de vaste `added_at` uit het manifest van het ontwerp (catalog/collectie.py: `toegevoegd`, dus niet de registratietijd in een database),
+    bij gelijke tijd de vaste volgorde (`sort_order`, naam).
     Een nieuw Special staat dus automatisch op plek 1. Filtert niets: wie alleen gepubliceerde of passende ontwerpen wil, filtert eerst.
     Dit is de enige sorteerregel: Collectie, Inspiratie, de ontwerpkeuze in de Studio en 'Meer voor…' gebruiken allemaal deze functie."""
+    from . import collectie
+
     def sleutel(t):
-        moment = getattr(t, "created_at", None)
+        # Zonder added_at in het manifest (een ontwerp van een ontwikkelaar die het vergat) telt de registratietijd; de test bewaakt dat elk manifest er een heeft.
+        moment = collectie.toegevoegd().get(t.slug) or getattr(t, "created_at", None)
         return (0 if getattr(t, "special", False) else 1, -(moment.timestamp() if moment else 0), t.sort_order, t.name)
 
     return sorted(designs, key=sleutel)

@@ -3,6 +3,8 @@ alle velden zijn optioneel, wisselen van onderdeel bewaart wat er staat en nieuw
 import re
 from datetime import timedelta
 
+from unittest import mock
+
 from django.test import Client
 from django.utils import timezone
 
@@ -231,81 +233,122 @@ class LegeKaartTests(VaylideTestCase):
         self.assertNotIn("Je bent uitgenodigd voor een feestje", html)
 
 
-class NieuwsteOntwerpenEerstTests(VaylideTestCase):
-    def maak(self, slug, dagen_geleden):
-        t = Template.objects.get(slug=slug)
-        Template.objects.filter(pk=t.pk).update(created_at=timezone.now() - timedelta(days=dagen_geleden))
-        return Template.objects.get(slug=slug)
+def vaste_volgorde(test, standaard_dagen=300, **dagen):
+    """Laat 'nieuwste eerst' in een test van vaste tijden uitgaan: alle ontwerpen standaard `standaard_dagen` geleden, de genoemde (slug met _ voor -) op de opgegeven dag(en) geleden."""
+    from catalog import collectie
 
+    nu = timezone.now()
+    kaart = {slug: nu - timedelta(days=standaard_dagen) for slug in collectie.toegevoegd()}
+    kaart.update({slug.replace("_", "-"): nu - timedelta(days=d) for slug, d in dagen.items()})
+    test.enterContext(mock.patch("catalog.collectie.toegevoegd", return_value=kaart))
+
+
+class NieuwsteOntwerpenEerstTests(VaylideTestCase):
     def test_een_nieuw_ontwerp_staat_vooraan(self):
-        oud = self.maak("liefde-op-papier", 400)
-        nieuw = self.maak("eucalyptus", 1)
-        midden = self.maak("avondgoud", 40)
-        self.assertEqual([t.slug for t in collectie_volgorde([oud, nieuw, midden])], ["eucalyptus", "avondgoud", "liefde-op-papier"])
+        vaste_volgorde(self, liefde_op_papier=400, eucalyptus=1, avondgoud=40)
+        ontwerpen = [Template.objects.get(slug=s) for s in ("liefde-op-papier", "eucalyptus", "avondgoud")]
+        self.assertEqual([t.slug for t in collectie_volgorde(ontwerpen)], ["eucalyptus", "avondgoud", "liefde-op-papier"])
 
     def test_zelfde_moment_valt_terug_op_de_vaste_volgorde(self):
-        a = self.maak("avondgoud", 5)
-        b = self.maak("puur-moment", 5)
-        Template.objects.filter(pk__in=[a.pk, b.pk]).update(created_at=timezone.now() - timedelta(days=5))
-        a, b = Template.objects.get(pk=a.pk), Template.objects.get(pk=b.pk)
+        vaste_volgorde(self, avondgoud=5, puur_moment=5)
+        a, b = Template.objects.get(slug="avondgoud"), Template.objects.get(slug="puur-moment")
         self.assertEqual(collectie_volgorde([b, a]), sorted([a, b], key=lambda t: (t.sort_order, t.name)))
 
     def test_specials_gaan_altijd_voor_op_een_nieuwer_gewoon_ontwerp(self):
-        special = self.maak("kerststad", 300)
-        gewoon = self.maak("eucalyptus", 0)
-        self.assertEqual([t.slug for t in collectie_volgorde([gewoon, special])], ["kerststad", "eucalyptus"])
+        vaste_volgorde(self, kerststad=300, eucalyptus=0)
+        ontwerpen = [Template.objects.get(slug=s) for s in ("eucalyptus", "kerststad")]
+        self.assertEqual([t.slug for t in collectie_volgorde(ontwerpen)], ["kerststad", "eucalyptus"])
 
     def test_de_collectiepagina_en_de_startpagina_tonen_het_nieuwste_eerst_en_alleen_actieve_ontwerpen(self):
-        Template.objects.update(created_at=timezone.now() - timedelta(days=100))
-        self.maak("liefde-op-papier", 500)
-        nieuw = self.maak("avondgoud", 0)
-        Template.objects.filter(slug="puur-moment").update(created_at=timezone.now() + timedelta(days=1), is_active=False)   # nieuwer, maar niet gepubliceerd
+        vaste_volgorde(self, liefde_op_papier=500, avondgoud=0, puur_moment=-1)       # puur-moment is 'nieuwer', maar niet gepubliceerd
+        Template.objects.filter(slug="puur-moment").update(is_active=False)
         c = Client()
         for adres in ("/ontwerpen/?gelegenheid=bruiloft", "/maken/?gelegenheid=bruiloft"):
             html = c.get(adres).content.decode()
             self.assertNotIn("puur-moment", html, adres)
             kaarten = re.findall(r'/(?:ontwerpen|voorbeeld)/([a-z0-9-]+)/', html) if "ontwerpen" in adres else re.findall(r'name="template" value="([a-z0-9-]+)"', html)
             kaarten = list(dict.fromkeys(kaarten))
-            self.assertIn(nieuw.slug, kaarten, adres)
+            self.assertIn("avondgoud", kaarten, adres)
             if "ontwerpen" not in adres:
                 gewoon = [k for k in kaarten if not Template.objects.get(slug=k).special]      # de specials staan er eerst
-                self.assertEqual(gewoon[0], nieuw.slug, adres)                          # daarna staat in de keuze het nieuwste vooraan
-                self.assertLess(kaarten.index(nieuw.slug), kaarten.index("liefde-op-papier"), adres)
+                self.assertEqual(gewoon[0], "avondgoud", adres)                         # daarna staat in de keuze het nieuwste vooraan
+                self.assertLess(kaarten.index("avondgoud"), kaarten.index("liefde-op-papier"), adres)
+
+
+class VasteToevoegdatumTests(VaylideTestCase):
+    """'Nieuwste' komt uit de code (`added_at` in het manifest), niet uit de database: overal dezelfde volgorde."""
+
+    def test_elk_manifest_heeft_een_geldige_added_at_en_die_is_gelijk_per_versie(self):
+        import json
+        from datetime import datetime
+        from pathlib import Path
+
+        from django.conf import settings
+
+        per_slug = {}
+        for pad in sorted((Path(settings.BASE_DIR) / "designs").glob("*/v*/manifest.json")):
+            data = json.loads(pad.read_text(encoding="utf-8"))
+            self.assertIn("added_at", data, f"{pad.parent.parent.name}: geef het manifest een added_at (de tijd van toevoegen, bijv. 2026-10-07T07:59:37Z)")
+            moment = datetime.fromisoformat(data["added_at"].replace("Z", "+00:00"))
+            self.assertIsNotNone(moment.tzinfo, pad)
+            self.assertLess(moment, timezone.now() + timedelta(days=1), f"{pad}: added_at ligt in de toekomst")
+            self.assertEqual(per_slug.setdefault(data["slug"], data["added_at"]), data["added_at"], f"{data['slug']}: versies met een verschillende added_at")
+        from catalog import collectie
+
+        self.assertEqual(set(collectie.toegevoegd()), set(per_slug))
+
+    def test_de_volgorde_hangt_niet_af_van_de_registratietijd_in_de_database(self):
+        ontwerpen = list(Template.objects.filter(is_active=True, current_version__isnull=False))
+        voor = [t.slug for t in collectie_volgorde(ontwerpen)]
+        Template.objects.update(created_at=timezone.now() - timedelta(days=3650))          # alles 'opnieuw geregistreerd'
+        Template.objects.filter(slug="avondgoud").update(created_at=timezone.now())
+        ontwerpen = list(Template.objects.filter(is_active=True, current_version__isnull=False))
+        self.assertEqual([t.slug for t in collectie_volgorde(ontwerpen)], voor)
+
+    def test_een_nieuwe_database_geeft_dezelfde_volgorde(self):
+        from catalog.seed import sync_designs
+
+        voor = [t.slug for t in collectie_volgorde(list(Template.objects.filter(is_active=True, current_version__isnull=False)))]
+        Template.objects.all().delete()                                                     # een lege database: alles wordt opnieuw geregistreerd, in alfabetische volgorde
+        sync_designs()
+        nu = list(Template.objects.filter(is_active=True, current_version__isnull=False))
+        self.assertEqual(sorted(t.slug for t in nu), sorted(voor))
+        self.assertEqual([t.slug for t in collectie_volgorde(nu)], voor)
+
+    def test_een_nieuw_special_met_de_nieuwste_added_at_staat_op_plek_1(self):
+        from catalog import collectie
+
+        kaart = dict(collectie.toegevoegd())
+        kaart["balzaal"] = max(kaart.values()) + timedelta(hours=1)         # zoals een nieuw Special in zijn manifest
+        with mock.patch("catalog.collectie.toegevoegd", return_value=kaart):
+            ontwerpen = list(Template.objects.filter(is_active=True, current_version__isnull=False))
+            volgorde = collectie_volgorde(ontwerpen)
+        self.assertEqual(volgorde[0].slug, "balzaal")
+        self.assertTrue(all(t.special for t in volgorde[: sum(1 for t in ontwerpen if t.special)]))
 
 
 class CollectieVolgordeTests(VaylideTestCase):
     """Specials eerst, daarna de gewone ontwerpen, overal het nieuwst toegevoegde eerst; één sorteermethode voor de hele collectie."""
 
-    def zet(self, slug, dagen_geleden, uren=0):
-        Template.objects.filter(slug=slug).update(created_at=timezone.now() - timedelta(days=dagen_geleden, hours=uren))
-
     def volgorde(self, **filter):
-        from core.views import _design_cards  # noqa: F401  (de pagina gebruikt dezelfde kaarten)
-
         antwoord = Client().get("/ontwerpen/", filter)
         self.assertEqual(antwoord.status_code, 200)
         return [c["template"].slug for c in antwoord.context["special_cards"]], [c["template"].slug for c in antwoord.context["cards"]]
 
     def test_specials_eerst_en_een_nieuw_special_staat_op_plek_1(self):
-        Template.objects.update(created_at=timezone.now() - timedelta(days=200))
-        self.zet("balzaal", 30)
-        self.zet("kerststad", 5)
+        vaste_volgorde(self, balzaal=30, kerststad=5)
         specials, gewoon = self.volgorde()
         self.assertEqual(specials[:2], ["kerststad", "balzaal"])
-        # Een nieuw toegevoegd Special (hier: een bestaand Special dat nu 'nieuw' wordt) staat links boven, op plek 1.
-        self.zet("aurora-nocturne", 0)
+
+    def test_een_nieuw_special_komt_links_boven_en_gewone_ontwerpen_staan_los(self):
+        vaste_volgorde(self, balzaal=30, kerststad=5, aurora_nocturne=0, avondgoud=1)
         specials, gewoon = self.volgorde()
         self.assertEqual(specials[0], "aurora-nocturne")
-        # De gewone ontwerpen staan er los van, ook van nieuw naar oud.
-        self.zet("avondgoud", 1)
-        specials, gewoon = self.volgorde()
         self.assertEqual(gewoon[0], "avondgoud")
         self.assertFalse(set(specials) & set(gewoon))
 
     def test_op_de_pagina_staan_de_specials_boven_de_gewone_ontwerpen_in_dezelfde_volgorde_voor_telefoon_en_computer(self):
-        Template.objects.update(created_at=timezone.now() - timedelta(days=200))
-        self.zet("midnight-emeraude", 2)
-        self.zet("puur-moment", 1)
+        vaste_volgorde(self, midnight_emeraude=2, puur_moment=1)
         html = Client().get("/ontwerpen/").content.decode()
         eerste_special = html.index('/ontwerpen/midnight-emeraude/')
         eerste_gewoon = html.index('/ontwerpen/puur-moment/')
@@ -321,8 +364,7 @@ class CollectieVolgordeTests(VaylideTestCase):
         only_s, only_g = self.volgorde(categorie="specials")
         self.assertEqual(only_g, [])
         self.assertEqual(only_s, alles_s)
-        inactief = Template.objects.get(slug="puur-moment")
-        Template.objects.filter(pk=inactief.pk).update(is_active=False)
+        Template.objects.filter(slug="puur-moment").update(is_active=False)
         s, g = self.volgorde()
         self.assertNotIn("puur-moment", s + g)                                       # alleen gepubliceerde ontwerpen
         self.assertEqual(Client().get("/inspiratie/").status_code, 200)
@@ -332,11 +374,7 @@ class OveralDezelfdeVolgordeTests(VaylideTestCase):
     """Waar VAYLIDE ontwerpen toont geldt één regel: Specials eerst, het nieuwste links of bovenaan. Alles via `collectie_volgorde`."""
 
     def setUp(self):
-        Template.objects.update(created_at=timezone.now() - timedelta(days=300))
-        for dagen, slug in ((3, "kerstbol"), (2, "golden-noel"), (1, "kerststad")):                 # specials voor kerst, kerststad het nieuwst
-            Template.objects.filter(slug=slug).update(created_at=timezone.now() - timedelta(days=dagen))
-        Template.objects.filter(slug="winterlicht").update(created_at=timezone.now() - timedelta(hours=1))       # gewoon kerstontwerp, het nieuwst
-        Template.objects.filter(slug="gloria").update(created_at=timezone.now() - timedelta(days=4))
+        vaste_volgorde(self, kerstbol=3, golden_noel=2, kerststad=1, winterlicht=0.04, gloria=4)    # specials voor kerst, kerststad het nieuwst; winterlicht en gloria gewoon
 
     def slugs(self, html, patroon):
         return list(dict.fromkeys(re.findall(patroon, html)))

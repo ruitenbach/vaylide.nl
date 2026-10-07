@@ -52,11 +52,16 @@ aanmelding (`GuestResponse.party_size`), de bevestiging noemt het ("Aangemeld me
 
 ## Nieuwste ontwerpen eerst
 
-`catalog/occasions.py: by_occasion` (gebruikt door de collectiepagina, de ontwerppagina's en de Studio): eerst de ontwerpen die voor de gekozen
-gelegenheid zijn gemaakt, daarbinnen de nieuwste (dag waarop het ontwerp aan de catalogus is toegevoegd, `Template.created_at`) vooraan, bij
-dezelfde dag de vaste volgorde (`sort_order`, naam). Alleen actieve ontwerpen met een versie worden getoond. Een nieuw ontwerp staat dus
-automatisch bovenaan, zonder nummers aan te passen. Gevolg: de A/B-indeling uit `catalog/collectie.py` bepaalt de volgorde alleen nog
-voor ontwerpen van dezelfde dag.
+Eén regel voor alle plekken waar ontwerpen staan: **Specials eerst, daarna de gewone ontwerpen, overal het nieuwst toegevoegde ontwerp links of
+bovenaan.** Eén functie: `catalog/occasions.py: collectie_volgorde`, gebruikt door de Collectie, Inspiratie (Specials en de 6 nieuwste ontwerpen,
+boven de teksten), de ontwerpkeuze in de Studio en 'Meer voor…' op de ontwerppagina. Alleen actieve ontwerpen met een versie worden getoond.
+
+"Nieuwst" komt uit de code, niet uit de database: elk manifest heeft een vaste `added_at` (ISO-tijd met tijdzone, bijv. `2026-10-07T07:59:37Z`),
+gelezen door `catalog/collectie.py: toegevoegd()`. `Template.created_at` (de registratietijd in een specifieke database) doet niet mee; staging,
+production en een nieuwe database geven dus dezelfde volgorde, ook na `sync_designs` of een nieuwe deploy. Bij gelijke tijd beslist `sort_order`.
+**Een nieuw ontwerp krijgt in zijn manifest een `added_at` met de tijd van toevoegen**; `tests/test_flow_eenvoudig.py` (`VasteToevoegdatumTests`) laat
+de tests falen als die ontbreekt. De waarden van de bestaande ontwerpen komen uit de git-geschiedenis (de commit waarin het ontwerp is toegevoegd).
+Gevolg: de A/B-indeling uit `catalog/collectie.py` bepaalt de volgorde alleen nog voor ontwerpen die op hetzelfde moment zijn toegevoegd.
 
 ## Controles
 

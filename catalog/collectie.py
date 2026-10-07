@@ -12,6 +12,13 @@ bestaande databases krijgen ze één keer via migratie 0006 (daarna beslist Behe
 """
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
+from functools import lru_cache
+from pathlib import Path
+
+from django.conf import settings
+
 A = (
     "aurora-nocturne", "midnight-emeraude", "rose-royale", "balzaal", "golden-noel", "gouden-avond", "kerstbol", "kerstkaart", "kerststad",      # specials
     "liefde-op-papier", "voor-altijd", "avondgoud", "puur-moment",                         # bruiloft en alle gelegenheden
@@ -40,6 +47,27 @@ SORT_ORDER = {
     "aurora-nocturne": 1, "midnight-emeraude": 2, "rose-royale": 3, "balzaal": 4, "golden-noel": 6, "kerstbol": 7, "kerstkaart": 8, "gouden-avond": 9,
     "eerste-dans": 100, "aan-tafel": 101, "middernacht": 102,
 }
+
+
+# Wanneer een ontwerp is toegevoegd: `added_at` in het manifest (ISO-tijd, vast per ontwerp, in de code). Dit is de enige bron voor 'nieuwste eerst' (zie
+# `catalog.occasions.collectie_volgorde`) en hangt dus niet af van de database: staging, production en een nieuwe database geven dezelfde volgorde, en
+# `sync_designs`, deployen of opnieuw registreren veranderen niets. Een nieuw ontwerp krijgt in zijn manifest de tijd van toevoegen (tests/test_collectie.py bewaakt dat).
+@lru_cache(maxsize=1)
+def toegevoegd() -> dict:
+    """slug -> tijdstip (met tijdzone) uit de manifesten; bij meerdere versies telt de vroegste."""
+    gevonden: dict = {}
+    for pad in sorted((Path(settings.BASE_DIR) / "designs").glob("*/v*/manifest.json")):
+        try:
+            data = json.loads(pad.read_text(encoding="utf-8"))
+            moment = datetime.fromisoformat(str(data["added_at"]).replace("Z", "+00:00"))
+        except (ValueError, KeyError, OSError):
+            continue
+        if moment.tzinfo is None:
+            moment = moment.replace(tzinfo=timezone.utc)
+        slug = data.get("slug") or pad.parent.parent.name
+        if slug not in gevonden or moment < gevonden[slug]:
+            gevonden[slug] = moment
+    return gevonden
 
 
 def groep(slug: str) -> str:

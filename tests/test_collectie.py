@@ -118,12 +118,17 @@ class WebsiteTests(VaylideTestCase):
 
     def test_specials_page_lists_the_specials_newest_first(self):
         from datetime import timedelta
+        from unittest import mock
 
         from django.utils import timezone
 
+        from catalog import collectie as coll
+
         nu = timezone.now()
+        kaart = {slug: nu - timedelta(days=100) for slug in coll.toegevoegd()}
         for dagen, slug in enumerate(("balzaal", "rose-royale", "midnight-emeraude", "aurora-nocturne")):
-            Template.objects.filter(slug=slug).update(created_at=nu - timedelta(days=10 + dagen))      # balzaal het nieuwst
+            kaart[slug] = nu - timedelta(days=10 + dagen)                                 # balzaal het nieuwst
+        self.enterContext(mock.patch("catalog.collectie.toegevoegd", return_value=kaart))
         html = Client().get("/ontwerpen/", {"categorie": "specials"}).content.decode()
         posities = [html.find(f"/ontwerpen/{slug}/") for slug in ("balzaal", "rose-royale", "midnight-emeraude", "aurora-nocturne")]
         self.assertTrue(all(p >= 0 for p in posities), posities)
