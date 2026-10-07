@@ -56,18 +56,20 @@ html.ks-bezig, html.ks-bezig body { overflow: hidden; overscroll-behavior: none;
   /* de onderrand van de kop loopt zacht over in de nachtblauwe kaart (geen harde naad) */
   background: linear-gradient(to bottom, transparent 62%, #0b1430 100%), radial-gradient(ellipse at 50% 50%, transparent 42%, rgba(3, 7, 20, .6) 100%); }
 .ks-scene { position: absolute; inset: 0; z-index: 1; overflow: hidden; background: #1b1209; container-type: size; }
-.ks-scene video, .ks-spiegel, .ks-eindbeeld { display: block; width: 100%; height: 100%; object-fit: cover; }
-.ks-spiegel, .ks-eindbeeld, .ks-poster { position: absolute; inset: 0; pointer-events: none; }
+.ks-scene video, .ks-eindbeeld { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ks-eindbeeld, .ks-poster { position: absolute; inset: 0; pointer-events: none; }
 .ks-poster, .ks-eindbeeld { display: block; width: 100%; height: 100%; }
 .ks-poster img, .ks-eindbeeld img { display: block; width: 100%; height: 100%; object-fit: cover; }
 /* het eerste beeld (de gesloten badge) ligt over de video tot de video speelt; staand of liggend volgt de gekozen bron (kerststad.js zet data-ks-formaat) */
 .ks-poster { z-index: 1; }
 .ks-playing .ks-poster, .ks-finished .ks-poster, .ks-eind .ks-poster { visibility: hidden; }
-/* het stilstaande laatste beeld dat bij de sprong van de eindloop in 1,4 s verdwijnt (kerststad.js) */
-.ks-spiegel { opacity: 0; transition: opacity 1.4s ease; }
-.ks-spiegel.ks-aan { opacity: 1; transition: none; }
+/* de levende eindloop: twee exemplaren van een kleine clip (kerststad.js maakt ze); het binnenkomende exemplaar komt in 0,8 s boven het huidige (z-index), dus nooit een doorzichtig tussenmoment */
+.ks-loop { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; transition: opacity .8s linear; }
+.ks-loop.ks-boven { z-index: 1; }
+.ks-loop.ks-zicht { opacity: 1; }
 /* het eindbeeld: direct zichtbaar in de stilstaande standen, en oplossend zodra de levende eindloop begint */
 .ks-eindbeeld { opacity: 0; visibility: hidden; transition: opacity 1.4s ease, visibility 0s 1.4s; }
+.ks-eindbeeld { z-index: 2; }
 .ks-eind .ks-eindbeeld { opacity: 1; visibility: visible; transition: none; }
 
 /* de V in de badge is zelf de knop: een zachte lichtring en twee golven die vanuit de V naar de rand van de badge uitwaaieren; de tekst eronder is de hint */
@@ -324,4 +326,4 @@ html.ks-bezig, html.ks-bezig body { overflow: hidden; overscroll-behavior: none;
   .ks-munt { width: 22rem; }
 }
 @media (prefers-reduced-motion: reduce) { .ks-folie, .ks-lichtjes, .ks-koekje, .ks-lamp, .ks-sterretje, .cd__unit { animation: none !important; } }
-@media print { .ks-hero { height: auto; min-height: 0; } .ks-skip, .ks-open, .ks-hint, .ks-replay, .ks-scroll, .ks-spiegel { display: none; } }
+@media print { .ks-hero { height: auto; min-height: 0; } .ks-skip, .ks-open, .ks-hint, .ks-replay, .ks-scroll { display: none; } }

@@ -4,8 +4,8 @@ Twee masters, beide buiten Git:
   --mobiel   9:16, 1080x1920, 24 fps, 20,04 s, HEVC 10-bit, 71 MB (de oorspronkelijke goedgekeurde video)
   --desktop  16:9 (bijvoorbeeld 1920x1080), dezelfde Kerststad, bewust opnieuw gemaakt voor brede schermen
 
-    python tools/kerststad/maak_media.py [--mobiel <9:16-bron>] [--desktop <16:9-bron> --lus-desktop <seconden>] [--ffmpeg <pad>]
-Elke master is optioneel: wie alleen --desktop geeft, laat de mobiele bestanden ongemoeid.
+    python tools/kerststad/maak_media.py [--mobiel <9:16-bron>] [--desktop <16:9-bron> --lus-desktop <seconden>] [--ffmpeg <pad>] [--alleen-loops] [--loop-start <seconden>]
+Elke master is optioneel: wie alleen --desktop geeft, laat de mobiele bestanden ongemoeid. Met --alleen-loops worden alleen de twee loopclips gemaakt (de openingen en beelden blijven zoals ze zijn).
 
 Maakt in designs/kerststad/v1/media/:
   opening.mp4           mobiel/staand 9:16: H.264 8-bit, 720x1280, CRF 23, zonder geluid, sleutelframe om de 2 s en precies op LUS_MOBIEL (16,0 s)
@@ -17,6 +17,9 @@ Maakt in designs/kerststad/v1/media/:
                         geen tweede resize, geen scherpte- of andere filters (alleen de omzetting van 10-bit naar 8-bit die browsers nodig hebben)
   poster-desktop.webp   eerste beeld (desktop, volle resolutie)
   eind-desktop.webp     laatste beeld (desktop, volle resolutie)
+  loop.mp4              de levende eindloop, mobiel: de laatste scène van de 9:16-video (vanaf --loop-start, standaard 16,5 s, tot het einde), zelfde resolutie, fps en CRF als de opening
+  loop-desktop.mp4      idem uit de 16:9-video. Het eerste beeld is een keyframe, faststart, geen geluid. De pagina laat de opening bij --loop-start overgaan in deze clip (dezelfde beelden) en wisselt
+                        daarna tussen twee exemplaren van de clip met een kruisverloop; er wordt nooit in de grote openingsvideo teruggesprongen.
 en het kaartbeeld static/img/designs/kerststad.webp (800x1000, uit het laatste mobiele beeld).
 Geen bijsnijding, geen kleurcorrectie: alleen verkleind en gecomprimeerd.
 """
@@ -34,10 +37,12 @@ ap.add_argument("--mobiel")
 ap.add_argument("--desktop")
 ap.add_argument("--lus-desktop", type=float)
 ap.add_argument("--ffmpeg", default="ffmpeg")
+ap.add_argument("--alleen-loops", action="store_true")
+ap.add_argument("--loop-start", type=float, default=16.5)
 args = ap.parse_args()
 if not (args.mobiel or args.desktop):
     ap.error("geef minstens --mobiel of --desktop")
-if bool(args.desktop) != bool(args.lus_desktop):
+if bool(args.desktop) != bool(args.lus_desktop) and not args.alleen_loops:
     ap.error("--desktop en --lus-desktop horen bij elkaar")
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -55,6 +60,18 @@ def encodeer(bron: str, uit: Path, breedte: int | None, hoogte: int | None, sleu
     ], check=True)
 
 
+def maak_loop(bron: str, uit: Path, breedte: int | None, hoogte: int | None, crf: int) -> None:
+    """De laatste scène (vanaf --loop-start tot het einde) als losse clip: frame-nauwkeurig afgekapt, eerste beeld een keyframe, geen geluid, faststart."""
+    eerste = round(args.loop_start * 24)
+    schaal = f"scale={breedte}:{hoogte}:flags=lanczos," if breedte else ""
+    subprocess.run([
+        args.ffmpeg, "-y", "-hide_banner", "-loglevel", "error", "-i", bron,
+        "-vf", f"trim=start_frame={eerste},setpts=PTS-STARTPTS,{schaal}format=yuv420p", "-c:v", "libx264", "-preset", "slow", "-crf", str(crf), "-profile:v", "high", "-level", "4.1", "-r", "24",
+        "-x264-params", "keyint=48:min-keyint=12:scenecut=0", "-force_key_frames", "0",
+        "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-an", "-movflags", "+faststart", str(uit),
+    ], check=True)
+
+
 def frame(bron: str, t: float) -> Image.Image:
     cap = cv2.VideoCapture(bron)
     cap.set(cv2.CAP_PROP_POS_FRAMES, min(int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1, round(t * 24)))
@@ -68,9 +85,12 @@ def sla_op(im: Image.Image, naam: str, kwaliteit: int = 80, **kw) -> None:
 
 
 # ---- mobiel / staand (9:16) ----
-if args.mobiel:
+if args.mobiel and args.alleen_loops:
+    maak_loop(args.mobiel, MEDIA / "loop.mp4", 720, 1280, 23)
+elif args.mobiel:
     BRON = args.mobiel
     encodeer(BRON, MEDIA / "opening.mp4", 720, 1280, LUS_MOBIEL)
+    maak_loop(BRON, MEDIA / "loop.mp4", 720, 1280, 23)
     eerste, laatste = frame(BRON, 0), frame(BRON, 19.95)
     sla_op(eerste.resize((720, 1280), Image.LANCZOS), "poster.webp", 80)
     sla_op(laatste.resize((720, 1280), Image.LANCZOS), "eind.webp", 78)
@@ -95,8 +115,11 @@ if args.mobiel:
     kaart.save(ROOT / "static/img/designs/kerststad.webp", "WEBP", quality=74, method=6)
 
 # ---- desktop / liggend (16:9) ----
-if args.desktop:
+if args.desktop and args.alleen_loops:
+    maak_loop(args.desktop, MEDIA / "loop-desktop.mp4", None, None, 19)
+elif args.desktop:
     encodeer(args.desktop, MEDIA / "opening-desktop.mp4", None, None, args.lus_desktop, crf=19)
+    maak_loop(args.desktop, MEDIA / "loop-desktop.mp4", None, None, 19)
     sla_op(frame(args.desktop, 0), "poster-desktop.webp", 84)
     sla_op(frame(args.desktop, 999), "eind-desktop.webp", 82)
 print("klaar")
