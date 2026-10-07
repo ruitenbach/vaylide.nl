@@ -101,7 +101,7 @@ def default_content(occasion: str, palette_key: str = "") -> dict:
         },
         "closing_text": "",
         "photos": {"hero": None, "gallery": []},
-        "music": {"asset": None, "title": ""},
+        "music": {"asset": None, "title": "", "source": ""},
         # haar: gekozen haarkleuren van het bruidspaar (alleen bij ontwerpen met een paar, zie catalog/paar.py).
         # paar_eigen: goedgekeurde eigen versie van het bruidspaar (upload-id, zie gezichten/).
         # envelop: envelop en lakzegel naar keuze (catalog/envelop.py); envelop.collectie: de Envelope Collection als losse laag om het ontwerp.
@@ -135,6 +135,27 @@ def _merge(defaults: dict, data: dict) -> dict:
         else:
             out[key] = value
     return out
+
+
+# De bron van de muziek, expliciet opgeslagen in content["music"]["source"]: "design" (de track van het ontwerp, inbegrepen), "none" (geen muziek) of "custom" (eigen muziek van
+# de klant, de betaalde extra). Leeg = niet gekozen (oudere kaarten, ontwerpen zonder eigen track): dan geldt alleen een eigen upload, zoals altijd.
+MUZIEKBRONNEN = ("design", "none", "custom")
+MUZIEKBRON_GRATIS = ("design", "none")
+
+
+def muziek_bij_ontwerp(content: dict, manifest: dict | None) -> dict:
+    """Zet de muziekbron bij een ontwerp met een eigen track (manifest "music") standaard op "design"; haalt een verouderde keuze weg als het ontwerp geen track heeft.
+
+    Raakt nooit een kaart met eigen klantmuziek of een bestaande keuze aan: alleen een lege bron wordt gevuld, en alleen een "design" zonder track wordt gewist."""
+    music = content.setdefault("music", {"asset": None, "title": "", "source": ""})
+    heeft_track = isinstance((manifest or {}).get("music"), dict) and bool((manifest or {})["music"].get("src"))
+    if heeft_track and not music.get("source") and not music.get("asset"):
+        music["source"] = "design"
+        content.setdefault("sections", {})["music"] = True
+    elif not heeft_track and music.get("source") == "design":
+        music["source"] = ""
+        content.setdefault("sections", {})["music"] = bool(music.get("asset"))
+    return content
 
 
 def normalize_content(content: dict | None, occasion: str, palette_key: str = "") -> dict:
@@ -273,7 +294,7 @@ def publish_issues(content: dict, occasion: str, *, first_publication: bool, now
             issues.append(Issue("aanmelden", "deadline", "De aanmelddeadline ligt na de datum van het evenement."))
         elif first_publication and times.rsvp_deadline and times.rsvp_deadline < now:
             issues.append(Issue("aanmelden", "deadline", "De aanmelddeadline ligt in het verleden."))
-    if sections.get("music") and not (content.get("music") or {}).get("asset"):
+    if sections.get("music") and not (content.get("music") or {}).get("asset") and (content.get("music") or {}).get("source") not in MUZIEKBRON_GRATIS:
         issues.append(Issue("fotos", "music", "Upload een muziekbestand of zet muziek uit.", blocking=False))
     if sections.get("gallery") and not (content.get("photos") or {}).get("gallery"):
         issues.append(Issue("fotos", "gallery", "Voeg foto's toe aan de galerij of zet de galerij uit.", blocking=False))
@@ -313,7 +334,10 @@ def required_features(content: dict) -> set[str]:
         needed.add("story")
     if sections.get("gallery") and (content.get("photos") or {}).get("gallery"):
         needed.add("gallery")
-    if sections.get("music") and (content.get("music") or {}).get("asset"):
+    # Alleen eigen muziek van de klant is de betaalde extra. De muziek van het ontwerp is inbegrepen en 'geen muziek' kost niets; een eerder geüploade
+    # klantmuziek blijft bewaard maar telt dan niet mee. Zonder gekozen bron (oudere kaarten en ontwerpen zonder eigen track) blijft alles zoals het was.
+    music = content.get("music") or {}
+    if sections.get("music") and music.get("asset") and music.get("source") not in MUZIEKBRON_GRATIS:
         needed.add("music")
     if sections.get("rsvp") and (content.get("rsvp") or {}).get("questions"):
         needed.add("extra_questions")

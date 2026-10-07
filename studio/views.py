@@ -24,7 +24,7 @@ from studio import pakket
 from core.ai import AIUnavailable, suggest_text
 from core.utils import ip_fingerprint, rate_limit, wants_json
 from invitations.access import get_accessible_invitation, remember_draft, session_drafts
-from invitations.content import SECTION_LABELS, card_kind, normalize_content, publish_issues, referenced_assets
+from invitations.content import SECTION_LABELS, card_kind, muziek_bij_ontwerp, normalize_content, publish_issues, referenced_assets
 from invitations.images import UploadError, process_logo, process_photo, sniff_audio
 from invitations.models import Invitation, MediaAsset, Source
 from invitations.render import PathResolver, RenderOptions, build_view
@@ -357,7 +357,8 @@ def _form_kwargs(inv: Invitation, step: str) -> dict:
         for photo in [p for p in photos if p.focus_x is None][:24]:
             photo.analyse()
         return {"photos": photos,
-                "audio": list(inv.assets.filter(kind=MediaAsset.Kind.AUDIO))}
+                "audio": list(inv.assets.filter(kind=MediaAsset.Kind.AUDIO)),
+                "ontwerp_muziek": (inv.template_version.manifest or {}).get("music")}
     if step in ("stijl", "envelop"):
         return {"template_version": inv.template_version}
     if step == "gegevens":
@@ -407,6 +408,7 @@ def design_step(request, inv: Invitation):
             content = normalize_content(_content(inv), occasion)
             if version.pk != inv.template_version_id:
                 content["style"]["palette"] = version.default_palette_key
+                muziek_bij_ontwerp(content, version.manifest)   # een nieuw ontwerp met een eigen track begint met die muziek; een keuze voor een track die het nieuwe ontwerp niet heeft vervalt
             try:
                 inv = save_draft(inv, expected_rev=posted_rev, content=content, template_version=version, occasion=occasion,
                                  user=request.user, source=_source(request), step="gegevens")

@@ -403,8 +403,23 @@ def build_view(
     music_url = ""
     music_title = (content.get("music") or {}).get("title", "")
     music_asset = (content.get("music") or {}).get("asset")
+    music_source = (content.get("music") or {}).get("source") or ""
+    if music_source in ("design", "none"):     # de klant koos de track van het ontwerp of geen muziek: een eerder geüploade eigen muziek speelt dan niet
+        music_asset = None
+        music_title = ""
     if music_asset and resolver and resolver.meta(music_asset):
         music_url = resolver.url(music_asset, "audio")
+    # Een ontwerp kan in zijn manifest een eigen track aanwijzen ("music": {"src", "title", "volume"}). Die speelt in het voorbeeld van het ontwerp en in een kaart waarvan de klant
+    # de bron "design" koos; bij "custom" (of een eerdere upload zonder gekozen bron) gaat de eigen muziek van de klant altijd voor, bij "none" speelt er niets. Ontwerpen zonder "music"
+    # in het manifest blijven bij het speeldoosje (voorbeeld) of de eigen upload van de klant, zoals altijd.
+    design_music = ((template_version.manifest or {}).get("music") if template_version else None) or {}
+    kiest_ontwerp = music_source == "design" or (options.music_synth and music_source != "none")
+    design_track = bool(isinstance(design_music, dict) and design_music.get("src") and not music_url and kiest_ontwerp)
+    music_volume = ""
+    if design_track:
+        music_url = static(design_music["src"])
+        music_title = music_title or str(design_music.get("title") or "")
+        music_volume = str(min(1.0, max(0.05, float(design_music.get("volume", 0.5)))))
 
     show = {
         "countdown": enabled("countdown") and (start is not None or countdown is not None),
@@ -419,7 +434,7 @@ def build_view(
         and bool((contact.get("name") or "").strip())
         and bool(phone or (contact.get("email") or "").strip() or (contact.get("note") or "").strip()),
         "closing": enabled("closing") and bool((content.get("closing_text") or "").strip()),
-        "music": enabled("music") and "music" in features and (bool(music_url) or options.music_synth),
+        "music": enabled("music") and ("music" in features or design_track) and (bool(music_url) or options.music_synth),
     }
     # Een wenskaart is alleen een groet: geen dresscode, 'Goed om te weten' of 'Vragen' (programma, locatie en
     # aanmelden vallen al weg omdat er geen evenement is).
@@ -576,6 +591,7 @@ def build_view(
         "gallery": gallery,
         "music_url": music_url,
         "music_title": music_title,
+        "music_volume": music_volume,
         "music_synth": options.music_synth and not music_url,
         # Welke melodie het speeldoosje in een voorbeeld speelt (manifest: demo_melody), anders de standaard.
         "music_melody": str((template_version.manifest or {}).get("demo_melody") or "") if options.music_synth and not music_url else "",

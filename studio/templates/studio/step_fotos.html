@@ -75,6 +75,33 @@
   </section>
 
   <section class="studio-block" aria-labelledby="blok-muziek">
+    {% if form.ontwerp_muziek %}
+    <h2 class="studio-block__title" id="blok-muziek">Muziek</h2>
+    <p class="hint">Start nooit vanzelf: gasten zetten de muziek zelf aan met de knop op de kaart.</p>
+    <fieldset class="muziekbron">
+      <legend class="label">Kies de muziek</legend>
+      {% for choice in form.music_source %}<div class="check-line">{{ choice }}{% if choice.data.value == "design" %} <span class="badge">Inbegrepen</span>{% elif choice.data.value == "none" %} <span class="badge">Geen kosten</span>{% else %} <span class="badge">{{ feature_badges.music }}</span>{% endif %}</div>{% endfor %}
+      {% if form.music_source.errors %}<p class="field-error" role="alert">{{ form.music_source.errors.0 }}</p>{% endif %}
+    </fieldset>
+    <div class="muziek-eigen" data-muziek-eigen>
+      <h3 class="label">Eigen muziek</h3>
+      <p class="small muted">Alleen nodig bij "Eigen muziek uploaden". MP3 of M4A, max. {{ upload_limits.audio_max_bytes|filesizeformat }}. Eigen muziek gaat altijd voor de muziek van het ontwerp.</p>
+      {% if audio %}
+      <fieldset>
+        <legend class="label">Kies je bestand</legend>
+        {% for choice in form.music_asset %}<div class="check-line">{{ choice }}</div>{% endfor %}
+      </fieldset>
+      {% include "studio/_field.html" with field=form.music_title %}
+      {% include "studio/_check.html" with field=form.music_rights %}
+      {% endif %}
+      {% if form.music_asset.errors %}<p class="field-error" role="alert">{{ form.music_asset.errors.0 }}</p>{% endif %}
+      <div class="music-upload">
+        <label class="field"><span class="label">Muziekbestand uploaden</span><input type="file" name="muziek" accept="audio/mpeg,audio/mp4,.mp3,.m4a" form="upload-muziek-form"></label>
+        <button type="submit" class="btn btn--secondary btn--sm" form="upload-muziek-form" formnovalidate>Muziek uploaden</button>
+      </div>
+      {% for a in audio %}<p class="small">{{ a.original_name }} · <button type="submit" class="link-button" form="delete-{{ a.uid }}">verwijderen</button></p>{% endfor %}
+    </div>
+    {% else %}
     <h2 class="studio-block__title" id="blok-muziek">Muziek <span class="badge">{{ feature_badges.music }}</span></h2>
     <p class="hint">Start nooit vanzelf. MP3 of M4A, max. {{ upload_limits.audio_max_bytes|filesizeformat }}.</p>
     {% if audio %}
@@ -90,6 +117,7 @@
       <button type="submit" class="btn btn--secondary btn--sm" form="upload-muziek-form" formnovalidate>Muziek uploaden</button>
     </div>
     {% for a in audio %}<p class="small">{{ a.original_name }} · <button type="submit" class="link-button" form="delete-{{ a.uid }}">verwijderen</button></p>{% endfor %}
+    {% endif %}
   </section>{% endif %}
   {% include "studio/_actions.html" %}
 </form>

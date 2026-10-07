@@ -164,6 +164,12 @@ def sync_designs(update_existing_manifest: bool = False) -> list[str]:
         )
         if v_created:
             messages.append(f"Versie geregistreerd: {template.name} v{number}")
+        elif isinstance(data.get("music"), dict) and (version.manifest or {}).get("music") != data["music"]:
+            # Het manifest wordt bij het registreren in de database vastgelegd en daarna niet meer overschreven. Alleen de eigen track van een ontwerp ("music") wordt wél bijgewerkt,
+            # zodat een ontwerp er later een kan krijgen zonder dat andere onderdelen van de bestaande versie veranderen. Ontwerpen zonder "music" worden niet aangeraakt.
+            version.manifest = {**(version.manifest or {}), "music": data["music"]}
+            version.save(update_fields=["manifest"])
+            messages.append(f"Muziek van het ontwerp bijgewerkt: {template.name} v{number}")
         elif update_existing_manifest and version.manifest != data:
             version.manifest = data
             version.renderer = renderer

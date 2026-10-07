@@ -185,8 +185,22 @@
       toggle.setAttribute("aria-pressed", on ? "true" : "false");
       label.textContent = on ? "Muziek pauzeren" : "Muziek afspelen";
     }
+    var doelVolume = parseFloat(root.getAttribute("data-music-volume"));   // alleen een ontwerp met een eigen track zet een volume; anders blijft het element zoals het was
+    var inzet = null;
+    function zachteInzet() {   // het volume stijgt in 2 s van stil naar het ingestelde niveau, zodat de muziek niet schrikt
+      if (!(doelVolume > 0)) return;
+      window.clearInterval(inzet);
+      var stap = 0;
+      audio.volume = 0;
+      inzet = window.setInterval(function () {
+        stap += 1;
+        audio.volume = Math.min(doelVolume, doelVolume * (stap / 20));
+        if (stap >= 20) window.clearInterval(inzet);
+      }, 100);
+    }
     function play() {
       if (synth) { synth.start(); setState(true); return; }
+      zachteInzet();
       var attempt = audio.play();
       if (attempt && attempt.then) {
         attempt.then(function () { setState(true); }).catch(function () {
@@ -196,6 +210,7 @@
       } else { setState(true); }
     }
     function pause() {
+      window.clearInterval(inzet);
       if (synth) synth.stop(); else audio.pause();
       setState(false);
     }

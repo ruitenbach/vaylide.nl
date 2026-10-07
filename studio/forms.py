@@ -452,18 +452,23 @@ class PhotosForm(StepForm):
     story_text = forms.CharField(label="Jullie verhaal (optioneel)", max_length=2000, required=False,
                                  widget=forms.Textarea(attrs={"rows": 6, "data-ai-field": "story"}))
     music_asset = forms.ChoiceField(label="Muziek", required=False, widget=forms.RadioSelect)
+    music_source = forms.ChoiceField(label="Muziek", required=False, widget=forms.RadioSelect,
+                                     choices=[("design", "Muziek van dit ontwerp"), ("none", "Geen muziek"), ("custom", "Eigen muziek uploaden")])
     music_title = forms.CharField(label="Titel en artiest (optioneel)", max_length=80, required=False)
     music_rights = forms.BooleanField(label="Ik heb toestemming om deze muziek op mijn uitnodiging te gebruiken", required=False)
 
-    def __init__(self, *args, photos, audio, **kwargs):
+    def __init__(self, *args, photos, audio, ontwerp_muziek=None, **kwargs):
         self.photos = list(photos)
         self.audio = list(audio)
+        self.ontwerp_muziek = ontwerp_muziek if isinstance(ontwerp_muziek, dict) and ontwerp_muziek.get("src") else None   # de track van het ontwerp (manifest "music"), of None
         super().__init__(*args, **kwargs)
         c = self.content
         # Een wenskaart heeft alleen een hoofdfoto: geen galerij, verhaal of muziek (die blijven ongewijzigd bewaard).
         self.wenskaart = c.get("soort") == "wenskaart"
         self.fields["hero"].choices = [("", "Geen hoofdfoto")] + [(str(p.uid), p.original_name or "Foto") for p in self.photos]
-        self.fields["music_asset"].choices = [("", "Geen muziek")] + [(str(a.uid), a.original_name or "Muziek") for a in self.audio]
+        self.fields["music_asset"].choices = ([] if self.ontwerp_muziek else [("", "Geen muziek")]) + [(str(a.uid), a.original_name or "Muziek") for a in self.audio]
+        if not self.ontwerp_muziek:
+            del self.fields["music_source"]       # een ontwerp zonder eigen track houdt de muziekstap zoals die was
         hero = (c.get("photos") or {}).get("hero") or {}
         gallery = {str(g.get("asset")): g for g in (c.get("photos") or {}).get("gallery") or [] if isinstance(g, dict)}
         for p in self.photos:
@@ -489,9 +494,11 @@ class PhotosForm(StepForm):
             self.initial["story_title"] = story.get("title", "")
             self.initial["story_text"] = story.get("text", "")
             music = c.get("music") or {}
-            self.initial["music_asset"] = str(music.get("asset") or "")
+            self.initial["music_asset"] = str(music.get("asset") or "") or (str(self.audio[0].uid) if self.ontwerp_muziek and self.audio else "")
             self.initial["music_title"] = music.get("title", "")
-            self.initial["music_rights"] = bool(music.get("asset"))
+            self.initial["music_rights"] = bool(music.get("asset")) and music.get("source") in ("custom", "")
+            if self.ontwerp_muziek:
+                self.initial["music_source"] = music.get("source") or ("custom" if music.get("asset") else "none")   # alleen om te tonen wat er nu geldt; opgeslagen wordt wat de klant kiest
 
     def photo_rows(self):
         rows = []
@@ -503,6 +510,16 @@ class PhotosForm(StepForm):
 
     def clean(self):
         data = super().clean()
+        if self.ontwerp_muziek and "music_source" in self.fields:
+            bron = data.get("music_source") or ""
+            if bron not in ("design", "none", "custom"):
+                self.add_error("music_source", "Kies welke muziek je wilt.")
+            elif bron == "custom":
+                if not data.get("music_asset"):
+                    self.add_error("music_asset", "Upload een muziekbestand en kies het hier, of kies een andere optie.")
+                elif not data.get("music_rights"):
+                    self.add_error("music_rights", "Bevestig dat je deze muziek mag gebruiken, of kies een andere optie.")
+            return data
         if data.get("music_asset") and not data.get("music_rights"):
             self.add_error("music_rights", "Bevestig dat je deze muziek mag gebruiken, of kies 'Geen muziek'.")
         return data
@@ -532,9 +549,18 @@ class PhotosForm(StepForm):
                             "text": _s(d.get("story_text"))}
         if gallery:
             content.setdefault("sections", {})["gallery"] = True
-        music_uid = d.get("music_asset") or ""
-        content["music"] = {"asset": music_uid or None, "title": _s(d.get("music_title"))}
-        content.setdefault("sections", {})["music"] = bool(music_uid)
+        if self.ontwerp_muziek:
+            # Ontwerp met een eigen track: de bron wordt expliciet bewaard. Eerder geüploade klantmuziek blijft bij "design" en "none" gewoon bewaard (en gratis, want ze speelt dan niet).
+            bron = d.get("music_source") or ""
+            oud = content.get("music") or {}
+            asset = (d.get("music_asset") or None) if bron == "custom" else (oud.get("asset") or None)
+            content["music"] = {"asset": asset, "title": _s(d.get("music_title")) if bron == "custom" else (oud.get("title") or ""), "source": bron}
+            content.setdefault("sections", {})["music"] = bron == "design" or (bron == "custom" and bool(asset))
+        else:
+            music_uid = d.get("music_asset") or ""
+            oud_bron = (content.get("music") or {}).get("source") or ""
+            content["music"] = {"asset": music_uid or None, "title": _s(d.get("music_title")), "source": oud_bron if oud_bron == "custom" and music_uid else ""}
+            content.setdefault("sections", {})["music"] = bool(music_uid)
         if content["story"]["text"]:
             content["sections"]["story"] = True
         return content

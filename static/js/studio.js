@@ -403,6 +403,35 @@
     window.addEventListener("pageshow", function (event) { if (event.persisted) schedule(); });
   });
 
+  /* ---------- Muziek: de velden voor eigen muziek (bestand kiezen, uploaden, toestemming) alleen bij "Eigen muziek uploaden" ---------- */
+  // Zonder JavaScript blijven ze zichtbaar. Het opslaan en de prijs veranderen hier niet: dat doet de server met de gekozen bron.
+  document.querySelectorAll("[data-muziek-eigen]").forEach(function (blok) {
+    var keuzes = document.querySelectorAll("input[name=music_source]");
+    if (!keuzes.length) return;
+    var opslagSleutel = "vierlief-studio-eigen-muziek";
+    function toon() {
+      var gekozen = document.querySelector("input[name=music_source]:checked");
+      var eigen = !!gekozen && gekozen.value === "custom";
+      blok.hidden = !eigen;
+      var toelichting = document.querySelector("[data-muziek-design]");
+      if (toelichting) toelichting.hidden = !gekozen || gekozen.value !== "design";
+    }
+    // Wie een bestand uploadt (de pagina laadt daarna opnieuw) blijft bij "Eigen muziek uploaden", ook als dat nog niet was opgeslagen.
+    blok.querySelectorAll("button[form=upload-muziek-form]").forEach(function (knop) {
+      knop.addEventListener("click", function () { try { window.sessionStorage.setItem(opslagSleutel, "1"); } catch (e) { /* privémodus */ } });
+    });
+    try {
+      if (window.sessionStorage.getItem(opslagSleutel)) {
+        window.sessionStorage.removeItem(opslagSleutel);
+        var eigenKeuze = document.querySelector("input[name=music_source][value=custom]");
+        if (eigenKeuze) eigenKeuze.checked = true;
+      }
+    } catch (e) { /* privémodus */ }
+    keuzes.forEach(function (keuze) { keuze.addEventListener("change", toon); });
+    window.addEventListener("pageshow", toon);   // na 'terug' of herladen zet de browser eerdere keuzes terug
+    toon();
+  });
+
   /* ---------- Bestellen: bedrag direct bijwerken bij een andere keuze ---------- */
   document.querySelectorAll("[data-recalc]").forEach(function (input) {
     input.addEventListener("change", function () {

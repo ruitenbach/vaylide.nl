@@ -19,7 +19,7 @@ Buiten schot: alles binnen `[data-media-vrij]` en wat niet uit `/static/` komt, 
 
 ### Welke bestanden vallen onder de hotlinkblokkade
 
-Bestanden met extensie `webp`, `jpg`, `jpeg`, `png`, `gif`, `avif`, `mp4` of `webm` onder `/static/designs/`, `/static/img/designs/`, `/static/img/site/`, `/static/img/demo/` en `/static/img/envelop/`.
+Bestanden met extensie `webp`, `jpg`, `jpeg`, `png`, `gif`, `avif`, `mp4`, `webm` of `mp3` (de eigen track van een ontwerp) onder `/static/designs/`, `/static/img/designs/`, `/static/img/site/`, `/static/img/demo/` en `/static/img/envelop/`.
 Het logo (`img/merk/`), de mailafbeeldingen (`img/mail/`), de deelbeelden (`og-*.jpg`), pictogrammen, CSS, scripts en lettertypen vallen er bewust buiten:
 mailprogramma's in de browser (Outlook.com en dergelijke) sturen een Referer mee en zouden het logo in onze mails niet meer laten zien, en zoekmachines en deelkaarten halen deelbeelden zonder Referer op.
 Een tweede domein hoort in `DJANGO_ALLOWED_HOSTS` of `VIERLIEF_BASE_URL`; die gelden als "eigen", met en zonder `www`.

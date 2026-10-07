@@ -582,3 +582,9 @@ html:has(body.studio-page) { scrollbar-gutter: stable; }
 /* De nieuwsbrief staat los van het bestellen: een lijn en ruimte ertussen, zodat het duidelijk een aparte, optionele keuze is. */
 .checkout .nieuwsbrief-check { margin-top: 1rem; padding-top: .85rem; border-top: 1px solid var(--line); }
 @media (max-width: 640px) { .checkout .nieuwsbrief-check { margin-top: .7rem; padding-top: .7rem; } }
+
+/* Muziekstap bij een ontwerp met een eigen track: de drie bronnen met hun prijslabel op één regel */
+.muziekbron .check-line { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .75rem; }
+.muziekbron .check-line .badge { white-space: nowrap; }
+.muziek-eigen { margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid rgba(0, 0, 0, .1); }
+.muziek-eigen[hidden] { display: none !important; }

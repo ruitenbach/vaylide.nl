@@ -94,7 +94,7 @@ class MediaHotlinkMiddleware:
     """
 
     PROTECTED_PREFIXES = ("/static/designs/", "/static/img/designs/", "/static/img/site/", "/static/img/demo/", "/static/img/envelop/")
-    MEDIA_EXTENSIONS = (".webp", ".jpg", ".jpeg", ".png", ".gif", ".avif", ".mp4", ".webm")
+    MEDIA_EXTENSIONS = (".webp", ".jpg", ".jpeg", ".png", ".gif", ".avif", ".mp4", ".webm", ".mp3")
     EMBED_DESTINATIONS = {"image", "video", "audio", "embed", "object", "iframe", "frame"}
 
     def __init__(self, get_response):

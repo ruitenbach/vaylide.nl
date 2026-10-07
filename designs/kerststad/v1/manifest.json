@@ -14,6 +14,11 @@
   "envelope_mode": "built_in",
   "opening_label": "Peperkoekbrug met een gouden V-badge, een filmische opening",
   "demo_melody": "we-wish-you",
+  "music": {
+    "src": "designs/kerststad/v1/media/muziek.mp3",
+    "title": "Kerststad (avondlicht), een eigen compositie van VAYLIDE",
+    "volume": 0.45
+  },
   "kaartbeeld": "open",
   "palettes": [
     {

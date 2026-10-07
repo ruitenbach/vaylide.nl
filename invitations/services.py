@@ -16,7 +16,7 @@ from django.utils.text import slugify
 
 from catalog.occasions import display_title, occasion_config
 
-from .content import SOORTEN, default_content, event_times, normalize_content, publish_issues, referenced_assets
+from .content import SOORTEN, default_content, event_times, muziek_bij_ontwerp, normalize_content, publish_issues, referenced_assets
 from .models import Invitation, InvitationVersion, MediaAsset, Source
 
 SLUG_ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789"
@@ -44,6 +44,7 @@ def create_draft(*, occasion: str, template, owner=None, palette: str = "", soor
     # Uitnodiging of wenskaart: de keuze aan het begin van het samenstellen, bij elke gelegenheid. Zonder keuze blijft het een uitnodiging.
     if soort in SOORTEN:
         content["soort"] = soort
+    muziek_bij_ontwerp(content, version.manifest)   # een ontwerp met een eigen track begint met die muziek (inbegrepen); andere ontwerpen blijven zoals ze waren
     return Invitation.objects.create(
         owner=owner,
         occasion=occasion,

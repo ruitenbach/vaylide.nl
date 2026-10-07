@@ -7,6 +7,7 @@ import struct
 
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client
 
 from catalog import collectie, wenskaart
@@ -276,3 +277,216 @@ class KerststadBronkeuzeTests(VaylideTestCase):
         self.assertNotRegex(css.split("/* ================================================================ de kaart")[0], r"(?<!backdrop-)filter:\s*blur\(\d{2}", "geen blur-fill naast de video (een lichte scherptediepte op de figuurtjes mag wel)")
         html = (ONTWERP / "invitation.html").read_text(encoding="utf-8")
         self.assertNotIn("ks-ambient", html)
+
+
+class OntwerpMuziekTests(VaylideTestCase):
+    """Een ontwerp kan in zijn manifest een eigen track aanwijzen ("music"); Kerststad is de eerste. Andere ontwerpen blijven ongewijzigd."""
+
+    def test_kerststad_speelt_zijn_eigen_track_via_de_bestaande_muziekknop(self):
+        html = Client().get(DEMO).content.decode()
+        self.assertIn("data-music", html)
+        audio = re.search(r"<audio[^>]*data-music-audio[^>]*>", html).group(0)
+        self.assertIn("designs/kerststad/v1/media/muziek", audio)
+        for woord in ("loop", 'preload="none"'):
+            self.assertIn(woord, audio)
+        self.assertNotRegex(audio, r"\sautoplay\b", "geen autoplay")
+        self.assertIn("data-music-volume=", html)
+        self.assertNotIn("data-music-synth", html, "het speeldoosje is vervangen door de echte track")
+        self.assertIn("data-music-toggle", html)
+        self.assertIn("Muziek afspelen", html)
+        self.assertTrue((ONTWERP / "media" / "muziek.mp3").exists())
+        self.assertLess((ONTWERP / "media" / "muziek.mp3").stat().st_size, 3_000_000)
+
+    def test_het_volume_staat_rustig_en_begint_met_een_zachte_inzet(self):
+        volume = float(self.manifest()["music"]["volume"])
+        self.assertTrue(0.2 <= volume <= 0.6, volume)
+        js = (settings.BASE_DIR / "invitations/static/invitations/invite.js").read_text(encoding="utf-8")
+        self.assertIn("zachteInzet", js)
+        self.assertIn("data-music-volume", js)
+
+    def manifest(self):
+        return json.loads((ONTWERP / "manifest.json").read_text(encoding="utf-8"))
+
+    def test_andere_ontwerpen_houden_het_speeldoosje_en_krijgen_geen_track(self):
+        for slug in ("kerstbol", "kerstkaart", "gouden-avond", "winterlicht", "golden-noel"):
+            html = Client().get(f"/voorbeeld/{slug}/", {"gelegenheid": "bruiloft" if slug == "gouden-avond" else "kerst"}).content.decode()
+            self.assertIn("data-music-synth=", html, slug)
+            self.assertNotIn("<audio", html.split('data-music')[1].split("</div>")[0] if "data-music" in html else "", slug)
+            self.assertNotIn("data-music-volume", html, slug)
+        for pad in (settings.BASE_DIR / "designs").glob("*/v*/manifest.json"):
+            if pad.parent.parent.name != "kerststad":
+                self.assertNotIn("music", json.loads(pad.read_text(encoding="utf-8")), pad.parent.parent.name)
+
+    def test_eigen_muziek_van_de_klant_gaat_voor_de_track_van_het_ontwerp(self):
+        version = Template.objects.get(slug="kerststad").current_version
+        content = demo_content("kerststad", "kerst")
+        view = build_view(occasion="kerst", content=content, overrides={}, template_version=version, options=RenderOptions(mode="demo", music_synth=True))
+        self.assertIn("kerststad/v1/media/muziek", view["music_url"])
+
+        class Resolver:
+            def meta(self, uid):
+                return {"kind": "audio"}
+
+            def url(self, uid, kind):
+                return "/media/klant.mp3"
+
+        content["music"] = {"asset": "abc", "title": "Ons liedje"}
+        view = build_view(occasion="kerst", content=content, overrides={}, template_version=version, options=RenderOptions(mode="demo", music_synth=True, resolver=Resolver()))
+        self.assertEqual(view["music_url"], "/media/klant.mp3")
+        self.assertEqual(view["music_volume"], "")
+        self.assertEqual(view["music_title"], "Ons liedje")
+
+    def test_een_wenskaart_toont_nog_steeds_geen_muziek(self):
+        html = _render(content=demo_content("kerststad", "kerst", soort="wenskaart"))
+        self.assertNotIn("data-music", html)
+
+    def test_het_registreren_werkt_alleen_de_muziek_van_een_bestaande_versie_bij(self):
+        from catalog.seed import sync_designs
+
+        version = Template.objects.get(slug="kerststad").current_version
+        oud = dict(version.manifest)
+        oud.pop("music")
+        oud["tagline"] = "oude tagline"
+        version.manifest = oud
+        version.save(update_fields=["manifest"])
+        andere = Template.objects.get(slug="kerstbol").current_version
+        voor = dict(andere.manifest)
+        sync_designs()
+        version.refresh_from_db()
+        andere.refresh_from_db()
+        self.assertEqual(version.manifest["music"]["src"], "designs/kerststad/v1/media/muziek.mp3")
+        self.assertEqual(version.manifest["tagline"], "oude tagline", "de rest van het vastgelegde manifest blijft zoals het was")
+        self.assertEqual(andere.manifest, voor)
+
+    def test_de_hotlinkblokkade_dekt_ook_de_muziek_van_een_ontwerp(self):
+        client = Client()
+        self.assertEqual(client.get("/static/designs/kerststad/v1/media/muziek.mp3", HTTP_REFERER="https://elders.example/").status_code, 403)
+
+    def _live(self, content, resolver=None):
+        version = Template.objects.get(slug="kerststad").current_version
+        return build_view(occasion="kerst", content=content, overrides={}, template_version=version, options=RenderOptions(mode="live", resolver=resolver))
+
+    def test_de_muziekbron_wordt_expliciet_gevolgd_in_de_echte_kaart(self):
+        content = demo_content("kerststad", "kerst")
+        content["sections"]["music"] = True
+        content["music"] = {"asset": None, "title": "", "source": ""}
+        view = self._live(content)
+        self.assertEqual((view["music_url"], view["show"]["music"]), ("", False), "zonder gekozen bron speelt de track van het ontwerp niet in een echte kaart")
+        content["music"]["source"] = "design"
+        view = self._live(content)
+        self.assertIn("kerststad/v1/media/muziek", view["music_url"])
+        self.assertEqual(view["music_volume"], "0.45")
+        self.assertTrue(view["show"]["music"])
+        content["music"]["source"] = "none"
+        view = self._live(content)
+        self.assertEqual((view["music_url"], view["show"]["music"]), ("", False))
+
+    def test_eigen_muziek_gaat_voor_en_blijft_bij_andere_keuzes_bewaard_maar_stil(self):
+        class Resolver:
+            def meta(self, uid):
+                return {"kind": "audio"}
+
+            def url(self, uid, kind):
+                return "/media/klant.mp3"
+
+        content = demo_content("kerststad", "kerst")
+        content["sections"]["music"] = True
+        content["music"] = {"asset": "abc", "title": "Ons liedje", "source": "custom"}
+        view = self._live(content, Resolver())
+        self.assertEqual((view["music_url"], view["music_volume"], view["music_title"]), ("/media/klant.mp3", "", "Ons liedje"))
+        content["music"]["source"] = "design"
+        view = self._live(content, Resolver())
+        self.assertIn("kerststad/v1/media/muziek", view["music_url"], "bij design speelt de upload niet, ook al is hij bewaard")
+        content["music"]["source"] = "none"
+        self.assertEqual(self._live(content, Resolver())["music_url"], "")
+        content["music"]["source"] = ""      # een eerdere upload zonder gekozen bron speelt zoals altijd
+        self.assertEqual(self._live(content, Resolver())["music_url"], "/media/klant.mp3")
+
+    def test_prijs_per_scenario(self):
+        from invitations.content import required_features
+
+        content = demo_content("kerststad", "kerst")
+        content["sections"]["music"] = True
+        for bron, asset, verwacht in (("design", None, set()), ("none", None, set()), ("custom", "abc", {"music"}), ("design", "abc", set()), ("none", "abc", set()), ("", "abc", {"music"})):
+            content["music"] = {"asset": asset, "title": "", "source": bron}
+            self.assertEqual(required_features(content) & {"music"}, verwacht, (bron, asset))
+
+    def test_nieuw_concept_bij_kerststad_begint_met_de_muziek_van_het_ontwerp(self):
+        owner = self.make_customer()
+        inv = create_draft(occasion="kerst", template=Template.objects.get(slug="kerststad"), owner=owner)
+        self.assertEqual(inv.draft_content["music"]["source"], "design")
+        self.assertTrue(inv.draft_content["sections"]["music"])
+        andere = create_draft(occasion="kerst", template=Template.objects.get(slug="kerstbol"), owner=owner)
+        self.assertEqual(andere.draft_content["music"]["source"], "")
+        self.assertFalse(andere.draft_content["sections"]["music"], "een ontwerp zonder eigen track blijft zoals het was")
+
+    def test_studio_stap_toont_drie_keuzes_en_bewaart_de_gekozen_bron(self):
+        owner = self.make_customer()
+        self.client.force_login(owner)
+        inv = create_draft(occasion="kerst", template=Template.objects.get(slug="kerststad"), owner=owner)
+        pagina = self.client.get(f"/maken/{inv.uid}/fotos/").content.decode()
+        for tekst in ("Muziek van dit ontwerp", "Geen muziek", "Eigen muziek uploaden", "Inbegrepen"):
+            self.assertIn(tekst, pagina)
+        self.assertRegex(pagina, r'value="design"[^>]*checked')
+        for bron in ("none", "design"):
+            inv.refresh_from_db()
+            self.client.post(f"/maken/{inv.uid}/fotos/", {"rev": inv.draft_rev, "actie": "opslaan", "hero": "", "music_source": bron})
+            inv.refresh_from_db()
+            self.assertEqual(inv.draft_content["music"]["source"], bron)
+            self.assertEqual(inv.draft_content["sections"]["music"], bron == "design")
+        inv.refresh_from_db()
+        fout = self.client.post(f"/maken/{inv.uid}/fotos/", {"rev": inv.draft_rev, "actie": "opslaan", "hero": "", "music_source": "custom"})
+        self.assertContains(fout, "Upload een muziekbestand")
+        inv.refresh_from_db()
+        self.assertEqual(inv.draft_content["music"]["source"], "design", "een ongeldige keuze wijzigt niets")
+
+    def test_studio_eigen_muziek_uploaden_kost_de_extra_en_de_ontwerptrack_vervalt(self):
+        from invitations.content import required_features
+
+        owner = self.make_customer()
+        self.client.force_login(owner)
+        inv = create_draft(occasion="kerst", template=Template.objects.get(slug="kerststad"), owner=owner)
+        mp3 = SimpleUploadedFile("liedje.mp3", b"ID3\x03\x00\x00\x00\x00\x00\x00" + b"\xff\xfb\x90\x00" + b"\x00" * 600, content_type="audio/mpeg")
+        r = self.client.post(f"/maken/{inv.uid}/upload/", {"muziek": mp3}, HTTP_ACCEPT="application/json")
+        if r.status_code != 200 or not r.json().get("created"):
+            self.skipTest(f"synthetische mp3 niet geaccepteerd door de uploadcontrole: {r.content[:120]!r}")
+        uid = r.json()["created"][0]["uid"]
+        self.assertIn("liedje.mp3", self.client.get(f"/maken/{inv.uid}/fotos/").content.decode())
+        inv.refresh_from_db()
+        self.client.post(f"/maken/{inv.uid}/fotos/", {"rev": inv.draft_rev, "actie": "opslaan", "hero": "", "music_source": "custom",
+                                                      "music_asset": uid, "music_rights": "on", "music_title": "Ons liedje"})
+        inv.refresh_from_db()
+        self.assertEqual(inv.draft_content["music"], {"asset": uid, "title": "Ons liedje", "source": "custom"})
+        self.assertIn("music", required_features(inv.draft_content))
+        self.client.post(f"/maken/{inv.uid}/fotos/", {"rev": inv.draft_rev, "actie": "opslaan", "hero": "", "music_source": "design"})
+        inv.refresh_from_db()
+        self.assertEqual((inv.draft_content["music"]["asset"], inv.draft_content["music"]["source"]), (uid, "design"))
+        self.assertNotIn("music", required_features(inv.draft_content))
+
+    def test_een_bestaande_kerstkaart_zonder_track_houdt_de_oude_muziekstap(self):
+        owner = self.make_customer()
+        self.client.force_login(owner)
+        inv = create_draft(occasion="kerst", template=Template.objects.get(slug="kerstbol"), owner=owner)
+        pagina = self.client.get(f"/maken/{inv.uid}/fotos/").content.decode()
+        self.assertNotIn("music_source", pagina)
+        self.assertNotIn("Muziek van dit ontwerp", pagina)
+        self.assertIn("Muziek", pagina)
+        inv.refresh_from_db()
+        self.client.post(f"/maken/{inv.uid}/fotos/", {"rev": inv.draft_rev, "actie": "opslaan", "hero": "", "music_asset": ""})
+        inv.refresh_from_db()
+        self.assertEqual(inv.draft_content["music"]["source"], "")
+        self.assertFalse(inv.draft_content["sections"]["music"])
+
+    def test_wisselen_van_ontwerp_zet_de_bron_goed(self):
+        from invitations.content import muziek_bij_ontwerp
+
+        stad = Template.objects.get(slug="kerststad").current_version.manifest
+        bol = Template.objects.get(slug="kerstbol").current_version.manifest
+        content = {"music": {"asset": None, "title": "", "source": ""}, "sections": {"music": False}}
+        muziek_bij_ontwerp(content, stad)
+        self.assertEqual((content["music"]["source"], content["sections"]["music"]), ("design", True))
+        muziek_bij_ontwerp(content, bol)
+        self.assertEqual((content["music"]["source"], content["sections"]["music"]), ("", False))
+        eigen = {"music": {"asset": "abc", "title": "", "source": ""}, "sections": {"music": True}}
+        muziek_bij_ontwerp(eigen, stad)
+        self.assertEqual(eigen["music"], {"asset": "abc", "title": "", "source": ""}, "bestaande klantmuziek wordt nooit vervangen")

@@ -44,6 +44,12 @@ video's zijn de goedgekeurde beelden zelf, zonder kunstmatige lagen erbovenop. E
 op verzoek van de eigenaar weer verwijderd: de originele video is visueel leidend. De liggende video heeft sinds 8 oktober de volle bronresolutie (1920×1080, H.264, CRF 19, ±17,7 MB, SSIM 0,989 en
 PSNR 45,3 dB ten opzichte van de HEVC-bron); de staande video (720×1280, ±5,4 MB) is ongewijzigd.
 
+### Muziek (9 oktober 2026)
+
+Kerststad heeft een eigen track, **"Kerststad (avondlicht)"** (`media/muziek.mp3`, 87 s, 1,4 MB, stereo): eigen compositie, door `tools/kerststad/maak_muziek.py` gesynthetiseerd (geen samples, geen bestaand lied, geen zang), dus vrij van rechten. D-groot, 66 BPM; celesta, zachte piano, strijkers, cello en kerstbelletjes. De opbouw volgt de film: rustig dorp (maat 1 tot 8) → de stad ontwaakt (9 tot 16) → bruisende kerstnacht (17 tot 22) → weer tot rust (23 en 24). De lus is circulair opgebouwd (ook de galm), dus de herhaling hoort naadloos te zijn; een mp3 kan in sommige browsers een paar honderdsten seconde stilte geven. Volume 0,45 met een zachte inzet van 2 s; nooit autoplay, alleen via de bestaande muziekknop.
+
+Koppeling: in het manifest van een ontwerp staat `"music": {"src", "title", "volume"}`. Ontwerpen zonder die sleutel veranderen niet. De track speelt in het voorbeeld van het ontwerp en in een uitnodiging waarvan de klant "muziek van het ontwerp" koos (`content.music.ontwerp`); eigen muziek van de klant gaat altijd voor. De Studio heeft die keuze nog niet (zie `docs/MUZIEK.md`).
+
 ## 7. Pagina na de opening
 
 Alleen wat de klant heeft ingevuld (bestaande Studio-velden, niets verzonnen):
