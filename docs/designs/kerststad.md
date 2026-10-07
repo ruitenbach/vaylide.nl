@@ -39,11 +39,12 @@ De camera blijft tot het einde langzaam omhoog en naar achteren bewegen; het laa
 
 ### De levende laag op de liggende video (8 oktober 2026)
 
-De liggende video heeft geen V op het huis naast de kerk en de figuurtjes rond de boom staan stil (gemeten in 12 tot 20 s). Er wordt **geen nieuwe video gegenereerd**; de kaartlaag lost het op, alleen bij de 16:9-bron:
+De liggende video heeft geen V op het huis naast de kerk en de figuurtjes rond de boom staan stil (gemeten in 12 tot 20 s). Er wordt **geen nieuwe video gegenereerd**; de kaartlaag lost het op, bij beide bronnen:
 
 - **De officiële VAYLIDE-V** (`static/img/merk/vaylide-v.png`, alleen de V, geen woordmerk) staat op de gevel van het huis links naast de kerk, direct onder het hartje, in de krans. Hij komt zichtbaar vanaf 12,5 s (het huis staat dan in beeld), met een zachte gouden gloed, en blijft de hele eindloop staan, ook in het eindbeeld bij 'minder beweging'.
 - **Vijf peperkoekfiguurtjes** (inline SVG met CSS-animatie, `_figuur.html`): drie wandelaars lopen rustig heen en weer (met een pauze en omdraaien), één zwaait, één kind stapt met kleine sprongetjes. Ze verschijnen vanaf 14 s, nadat de video zelf zijn eigen (stilstaande) figuurtjes heeft laten verschijnen, en lopen op hun eigen klok, dus de beweging loopt gewoon door bij de sprong van de eindloop.
-- **Aansluiting op de camera**: de camerabeweging van de video (12,0 tot 20,04 s) is uit de video zelf gemeten (`tools/kerststad/maak_spoor.py` → `kerststad-spoor.js`, uitlijning van de gevel en van het plein op het referentiebeeld van 16,0 s). `kerststad.js` laat de V en de figuurtjes daarmee meeschalen en meeschuiven; bij het kruisverloop van de eindloop (1,4 s) schuiven ze mee. Mobiel (9:16) heeft de laag niet.
+- **Ook op de staande 9:16-video** (8 oktober 2026, besluit eigenaar): dezelfde laag, met een eigen spoor (gemeten uit `opening.mp4`), eigen ankerpunt voor de V (het midden van de krans onder het hartje) en eigen paden: vier figuurtjes (twee wandelaars, één zwaaier, één kind). Het vijfde (rechts bij de boom) ontbreekt mobiel, omdat daar al figuurtjes in de video staan en de kaart er anders overheen zou lopen. De video zelf is ongewijzigd.
+- **Aansluiting op de camera**: de camerabeweging van de video (12,0 tot 20,04 s) is uit de video zelf gemeten (`tools/kerststad/maak_spoor.py` → `kerststad-spoor.js`, uitlijning van de gevel en van het plein op het referentiebeeld van 16,0 s). `kerststad.js` laat de V en de figuurtjes daarmee meeschalen en meeschuiven; bij het kruisverloop van de eindloop (1,4 s) schuiven ze mee. 
 - **Groet op een breed scherm** is compacter en staat lager, zodat gevel en plein zichtbaar blijven.
 - Beperking: de figuurtjes zijn een eenvoudige tekening naast fotorealistische video; ze staan op open stukken sneeuw en lopen kort (±50 beeldpunten). Alles in `style.css` (`.ks-fig`, `.ks-v`) en `_figuur.html` is aan te passen zonder de video aan te raken.
 
@@ -67,7 +68,7 @@ Alleen wat de klant heeft ingevuld (bestaande Studio-velden, niets verzonnen):
 | Eindbeeld | `.../media/eind.webp` | laatste beeld van de video | rustige stand en terugval |
 | Badge | `.../media/badge.webp` | uitsnede van het eerste beeld | de officiële VAYLIDE-V in de ronde badge |
 | Achtergronden | `.../media/dorp-kerk.webp`, `dorp-ijs.webp`, `dorp-brug.webp` | uitsneden uit latere beelden | donker gemaakt achter de banden |
-| Spoor | `designs/kerststad/v1/kerststad-spoor.js` | gemeten uit `opening-desktop.mp4` | camerabeweging 12 tot 20 s voor de levende laag (`tools/kerststad/maak_spoor.py`) |
+| Spoor | `designs/kerststad/v1/kerststad-spoor.js` | gemeten uit beide video's | camerabeweging 12 tot 20 s voor de levende laag (`tools/kerststad/maak_spoor.py`) |
 | Figuurtje | `designs/kerststad/v1/_figuur.html` | eigen SVG | peperkoekfiguurtje met lopen, zwaaien en kinderstap |
 | Kaartbeeld | `static/img/designs/kerststad.webp` | uitsnede van het laatste beeld (4:5) | ontwerpkaart in de collectie |
 

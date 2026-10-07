@@ -70,10 +70,9 @@ html.ks-bezig, html.ks-bezig body { overflow: hidden; overscroll-behavior: none;
 .ks-eindbeeld { opacity: 0; visibility: hidden; transition: opacity 1.4s ease, visibility 0s 1.4s; }
 .ks-eind .ks-eindbeeld { opacity: 1; visibility: visible; transition: none; }
 
-/* de levende laag op de liggende video (alleen bij de 16:9-bron): de officiële VAYLIDE-V op de voorgevel van het huis naast de kerk en een paar peperkoekfiguurtjes op het plein.
-   kerststad.js plaatst alles in beeldcoördinaten en laat het met de camera van de video meebewegen (kerststad-spoor.js). Buiten beeld, bij 'minder beweging' en zonder de liggende bron blijft de laag verborgen. */
-.ks-laag { display: none; position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
-.ks-hero[data-ks-formaat="breed"] .ks-laag { display: block; }
+/* de levende laag op de liggende video (bij beide bronnen): de officiële VAYLIDE-V op de voorgevel van het huis naast de kerk en een paar peperkoekfiguurtjes op het plein.
+   kerststad.js plaatst alles in beeldcoördinaten en laat het met de camera van de video meebewegen (kerststad-spoor.js). Buiten beeld en in de gesloten stand is de laag onzichtbaar. */
+.ks-laag { display: block; position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
 .ks-v { position: absolute; left: 0; top: 0; width: 100px; height: auto; opacity: 0; will-change: transform, opacity; transform-origin: 50% 50%;
   filter: sepia(.45) saturate(1.5) brightness(1.1) drop-shadow(0 1px 0 rgba(255, 238, 190, .55)) drop-shadow(0 1.5px 1px rgba(70, 30, 0, .85)) drop-shadow(0 0 5px rgba(255, 196, 96, .75)); }
 .fx-motion .ks-v { animation: ks-v-gloed 3.4s ease-in-out infinite alternate; animation-play-state: var(--fx-play, running); }

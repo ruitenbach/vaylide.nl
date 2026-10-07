@@ -20,11 +20,11 @@
     <picture class="ks-eindbeeld" data-ks-eindbeeld><source media="(min-aspect-ratio: 6/5)" srcset="{% static 'designs/kerststad/v1/media/eind-desktop.webp' %}" width="1280" height="720"><img src="{% static 'designs/kerststad/v1/media/eind.webp' %}" alt="De kerststad bij nacht: peperkoekhuisjes, een verlichte kerstboom en schaatsers op het ijs" width="720" height="1280" loading="lazy" decoding="async"></picture>
     <div class="ks-laag" data-ks-laag aria-hidden="true">
       <img class="ks-v" data-ks-v src="{% static 'img/merk/vaylide-v.png' %}" alt="" width="178" height="160" decoding="async">
-      {% include "kerststad/v1/_figuur.html" with gedrag="loop" pad="452,352 505,352" snelheid="6" sjaal="rood" fase="0" %}
+      {% include "kerststad/v1/_figuur.html" with gedrag="loop" pad="452,352 505,352" pad_smal="235,522 285,522" hoogte_smal="40" snelheid="6" sjaal="rood" fase="0" %}
       {% include "kerststad/v1/_figuur.html" with gedrag="loop" pad="548,354 590,354" snelheid="5.5" sjaal="groen" fase="0.45" %}
-      {% include "kerststad/v1/_figuur.html" with gedrag="loop" pad="266,344 322,344" snelheid="6.5" sjaal="blauw" fase="0.8" %}
-      {% include "kerststad/v1/_figuur.html" with gedrag="zwaai" pad="443,322" sjaal="groen" fase="0.2" %}
-      {% include "kerststad/v1/_figuur.html" with gedrag="kind" pad="296,356 318,356" snelheid="7" sjaal="rood" fase="0.6" hoogte="23" %}
+      {% include "kerststad/v1/_figuur.html" with gedrag="loop" pad="266,344 322,344" pad_smal="98,506 140,506" hoogte_smal="40" snelheid="6.5" sjaal="blauw" fase="0.8" %}
+      {% include "kerststad/v1/_figuur.html" with gedrag="zwaai" pad="443,322" pad_smal="185,556" hoogte_smal="40" sjaal="groen" fase="0.2" %}
+      {% include "kerststad/v1/_figuur.html" with gedrag="kind" pad="296,356 318,356" pad_smal="130,545 152,550" hoogte_smal="30" snelheid="7" sjaal="rood" fase="0.6" hoogte="23" %}
     </div>
     {% if v.opening_enabled %}<button type="button" class="ks-open" data-ks-open data-fx-origin aria-label="Tik op de V om de kerststad te openen"><span class="ks-golf" aria-hidden="true"></span><span class="ks-golf ks-golf--twee" aria-hidden="true"></span></button>
     <p class="ks-hint" data-ks-hint>TIK OP DE V OM TE OPENEN</p>{% endif %}

@@ -290,33 +290,43 @@ class KerststadLaagTests(VaylideTestCase):
 
     def test_er_staan_figuurtjes_die_lopen_zwaaien_en_een_kind(self):
         html = Client().get(DEMO).content.decode()
-        gedrag = re.findall(r'data-ks-fig data-pad="[^"]*" data-snelheid="[^"]*" data-gedrag="(\w+)"', html)
+        gedrag = re.findall(r'<span class="ks-fig [^"]*" data-ks-fig [^>]*?data-gedrag="(\w+)"', html)
         self.assertGreaterEqual(gedrag.count("loop"), 3)
         self.assertEqual(gedrag.count("zwaai"), 1)
         self.assertEqual(gedrag.count("kind"), 1)
         self.assertLessEqual(len(gedrag), 8, "geen chaotische drukte")
 
-    def test_het_spoor_dekt_de_hele_avondscene_van_de_liggende_video(self):
+    def test_het_spoor_dekt_de_hele_avondscene_van_beide_video_s(self):
         js = (ONTWERP / "kerststad-spoor.js").read_text(encoding="utf-8")
-        data = json.loads(re.search(r"window\.KERSTSTAD_SPOOR = \{van: 12, stap: 2 / 24, ref: 16, gevel: (\[.*?\]\]), plein: (\[.*\]\])\};", js, re.S).expand(r"[\1,\2]"))
-        for rij in data:
-            self.assertEqual(len(rij), 97, "12 per seconde van 12,0 tot 20,0 s")
-            self.assertTrue(all(len(r) == 6 for r in rij))
-        duur = _duur_mp4(ONTWERP / "media" / "opening-desktop.mp4")
-        self.assertGreaterEqual(12 + 96 * 2 / 24, duur - 0.1)
+        gevonden = re.search(r"window\.KERSTSTAD_SPOOR = \{van: 12, stap: 2 / 24, ref: 16, breed: (\{.*?\}), smal: (\{.*\})\};", js, re.S)
+        data = [json.loads(gevonden.group(1)), json.loads(gevonden.group(2))]
+        self.assertEqual([(d["w"], d["h"]) for d in data], [(960, 540), (540, 960)])
+        for d in data:
+            for naam in ("gevel", "plein"):
+                self.assertEqual(len(d[naam]), 97, "12 per seconde van 12,0 tot 20,0 s")
+                self.assertTrue(all(len(r) == 6 for r in d[naam]))
+        for video in ("opening-desktop.mp4", "opening.mp4"):
+            self.assertGreaterEqual(12 + 96 * 2 / 24, _duur_mp4(ONTWERP / "media" / video) - 0.1, video)
 
-    def test_de_laag_start_pas_in_de_avond_en_draait_alleen_bij_de_liggende_bron(self):
+    def test_de_laag_start_pas_in_de_avond_en_draait_bij_beide_bronnen(self):
         js = (ONTWERP / "kerststad.js").read_text(encoding="utf-8")
         code = re.sub(r"/\*.*?\*/", "", js, flags=re.S)
-        self.assertRegex(code, r"T_V = 1[23]\.\d, T_FIG = 1[3-5]\.\d")
-        self.assertIn('formaat !== "breed"', code)
+        self.assertRegex(code, r"breed: \{[^}]*tV: 1[23]\.\d, tFig: 1[3-5]\.\d")
+        self.assertRegex(code, r"smal: \{[^}]*tV: 1[23]\.\d, tFig: 1[3-5]\.\d")
         self.assertIn("nu / 1000", code, "de figuurtjes lopen op hun eigen klok, zodat de beweging bij de sprong van de eindloop doorloopt")
         self.assertIn("opSpiegel", code, "tijdens het kruisverloop schuift de laag mee")
+        self.assertIn("data-pad-smal", code)
         css = (ONTWERP / "style.css").read_text(encoding="utf-8")
-        self.assertIn(".ks-laag { display: none;", css)
-        self.assertIn('.ks-hero[data-ks-formaat="breed"] .ks-laag { display: block; }', css)
+        self.assertRegex(css, r"(?m)^\.ks-laag \{ display: block;")
         self.assertRegex(css, r"prefers-reduced-motion: reduce\) \{ \.ks-laag \.ks-fig__lijf[^}]*\.ks-v \{ animation: none")
 
-    def test_de_mobiele_pagina_houdt_dezelfde_bron_en_de_laag_blijft_verborgen(self):
-        css = (ONTWERP / "style.css").read_text(encoding="utf-8")
-        self.assertNotRegex(css, r"(?m)^\.ks-laag \{[^}]*display: (block|flex)")
+    def test_ook_de_staande_video_krijgt_de_v_en_figuurtjes_op_eigen_plekken(self):
+        html = Client().get(DEMO).content.decode()
+        smal = re.findall(r'data-pad-smal="([^"]*)"', html)
+        self.assertEqual(len(smal), 5)
+        self.assertGreaterEqual(len([p for p in smal if p]), 4, "vier of vijf figuurtjes op de staande video, een paar minder dan liggend om niet over bestaande figuren te lopen")
+        js = (ONTWERP / "kerststad.js").read_text(encoding="utf-8")
+        self.assertIn("smal: { vAnker:", js)
+        self.assertIn("breed: { vAnker: [319, 234.5], vBreedte: 30", js, "de liggende laag is ongewijzigd")
+
+
