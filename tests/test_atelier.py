@@ -187,13 +187,11 @@ class AtelierSiteTests(VaylideTestCase):
         for slug in ("winterlicht", "liefde-op-papier", "confetti"):
             self.assertContains(response, f"/ontwerpen/{slug}/")
 
-    def test_collection_lists_designs_made_for_the_occasion_first(self):
+    def test_collection_filter_toont_alleen_ontwerpen_voor_de_gelegenheid(self):
         response = Client().get("/ontwerpen/", {"gelegenheid": "verjaardag"})
         cards = response.context["cards"]
-        self.assertTrue(all("verjaardag" in c["template"].occasions for c in cards))
-        firsts = [c["template"].occasions[0] for c in cards[:5]]
-        self.assertEqual(firsts, ["verjaardag"] * 5)
-        self.assertNotEqual(cards[5]["template"].occasions[0], "verjaardag")
+        self.assertTrue(cards)
+        self.assertTrue(all("verjaardag" in c["template"].occasions for c in cards))      # de volgorde (nieuwste eerst) staat in tests/test_flow_eenvoudig.py
 
     def test_design_detail_suggests_three_designs_for_the_same_occasion(self):
         response = Client().get("/ontwerpen/confetti/", {"gelegenheid": "verjaardag"})

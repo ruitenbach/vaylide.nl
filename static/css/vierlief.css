@@ -1021,6 +1021,8 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .specials__kop { max-width: 38rem; margin-bottom: 1.4rem; }
 .specials__kop h2 { margin-bottom: .4rem; }
 .specials__kop p:not(.eyebrow) { color: var(--ink-2); }
+.container > .specials:first-child { margin-top: 0; }
+.specials__vervolg { margin: clamp(2rem, 5vw, 3rem) 0 1.2rem; }
 .design-card__special { display: inline-block; margin-right: .3rem; padding: .08rem .5rem; border-radius: 999px; vertical-align: .12em;
   background: linear-gradient(135deg, #B8893F, #E9CB85 55%, #D2AA5E); color: #2E2010; font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .chip--special { border-color: var(--gold); }

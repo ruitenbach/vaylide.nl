@@ -116,9 +116,16 @@ class WebsiteTests(VaylideTestCase):
         for slug in ("liefde-op-papier", "voor-altijd", "winterlicht", "gloria", "eucalyptus", "eerste-dans"):
             self.assertIn(f"/ontwerpen/{slug}/", html, slug)
 
-    def test_specials_page_lists_the_five_specials_in_order(self):
+    def test_specials_page_lists_the_specials_newest_first(self):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        nu = timezone.now()
+        for dagen, slug in enumerate(("balzaal", "rose-royale", "midnight-emeraude", "aurora-nocturne")):
+            Template.objects.filter(slug=slug).update(created_at=nu - timedelta(days=10 + dagen))      # balzaal het nieuwst
         html = Client().get("/ontwerpen/", {"categorie": "specials"}).content.decode()
-        posities = [html.find(f"/ontwerpen/{slug}/") for slug in ("aurora-nocturne", "midnight-emeraude", "rose-royale", "balzaal")]
+        posities = [html.find(f"/ontwerpen/{slug}/") for slug in ("balzaal", "rose-royale", "midnight-emeraude", "aurora-nocturne")]
         self.assertTrue(all(p >= 0 for p in posities), posities)
         self.assertEqual(posities, sorted(posities))
         self.assertNotIn("/ontwerpen/winterlicht/", html)

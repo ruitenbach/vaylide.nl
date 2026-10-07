@@ -273,3 +273,58 @@ class NieuwsteOntwerpenEerstTests(VaylideTestCase):
             if "ontwerpen" not in adres:
                 self.assertEqual(kaarten[0], nieuw.slug, adres)                         # in de keuze staat het nieuwste vooraan
                 self.assertLess(kaarten.index(nieuw.slug), kaarten.index("liefde-op-papier"), adres)
+
+
+class CollectieVolgordeTests(VaylideTestCase):
+    """Specials eerst, daarna de gewone ontwerpen, overal het nieuwst toegevoegde eerst; één sorteermethode voor de hele collectie."""
+
+    def zet(self, slug, dagen_geleden, uren=0):
+        Template.objects.filter(slug=slug).update(created_at=timezone.now() - timedelta(days=dagen_geleden, hours=uren))
+
+    def volgorde(self, **filter):
+        from core.views import _design_cards  # noqa: F401  (de pagina gebruikt dezelfde kaarten)
+
+        antwoord = Client().get("/ontwerpen/", filter)
+        self.assertEqual(antwoord.status_code, 200)
+        return [c["template"].slug for c in antwoord.context["special_cards"]], [c["template"].slug for c in antwoord.context["cards"]]
+
+    def test_specials_eerst_en_een_nieuw_special_staat_op_plek_1(self):
+        Template.objects.update(created_at=timezone.now() - timedelta(days=200))
+        self.zet("balzaal", 30)
+        self.zet("kerststad", 5)
+        specials, gewoon = self.volgorde()
+        self.assertEqual(specials[:2], ["kerststad", "balzaal"])
+        # Een nieuw toegevoegd Special (hier: een bestaand Special dat nu 'nieuw' wordt) staat links boven, op plek 1.
+        self.zet("aurora-nocturne", 0)
+        specials, gewoon = self.volgorde()
+        self.assertEqual(specials[0], "aurora-nocturne")
+        # De gewone ontwerpen staan er los van, ook van nieuw naar oud.
+        self.zet("avondgoud", 1)
+        specials, gewoon = self.volgorde()
+        self.assertEqual(gewoon[0], "avondgoud")
+        self.assertFalse(set(specials) & set(gewoon))
+
+    def test_op_de_pagina_staan_de_specials_boven_de_gewone_ontwerpen_in_dezelfde_volgorde_voor_telefoon_en_computer(self):
+        Template.objects.update(created_at=timezone.now() - timedelta(days=200))
+        self.zet("midnight-emeraude", 2)
+        self.zet("puur-moment", 1)
+        html = Client().get("/ontwerpen/").content.decode()
+        eerste_special = html.index('/ontwerpen/midnight-emeraude/')
+        eerste_gewoon = html.index('/ontwerpen/puur-moment/')
+        self.assertLess(eerste_special, eerste_gewoon)                              # in de bron (en dus op een telefoon): Specials bovenaan
+        self.assertLess(html.index('class="specials"'), html.index('<h2 class="specials__vervolg">'))
+        self.assertLess(html.index('<h2 class="specials__vervolg">'), eerste_gewoon)
+
+    def test_filters_blijven_werken_en_er_verdwijnt_niets(self):
+        alles_s, alles_g = self.volgorde()
+        self.assertEqual(len(alles_s) + len(alles_g), Template.objects.filter(is_active=True, current_version__isnull=False).count())
+        s, g = self.volgorde(gelegenheid="kerst")
+        self.assertTrue(all("kerst" in Template.objects.get(slug=x).occasions for x in s + g))
+        only_s, only_g = self.volgorde(categorie="specials")
+        self.assertEqual(only_g, [])
+        self.assertEqual(only_s, alles_s)
+        inactief = Template.objects.get(slug="puur-moment")
+        Template.objects.filter(pk=inactief.pk).update(is_active=False)
+        s, g = self.volgorde()
+        self.assertNotIn("puur-moment", s + g)                                       # alleen gepubliceerde ontwerpen
+        self.assertEqual(Client().get("/inspiratie/").status_code, 200)

@@ -13,7 +13,7 @@ from catalog.assets import design_image_url
 from catalog import wenskaart
 from catalog.models import AddOn, Package, Template, format_euro
 from catalog.specials import is_special
-from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, occasion_config
+from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, collectie_volgorde, occasion_config
 from catalog.effects import effect_card_label, effect_summary
 from invitations.demo import DEFAULT_DEMO_OCCASION
 
@@ -83,8 +83,9 @@ def designs(request):
     only_specials = request.GET.get("categorie") == "specials"
     all_designs = [d for d in _designs() if not occasion or occasion in d.occasions]
     # Specials staan apart: nooit tussen de gewone kaarten, wel in een eigen blok en onder de keuze Specials.
-    specials = by_occasion([d for d in all_designs if d.special], occasion)
-    shown = [] if only_specials else by_occasion([d for d in all_designs if not d.special], occasion)
+    ordered = collectie_volgorde(all_designs)    # Specials eerst, daarna de gewone ontwerpen; overal het nieuwste eerst
+    specials = [d for d in ordered if d.special]
+    shown = [] if only_specials else [d for d in ordered if not d.special]
     list_path = reverse("core:designs")
     crumbs = [("Home", "/"), ("Collectie", list_path)]
     seo_title = seo_description = ""
