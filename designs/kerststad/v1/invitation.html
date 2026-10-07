@@ -1,5 +1,5 @@
 {% extends "invitations/base_invitation.html" %}{% load static %}
-{# Kerststad v1 — de goedgekeurde peperkoekstad-video, beeldvullend. Het eerste beeld is de gouden badge met de officiële VAYLIDE-V: de V is het klikpunt. Na één tik speelt de opening één keer
+{# Kerststad v1 — de goedgekeurde peperkoekstad-video, beeldvullend. Het eerste beeld is de gouden badge met de officiële VAYLIDE-V: de V is het klikpunt. Na één tik speelt de volledige video één keer
    (0 s tot het einde); daarna loopt de laatste scène door als levende eindloop (kerststad.js: vanaf 16,0 s tot het einde, met een zacht kruisverloop). De opening start nooit opnieuw vanzelf.
    Opening, kop en groet zijn één scène (.ks-hero) in het eigen script, net als Kerstbol: geen openingsscherm van invite.js. De kaart daaronder gebruikt alleen wat de klant heeft ingevuld;
    datum, programma, locatie, aftellen en aanmelden verschijnen alleen bij een kerstdiner (een datum). Wijzig een uitgebrachte versie niet: maak een v2. #}
@@ -11,10 +11,10 @@
 {% block content %}
 <header class="ks-hero{% if not v.opening_enabled %} ks-eind ks-klaar{% endif %}" id="ks-hero" data-ks{% if v.opening_enabled %} data-ks-opening{% endif %} aria-label="De kerststad">
   <div class="ks-scene" data-ks-scene>
-    <video id="ks-video" muted playsinline controlslist="nodownload noplaybackrate" disablepictureinpicture disableremoteplayback preload="none" width="720" height="1280" aria-label="Een peperkoekbrug met een gouden V-badge; de camera trekt terug en onthult een besneeuwde kerststad bij nacht" data-ks-video data-ks-lus="16.5" data-ks-loop="{% static 'designs/kerststad/v1/media/loop.mp4' %}" data-ks-loop-desktop="{% static 'designs/kerststad/v1/media/loop-desktop.mp4' %}" data-ks-bron-desktop="{% static 'designs/kerststad/v1/media/opening-desktop.mp4' %}" data-ks-lus-desktop="16.5">
-      <source src="{% static 'designs/kerststad/v1/media/opening.mp4' %}" type="video/mp4">
+    <video id="ks-video" muted playsinline controlslist="nodownload noplaybackrate" disablepictureinpicture disableremoteplayback preload="metadata" width="720" height="1280" aria-label="Een peperkoekbrug met een gouden V-badge; de camera trekt terug en onthult een besneeuwde kerststad bij nacht" data-ks-video data-ks-lus="16.5" data-ks-bron="{% static 'designs/kerststad/v1/media/opening.mp4' %}" data-ks-loop="{% static 'designs/kerststad/v1/media/loop.mp4' %}" data-ks-loop-desktop="{% static 'designs/kerststad/v1/media/loop-desktop.mp4' %}" data-ks-bron-desktop="{% static 'designs/kerststad/v1/media/opening-desktop.mp4' %}" data-ks-lus-desktop="16.5">
     </video>
     <picture class="ks-poster" data-ks-poster><source media="(min-aspect-ratio: 6/5)" srcset="{% static 'designs/kerststad/v1/media/poster-desktop.webp' %}" width="1920" height="1080"><img src="{% static 'designs/kerststad/v1/media/poster.webp' %}" alt="" width="720" height="1280" decoding="async" fetchpriority="high"></picture>
+    <canvas class="ks-spiegel" data-ks-spiegel width="540" height="960" aria-hidden="true"></canvas>
     <picture class="ks-eindbeeld" data-ks-eindbeeld><source media="(min-aspect-ratio: 6/5)" srcset="{% static 'designs/kerststad/v1/media/eind-desktop.webp' %}" width="1920" height="1080"><img src="{% static 'designs/kerststad/v1/media/eind.webp' %}" alt="De kerststad bij nacht: peperkoekhuisjes, een verlichte kerstboom en schaatsers op het ijs" width="720" height="1280" loading="lazy" decoding="async"></picture>
     {% if v.opening_enabled %}<button type="button" class="ks-open" data-ks-open data-fx-origin aria-label="Tik op de V om de kerststad te openen"><span class="ks-golf" aria-hidden="true"></span><span class="ks-golf ks-golf--twee" aria-hidden="true"></span></button>
     <p class="ks-hint" data-ks-hint>TIK OP DE V OM TE OPENEN</p>{% endif %}

@@ -128,7 +128,7 @@ class KerststadWeergaveTests(VaylideTestCase):
     def test_video_is_stil_speelt_niet_vanzelf_en_herhaalt_niet_in_de_html(self):
         html = Client().get(DEMO).content.decode()
         video = re.search(r"<video[^>]*>", html).group(0)
-        for woord in ("muted", "playsinline", 'preload="none"', "data-ks-bron-desktop=", "data-ks-lus-desktop=", "data-ks-loop=", "data-ks-loop-desktop="):
+        for woord in ("muted", "playsinline", 'preload="metadata"', "data-ks-bron=", "data-ks-bron-desktop=", "data-ks-lus-desktop=", "data-ks-loop=", "data-ks-loop-desktop="):
             self.assertIn(woord, video)
         self.assertIn('<picture class="ks-poster"', html, "het eerste beeld (staand en liggend) staat in een picture, zodat de juiste poster direct laadt")
         self.assertIn("poster-desktop.webp", html)
@@ -137,23 +137,23 @@ class KerststadWeergaveTests(VaylideTestCase):
         self.assertEqual(html.count("<video"), 1, "één video, hergebruikt voor de eindloop en opnieuw beleven")
         self.assertNotIn("data:video", html)
 
-    def test_de_eindloop_is_een_aparte_clip_in_twee_exemplaren_en_springt_nooit_terug_in_de_opening(self):
+    def test_de_eindloop_is_een_aparte_clip_in_twee_exemplaren_met_de_oude_eindloop_als_terugval(self):
         js = (ONTWERP / "kerststad.js").read_text(encoding="utf-8")
         code = re.sub(r"/\*.*?\*/", "", js, flags=re.S)
         self.assertNotRegex(code, r"\.loop\s*=\s*true|\bautoplay\b", "geen native loop en geen autoplay")
-        # de oude methode (terugspringen in de grote openingsvideo met een stilstaand kruisverloopbeeld) is weg
-        for weg in ("springNaarLus", "kanZoeken", "zetSprong", "ks-spiegel", "zoekNaar(lusStart)"):
-            self.assertNotIn(weg, code, weg)
         # twee exemplaren van de loopclip, A/B, met een kruisverloop; het volgende exemplaar staat al klaar op zijn eerste beeld
-        self.assertIn("function maakLoop()", code)
-        self.assertIn("function wissel()", code)
+        for naam in ("function maakLoop()", "function wissel()", "function loopStart()", "function volgOpening()"):
+            self.assertIn(naam, code, naam)
         self.assertRegex(code, r"loopEls = \[0, 1\]\.map")
         self.assertIn("LOOP_FADE = 0.8", code)
-        self.assertIn("data-ks-loop", code)
-        # de opening gaat bij lusStart over in clip A (requestVideoFrameCallback, met timeupdate als vangnet) en blijft nooit terugspringen
         self.assertIn("meta.mediaTime >= lusStart", code)
-        self.assertIn("function startLoop()", code)
-        # de opening start alleen vanuit een tik; een tweede bezoek en overslaan laden alleen de kleine clip
+        # de loopcode is een extraatje met terugval: alles via veilig(), start met play() (niet wachten op een canplay die iOS nooit stuurt), en de oude sprong blijft bestaan
+        self.assertIn("function veilig(fn)", code)
+        self.assertNotIn("canplay", code, "iOS laadt een clip pas na play(): wachten op canplay hield de eindloop daar tegen")
+        self.assertRegex(code, r"var b = a\.play\(\);")
+        for terugval in ("function spring()", "function springNaarLus", "function kanZoeken()", "if (!ok) { loopKapot = true; spring(); }", "function loopMislukt()"):
+            self.assertIn(terugval, code, terugval)
+        # de V en de opening hangen niet af van de loopclips: de klik wordt gebonden vóór alles wat de clips doet en speel() start de video zelf
         self.assertIn('open.addEventListener("click", begin)', code)
         self.assertIn("gezien()", code)
         self.assertIn("onthoud()", code)
@@ -164,6 +164,36 @@ class KerststadWeergaveTests(VaylideTestCase):
         self.assertRegex(css, r"\.ks-loop \{[^}]*opacity: 0[^}]*transition: opacity \.8s")
         self.assertIn(".ks-loop.ks-boven { z-index: 1; }", css)
         self.assertIn(".ks-loop.ks-zicht { opacity: 1; }", css)
+        self.assertIn("pointer-events: none", re.search(r"\.ks-loop \{[^}]*\}", css).group(0), "een clip vangt nooit de aanraking van de V op")
+
+    def test_de_tik_op_de_v_geeft_direct_feedback_en_de_loopcode_kan_de_opening_niet_blokkeren(self):
+        js = (ONTWERP / "kerststad.js").read_text(encoding="utf-8")
+        code = re.sub(r"/\*.*?\*/", "", js, flags=re.S)
+        # direct na de tik: laadstand, de knop is dan al bezet en de hint zegt wat er gebeurt; pas als de video speelt volgt ks-playing
+        self.assertIn("function laadt(aan)", code)
+        self.assertIn("EVEN LADEN", code)
+        self.assertRegex(code, r"laadt\(true\); if \(open\) open\.disabled = true;")
+        self.assertRegex(code, r"laadt\(false\); if \(open\) open\.disabled = false;", "mislukt het afspelen, dan is de V weer te gebruiken")
+        speel = code[code.index("function speel()"):code.index("if (video) {")]
+        self.assertLess(speel.index("laadt(true)"), speel.index("afspelen()"), "eerst de feedback, dan het afspelen (binnen hetzelfde gebaar)")
+        self.assertLess(speel.index("veilig(maakLoop)"), speel.index("afspelen()"))
+        css = (ONTWERP / "style.css").read_text(encoding="utf-8")
+        self.assertIn(".ks-laadt .ks-hint::after", css)
+        # de openingsvideo eronder wordt na het kruisverloop stilgezet en de film eindigt waar clip A eindigt; stilstand van een clip leidt tot de oude eindloop
+        for naam in ("openingStil", "pauzeTimer", "loopVoortgang"):
+            self.assertIn(naam, code, naam)
+        self.assertIn("preload", (ONTWERP / "invitation.html").read_text(encoding="utf-8"))
+
+    def test_de_v_ligt_boven_alle_video_lagen_en_de_opening_haalt_alleen_de_gekozen_bron_binnen(self):
+        css = (ONTWERP / "style.css").read_text(encoding="utf-8")
+        z = lambda sel: int(re.search(rf"{re.escape(sel)} \{{[^}}]*z-index: (\d+)", css).group(1))
+        self.assertGreater(z(".ks-open"), z(".ks-eindbeeld"))
+        self.assertGreater(z(".ks-eindbeeld"), z(".ks-loop.ks-boven"))
+        self.assertGreater(z(".ks-eindbeeld"), z(".ks-poster"))
+        html = Client().get(DEMO).content.decode()
+        video = re.search(r"<video[^>]*>.*?</video>", html, re.S).group(0)
+        self.assertNotIn("<source", video, "geen vaste bron: de pagina haalt alleen de opening van het gekozen formaat binnen")
+        self.assertIn("opening.mp4", re.search(r"<video[^>]*>", video).group(0))
 
     def test_kleurenkaart_en_de_v_van_het_merk_zitten_in_de_pagina(self):
         html = Client().get(DEMO).content.decode()
@@ -274,7 +304,7 @@ class KerststadBronkeuzeTests(VaylideTestCase):
         # Tijdens de opening of de eindloop wordt nooit van bron gewisseld.
         self.assertRegex(code, r"function kiesBron\(\) \{\s*if \(!video \|\| bezig \|\| lusAan\) return;")
         # Gekozen vóór het afspelen: bij het begin, bij een tik en bij opnieuw beleven.
-        for plek in ("function start() {\n    kiesBron();", "stopLoop(); kiesBron(); maakLoop();"):
+        for plek in ("function start() {\n    kiesBron();", "veilig(stopLoop); oudeLus = false; lusAan = false; zetSprong(false); kiesBron(); veilig(maakLoop);".replace("oudeLus = false; lusAan", "oudeLus = false; loopKapot = false; lusAan")):
             self.assertIn(plek, code)
 
     def test_staand_en_liggend_hebben_een_eigen_poster_eindbeeld_en_klikpuntgeometrie(self):

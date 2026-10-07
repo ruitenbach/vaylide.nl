@@ -56,19 +56,23 @@ html.ks-bezig, html.ks-bezig body { overflow: hidden; overscroll-behavior: none;
   /* de onderrand van de kop loopt zacht over in de nachtblauwe kaart (geen harde naad) */
   background: linear-gradient(to bottom, transparent 62%, #0b1430 100%), radial-gradient(ellipse at 50% 50%, transparent 42%, rgba(3, 7, 20, .6) 100%); }
 .ks-scene { position: absolute; inset: 0; z-index: 1; overflow: hidden; background: #1b1209; container-type: size; }
-.ks-scene video, .ks-eindbeeld { display: block; width: 100%; height: 100%; object-fit: cover; }
-.ks-eindbeeld, .ks-poster { position: absolute; inset: 0; pointer-events: none; }
+.ks-scene video, .ks-spiegel, .ks-eindbeeld { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ks-spiegel, .ks-eindbeeld, .ks-poster { position: absolute; inset: 0; pointer-events: none; }
 .ks-poster, .ks-eindbeeld { display: block; width: 100%; height: 100%; }
 .ks-poster img, .ks-eindbeeld img { display: block; width: 100%; height: 100%; object-fit: cover; }
 /* het eerste beeld (de gesloten badge) ligt over de video tot de video speelt; staand of liggend volgt de gekozen bron (kerststad.js zet data-ks-formaat) */
 .ks-poster { z-index: 1; }
 .ks-playing .ks-poster, .ks-finished .ks-poster, .ks-eind .ks-poster { visibility: hidden; }
-/* de levende eindloop: twee exemplaren van een kleine clip (kerststad.js maakt ze); het binnenkomende exemplaar komt in 0,8 s boven het huidige (z-index), dus nooit een doorzichtig tussenmoment */
+/* het stilstaande laatste beeld dat bij de sprong van de eindloop in 1,4 s verdwijnt (kerststad.js) */
+.ks-spiegel { opacity: 0; transition: opacity 1.4s ease; }
+.ks-spiegel.ks-aan { opacity: 1; transition: none; }
+/* het eindbeeld: direct zichtbaar in de stilstaande standen, en oplossend zodra de levende eindloop begint */
+.ks-eindbeeld { opacity: 0; visibility: hidden; transition: opacity 1.4s ease, visibility 0s 1.4s; }
+/* de levende eindloop: twee exemplaren van een kleine clip (kerststad.js maakt ze); het binnenkomende exemplaar komt in 0,8 s boven het huidige (z-index), dus nooit een doorzichtig tussenmoment.
+   Ze liggen onder het eindbeeld en onder de knoppen; een clip vangt geen aanrakingen op (pointer-events). */
 .ks-loop { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; transition: opacity .8s linear; }
 .ks-loop.ks-boven { z-index: 1; }
 .ks-loop.ks-zicht { opacity: 1; }
-/* het eindbeeld: direct zichtbaar in de stilstaande standen, en oplossend zodra de levende eindloop begint */
-.ks-eindbeeld { opacity: 0; visibility: hidden; transition: opacity 1.4s ease, visibility 0s 1.4s; }
 .ks-eindbeeld { z-index: 2; }
 .ks-eind .ks-eindbeeld { opacity: 1; visibility: visible; transition: none; }
 
@@ -90,6 +94,12 @@ html.ks-bezig, html.ks-bezig body { overflow: hidden; overscroll-behavior: none;
 .ks-skip:focus-visible, .ks-scroll:focus-visible { outline-offset: 3px; }
 .ks-hint { position: absolute; left: 7%; bottom: 8%; z-index: 3; width: 86%; margin: 0; padding: 15px 10px; text-align: center; font: 600 clamp(10px, calc(var(--ks-h) * .0135), 14px)/1.3 Arial, "DM Sans", sans-serif; letter-spacing: .14em; color: #fff0cf;
   background: #0c1330a8; border: 1px solid #ffe3a366; border-radius: 30px; pointer-events: none; transition: opacity .5s; }
+/* na de tik: direct zichtbare reactie, ook als de opening nog laadt (de kaart staat dan al in "opening start": snellere lichtgolven, "EVEN LADEN…" met een draaiend bolletje) */
+.ks-open:disabled { cursor: progress; }
+.fx-motion .ks-laadt .ks-golf { animation-duration: 1.3s; }
+.fx-motion .ks-laadt .ks-open::before { animation-duration: 1.3s; }
+.ks-laadt .ks-hint::after { content: ""; display: inline-block; width: .85em; height: .85em; margin-left: .7em; vertical-align: -.12em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: ks-laad .8s linear infinite; }
+@keyframes ks-laad { to { rotate: 360deg; } }
 .ks-playing .ks-open, .ks-playing .ks-hint, .ks-finished .ks-open, .ks-finished .ks-hint, .ks-eind .ks-hint { opacity: 0; pointer-events: none; visibility: hidden; }
 
 .ks-fallback, .ks-replay { padding: 10px 17px; min-height: 44px; border: 1px solid #ffe3a380; border-radius: 25px; background: #0d1738d9; color: #fff0cf; font: 600 11px Arial, "DM Sans", sans-serif; letter-spacing: .04em; cursor: pointer; }
@@ -326,4 +336,4 @@ html.ks-bezig, html.ks-bezig body { overflow: hidden; overscroll-behavior: none;
   .ks-munt { width: 22rem; }
 }
 @media (prefers-reduced-motion: reduce) { .ks-folie, .ks-lichtjes, .ks-koekje, .ks-lamp, .ks-sterretje, .cd__unit { animation: none !important; } }
-@media print { .ks-hero { height: auto; min-height: 0; } .ks-skip, .ks-open, .ks-hint, .ks-replay, .ks-scroll { display: none; } }
+@media print { .ks-hero { height: auto; min-height: 0; } .ks-skip, .ks-open, .ks-hint, .ks-replay, .ks-scroll, .ks-spiegel { display: none; } }
