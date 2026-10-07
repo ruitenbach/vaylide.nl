@@ -13,7 +13,7 @@
     <div class="form-row">
       {% for name, key, label, required in form.name_keys %}{% for field in form %}{% if field.name == name %}{% include "studio/_field.html" with field=field %}{% endif %}{% endfor %}{% endfor %}
     </div>
-    <details class="studio-more"{% if form.headline.value %} open{% endif %}><summary>Eigen kopregel</summary>
+    <details class="studio-more" open><summary>Eigen kopregel</summary>
       {% include "studio/_field.html" with field=form.headline %}
     </details>
   </section>
