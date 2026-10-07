@@ -15,7 +15,7 @@ from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_http_methods, require_POST
 
 from catalog.models import Package, Template, format_euro
-from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, occasion_config
+from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, collectie_volgorde, occasion_config
 from catalog import envelop_collectie
 from catalog.envelop import choice as envelop_choice
 from catalog import wenskaart
@@ -193,7 +193,7 @@ def start(request):
             return redirect("studio:step", uid=inv.uid, step=_na_ontwerp(inv))
     else:
         form = DesignForm(initial={"occasion": occasion, "template": chosen}, templates=templates)
-    shown = by_occasion([t for t in templates if not occasion or t.supports(occasion)], occasion)
+    shown = collectie_volgorde([t for t in templates if not occasion or t.supports(occasion)])
     if chosen and occasion and chosen not in [t.slug for t in shown]:
         chosen = ""
     soort = request.GET.get("soort") or request.POST.get("soort") or ""
@@ -475,7 +475,7 @@ def design_step(request, inv: Invitation):
     return render(
         request,
         "studio/step_ontwerp.html",
-        _context(request, inv, "ontwerp", form=form, rev=inv.draft_rev, templates=by_occasion([t for t in templates if t.supports(occasion)], occasion),
+        _context(request, inv, "ontwerp", form=form, rev=inv.draft_rev, templates=collectie_volgorde([t for t in templates if t.supports(occasion)]),
                  occasions=OCCASION_CHOICES, occasion=occasion, occasion_label=OCCASION_LABELS.get(occasion, ""), paid=paid, terug=terug if terug in PERSONALISEER else ""),
     )
 

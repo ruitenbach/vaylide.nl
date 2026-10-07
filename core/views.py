@@ -13,7 +13,7 @@ from catalog.assets import design_image_url
 from catalog import wenskaart
 from catalog.models import AddOn, Package, Template, format_euro
 from catalog.specials import is_special
-from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, by_occasion, collectie_volgorde, occasion_config
+from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, collectie_volgorde, occasion_config
 from catalog.effects import effect_card_label, effect_summary
 from invitations.demo import DEFAULT_DEMO_OCCASION
 
@@ -155,7 +155,7 @@ def design_detail(request, slug):
             "occasion_choices": [(k, OCCASION_LABELS[k]) for k in template.occasions if k in OCCASION_LABELS],
             "demo_url": f"{reverse('invitations:demo', args=[slug])}?gelegenheid={occasion}&kleur={kleur}{extra}",
             "start_url": f"{reverse('studio:start')}?ontwerp={slug}&gelegenheid={occasion}&kleur={kleur}{extra}&direct=1",
-            "others": _design_cards([t for t in by_occasion(_designs(), occasion) if t.pk != template.pk and t.supports(occasion)][:3], occasion),
+            "others": _design_cards(collectie_volgorde([t for t in _designs() if t.pk != template.pk and t.supports(occasion)])[:3], occasion),
             "occasion_label": OCCASION_LABELS.get(occasion, ""),
             "effects_text": effect_summary(version.manifest.get("effects")),
             "image_url": seo.absolute(design_image_url(slug)),
@@ -194,7 +194,13 @@ def faq(request):
 def inspiration(request):
     labels = dict(OCCASION_TILES)
     samples = sorted(TEXT_SAMPLES, key=lambda s: list(labels).index(s[0]) if s[0] in labels else 99)
-    return render(request, "core/inspiration.html", {"samples": samples, "tips": TIPS})
+    # Bovenaan de ontwerpen, met dezelfde kaarten en dezelfde volgorde als de Collectie: Specials eerst, overal het nieuwste eerst.
+    ordered = collectie_volgorde(_designs())
+    return render(request, "core/inspiration.html", {
+        "samples": samples, "tips": TIPS,
+        "special_cards": _design_cards([d for d in ordered if d.special]),
+        "nieuwste_cards": _design_cards([d for d in ordered if not d.special][:6]),
+    })
 
 
 def about(request):

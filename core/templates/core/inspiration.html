@@ -12,6 +12,26 @@
   </div>
 </section>
 
+<section class="section section--flush" aria-labelledby="ontwerpen-titel">
+  <div class="container">
+    <h2 id="ontwerpen-titel" class="visually-hidden">Ontwerpen</h2>
+    {% if special_cards %}
+    <section class="specials" aria-labelledby="inspiratie-specials-titel">
+      <div class="specials__kop">
+        <p class="eyebrow">Specials</p>
+        <h2 id="inspiratie-specials-titel">Bijzondere kaarten</h2>
+      </div>
+      <div class="grid grid--3">{% for card in special_cards %}{% include "partials/design_card.html" %}{% endfor %}</div>
+    </section>
+    {% endif %}
+    {% if nieuwste_cards %}
+    <h2 class="specials__vervolg">Nieuwste ontwerpen</h2>
+    <div class="grid grid--3">{% for card in nieuwste_cards %}{% include "partials/design_card.html" %}{% endfor %}</div>
+    <p class="aside-line"><a class="link-arrow" href="{% url 'core:designs' %}">Bekijk alle ontwerpen</a></p>
+    {% endif %}
+  </div>
+</section>
+
 <section class="section section--flush" aria-labelledby="teksten-titel">
   <div class="container">
     <h2 id="teksten-titel" class="visually-hidden">Voorbeeldteksten</h2>

@@ -7,7 +7,7 @@ from django.test import Client
 from django.utils import timezone
 
 from catalog.models import Template
-from catalog.occasions import OCCASION_CHOICES, by_occasion
+from catalog.occasions import OCCASION_CHOICES, collectie_volgorde
 from invitations.models import Invitation
 from invitations.services import create_draft, save_draft
 from studio.steps import FASEN, PERSONALISEER, next_step, progress, substeps
@@ -237,26 +237,23 @@ class NieuwsteOntwerpenEerstTests(VaylideTestCase):
         Template.objects.filter(pk=t.pk).update(created_at=timezone.now() - timedelta(days=dagen_geleden))
         return Template.objects.get(slug=slug)
 
-    def test_een_nieuw_ontwerp_staat_vooraan_binnen_de_gelegenheid(self):
+    def test_een_nieuw_ontwerp_staat_vooraan(self):
         oud = self.maak("liefde-op-papier", 400)
         nieuw = self.maak("eucalyptus", 1)
         midden = self.maak("avondgoud", 40)
-        volgorde = [t.slug for t in by_occasion([oud, nieuw, midden], "bruiloft")]
-        self.assertEqual(volgorde, ["eucalyptus", "avondgoud", "liefde-op-papier"])
-        self.assertEqual([t.slug for t in by_occasion([oud, nieuw, midden], "")], ["eucalyptus", "avondgoud", "liefde-op-papier"])
+        self.assertEqual([t.slug for t in collectie_volgorde([oud, nieuw, midden])], ["eucalyptus", "avondgoud", "liefde-op-papier"])
 
-    def test_zelfde_dag_valt_terug_op_de_vaste_volgorde(self):
+    def test_zelfde_moment_valt_terug_op_de_vaste_volgorde(self):
         a = self.maak("avondgoud", 5)
         b = self.maak("puur-moment", 5)
-        verwacht = sorted([a, b], key=lambda t: (t.sort_order, t.name))
-        self.assertEqual(by_occasion([b, a], "bruiloft"), verwacht)
+        Template.objects.filter(pk__in=[a.pk, b.pk]).update(created_at=timezone.now() - timedelta(days=5))
+        a, b = Template.objects.get(pk=a.pk), Template.objects.get(pk=b.pk)
+        self.assertEqual(collectie_volgorde([b, a]), sorted([a, b], key=lambda t: (t.sort_order, t.name)))
 
-    def test_voor_de_gelegenheid_gemaakte_ontwerpen_gaan_voor_op_nieuwere_van_een_andere_gelegenheid(self):
-        eigen = self.maak("eucalyptus", 300)             # gemaakt voor bruiloft
-        vreemd = self.maak("confetti", 1)                # eerst voor verjaardag, wel nieuw
-        vreemd_bruiloft = Template.objects.get(pk=vreemd.pk)
-        volgorde = by_occasion([vreemd_bruiloft, eigen], "bruiloft")
-        self.assertEqual(volgorde[0].slug, "eucalyptus")
+    def test_specials_gaan_altijd_voor_op_een_nieuwer_gewoon_ontwerp(self):
+        special = self.maak("kerststad", 300)
+        gewoon = self.maak("eucalyptus", 0)
+        self.assertEqual([t.slug for t in collectie_volgorde([gewoon, special])], ["kerststad", "eucalyptus"])
 
     def test_de_collectiepagina_en_de_startpagina_tonen_het_nieuwste_eerst_en_alleen_actieve_ontwerpen(self):
         Template.objects.update(created_at=timezone.now() - timedelta(days=100))
@@ -271,7 +268,8 @@ class NieuwsteOntwerpenEerstTests(VaylideTestCase):
             kaarten = list(dict.fromkeys(kaarten))
             self.assertIn(nieuw.slug, kaarten, adres)
             if "ontwerpen" not in adres:
-                self.assertEqual(kaarten[0], nieuw.slug, adres)                         # in de keuze staat het nieuwste vooraan
+                gewoon = [k for k in kaarten if not Template.objects.get(slug=k).special]      # de specials staan er eerst
+                self.assertEqual(gewoon[0], nieuw.slug, adres)                          # daarna staat in de keuze het nieuwste vooraan
                 self.assertLess(kaarten.index(nieuw.slug), kaarten.index("liefde-op-papier"), adres)
 
 
@@ -328,3 +326,61 @@ class CollectieVolgordeTests(VaylideTestCase):
         s, g = self.volgorde()
         self.assertNotIn("puur-moment", s + g)                                       # alleen gepubliceerde ontwerpen
         self.assertEqual(Client().get("/inspiratie/").status_code, 200)
+
+
+class OveralDezelfdeVolgordeTests(VaylideTestCase):
+    """Waar VAYLIDE ontwerpen toont geldt één regel: Specials eerst, het nieuwste links of bovenaan. Alles via `collectie_volgorde`."""
+
+    def setUp(self):
+        Template.objects.update(created_at=timezone.now() - timedelta(days=300))
+        for dagen, slug in ((3, "kerstbol"), (2, "golden-noel"), (1, "kerststad")):                 # specials voor kerst, kerststad het nieuwst
+            Template.objects.filter(slug=slug).update(created_at=timezone.now() - timedelta(days=dagen))
+        Template.objects.filter(slug="winterlicht").update(created_at=timezone.now() - timedelta(hours=1))       # gewoon kerstontwerp, het nieuwst
+        Template.objects.filter(slug="gloria").update(created_at=timezone.now() - timedelta(days=4))
+
+    def slugs(self, html, patroon):
+        return list(dict.fromkeys(re.findall(patroon, html)))
+
+    def test_inspiratie_toont_specials_eerst_dan_nieuwste_ontwerpen_en_daaronder_de_teksten(self):
+        html = Client().get("/inspiratie/").content.decode()
+        kaarten = self.slugs(html, r'class="design-card__link" href="/ontwerpen/([a-z0-9-]+)/')
+        specials = [t.slug for t in collectie_volgorde(Template.objects.filter(is_active=True, current_version__isnull=False)) if t.special]
+        self.assertEqual(kaarten[: len(specials)], specials)
+        self.assertEqual(kaarten[0], "kerststad")                                             # nieuwste Special op plek 1
+        gewoon = kaarten[len(specials):]
+        self.assertEqual(gewoon[:2], ["winterlicht", "gloria"])                                # daarna gewone ontwerpen, nieuw → oud
+        self.assertLessEqual(len(gewoon), 6)
+        self.assertLess(html.index('class="specials"'), html.index("Nieuwste ontwerpen"))
+        self.assertLess(html.index("Nieuwste ontwerpen"), html.index('id="tekst-bruiloft"'))    # de bestaande teksten blijven eronder staan
+        self.assertIn("Handige tips", html)
+
+    def test_studio_keuze_gebruikt_dezelfde_volgorde_ook_met_een_gelegenheid_en_bij_ander_ontwerp(self):
+        c = Client()
+        html = c.get("/maken/", {"gelegenheid": "kerst"}).content.decode()
+        kaarten = self.slugs(html, r'name="template" value="([a-z0-9-]+)"')
+        self.assertEqual(kaarten[:3], ["kerststad", "golden-noel", "kerstbol"])                # specials eerst, nieuw → oud
+        self.assertLess(kaarten.index("kerstbol"), kaarten.index("winterlicht"))              # een gewoon ontwerp, hoe nieuw ook, komt na de specials
+        self.assertLess(kaarten.index("winterlicht"), kaarten.index("gloria"))
+        owner = self.make_customer()
+        inv = create_draft(occasion="kerst", template=Template.objects.get(slug="winterlicht"), owner=owner)
+        c.force_login(owner)
+        keuze = c.get(f"/maken/{inv.uid}/ontwerp/").content.decode()
+        eigen = self.slugs(keuze, r'name="template" value="([a-z0-9-]+)"')
+        self.assertEqual(eigen[:3], ["kerststad", "golden-noel", "kerstbol"])
+
+    def test_meer_voor_de_gelegenheid_toont_specials_eerst_en_dan_het_nieuwste(self):
+        antwoord = Client().get("/ontwerpen/winterlicht/", {"gelegenheid": "kerst"})
+        slugs = [c["template"].slug for c in antwoord.context["others"]]
+        self.assertEqual(slugs, ["kerststad", "golden-noel", "kerstbol"])
+        self.assertTrue(all(Template.objects.get(slug=s).supports("kerst") for s in slugs))   # alleen ontwerpen die bij de gelegenheid horen
+        self.assertNotIn("winterlicht", slugs)
+        gewoon = Client().get("/ontwerpen/kerststad/", {"gelegenheid": "kerst"})
+        slugs = [c["template"].slug for c in gewoon.context["others"]]
+        self.assertEqual(slugs[:2], ["golden-noel", "kerstbol"])                              # kerststad zelf valt weg, de rest blijft in volgorde
+
+    def test_collectie_blijft_zoals_afgesproken(self):
+        antwoord = Client().get("/ontwerpen/", {"gelegenheid": "kerst"})
+        specials = [c["template"].slug for c in antwoord.context["special_cards"]]
+        gewoon = [c["template"].slug for c in antwoord.context["cards"]]
+        self.assertEqual(specials[:3], ["kerststad", "golden-noel", "kerstbol"])
+        self.assertEqual(gewoon[:2], ["winterlicht", "gloria"])

@@ -126,35 +126,14 @@ OCCASIONS: dict[str, dict] = {
 _FAMILY_WORDS = {"familie", "fam", "fam.", "gezin", "het", "de", "van", "der", "den", "ten", "ter", "te", "'t", "family", "the"}
 
 
-def _aangemaakt(template) -> int:
-    """De dag (als getal) waarop het ontwerp aan de catalogus is toegevoegd; hoger = nieuwer. Een ontwerp zonder datum telt als oud."""
-    moment = getattr(template, "created_at", None)
-    if not moment:
-        return 0
-    from django.utils import timezone
-
-    return timezone.localtime(moment).date().toordinal() if timezone.is_aware(moment) else moment.date().toordinal()
-
-
 def collectie_volgorde(designs) -> list:
     """De volgorde van de collectie, op één plek: eerst alle Specials, daarna de gewone ontwerpen; binnen elk deel het nieuwst toegevoegde
     ontwerp eerst (op het moment van toevoegen aan de catalogus, `Template.created_at`), bij gelijke tijd de vaste volgorde (`sort_order`, naam).
-    Een nieuw Special staat dus automatisch op plek 1. Filtert niets: wie alleen gepubliceerde of passende ontwerpen wil, filtert eerst."""
+    Een nieuw Special staat dus automatisch op plek 1. Filtert niets: wie alleen gepubliceerde of passende ontwerpen wil, filtert eerst.
+    Dit is de enige sorteerregel: Collectie, Inspiratie, de ontwerpkeuze in de Studio en 'Meer voor…' gebruiken allemaal deze functie."""
     def sleutel(t):
         moment = getattr(t, "created_at", None)
         return (0 if getattr(t, "special", False) else 1, -(moment.timestamp() if moment else 0), t.sort_order, t.name)
-
-    return sorted(designs, key=sleutel)
-
-
-def by_occasion(designs, occasion: str) -> list:
-    """De volgorde van de collectie, centraal: eerst de ontwerpen die voor deze gelegenheid zijn gemaakt (eerste in hun lijst), daarna de rest.
-    Binnen elk deel staan de nieuwste ontwerpen vooraan (op de dag waarop ze zijn toegevoegd) en de oudere daarna. Een nieuw ontwerp staat dus
-    automatisch bovenaan, zonder nummers aan te passen; `sort_order` bepaalt alleen de volgorde van ontwerpen van dezelfde dag.
-    Wie de lijst filtert op actief (is_active en een versie) houdt alleen gepubliceerde ontwerpen over."""
-    def sleutel(t):
-        eerst = 0 if (not occasion or (t.occasions or [""])[0] == occasion) else 1
-        return (eerst, -_aangemaakt(t), t.sort_order, t.name)
 
     return sorted(designs, key=sleutel)
 
