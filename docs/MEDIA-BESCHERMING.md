@@ -10,7 +10,7 @@ Er is bewust geen "screenshotblokkade" en geen DRM gebouwd: dat werkt niet in ee
 |---|---|---|
 | Script | `static/js/media-bescherming.js`, geladen via `templates/base.html` en `invitations/.../base_invitation.html` | Geen contextmenu (rechtsklik, lang indrukken) op beschermde media, geen slepen (`dragstart`), `draggable="false"` op afbeeldingen. Bij `<video>`: `controlslist="nodownload noplaybackrate"`, `disablepictureinpicture`, `disableremoteplayback`. Nieuwe elementen die later in de pagina komen worden ook beschermd. |
 | CSS | `static/css/vierlief.css`, `invitations/static/invitations/invite-base.css` | `-webkit-user-drag: none`, `-webkit-touch-callout: none` (lang indrukken op iOS) en `user-select: none` op onze beelden en video's. Een afbeelding **binnen een link** krijgt `pointer-events: none`: klik en linkmenu gaan naar de link, zonder "afbeelding opslaan". |
-| Video | de drie ontwerpen met video (Kerstbol, Kerstkaart, Gouden Avond) | De kenmerken staan ook direct in de HTML; Balzaal krijgt ze via het script. Geen `controls`: er is geen speler met een downloadknop. |
+| Video | de vier ontwerpen met video (Kerstbol, Kerstkaart, Gouden Avond, Kerststad) | De kenmerken staan ook direct in de HTML; Balzaal krijgt ze via het script. Geen `controls`: er is geen speler met een downloadknop. |
 | Hotlink | `core/middleware.py::MediaHotlinkMiddleware`, in `config/settings.py` **vóór** WhiteNoise | Een beeld of video met een Referer van een vreemde website krijgt 403. `Sec-Fetch-Site: cross-site` bij een afbeelding, video of iframe krijgt ook 403 (vangt wie de Referer onderdrukt). Eigen pagina's, geen Referer en het openen van het beeld via een link blijven werken. De goede antwoorden krijgen `Cross-Origin-Resource-Policy: same-site`. |
 
 Beschermd zijn alleen `<img>`, `<video>` en `<svg><image>` uit `/static/` en alles binnen `[data-media-beschermd]`.
@@ -26,7 +26,7 @@ Een tweede domein hoort in `DJANGO_ALLOWED_HOSTS` of `VIERLIEF_BASE_URL`; die ge
 
 ## Geen masterbestanden in de interface
 
-Er staan geen losse originelen in `static/` of `designs/`: de beelden zijn webp/jpg in webformaat (kleiner dan 600 kB) en de drie video's zijn korte mp4's van 1,2 tot 2,4 MB.
+Er staan geen losse originelen in `static/` of `designs/`: de beelden zijn webp/jpg in webformaat (kleiner dan 600 kB) en de video's zijn korte mp4's van 1,2 tot 2,4 MB; alleen de video van Kerststad (20 s) is ±5,4 MB. De bron daarvan (71 MB) staat buiten Git.
 Geen enkel sjabloon linkt naar een beeld of video om te downloaden (`tests/test_mediabescherming.py` bewaakt dat, ook voor een `download`-kenmerk op media).
 De downloads die wel bestaan zijn bedoeld: de QR-code (PNG/SVG), het agendabestand (.ics) en de voorwaarden (PDF). Grote originelen en prompts blijven buiten Git (zie `docs/designs/README.md`).
 

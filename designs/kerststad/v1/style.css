@@ -1,0 +1,321 @@
+/* Kerststad v1: de goedgekeurde peperkoekstad-video als opening (beeldvullend, gouden V-badge als klikpunt) met een levende eindloop, en daarna een kaart in dezelfde wereld:
+   nachtblauw, warm lantaarnlicht, peperkoek, glazuur, rood-witte zuurstokken en goud. Opening, kop en groet zijn één scène (.ks-hero) die kerststad.js bestuurt.
+   Achtergronden van de banden zijn uitsneden uit dezelfde video; de sneeuw komt van het gedeelde effect. Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Pinyon Script"; src: url("../../../fonts/pinyon-script-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../../../fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 300 800; font-display: swap; }
+
+body {
+  --ks-script: "Pinyon Script", "Great Vibes", cursive;
+  --ks-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --ks-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ks-koekvlak: radial-gradient(circle at 14% 18%, rgba(30, 12, 2, .34) 0 2px, transparent 3.4px) 0 0 / 47px 53px,
+    radial-gradient(circle at 63% 71%, rgba(30, 12, 2, .28) 0 1.6px, transparent 3px) 0 0 / 61px 47px,
+    radial-gradient(130% 90% at 28% 0%, rgba(255, 207, 140, .26), transparent 62%),
+    linear-gradient(165deg, #9a5a2a, var(--ks-koek-2) 52%, #55300f);
+  --ks-zuurstok: repeating-linear-gradient(45deg, #fff 0 9px, var(--ks-rood) 9px 18px);
+  --inv-bg: var(--ks-nacht);
+  --inv-text: var(--ks-glazuur);
+  --inv-muted: var(--ks-glazuur-2);
+  --inv-accent: var(--ks-goud);
+  --inv-accent-contrast: #1B1405;
+  --inv-focus: var(--ks-goud-lt);
+  --inv-font-body: var(--ks-serif);
+  --inv-font-ui: var(--ks-ui);
+  --inv-radius: 14px;
+  --inv-surface-2: var(--ks-nacht-2);
+  --inv-btn-border: color-mix(in srgb, var(--ks-goud) 65%, transparent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--ks-goud) 14%, transparent);
+  --inv-field-bg: #FFFDF6;
+  --inv-field-text: var(--ks-ink);
+  --inv-field-border: color-mix(in srgb, var(--ks-ink) 32%, transparent);
+  --inv-music-bg: linear-gradient(180deg, #FFF6E2, #E4C88E);
+  --inv-music-text: #2B2010;
+  --inv-music-border: rgba(120, 90, 30, .35);
+  --inv-photo-bg: var(--ks-nacht-2);
+  --fx-pulse: var(--ks-goud);
+  background: var(--ks-nacht);
+  color: var(--ks-glazuur);
+  font-family: var(--ks-serif);
+  font-size: 1.16rem;
+  font-weight: 500;
+}
+
+/* ================================================================ de scène: beeldvullende video met de gouden V-badge als klikpunt */
+/* De video (9:16) vult het scherm: op een telefoon van rand tot rand; op een breder scherm over de volle hoogte, met aan weerszijden een zachte gloed in de kleuren van de video
+   zelf (kerststad.js tekent die uit de video). Zonder JavaScript, met 'minder beweging', in de Studio of bij een tweede bezoek staat het eindbeeld met de groet er direct. */
+.ks-hero {
+  --ks-h: 100vh; --ks-h: 100svh;
+  position: relative; isolation: isolate; overflow: hidden; height: var(--ks-h); min-height: 420px; color: #fff7ea; background: #070d22; font-family: Georgia, "Cormorant Garamond", serif;
+}
+html:not(.inv-embed) body:has(.inv-banner) .ks-hero { --ks-h: calc(100svh - var(--inv-banner-h, 3.9rem)); }
+html.ks-bezig, html.ks-bezig body { overflow: hidden; overscroll-behavior: none; }
+html.ks-bezig { scrollbar-gutter: stable; }
+.ks-ambient { display: none; position: absolute; inset: -4%; z-index: 0; width: 108%; height: 108%; filter: blur(22px) saturate(1.25) brightness(.85); opacity: .95; }
+.ks-hero::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  /* de onderrand van de kop loopt zacht over in de nachtblauwe kaart (geen harde naad) */
+  background: linear-gradient(to bottom, transparent 62%, #0b1430 100%), radial-gradient(ellipse at 50% 50%, transparent 42%, rgba(3, 7, 20, .6) 100%); }
+@media (min-aspect-ratio: 3/5) { .ks-ambient { display: block; } }
+.ks-scene {
+  position: absolute; top: 0; bottom: 0; left: 50%; z-index: 1; translate: -50% 0; overflow: hidden; background: #1b1209;
+  width: min(100%, calc(var(--ks-h) * .5625));
+}
+@media (min-aspect-ratio: 3/5) {
+  .ks-scene { -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent), linear-gradient(180deg, #000 93%, transparent); -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent), linear-gradient(180deg, #000 93%, transparent); mask-composite: intersect; }
+}
+.ks-scene video, .ks-spiegel, .ks-eindbeeld { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ks-spiegel, .ks-eindbeeld { position: absolute; inset: 0; pointer-events: none; }
+/* het stilstaande laatste beeld dat bij de sprong van de eindloop in 1,4 s verdwijnt (kerststad.js) */
+.ks-spiegel { opacity: 0; transition: opacity 1.4s ease; }
+.ks-spiegel.ks-aan { opacity: 1; transition: none; }
+/* het eindbeeld: direct zichtbaar in de stilstaande standen, en oplossend zodra de levende eindloop begint */
+.ks-eindbeeld { opacity: 0; visibility: hidden; transition: opacity 1.4s ease, visibility 0s 1.4s; }
+.ks-eind .ks-eindbeeld { opacity: 1; visibility: visible; transition: none; }
+
+/* de V in de badge is zelf de knop: een zachte lichtring en twee golven die vanuit de V naar de rand van de badge uitwaaieren; de tekst eronder is de hint */
+.ks-open { position: absolute; left: 49.2%; top: 50.5%; z-index: 3; width: calc(var(--ks-h) * .53); aspect-ratio: 1; translate: -50% -50%; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #ffe3a3; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ks-open::before { content: ""; position: absolute; left: 50%; top: 50%; width: 74%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; pointer-events: none;
+  border: 1.5px solid rgba(255, 255, 255, .62); box-shadow: 0 0 22px rgba(255, 255, 255, .4), inset 0 0 34px rgba(255, 244, 214, .3); }
+.ks-golf { position: absolute; left: 50%; top: 50%; width: 74%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .9); box-shadow: 0 0 16px rgba(255, 255, 255, .55); opacity: 0; pointer-events: none; }
+.fx-motion .ks-golf { animation: ks-golf 3.6s ease-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .ks-golf--twee { animation-delay: 1.8s; }
+.fx-motion .ks-open::before { animation: ks-adem 3.6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes ks-golf { 0% { opacity: 0; scale: .92; } 14% { opacity: .75; } 100% { opacity: 0; scale: 1.34; } }
+@keyframes ks-adem { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
+.ks-open:focus-visible, .ks-fallback:focus-visible, .ks-replay:focus-visible, .ks-skip:focus-visible, .ks-scroll:focus-visible { outline: 3px solid #ffe3a0; outline-offset: -5px; }
+.ks-skip:focus-visible, .ks-scroll:focus-visible { outline-offset: 3px; }
+.ks-hint { position: absolute; left: 7%; bottom: 8%; z-index: 3; width: 86%; margin: 0; padding: 15px 10px; text-align: center; font: 600 clamp(10px, calc(var(--ks-h) * .0135), 14px)/1.3 Arial, "DM Sans", sans-serif; letter-spacing: .14em; color: #fff0cf;
+  background: #0c1330a8; border: 1px solid #ffe3a366; border-radius: 30px; pointer-events: none; transition: opacity .5s; }
+.ks-playing .ks-open, .ks-playing .ks-hint, .ks-finished .ks-open, .ks-finished .ks-hint, .ks-eind .ks-hint { opacity: 0; pointer-events: none; visibility: hidden; }
+
+.ks-fallback, .ks-replay { padding: 10px 17px; min-height: 44px; border: 1px solid #ffe3a380; border-radius: 25px; background: #0d1738d9; color: #fff0cf; font: 600 11px Arial, "DM Sans", sans-serif; letter-spacing: .04em; cursor: pointer; }
+.ks-fallback { position: absolute; left: 50%; top: 65%; z-index: 4; transform: translateX(-50%); }
+.ks-fallback[hidden], .ks-replay[hidden] { display: none; }
+
+/* de groet over de levende eindloop */
+.ks-caption { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 110px 18px 64px; text-align: center; color: #fff7ea;
+  background: linear-gradient(to bottom, rgba(6, 11, 30, 0), rgba(6, 11, 30, .78) 44%, rgba(6, 11, 30, .92));
+  opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity 1.2s, transform 1.2s, visibility 0s 1.2s; }
+.ks-finished .ks-caption { opacity: 1; visibility: visible; transform: none; transition: opacity 1.2s, transform 1.2s, visibility 0s; }
+.ks-eyebrow { margin: 0; font: 600 clamp(10px, calc(var(--ks-h) * .0135), 13px)/1.3 Arial, "DM Sans", sans-serif; letter-spacing: .22em; text-transform: uppercase; color: #ffe3a3; }
+.ks-groet { margin: 8px 0 10px; font: 400 clamp(2.9rem, calc(var(--ks-h) * .075), 4.6rem)/1.08 var(--ks-script); overflow-wrap: anywhere; text-wrap: balance; }
+.ks-tekst { margin: 0 0 6px; font: clamp(14px, calc(var(--ks-h) * .0185), 19px)/1.55 Georgia, "Cormorant Garamond", serif; }
+.ks-namen { margin: 0 0 8px; font: italic clamp(14px, calc(var(--ks-h) * .0185), 19px)/1.5 Georgia, "Cormorant Garamond", serif; color: #ffe3a3; }
+.ks-replay { margin-top: 6px; }
+
+.ks-skip { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 20; min-height: 44px; padding: 8px 15px; border: 1px solid #ffe3a366; border-radius: 30px; background: #0c1330cc;
+  color: #fff0cf; font: 600 11px Arial, "DM Sans", sans-serif; letter-spacing: .08em; cursor: pointer; backdrop-filter: blur(3px); transition: opacity .5s; }
+.ks-klaar .ks-skip, html:not(.js) .ks-skip { opacity: 0; pointer-events: none; visibility: hidden; }
+.ks-scroll { position: absolute; left: 50%; bottom: max(8px, env(safe-area-inset-bottom)); z-index: 4; translate: -50% 0; display: none; align-items: center; gap: .4rem; min-height: 44px; padding: 0 1rem;
+  font: 600 11px Arial, "DM Sans", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: #ffe3a3; text-decoration: none; }
+.ks-klaar .ks-scroll, html:not(.js) .ks-scroll { display: inline-flex; }
+.ks-status { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.ks-resetting, .ks-resetting * { transition: none !important; }
+@media (max-height: 620px) {
+  .ks-caption { padding-top: 60px; padding-bottom: 54px; }
+  .ks-groet { margin: 4px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ks-hero *, .ks-hero *::before, .ks-hero *::after { transition: none !important; animation: none !important; }
+}
+
+/* ================================================================ de kaart: een kerstavond in de peperkoekstad */
+/* Alleen wat de klant heeft ingevuld. Banden in nachtblauw met lantaarnlicht, peperkoekplaten met glazuur, zuurstokken, lichtsnoeren en goudfolie op de koppen. */
+.inv-kerststad .inv-main { position: relative; z-index: 1; }
+.ks-body { position: relative; z-index: 1; overflow-x: clip; background: linear-gradient(180deg, #0b1430, #0e1838 40%, #080e24); }
+.ks-sec { position: relative; isolation: isolate; overflow: hidden; padding: clamp(4.6rem, 15vw, 8.5rem) 1.25rem; text-align: center; }
+.ks-in { position: relative; z-index: 2; width: min(100%, 40rem); margin-inline: auto; }
+.ks-in--breed { width: min(100%, 62rem); }
+.ks-h2 { margin: 0 0 1.4rem; font: 400 clamp(3rem, 13vw, 5rem)/1.05 var(--ks-script); color: var(--ks-goud-lt); text-wrap: balance; }
+.ks-krul { display: block; width: 11.5rem; height: auto; margin: 1.1rem auto; color: var(--ks-goud); filter: drop-shadow(0 0 7px rgba(255, 227, 163, .4)); }
+
+/* goudfolie op koppen en tijden */
+.ks-folie { background: linear-gradient(100deg, #c9a255 0%, #f0d796 20%, #fff7dc 38%, #e2bf72 56%, #fbeabd 78%, #cfa95b 100%) 0 0 / 220% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; padding-inline: .14em; }
+.fx-motion .ks-zichtbaar .ks-folie, .fx-motion .ks-finished .ks-folie { animation: ks-glans 8s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes ks-glans { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
+
+/* de lichtsnoeren: een draad met warme lampjes die om de beurt twinkelen */
+.ks-slinger { display: block; width: 100%; height: clamp(3.4rem, 9vw, 5.6rem); margin-bottom: -1px; }
+.ks-lamp { opacity: .55; }
+.fx-motion .ks-lamp { animation: ks-lamp 3.2s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.ks-lamp--b { animation-delay: -.8s; } .ks-lamp--c { animation-delay: -1.6s; } .ks-lamp--d { animation-delay: -2.4s; }
+@keyframes ks-lamp { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+
+/* zachte lichtpuntjes: warme ramen in de verte */
+.ks-lichtjes { position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 22%, rgba(255, 220, 150, .95) 0 1.5px, transparent 3px), radial-gradient(circle at 84% 16%, rgba(255, 220, 150, .8) 0 1.5px, transparent 3px),
+    radial-gradient(circle at 70% 58%, rgba(255, 220, 150, .9) 0 1.6px, transparent 3.4px), radial-gradient(circle at 26% 76%, rgba(255, 220, 150, .85) 0 1.4px, transparent 3px),
+    radial-gradient(circle at 92% 84%, rgba(255, 220, 150, .75) 0 1.4px, transparent 3px), radial-gradient(60% 40% at 50% 0%, rgba(255, 190, 100, .14), transparent 70%); }
+.fx-motion .ks-zichtbaar .ks-lichtjes { animation: ks-twinkel 5s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes ks-twinkel { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+
+/* achtergronden uit de video, donker gemaakt zodat de tekst leesbaar blijft */
+.ks-fotosec::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, #0b1430 0%, rgba(10, 18, 46, .76) 26%, rgba(10, 18, 46, .8) 74%, #080e24 100%); }
+.ks-bg { position: absolute; inset: -6% 0; z-index: -1; width: 100%; height: 112%; object-fit: cover; opacity: .62; }
+.ks-bg--spiegel { scale: -1 1; }
+@supports (animation-timeline: view()) {
+  .ks-bg { animation: ks-parallax linear both; animation-timeline: view(); animation-range: cover; }
+  @keyframes ks-parallax { from { translate: 0 -5%; } to { translate: 0 5%; } }
+}
+.ks-programma { background: linear-gradient(180deg, #0b1430, #101b42 50%, #0b1430); }
+.ks-programma .ks-bg { opacity: .42; }
+
+/* peperkoekplaten met glazuur: de brief, het aanmeldkaartje en de wegwijzer */
+.ks-koekbrief { --inv-text: var(--ks-glazuur); --inv-muted: var(--ks-glazuur-2); --inv-focus: var(--ks-goud-lt);
+  position: relative; padding: clamp(3.4rem, 9vw, 4.2rem) clamp(1.4rem, 6vw, 2.8rem) clamp(2.4rem, 7vw, 3.2rem); text-align: left; color: var(--ks-glazuur);
+  background: var(--ks-koekvlak); border-radius: 1.5rem; box-shadow: 0 0 0 2px var(--ks-koek-3), 0 36px 70px -26px rgba(0, 0, 0, .85), 0 0 90px rgba(255, 170, 70, .16); }
+.ks-koekbrief::before { content: ""; position: absolute; inset: .7rem; z-index: 0; pointer-events: none; border: 3px solid rgba(255, 247, 234, .92); border-radius: 1rem; box-shadow: 0 1px 0 rgba(0, 0, 0, .25); }
+/* een druipende rand van glazuur langs de bovenkant */
+.ks-koekbrief::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1.9rem; z-index: 1; pointer-events: none; border-radius: 1.5rem 1.5rem 0 0;
+  background: radial-gradient(circle at 16px 0, var(--ks-glazuur) 15px, transparent 16px) 0 0 / 32px 1.5rem repeat-x, radial-gradient(circle at 21px 0, var(--ks-glazuur) 11px, transparent 12px) 11px 0 / 53px 1.9rem repeat-x; }
+.ks-koekbrief > * { position: relative; z-index: 2; }
+.ks-koekbrief a:not(.inv-btn) { color: var(--ks-goud-lt); }
+.ks-koekbrief .inv-btn { color: var(--ks-glazuur); border-color: rgba(255, 247, 234, .7); background: rgba(255, 247, 234, .08); }
+.ks-koekbrief .inv-btn--primary { color: #2A1C06; background: linear-gradient(180deg, #FFE9B0, #D9A94F); border-color: #8A6224; }
+.ks-badge { position: absolute !important; left: 50%; top: -3rem; z-index: 4 !important; width: 6rem; height: 6rem; translate: -50% 0; filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .55)) drop-shadow(0 0 22px rgba(255, 200, 110, .5)); pointer-events: none; }
+
+/* de foto als versiering: een ring van zuurstok en een gouden oogje */
+.ks-ornament { position: relative; width: min(70vw, 17rem); margin: 1.2rem auto 2rem; }
+.ks-ornament .ph { aspect-ratio: 1; width: 100%; border-radius: 50%; overflow: hidden; position: relative; border: 8px solid transparent;
+  background: linear-gradient(var(--ks-nacht), var(--ks-nacht)) padding-box, var(--ks-zuurstok) border-box;
+  box-shadow: 0 0 0 3px var(--ks-glazuur), 0 0 0 5px var(--ks-goud-donker), 0 26px 44px -20px rgba(20, 8, 0, .85); }
+.ks-ornament::before { content: ""; position: absolute; left: 50%; top: -1.05rem; z-index: 2; width: 1.3rem; height: 1.3rem; translate: -50% 0; border: 3px solid var(--ks-goud); border-radius: 50%; box-shadow: 0 0 8px rgba(255, 227, 163, .6); }
+.ks-ornament::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 50%; pointer-events: none; background: radial-gradient(ellipse 36% 22% at 30% 16%, rgba(255, 255, 255, .5), transparent 72%); }
+.ks-brief::before { content: ""; position: absolute; inset: 0 0 auto 0; z-index: 1; height: 8rem; pointer-events: none; background: linear-gradient(#0b1430, transparent); }
+.ks-brief { padding-top: clamp(7.5rem, 22vw, 10rem); }
+.ks-brief__tekst { font-size: 1.24rem; line-height: 1.7; font-weight: 600; }
+.ks-brief__tekst p { margin: 0 0 1rem; }
+.ks-brief__tekst p:first-child { font: 400 clamp(2.3rem, 9vw, 3.2rem)/1.15 var(--ks-script); color: var(--ks-goud-lt); }
+
+.ks-jaar__tekst { max-width: 30rem; margin: 0 auto; font-size: 1.28rem; line-height: 1.75; color: var(--ks-glazuur); text-shadow: 0 2px 18px rgba(0, 0, 0, .65); }
+.ks-jaar__tekst p { margin: 0 0 1.1rem; }
+.ks-jaar__tekst p:first-child { font: italic 500 clamp(1.6rem, 6.4vw, 2.1rem)/1.45 var(--ks-serif); color: var(--ks-goud-lt); }
+.ks-jaar__tekst p:first-child::before { content: "\201C"; display: block; height: .5em; font: 400 4.6em/1 var(--ks-script); color: var(--ks-goud); opacity: .85; }
+
+/* de momenten als peperkoekjes met een lintje aan een draad */
+.ks-koekjes { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4.4rem 1.2rem; max-width: 40rem; margin: 3rem auto 0; padding: 0; align-items: start; }
+.ks-koekje { position: relative; display: grid; justify-items: center; transform-origin: 50% -3.6rem; }
+.ks-koekje::before { content: ""; position: absolute; top: -3.6rem; left: 50%; width: 1px; height: 3.6rem; background: linear-gradient(#8a6224, #ffe3a3); box-shadow: 0 0 6px rgba(255, 227, 163, .5); }
+.ks-koekje:nth-child(even) { margin-top: 2.6rem; }
+.ks-koekje__lint { position: absolute; left: 50%; top: -.8rem; z-index: 3; width: 1.5rem; height: 2rem; translate: -50% 0; background: var(--ks-rood); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 74%, 0 100%); filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .5)); }
+.ks-koekje figure { position: relative; width: 100%; margin: 0; padding: .65rem; border-radius: 1.2rem; background: var(--ks-koekvlak); box-shadow: inset 0 0 0 2px rgba(255, 247, 234, .9), 0 24px 36px -16px rgba(0, 0, 0, .85), 0 0 40px rgba(255, 170, 70, .16); }
+.ks-koekje .ph { aspect-ratio: 4 / 5; width: 100%; border-radius: .8rem; overflow: hidden; }
+.ks-koekje figcaption { padding: .6rem .2rem .2rem; text-align: center; font: italic 600 1.05rem var(--ks-serif); color: var(--ks-glazuur); }
+.fx-motion .ks-zichtbaar .ks-koekje { animation: ks-zwaai 6s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -1.4s); animation-play-state: var(--fx-play, running); }
+@keyframes ks-zwaai { from { rotate: -2.2deg; } to { rotate: 2.2deg; } }
+
+/* kerstdiner: een gouden munt zoals de badge uit de opening */
+.ks-munt { position: relative; display: grid; justify-items: center; align-content: center; width: min(76vw, 19rem); aspect-ratio: 1; margin: 0 auto; border-radius: 50%; line-height: .95; isolation: isolate; color: #3a2208;
+  background: radial-gradient(circle at 32% 24%, #fff3cc, #ecc577 36%, #c99645 68%, #9a6c24);
+  box-shadow: 0 0 0 3px #fff0c0, 0 0 0 7px #8a6224, 0 0 0 9px #ffe3a3, inset 0 3px 8px rgba(255, 255, 255, .6), inset 0 -10px 24px rgba(120, 70, 10, .35), 0 30px 60px -18px rgba(0, 0, 0, .85), 0 0 80px rgba(255, 190, 90, .35); }
+.ks-munt::before { content: ""; position: absolute; inset: 7%; z-index: -1; border-radius: 50%; border: 2px solid rgba(110, 66, 8, .5); box-shadow: inset 0 0 0 5px rgba(255, 243, 204, .35); }
+.ks-weekdag, .ks-jaartal { font: 700 .74rem var(--ks-ui); letter-spacing: .4em; text-indent: .4em; text-transform: uppercase; color: #4a2c0a; }
+.ks-dag { font: 400 clamp(5.4rem, 24vw, 8rem)/.9 var(--ks-serif); font-weight: 600; text-shadow: 0 2px 0 rgba(255, 243, 204, .55); }
+.ks-maand { margin-top: -.1rem; font: 400 clamp(2.6rem, 11vw, 3.6rem)/1 var(--ks-script); color: #3a2208; }
+.ks-datum__tijd { margin: 1.8rem 0 0; font: italic 600 1.4rem var(--ks-serif); color: var(--ks-glazuur); }
+
+/* programma: een zuurstok als rail met een peperkoekmannetje bij elk onderdeel */
+.ks-tijdlijn { position: relative; list-style: none; margin: 2.2rem auto 0; padding: 0; max-width: 28rem; display: grid; gap: 2.4rem; text-align: left; }
+.ks-tijdlijn::before { content: ""; position: absolute; left: 1.35rem; top: .4rem; bottom: .4rem; width: .7rem; translate: -50% 0; border-radius: .35rem; background: var(--ks-zuurstok); box-shadow: 0 0 0 1px rgba(110, 20, 35, .6), 0 0 16px rgba(255, 227, 163, .5); }
+.ks-tl { position: relative; display: grid; grid-template-columns: 2.7rem 1fr; gap: 1.1rem; align-items: start; }
+.ks-tl__man { display: block; width: 2.3rem; margin: .45rem 0 0 .2rem; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .6)); }
+.ks-tl__man svg { display: block; width: 100%; height: auto; }
+.ks-tl__tijd { margin: 0; font: 600 clamp(2.3rem, 10vw, 3.4rem)/1 var(--ks-serif); letter-spacing: .02em; }
+.ks-tl__titel { margin: .25rem 0 0; font: italic 600 clamp(1.5rem, 6vw, 1.9rem)/1.2 var(--ks-serif); color: var(--ks-glazuur); text-shadow: 0 2px 14px rgba(0, 0, 0, .7); }
+.ks-tl__desc { margin: .3rem 0 0; color: var(--ks-glazuur-2); line-height: 1.5; text-shadow: 0 2px 12px rgba(0, 0, 0, .7); }
+@media (min-width: 860px) {
+  .ks-tijdlijn { max-width: 52rem; gap: 3rem; }
+  .ks-tijdlijn::before { left: 50%; }
+  .ks-tl { grid-template-columns: 1fr 3rem 1fr; gap: 0; }
+  .ks-tl__man { grid-column: 2; grid-row: 1; justify-self: center; margin: .6rem 0 0; }
+  .ks-tl__tekst { grid-row: 1; }
+  .ks-tl:nth-child(odd) .ks-tl__tekst { grid-column: 1; text-align: right; padding-right: 2.2rem; }
+  .ks-tl:nth-child(even) .ks-tl__tekst { grid-column: 3; padding-left: 2.2rem; }
+}
+
+/* aftellen: elk getal is een verlicht raam van een peperkoekhuisje */
+.ks-aftellen { background: linear-gradient(180deg, #0b1430, #14214e 55%, #0b1430); }
+.ks-aftellen .cd { gap: clamp(.8rem, 3.8vw, 1.6rem); margin: 2rem 0 1.6rem; flex-wrap: nowrap; align-items: flex-end; }
+.ks-aftellen .cd__unit { position: relative; width: clamp(3.6rem, 17.6vw, 7rem); min-width: 0; aspect-ratio: 3 / 4; justify-content: center; border-radius: 999px 999px .6rem .6rem; overflow: hidden; color: #3a2208;
+  background: radial-gradient(circle at 50% 38%, #fff0b8, #ffc965 62%, #f0a040); box-shadow: 0 0 0 4px var(--ks-koek-2), 0 0 0 6px var(--ks-glazuur), 0 0 38px rgba(255, 190, 90, .55); }
+.ks-aftellen .cd__unit::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background: linear-gradient(90deg, transparent calc(50% - 1.5px), var(--ks-koek-2) calc(50% - 1.5px) calc(50% + 1.5px), transparent calc(50% + 1.5px)), linear-gradient(0deg, transparent calc(46% - 1.5px), var(--ks-koek-2) calc(46% - 1.5px) calc(46% + 1.5px), transparent calc(46% + 1.5px)); }
+.fx-motion .ks-zichtbaar .cd__unit { animation: ks-raam 4.4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .ks-zichtbaar .cd__unit:nth-child(2) { animation-delay: -1.1s; } .fx-motion .ks-zichtbaar .cd__unit:nth-child(3) { animation-delay: -2.2s; } .fx-motion .ks-zichtbaar .cd__unit:nth-child(4) { animation-delay: -3.3s; }
+@keyframes ks-raam { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.12); } }
+.ks-aftellen .cd__num { position: relative; font: 600 clamp(1.8rem, 8vw, 3.1rem)/1 var(--ks-serif); color: #3a2208; text-shadow: 0 1px 0 rgba(255, 243, 204, .7); }
+.ks-aftellen .cd__label { position: relative; margin-top: .2rem; font: 700 .6rem var(--ks-ui); letter-spacing: .2em; color: #4a2c0a; }
+
+/* locatie: een peperkoeken wegwijzer */
+.ks-wegwijzer { margin-top: 1.6rem; text-align: center; }
+.ks-plaats__naam { margin: 0; font: italic 600 clamp(1.9rem, 8vw, 2.9rem)/1.2 var(--ks-serif); color: var(--ks-goud-lt); text-shadow: 0 2px 20px rgba(0, 0, 0, .6); }
+.ks-plaats__adres { margin: .7rem 0 0; font-style: normal; line-height: 1.6; }
+.ks-plaats__wanneer { margin: 1.2rem 0 1.8rem; color: var(--ks-glazuur-2); }
+
+/* dresscode: snoepjes in de kleuren van de klant */
+.ks-kleding { background: var(--ks-koekvlak); box-shadow: inset 0 0 0 2px var(--ks-koek-3); }
+.ks-kleding::before, .ks-aanmelden::before { content: ""; position: absolute; left: 0; right: 0; top: -1px; z-index: 1; height: 1.5rem; pointer-events: none;
+  background: radial-gradient(circle at 16px 0, var(--ks-glazuur) 15px, transparent 16px) 0 0 / 32px 1.5rem repeat-x, radial-gradient(circle at 21px 0, var(--ks-glazuur) 10px, transparent 11px) 11px 0 / 53px 1.5rem repeat-x; }
+.ks-kleuren { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem; margin: 0 0 1.5rem; padding: 0; }
+.ks-kleur { width: 3.6rem; height: 3.6rem; border-radius: 50%; background: radial-gradient(circle at 35% 28%, color-mix(in srgb, var(--c) 50%, #fff), var(--c) 62%); box-shadow: 0 0 0 3px var(--ks-koek-2), 0 0 0 5px var(--ks-glazuur), 0 12px 20px -8px rgba(0, 0, 0, .7); }
+.ks-kleding__tekst { max-width: 26rem; margin: 0 auto .6rem; font-size: 1.2rem; font-weight: 600; }
+.ks-praktisch__lijst { display: grid; gap: 1.5rem; max-width: 28rem; margin: 2rem auto 0; }
+.ks-praktisch__item { padding-top: 1.1rem; border-top: 3px dotted rgba(255, 247, 234, .75); }
+.ks-praktisch__item dt { font: 700 .78rem var(--ks-ui); letter-spacing: .22em; text-transform: uppercase; color: var(--ks-goud); }
+.ks-praktisch__item dd { margin: .4rem 0 0; font-size: 1.15rem; }
+
+/* aanmelden: een glazuurwit kaartje met een rand van zuurstok, zodat het formulier goed leesbaar blijft */
+.ks-aanmelden { background: var(--ks-koekvlak); box-shadow: inset 0 0 0 2px var(--ks-koek-3); }
+.ks-kaart { --inv-text: var(--ks-ink); --inv-muted: var(--ks-ink-2); --inv-accent: var(--ks-accent); --inv-accent-contrast: #fff; --inv-focus: var(--ks-accent);
+  --inv-btn-border: color-mix(in srgb, var(--ks-accent) 60%, transparent); --inv-btn-hover-bg: color-mix(in srgb, var(--ks-accent) 10%, transparent);
+  max-width: 30rem; margin: 2.2rem auto 0; padding: clamp(1.8rem, 6vw, 2.6rem) clamp(1.3rem, 6vw, 2.4rem); color: var(--ks-ink); border-radius: 1rem;
+  background: linear-gradient(160deg, var(--ks-glazuur), var(--ks-glazuur-2)); border: 8px solid transparent; border-image: var(--ks-zuurstok) 8; border-radius: 0;
+  box-shadow: 0 36px 70px -26px rgba(0, 0, 0, .85); }
+.ks-kaart::before, .ks-kaart::after { display: none; }
+.ks-kaart a:not(.inv-btn), .ks-kaart .inv-link { color: var(--ks-accent); }
+.ks-kaart .inv-btn { color: var(--ks-ink); border-color: color-mix(in srgb, var(--ks-accent) 60%, transparent); background: transparent; }
+.ks-kaart .inv-btn--primary { color: #fff; background: var(--ks-accent); border-color: var(--ks-accent); box-shadow: none; }
+.ks-kaart .rsvp__deadline { font-style: italic; font-size: 1.12rem; }
+.ks-contact__naam { margin: .5rem 0 .3rem; font: 400 clamp(2.2rem, 9vw, 3rem) var(--ks-script); color: var(--ks-goud-lt); }
+
+.ks-afsluiting { padding-block: clamp(6rem, 20vw, 11rem); }
+.ks-sterretje { display: block; width: 2.6rem; height: 2.6rem; margin: 0 auto .8rem; color: var(--ks-goud-lt); filter: drop-shadow(0 0 12px rgba(255, 227, 163, .7)); }
+.fx-motion .ks-zichtbaar .ks-sterretje { animation: ks-puls 3.4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes ks-puls { 0%, 100% { scale: .85; opacity: .8; } 50% { scale: 1.15; opacity: 1; } }
+.ks-afsluiting__naam { margin: 0; font: 400 clamp(3.2rem, 15vw, 6rem)/1.1 var(--ks-script); filter: drop-shadow(0 4px 20px rgba(0, 0, 0, .55)); }
+.ks-afsluiting__leden { margin: .4rem 0 0; font: italic 600 1.3rem var(--ks-serif); color: var(--ks-glazuur-2); }
+.ks-afsluiting__tekst { max-width: 26rem; margin: 1rem auto 0; font-size: 1.25rem; font-weight: 600; text-shadow: 0 2px 16px rgba(0, 0, 0, .7); }
+.ks-afsluiting .inv-share { margin-top: 1.8rem; }
+.ks-body .inv-btn { color: var(--ks-glazuur); border-color: rgba(255, 227, 163, .65); background: rgba(255, 247, 234, .06); }
+.ks-body .inv-btn--primary { background: linear-gradient(180deg, #FFE9B0, #D4A247); color: #2A1C06; border-color: #8A6224; box-shadow: 0 10px 30px -10px rgba(255, 190, 90, .5); }
+.ks-body .inv-link, .ks-body a:not(.inv-btn) { color: var(--ks-goud-lt); }
+.ks-body .tz-note, .ks-body .inv-share__status { color: var(--ks-glazuur-2); }
+.ks-kaart a:not(.inv-btn), .ks-kaart .inv-link { color: var(--ks-accent); }
+.inv-kerststad .music__toggle, .inv-kerststad .fx-toggle { box-shadow: 0 8px 22px -6px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .6); }
+.inv-kerststad .music__toggle { background: linear-gradient(180deg, #FFF6E2, #E4C88E); }
+
+@media (min-width: 900px) {
+  .ks-sec { padding-block: clamp(6rem, 10vw, 9.5rem); }
+  .ks-in { width: min(100%, 46rem); }
+  .ks-in--breed { width: min(100%, 68rem); }
+  .ks-h2 { font-size: clamp(4rem, 5.6vw, 6rem); }
+  .ks-brief .ks-in { width: min(100%, 60rem); }
+  .ks-brief .ks-koekbrief:has(.ks-ornament) { display: grid; grid-template-columns: auto 1fr; gap: clamp(2.4rem, 5vw, 4.4rem); align-items: center; padding-inline: clamp(3rem, 6vw, 5rem); }
+  .ks-brief .ks-badge { grid-column: auto; }
+  .ks-ornament { margin: 1rem 0; width: 20rem; }
+  .ks-jaar__tekst { max-width: 36rem; font-size: 1.4rem; }
+  .ks-koekjes { grid-template-columns: repeat(4, 1fr); max-width: 66rem; gap: 4.4rem 1.8rem; }
+  .ks-aftellen .cd { gap: 2rem; }
+  .ks-aftellen .cd__unit { width: 8.6rem; }
+  .ks-aftellen .cd__num { font-size: 3.6rem; }
+  .ks-afsluiting__naam { font-size: clamp(5rem, 8vw, 8rem); }
+  .ks-munt { width: 22rem; }
+}
+@media (prefers-reduced-motion: reduce) { .ks-folie, .ks-lichtjes, .ks-koekje, .ks-lamp, .ks-sterretje, .cd__unit { animation: none !important; } }
+@media print { .ks-hero { height: auto; min-height: 0; } .ks-skip, .ks-open, .ks-hint, .ks-replay, .ks-scroll, .ks-ambient, .ks-spiegel { display: none; } }

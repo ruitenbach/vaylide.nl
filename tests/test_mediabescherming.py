@@ -61,7 +61,7 @@ class PaginaTests(VaylideTestCase):
     SCRIPT = "js/media-bescherming"
 
     def test_script_staat_op_site_en_uitnodigingen(self):
-        for pad in ("/", "/ontwerpen/", "/ontwerpen/kerstkaart/", "/voorbeeld/kerstkaart/?gelegenheid=kerst", "/voorbeeld/gouden-avond/", "/voorbeeld/kerstbol/?gelegenheid=kerst"):
+        for pad in ("/", "/ontwerpen/", "/ontwerpen/kerstkaart/", "/voorbeeld/kerstkaart/?gelegenheid=kerst", "/voorbeeld/gouden-avond/", "/voorbeeld/kerstbol/?gelegenheid=kerst", "/voorbeeld/kerststad/?gelegenheid=kerst"):
             html = Client().get(pad).content.decode()
             self.assertIn(self.SCRIPT, html, pad)
 
@@ -75,14 +75,14 @@ class PaginaTests(VaylideTestCase):
 
     def test_elke_video_zonder_downloadknop_en_zonder_eigen_bediening(self):
         gevonden = 0
-        for pad in ("/voorbeeld/kerstkaart/?gelegenheid=kerst", "/voorbeeld/kerstbol/?gelegenheid=kerst", "/voorbeeld/gouden-avond/"):
+        for pad in ("/voorbeeld/kerstkaart/?gelegenheid=kerst", "/voorbeeld/kerstbol/?gelegenheid=kerst", "/voorbeeld/kerststad/?gelegenheid=kerst", "/voorbeeld/gouden-avond/"):
             html = Client().get(pad).content.decode()
             for tag in re.findall(r"<video\b[^>]*>", html):
                 gevonden += 1
                 self.assertIn('controlslist="nodownload', tag, pad)
                 self.assertIn("disablepictureinpicture", tag, pad)
                 self.assertNotRegex(tag, r"\scontrols\b", pad)
-        self.assertGreaterEqual(gevonden, 3)
+        self.assertGreaterEqual(gevonden, 4)
 
     def test_geen_template_linkt_naar_een_beeld_of_video_om_te_downloaden(self):
         patroon = re.compile(r"<a\b[^>]*href=\"[^\"]*(?:\.(?:webp|jpe?g|png|mp4|webm)\b|\{% static [^%]*(?:media|img/designs)[^%]*%\})[^\"]*\"", re.I)

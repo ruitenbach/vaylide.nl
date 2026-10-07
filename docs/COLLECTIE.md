@@ -7,13 +7,13 @@ de eigenaar en is bewust klein gehouden: er zijn geen ontwerpen opnieuw gebouwd,
 
 | Groep | Betekenis | Aantal |
 |---|---|---|
-| **A** | Prominent tonen: staat vooraan in de collectie | 14 |
+| **A** | Prominent tonen: staat vooraan in de collectie | 15 |
 | **B** | Secundair behouden: staat na de A-ontwerpen | 26 |
 | **C** | Technisch bewaren, voorlopig niet tonen | 9 |
 
 De indeling staat op één plek: `catalog/collectie.py` (met de redenen per groep). Een nieuw ontwerp dat daar niet staat, is B.
 
-- **A**: Aurora Nocturne, Midnight Émeraude, Rosé Royale, Balzaal, Golden Noël, Gouden Avond, Kerstbol en Kerstkaart (de acht Specials), Liefde op papier, Voor altijd, Avondgoud,
+- **A**: Aurora Nocturne, Midnight Émeraude, Rosé Royale, Balzaal, Golden Noël, Gouden Avond, Kerstbol, Kerstkaart en Kerststad (de negen Specials), Liefde op papier, Voor altijd, Avondgoud,
   Puur moment, Winterlicht en Gloria.
 - **B**: Eerste dans, Aan tafel, Middernacht en 23 Atelier-ontwerpen (zie het bestand).
 - **C**: Ho ho ho, Sneeuwpret, Wolkje, Stipjes, Door de jaren, Mijlpaal, Borrel, Congres en Lijnenspel.
@@ -26,7 +26,7 @@ Er is geen nieuwe databasekolom of schermonderdeel. De bestaande velden van een 
 - **C niet tonen**: `is_active` staat uit (Beheer → Ontwerpen → "Zichtbaar en bestelbaar"). Het ontwerp staat dan niet in de collectie, de
   zoekfunctie of de Studio. De map, de versies en **alle bestaande uitnodigingen blijven gewoon werken**. Aanzetten in Beheer brengt het
   ontwerp meteen terug.
-- **Specials**: `special` staat aan voor Aurora Nocturne, Midnight Émeraude, Rosé Royale, Balzaal, Golden Noël, Gouden Avond, Kerstbol en Kerstkaart. Winterlicht is A maar
+- **Specials**: `special` staat aan voor Aurora Nocturne, Midnight Émeraude, Rosé Royale, Balzaal, Golden Noël, Gouden Avond, Kerstbol, Kerstkaart en Kerststad. Winterlicht is A maar
   bewust geen special. Specials staan onder Specials; een eigen meerprijs is een optie `special-<code>` in Beheer → Prijzen. Zonder die
   optie kost een special gewoon de prijs van het pakket (keuze van de eigenaar, zie `tests/test_specials.py`). Voor Midnight Émeraude en
   Rosé Royale is er nog geen meerprijs ingesteld; die verzin ik niet.
@@ -59,6 +59,6 @@ Er is geen nieuwe databasekolom of schermonderdeel. De bestaande velden van een 
 - Een visuele uitlichting van A (bijvoorbeeld een eigen sectie op de collectiepagina) bestaat nog niet; A staat nu alleen vooraan.
 - De zakelijke lijn is dun (Gala, Strak zakelijk, Avondgoud, Puur moment).
 
-## Stand 4 oktober 2026: 49 ontwerpen
+## Stand 7 oktober 2026: 50 ontwerpen
 
-A/B/C is 14 / 26 / 9 (49 in totaal). Gouden Avond (`sort_order` 9), Kerstbol (7) en Kerstkaart (8) zijn Specials in groep A; alle `sort_order`s zijn uniek. Er is voor deze drie nog geen `special-<code>`-prijs ingesteld: zonder die optie kost een special de prijs van het gekozen pakket en is hij dus bestelbaar.
+A/B/C is 15 / 26 / 9 (50 in totaal). Kerststad (`sort_order` 11) is sinds 7 oktober een Special in groep A. Gouden Avond (`sort_order` 9), Kerstbol (7) en Kerstkaart (8) zijn Specials in groep A; alle `sort_order`s zijn uniek. Er is voor deze drie nog geen `special-<code>`-prijs ingesteld: zonder die optie kost een special de prijs van het gekozen pakket en is hij dus bestelbaar.

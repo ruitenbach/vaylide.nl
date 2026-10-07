@@ -1,0 +1,75 @@
+{
+  "slug": "kerststad",
+  "version": 1,
+  "name": "Kerststad",
+  "tagline": "Een levende peperkoekstad: tik op de V en de brug opent een stad vol licht en sneeuw",
+  "description": "Je ziet eerst, extreem dichtbij, een ronde gouden badge met de VAYLIDE-V op een peperkoeken brug. Na één tik speelt de volledige film: de camera trekt langzaam terug, over de brug, langs de peperkoekfiguurtjes, naar een besneeuwd kerstdorp met een kerk, een verlichte kerstboom, marktkraampjes en schaatsers op het ijs, tot het avond is. Daarna valt de kaart niet stil: de laatste seconden blijven rustig doorlopen, met vallende sneeuw, twinkelende lichtjes, bewegende peperkoekfiguurtjes en een levende markt. Eronder gaat de kaart door in dezelfde wereld: nachtblauw, warm lantaarnlicht, peperkoek, glazuur, rood-witte zuurstokken en goud, met jullie foto, jullie tekst en, bij een kerstdiner, datum, programma, locatie, aftellen en aanmelden. De opening is over te slaan en rustig bij minder beweging. De video is een gegenereerde scène zonder personen.",
+  "style_notes": "Levende peperkoekstad bij nacht, gouden badge met de officiële VAYLIDE-V, glazuur, zuurstokken, lantaarnlicht, sneeuw; filmisch en luxe; één video met een levende eindloop",
+  "occasions": [
+    "kerst"
+  ],
+  "sort_order": 11,
+  "special": true,
+  "opening": "cadeau",
+  "envelope_mode": "built_in",
+  "opening_label": "Peperkoekbrug met een gouden V-badge, een filmische opening",
+  "demo_melody": "we-wish-you",
+  "kaartbeeld": "open",
+  "palettes": [
+    {
+      "key": "kerstnacht",
+      "name": "Kerstnacht, peperkoek en goud",
+      "swatch": [
+        "#0B1430",
+        "#8A4E22",
+        "#E7BE6F"
+      ],
+      "vars": {
+        "--ks-nacht": "#0B1430",
+        "--ks-nacht-2": "#111C42",
+        "--ks-nacht-3": "#1A2858",
+        "--ks-koek": "#8A4E22",
+        "--ks-koek-2": "#6B3A18",
+        "--ks-koek-3": "#4B270F",
+        "--ks-koek-licht": "#C98B4C",
+        "--ks-glazuur": "#FFF7EA",
+        "--ks-glazuur-2": "#EFDFC4",
+        "--ks-goud": "#E7BE6F",
+        "--ks-goud-lt": "#FFE3A3",
+        "--ks-goud-donker": "#8A6224",
+        "--ks-rood": "#B8283A",
+        "--ks-rood-donker": "#6E1423",
+        "--ks-ink": "#2F1A0B",
+        "--ks-ink-2": "#5A3A1E",
+        "--ks-accent": "#8A2331",
+        "--fx-1": "#FFFFFF",
+        "--fx-2": "#FFE3A3",
+        "--fx-3": "#E7BE6F",
+        "--fx-4": "#FFF7EA",
+        "--fx-bg": "#0B1430"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "sneeuw",
+    "knal": "geen",
+    "viering": "sterren",
+    "namen": "zacht",
+    "onthul": "zacht",
+    "extra": []
+  },
+  "changelog": "Eerste versie: de goedgekeurde kerststad-video met de gouden V-badge als klikpunt, één keer volledig afgespeeld en daarna een levende eindloop (vanaf 16,0 s), met een kaart in dezelfde peperkoekwereld."
+}

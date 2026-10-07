@@ -21,6 +21,7 @@ De eigenaar wil nieuwe kaarten altijd uitbundig. Dat betekent **hoogwaardig, gel
 | Ontwerp | Slug | Document | Status |
 |---|---|---|---|
 | Kerstkaart | `kerstkaart` | [kerstkaart.md](kerstkaart.md) | on hold: concept; preview-video en storyboard als referentie in `tools/design-references/kerstkaart/`, nog niet ingebouwd |
+| Kerststad | `kerststad` (werknaam) | [kerststad.md](kerststad.md) | lokaal gebouwd als Special in `designs/kerststad/v1/`, ter beoordeling; niet gecommit |
 | Kerstbol | `kerstbol` (definitief) | [kerstbol.md](kerstbol.md) | lokaal gebouwd als Special in `designs/kerstbol/v1/` (branch `claude/kerstbol`), ter beoordeling; niet gepusht |
 
 Voeg een regel toe zodra er een ontwerpdocument is. Bestaande ontwerpen worden hier pas ingevuld als de eigenaar daarom vraagt.
