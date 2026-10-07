@@ -3,7 +3,9 @@
 from django.test import Client
 
 from accounts.models import LoginCode
+from invitations.content import publish_issues
 from invitations.models import Invitation
+from invitations.services import save_draft
 from orders.models import Order
 from processing.models import OutboundEmail
 
@@ -189,13 +191,15 @@ class InvalidInputTests(VaylideTestCase):
         self.inv.refresh_from_db()
         return self.c.post(f"/maken/{self.inv.uid}/{step}/", {"rev": self.inv.draft_rev, "actie": "volgende", **data})
 
-    def test_required_fields_block_next_but_keep_input(self):
+    def test_leeg_gelaten_velden_blokkeren_niet_en_invoer_blijft_bewaard(self):
         response = self.post("gegevens", {"name_partner_1": "Anna", "timezone": "Europe/Amsterdam"})
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Vul de datum in.")
-        self.assertContains(response, "Vul de naam van de locatie in.")
+        self.assertEqual(response.status_code, 302)     # niets is verplicht: door naar het volgende onderdeel
+        self.assertTrue(response["Location"].endswith("/programma/"))
         self.inv.refresh_from_db()
-        self.assertEqual(self.inv.draft_content["names"]["partner_1"], "Anna")  # niet verloren
+        self.assertEqual(self.inv.draft_content["names"]["partner_1"], "Anna")
+        self.assertEqual(self.inv.draft_content["date"], "")
+        tips = [i for i in publish_issues(self.inv.draft_content, "bruiloft", first_publication=True)]
+        self.assertTrue(tips and not any(i.blocking for i in tips))     # ontbrekende gegevens zijn alleen een tip
 
     def test_invalid_formats_are_rejected(self):
         response = self.post("gegevens", {"name_partner_1": "A", "name_partner_2": "B", "date": "31-02-2027", "start_time": "25:99",
@@ -219,12 +223,26 @@ class InvalidInputTests(VaylideTestCase):
         self.assertContains(response, "Vul een geldig e-mailadres in.")
 
     def test_rsvp_deadline_after_event_is_rejected(self):
-        self.post("gegevens", {"name_partner_1": "A", "name_partner_2": "B", "date": future_date(30), "start_time": "14:00",
+        uid = self.c.post("/maken/", {"occasion": "verjaardag", "template": "confetti"})["Location"].split("/")[2]
+        self.inv = Invitation.objects.get(uid=uid)
+        self.post("gegevens", {"name_person_name": "A", "date": future_date(30), "start_time": "14:00",
                                "timezone": "Europe/Amsterdam", "venue_name": "X"})
         response = self.post("aanmelden", {"enabled": "on", "deadline": future_date(60), "max_party_size": "2"})
         self.assertContains(response, "op of vóór de datum")
         response = self.post("aanmelden", {"enabled": "on", "deadline": future_date(10), "max_party_size": "99"})
         self.assertContains(response, "Maximaal 10.")
+
+    def test_bij_een_bruiloft_bestaat_de_aanmelddeadline_niet_meer(self):
+        self.post("gegevens", {"name_partner_1": "A", "name_partner_2": "B", "date": future_date(30), "start_time": "14:00",
+                               "timezone": "Europe/Amsterdam", "venue_name": "X"})
+        page = self.c.get(f"/maken/{self.inv.uid}/aanmelden/").content.decode()
+        self.assertNotIn("id_deadline", page)
+        response = self.post("aanmelden", {"enabled": "on", "deadline": future_date(60), "max_party_size": "3"})
+        self.assertEqual(response.status_code, 302)     # een meegestuurde deadline telt niet mee
+        self.inv.refresh_from_db()
+        self.assertEqual(self.inv.draft_content["rsvp"]["deadline"], "")
+        self.assertEqual(self.inv.draft_content["rsvp"]["max_party_size"], 3)
+        self.assertEqual([i for i in publish_issues(self.inv.draft_content, "bruiloft", first_publication=True) if i.blocking], [])
 
     def test_at_most_five_fixed_questions(self):
         data = {"enabled": "on", "deadline": future_date(10), "max_party_size": "2"}
@@ -237,8 +255,12 @@ class InvalidInputTests(VaylideTestCase):
         self.inv.owner = customer
         self.inv.save()
         self.c.force_login(customer)
+        # Een leeg ontwerp mag besteld worden (niets is verplicht); een datum in het verleden niet.
+        self.inv.refresh_from_db()
+        content = dict(self.inv.draft_content, date="2020-01-01", start_time="12:00", venue_name="Oud")
+        save_draft(self.inv, expected_rev=None, content=content, user=customer)
         response = self.c.post(f"/maken/{self.inv.uid}/bestellen/", {"actie": "betalen", "package": "essentieel", "terms": "on", "direct_leveren": "on", "online_dienst": "on"})
-        self.assertContains(response, "nog niet compleet")
+        self.assertContains(response, "niet klaar om te bestellen")
         self.assertFalse(Order.objects.exists())
         complete = self.make_invitation(owner=customer)
         response = self.c.post(f"/maken/{complete.uid}/bestellen/", {"actie": "betalen", "package": "gratis-alles", "terms": "on", "direct_leveren": "on", "online_dienst": "on"})
@@ -252,3 +274,4 @@ class InvalidInputTests(VaylideTestCase):
         label = page.split('class="check terms-check"', 1)[1].split("</label>", 1)[0]
         self.assertIn("Versie 29 september 2026", label)
         self.assertNotIn("concept", label.lower())
+

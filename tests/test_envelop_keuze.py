@@ -93,13 +93,15 @@ class StudioEnvelopTests(VaylideTestCase):
         inv.refresh_from_db()
         return ec.keuze_van(inv.draft_content)
 
-    def test_start_gaat_na_een_optioneel_ontwerp_naar_envelop_en_zegel(self):
-        for slug, stap in ((self.OPTIONEEL, "envelop"), ("ballonfeest", "gegevens"), (self.INGEBOUWD, "gegevens")):
+    def test_start_gaat_na_elk_ontwerp_direct_naar_de_gegevens_en_de_envelop_is_een_onderdeel(self):
+        for slug in (self.OPTIONEEL, "ballonfeest", self.INGEBOUWD):
             template = Template.objects.get(slug=slug)
             occasion = "bruiloft" if template.supports("bruiloft") else template.occasions[0]
             reactie = self.client.post("/maken/", {"occasion": occasion, "template": slug})
             self.assertEqual(reactie.status_code, 302, slug)
-            self.assertTrue(reactie.url.endswith(f"/{stap}/"), (slug, reactie.url))
+            self.assertTrue(reactie.url.endswith("/gegevens/"), (slug, reactie.url))
+            pagina = self.client.get(reactie.url).content.decode()
+            self.assertEqual("/envelop/" in pagina, slug == self.OPTIONEEL, slug)     # Envelop & zegel staat alleen in de balk bij een optioneel ontwerp
 
     def test_stap_toont_echte_voorbeelden_en_alleen_passende_zegels(self):
         inv = self.draft()
@@ -126,7 +128,7 @@ class StudioEnvelopTests(VaylideTestCase):
         inv = self.draft(self.INGEBOUWD)
         reactie = self.client.get(f"/maken/{inv.uid}/envelop/")
         self.assertEqual(reactie.status_code, 302)
-        self.assertTrue(reactie.url.endswith("/gegevens/"))
+        self.assertTrue(reactie.url.endswith("/stijl/"))      # de eerstvolgende stap na het (overgeslagen) onderdeel
 
     def test_kiezen_wisselen_en_niets_kwijt(self):
         inv = self.draft()

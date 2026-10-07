@@ -1,9 +1,9 @@
 {% extends "studio/base_studio.html" %}{% load vl %}
-{% block title %}Stijl en onderdelen{% endblock %}
+{% block title %}Stijl{% endblock %}
 {% block studio %}
-<div class="studio-intro">
-  <h1>Stijl en onderdelen</h1>
-  <p class="lead">Kleur en onderdelen van <strong>{{ inv.template_version.template.name }}</strong>. <a href="{% url 'studio:step' inv.uid 'ontwerp' %}">Ander ontwerp</a></p>
+<div class="studio-intro studio-intro--kort">
+  <h1>Stijl</h1>
+  <p class="lead">Kies de kleur en welke extra's er op je kaart staan.</p>
 </div>
 {% include "studio/_conflict.html" %}
 <form method="post" class="form studio-form" data-once data-dirty-check novalidate>
@@ -23,7 +23,7 @@
   {% if form.hair_enabled %}
   <fieldset class="studio-block">
     <legend class="studio-block__title">Het bruidspaar</legend>
-    <p class="hint">Kies de haarkleur van het voorbeeldpaar op de kaart. Houding en kleding blijven hetzelfde.</p>
+    <p class="hint">De haarkleur van het paar op de kaart.</p>
     <div class="form-row">
       <div class="field"><span class="label">{{ form.haar_man.label }}</span><div class="chips">{% for r in form.haar_man %}<label class="chip">{{ r.tag }} {{ r.choice_label }}</label>{% endfor %}</div></div>
       <div class="field"><span class="label">{{ form.haar_vrouw.label }}</span><div class="chips">{% for r in form.haar_vrouw %}<label class="chip">{{ r.tag }} {{ r.choice_label }}</label>{% endfor %}</div></div>
@@ -33,7 +33,7 @@
   {% if faces_link %}
   <section class="studio-block" aria-labelledby="blok-gezichten">
     <h2 class="studio-block__title" id="blok-gezichten">Onze eigen gezichten (optioneel)</h2>
-    <p class="hint">Laat het bruidspaar op jullie lijken: upload een foto van allebei en keur het voorbeeld goed vóór je betaalt.</p>
+    <p class="hint">Laat het paar op jullie lijken: upload een foto van allebei.</p>
     <a class="btn btn--secondary btn--sm" href="{% url 'gezichten:page' inv.uid %}">Eigen gezichten{% if faces_status %} · {{ faces_status }}{% endif %}</a>
   </section>
   {% endif %}
@@ -42,10 +42,10 @@
     {% comment %}Alleen controls die bij dit ontwerp echt iets veranderen (catalog/envelop.py: zegelkeuzes). Bij een ontwerp dat zelf de Envelope Collection gebruikt zijn envelop en zegel vast.{% endcomment %}
     {% if form.keuzes.vast %}
     <legend class="studio-block__title">Zegel</legend>
-    <p class="hint">De envelop en het zegel horen bij dit ontwerp. Alleen de initialen kies je zelf. Je ziet het meteen op je kaart.</p>
+    <p class="hint">Envelop en zegel horen bij dit ontwerp. Alleen de initialen kies je zelf.</p>
     {% else %}
     <legend class="studio-block__title">Envelop en lakzegel</legend>
-    <p class="hint">Maak de opening helemaal van jullie: kies de kleuren en zet jullie initialen of een eigen logo op het zegel. Je ziet het meteen op je kaart.</p>
+    <p class="hint">Kies de kleuren en zet initialen of een eigen logo op het zegel.</p>
     {% endif %}
     {% if form.keuzes.env_kleur %}
     <div class="field"><span class="label">{{ form.env_kleur.label }}</span>
@@ -76,16 +76,12 @@
   {% if form.opening_hier %}
   <section class="studio-block" aria-labelledby="blok-opening">
     <h2 class="studio-block__title" id="blok-opening">Opening</h2>
-    <p class="hint">Dit ontwerp heeft een eigen opening{% if eigen_opening.label %} ({{ eigen_opening.label }}){% endif %}.</p>
+    {% if eigen_opening.label %}<p class="hint">Eigen opening: {{ eigen_opening.label }}.</p>{% endif %}
     {% include "studio/_check.html" with field=form.opening %}
-    <p class="hint">Met 'minder beweging' krijgen gasten vanzelf een rustige variant.</p>
   </section>
-  {% else %}
-  <p class="hint">De opening (een envelop uit de collectie, de opening van het ontwerp, of geen) kies je bij <a href="{% url 'studio:step' inv.uid 'envelop' %}">Envelop &amp; zegel</a>.</p>
   {% endif %}
   <fieldset class="studio-block">
-    <legend class="studio-block__title">Onderdelen tonen</legend>
-    <p class="hint">Lege onderdelen worden altijd verborgen.</p>
+    <legend class="studio-block__title">Extra's op je kaart</legend>
     <div class="section-toggles">
       {% for key, field in form.section_fields %}
       <label class="check section-toggle">{{ field }}<span>{{ field.label }}{% if key == "story" or key == "gallery" or key == "music" %} <span class="badge">{% if key in features %}inbegrepen{% else %}{{ feature_badges|get_item:key }}{% endif %}</span>{% endif %}</span></label>

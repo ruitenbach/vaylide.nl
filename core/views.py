@@ -153,7 +153,7 @@ def design_detail(request, slug):
             "wenskaart_special": is_special(template),
             "occasion_choices": [(k, OCCASION_LABELS[k]) for k in template.occasions if k in OCCASION_LABELS],
             "demo_url": f"{reverse('invitations:demo', args=[slug])}?gelegenheid={occasion}&kleur={kleur}{extra}",
-            "start_url": f"{reverse('studio:start')}?ontwerp={slug}&gelegenheid={occasion}&kleur={kleur}{extra}",
+            "start_url": f"{reverse('studio:start')}?ontwerp={slug}&gelegenheid={occasion}&kleur={kleur}{extra}&direct=1",
             "others": _design_cards([t for t in by_occasion(_designs(), occasion) if t.pk != template.pk and t.supports(occasion)][:3], occasion),
             "occasion_label": OCCASION_LABELS.get(occasion, ""),
             "effects_text": effect_summary(version.manifest.get("effects")),

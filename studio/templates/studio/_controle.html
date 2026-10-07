@@ -5,8 +5,8 @@
   <div class="controle__head">
     <span class="controle__icon" aria-hidden="true"></span>
     <div>
-      <h2 class="controle__title" id="controle-titel">{% if not issues %}Alles is compleet{% elif alleen_nodig %}Nog {{ open_count }} punt{{ open_count|pluralize:"en" }} voordat je kunt bestellen{% else %}Controle van je {% if wenskaart_vast %}wenskaart{% else %}uitnodiging{% endif %}{% endif %}</h2>
-      <p class="controle__sub">{% if not issues %}Je {% if wenskaart_vast %}wenskaart{% else %}uitnodiging{% endif %} is klaar. Lees de teksten nog één keer rustig door.{% elif alleen_nodig %}{% if open_count == 1 %}Vul dit punt aan{% else %}Vul deze punten aan{% endif %}; je ontwerp blijft bewaard.{% else %}<strong>Nodig</strong> houdt bestellen tegen, een <strong>tip</strong> is een suggestie.{% endif %}</p>
+      <h2 class="controle__title" id="controle-titel">{% if not issues %}Alles klopt{% elif alleen_nodig %}Nog {{ open_count }} punt{{ open_count|pluralize:"en" }} voordat je kunt bestellen{% else %}Tips voor je kaart{% endif %}</h2>
+      <p class="controle__sub">{% if not issues %}Lees de teksten nog één keer door.{% elif alleen_nodig %}Pas {% if open_count == 1 %}dit punt{% else %}deze punten{% endif %} aan; je ontwerp blijft bewaard.{% else %}<strong>Nodig</strong> houdt bestellen tegen, een <strong>tip</strong> is een suggestie.{% endif %}</p>
     </div>
   </div>
   {% if issues %}

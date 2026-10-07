@@ -89,13 +89,10 @@ class OudeKerstkaartTests(VaylideTestCase):
         self.assertNotIn("aria-labelledby=\"blok-wanneer\" data-alleen-uitnodiging hidden", gegevens)
         self.assertEqual(c.get(f"/maken/{inv.uid}/aanmelden/").status_code, 200)                  # Aanmelden valt niet weg
         self.assertEqual(c.get(f"/maken/{inv.uid}/envelop/").status_code in (200, 302), True)
-        # Datum, begintijd en locatie zijn weer verplicht: leeg laten maakt er geen wenskaart van.
+        # Datum, begintijd en locatie zijn niet verplicht, maar leeg laten maakt er ook geen wenskaart van.
         response = c.post(f"/maken/{inv.uid}/gegevens/", {
             "rev": inv.draft_rev, "actie": "volgende", "name_family": "Familie Jansen", "timezone": "Europe/Amsterdam"})
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Vul de datum in.")
-        self.assertContains(response, "Vul de begintijd in.")
-        self.assertContains(response, "Vul de naam van de locatie in.")
+        self.assertEqual(response.status_code, 302)
         inv.refresh_from_db()
         self.assertNotEqual(inv.draft_content.get("soort"), "wenskaart")
 
@@ -109,11 +106,12 @@ class OudeKerstkaartTests(VaylideTestCase):
         inv.refresh_from_db()
         self.assertNotEqual(inv.draft_content.get("soort"), "wenskaart")
 
-    def test_publicatie_vraagt_datum_en_locatie(self):
+    def test_publicatie_geeft_tips_voor_datum_en_locatie(self):
         owner = self.make_customer()
         inv = kerst_zonder_datum(owner)
-        velden = {i.field for i in publish_issues(inv.draft_content, "kerst", first_publication=True) if i.blocking}
-        self.assertTrue({"date", "start_time", "venue_name"} <= velden)
+        issues = publish_issues(inv.draft_content, "kerst", first_publication=True)
+        self.assertTrue({"date", "start_time", "venue_name"} <= {i.field for i in issues})
+        self.assertFalse(any(i.blocking for i in issues))
 
     def test_voorbeeld_en_openbaar_tonen_aanmelden(self):
         owner = self.make_customer()

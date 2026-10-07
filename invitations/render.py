@@ -60,6 +60,17 @@ PROGRAM_ICONS = [
 PROGRAM_ICON_FALLBACK = ["ster", "bel", "kaars", "kerstbal"]
 
 
+# De regel onder de namen als de klant geen naam invulde (alles is optioneel): zonder onderwerp, zodat het nooit als 'Bruiloft nodigen je uit' leest.
+NAAMLOZE_REGEL = {
+    "bruiloft": "Je bent van harte uitgenodigd",
+    "verloving": "Je bent van harte uitgenodigd",
+    "verjaardag": "Je bent uitgenodigd voor een feestje",
+    "jubileum": "Je bent uitgenodigd om het jubileum te vieren",
+    "babyshower": "Je bent uitgenodigd voor een babyshower",
+    "kerst": "Fijne feestdagen en een gelukkig {jaar}",
+}
+
+
 def program_icon(title: str, index: int) -> str:
     lowered = f" {title.lower()} "
     for icon, words in PROGRAM_ICONS:
@@ -299,7 +310,10 @@ def build_view(
         organization = names_raw.get("organization", "").strip()
         kicker = organization or "Uitnodiging"
         tagline = f"{organization} nodigt u graag uit" if organization else "Graag nodigen wij u uit"
+    heeft_namen = any(names)
     names = [n for n in names if n] or [title]
+    if not heeft_namen and occasion in NAAMLOZE_REGEL:    # geen naam ingevuld: de zin krijgt geen onderwerp ('Bruiloft nodigen je uit' bestaat niet)
+        tagline = NAAMLOZE_REGEL[occasion].format(jaar=new_year(parse_date(content.get("date")), now))
     # Wenskaart bij een andere gelegenheid dan Kerst: een felicitatie in plaats van een uitnodiging (Kerst heeft eigen teksten in de ontwerpen).
     wenskaart = card_kind(content, occasion) == "wenskaart"
     if wenskaart and occasion in wenskaart_tekst.KOP:

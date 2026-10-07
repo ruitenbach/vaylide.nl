@@ -19,12 +19,11 @@ class PackageFlowTests(VaylideTestCase):
         inv.save(update_fields=["package_code"])
         return inv
 
-    def test_package_is_chosen_at_the_start(self):
+    def test_package_is_chosen_at_checkout_not_at_the_start(self):
         page = self.client.get("/maken/?gelegenheid=bruiloft")
-        self.assertContains(page, 'name="pakket" value="essentieel"')
-        self.assertContains(page, 'name="pakket" value="compleet"')
+        self.assertNotContains(page, 'name="pakket"')       # de startpagina vraagt geen pakket meer
         self.client.post("/maken/", {"occasion": "bruiloft", "template": "liefde-op-papier", "pakket": "compleet"})
-        self.assertEqual(Invitation.objects.latest("created_at").package_code, "compleet")
+        self.assertEqual(Invitation.objects.latest("created_at").package_code, "compleet")   # een meegegeven keuze blijft wel gelden
 
     def test_unknown_package_at_the_start_is_ignored(self):
         self.client.post("/maken/", {"occasion": "bruiloft", "template": "liefde-op-papier", "pakket": "gratis"})
@@ -60,8 +59,7 @@ class PackageFlowTests(VaylideTestCase):
 
     def test_checklist_on_checkout(self):
         inv = self.invitation("essentieel")
-        content = dict(inv.draft_content)
-        content["rsvp"] = dict(content["rsvp"], enabled=True, deadline="")
+        content = dict(inv.draft_content, date="2020-01-01", start_time="12:00", venue_name="Oud")    # een datum in het verleden houdt het bestellen tegen
         from invitations.services import save_draft
 
         save_draft(inv, expected_rev=None, content=content, user=self.customer)
@@ -69,14 +67,13 @@ class PackageFlowTests(VaylideTestCase):
         self.assertContains(page, "voordat je kunt bestellen")
         self.assertContains(page, "controle__item--nodig")
         complete = self.invitation("essentieel")
-        self.assertContains(self.client.get(f"/maken/{complete.uid}/bestellen/"), "Alles is compleet")
-
+        self.assertContains(self.client.get(f"/maken/{complete.uid}/bestellen/"), "Alles klopt")
 
 class GuestAndLoginTests(VaylideTestCase):
     def test_start_as_guest_or_log_in(self):
         page = Client().get("/maken/?gelegenheid=bruiloft")
-        self.assertContains(page, "Doorgaan als gast")
-        self.assertContains(page, "Log eerst in")
+        self.assertContains(page, "Je hebt pas een account nodig bij het bestellen")
+        self.assertContains(page, "Log in")
 
     def test_header_shows_login_text(self):
         self.assertContains(Client().get("/"), 'class="site-header__account" href="/inloggen/" aria-label="Inloggen"')

@@ -29,24 +29,25 @@ class PartnerTweeTests(VaylideTestCase):
     def draft(self, soort="", occasion="bruiloft", template="liefde-op-papier"):
         return create_draft(occasion=occasion, template=Template.objects.get(slug=template), owner=self.owner, soort=soort)
 
-    def test_beide_naamvelden_hebben_dezelfde_structuur_en_verplichtingen_bij_een_uitnodiging(self):
+    def test_beide_naamvelden_hebben_dezelfde_structuur_en_zijn_optioneel(self):
         inv = self.draft()
         html = self.c.get(f"/maken/{inv.uid}/gegevens/").content.decode()
         for naam in ("name_partner_1", "name_partner_2"):
             blok = html.split(f'name="{naam}"')[1][:300]
-            self.assertIn('data-required="1"', blok, naam)
+            self.assertNotIn('data-required="1"', blok, naam)
         for nummer in ("1", "2"):
             self.assertIn(f'for="id_name_partner_{nummer}"', html)
-        self.assertEqual(html.count("data-alleen-uitnodiging-verplicht"), 1)   # alleen het tweede veld wisselt van verplichting
+        self.assertNotIn('class="req"', html)           # nergens een verplicht-sterretje
 
-    def test_uitnodiging_vraagt_beide_namen(self):
+    def test_uitnodiging_zonder_namen_kan_door_en_bewaart_niets_vervelends(self):
         inv = self.draft()
         response = post(self.c, inv, name_partner_1="Anna", date=future_date(60), start_time="14:00", venue_name="Kasteel")
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Vul &#x27;naam partner 2&#x27; in.")
+        self.assertEqual(response.status_code, 302)     # partner 2 mag leeg blijven
         inv.refresh_from_db()
-        response = post(self.c, inv, name_partner_2="Bram", date=future_date(60), start_time="14:00", venue_name="Kasteel")
-        self.assertContains(response, "Vul &#x27;naam partner 1&#x27; in.")
+        self.assertEqual(inv.draft_content["names"], {"partner_1": "Anna", "partner_2": ""})
+        inv.refresh_from_db()
+        response = post(self.c, inv)                    # en helemaal leeg doorgaan kan ook
+        self.assertEqual(response.status_code, 302)
 
     def test_wenskaart_heeft_aan_een_naam_genoeg(self):
         inv = self.draft("wenskaart")
@@ -60,17 +61,18 @@ class PartnerTweeTests(VaylideTestCase):
         self.assertEqual(inv.draft_content["names"]["partner_2"], "")
         self.assertEqual([i for i in publish_issues(inv.draft_content, "bruiloft", first_publication=True) if i.blocking], [])
 
-    def test_de_eerste_naam_blijft_ook_bij_een_wenskaart_verplicht(self):
+    def test_ook_bij_een_wenskaart_is_geen_naam_verplicht(self):
         inv = self.draft("wenskaart")
         response = post(self.c, inv, soort="wenskaart", name_partner_2="Bram")
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Vul &#x27;naam partner 1&#x27; in.")
-        self.assertNotContains(response, "naam partner 2&#x27; in.")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual([i.field for i in publish_issues(inv.draft_content, "bruiloft", first_publication=True) if i.blocking], [])
 
-    def test_wisselen_van_wenskaart_naar_uitnodiging_vraagt_de_tweede_naam_weer(self):
+    def test_wisselen_van_wenskaart_naar_uitnodiging_vraagt_niets_meer(self):
         inv = self.draft("wenskaart")
         response = post(self.c, inv, soort="uitnodiging", name_partner_1="Anna", date=future_date(60), start_time="14:00", venue_name="Kasteel")
-        self.assertContains(response, "Vul &#x27;naam partner 2&#x27; in.")
+        self.assertEqual(response.status_code, 302)
+        inv.refresh_from_db()
+        self.assertEqual(inv.draft_content["soort"], "uitnodiging")
 
     def test_partner_twee_wordt_opgeslagen_bewaard_en_komt_in_de_live_preview(self):
         inv = self.draft()
@@ -91,13 +93,12 @@ class PartnerTweeTests(VaylideTestCase):
         self.assertNotIn("Anna &amp; ", frame)
         self.assertNotIn("Anna & ", frame)
 
-    def test_andere_gelegenheden_houden_hun_verplichte_velden(self):
+    def test_andere_gelegenheden_hebben_ook_geen_verplichte_velden(self):
         for occasion, template, veld in (("verjaardag", "avondgoud", "name_person_name"), ("kerst", "winterlicht", "name_family")):
             inv = self.draft("wenskaart", occasion, template)
-            self.assertEqual(post(self.c, inv, soort="wenskaart").status_code, 200, occasion)       # de enige naam blijft nodig
+            self.assertEqual(post(self.c, inv, soort="wenskaart").status_code, 302, occasion)
             inv.refresh_from_db()
             self.assertEqual(post(self.c, inv, soort="wenskaart", **{veld: "Naam"}).status_code, 302, occasion)
-
 
 class LayoutEnLiveKaartTests(VaylideTestCase):
     def test_velden_naast_elkaar_staan_op_dezelfde_rijen(self):

@@ -1,38 +1,39 @@
 {% extends "studio/base_studio.html" %}
 {% block title %}Aanmelden{% endblock %}
 {% block studio %}
-<div class="studio-intro">
-  <h1>Aanmelden door gasten</h1>
-  <p class="lead">Gasten hebben geen account nodig. Standaard vragen we naam, aanwezigheid en aantal personen.</p>
-  {% if content.soort == "wenskaart" %}<p class="notice">Je maakt een wenskaart: aanmelden wordt niet getoond. Wil je toch mensen uitnodigen{% if cfg.event_optional %}, bijvoorbeeld voor het kerstdiner{% endif %}? Kies dan 'Uitnodiging' bij <a href="{% url 'studio:step' inv.uid 'gegevens' %}">Gegevens</a>. Anders ga je gewoon verder.</p>
-  {% endif %}
+<div class="studio-intro studio-intro--kort">
+  <h1>Aanmelden</h1>
+  <p class="lead">Gasten geven hun naam, of ze komen en met hoeveel personen. Geen account nodig.</p>
+  {% if content.soort == "wenskaart" %}<p class="notice">Bij een wenskaart is aanmelden uitgeschakeld. Wil je toch mensen uitnodigen? Kies dan 'Uitnodiging' bij <a href="{% url 'studio:step' inv.uid 'gegevens' %}" data-ga="gegevens">Gegevens</a>.</p>{% endif %}
 </div>
 {% include "studio/_conflict.html" %}
 <form method="post" class="form studio-form" data-once data-dirty-check novalidate>
   {% csrf_token %}
-  <section class="studio-block" aria-labelledby="blok-rsvp">
-    <h2 class="studio-block__title" id="blok-rsvp">Instellingen</h2>
+  <section class="studio-block studio-block--rustig" aria-labelledby="blok-rsvp">
+    <h2 class="studio-block__title" id="blok-rsvp">Gasten laten aanmelden</h2>
     {% include "studio/_check.html" with field=form.enabled %}
     <div class="form-row">
-      {% include "studio/_field.html" with field=form.deadline req=True %}
       {% include "studio/_field.html" with field=form.max_party_size %}
-      {% include "studio/_field.html" with field=form.capacity %}
+      {% if not form.zonder_deadline %}{% include "studio/_field.html" with field=form.deadline %}{% endif %}
     </div>
     {% include "studio/_check.html" with field=form.ask_remark %}
     {% if form.oude_toelichting %}
-    <div class="notice notice--warning oude-vraag"><strong>Eigen vraag bij de toelichting</strong><p>"{{ form.oude_toelichting }}". Eigen vraagteksten kunnen niet meer. Deze blijft staan tot je de standaardvraag kiest.</p>
+    <div class="notice notice--warning oude-vraag"><strong>Eigen vraag bij de toelichting</strong><p>"{{ form.oude_toelichting }}". Eigen vraagteksten kunnen niet meer; deze blijft staan tot je de standaardvraag kiest.</p>
       {% include "studio/_check.html" with field=form.remark_standaard %}</div>
     {% endif %}
+    <details class="studio-more"{% if form.capacity.value %} open{% endif %}><summary>Maximaal aantal gasten in totaal</summary>
+      {% include "studio/_field.html" with field=form.capacity %}
+    </details>
   </section>
-  <section class="studio-block" aria-labelledby="blok-vragen">
-    <h2 class="studio-block__title" id="blok-vragen">Extra vragen (optioneel) <span class="badge">{{ feature_badges.extra_questions }}</span></h2>
-    <p class="hint">Kies uit deze vaste vragen; eigen vragen zijn niet mogelijk. Zo vraag je geen gevoelige gegevens, zoals over gezondheid, allergieën of geloof. Vraag niet meer dan nodig: maximaal {{ form.max_vragen }}. Onderdeel van Compleet of als extra optie.</p>
+  <details class="studio-deel" aria-labelledby="blok-vragen"{% if form.vragen_open %} open{% endif %}>
+    <summary class="studio-deel__kop" id="blok-vragen">Extra vragen aan gasten <span class="badge">{{ feature_badges.extra_questions }}</span></summary>
+    <p class="hint">Kies uit vaste vragen, maximaal {{ form.max_vragen }}. Eigen vragen kunnen niet: zo vraag je nooit gevoelige gegevens.</p>
     {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors.0 }}</div>{% endif %}
     <div class="vaste-vragen">
       {% for kies, verplicht, v in form.question_fields %}
       <div class="vaste-vraag">
         {% include "studio/_check.html" with field=kies %}
-        <p class="hint vaste-vraag__antwoord">{% if v.type == "yesno" %}Antwoord: ja of nee{% elif v.type == "choice" %}Antwoord: {{ v.options|join:", " }}{% else %}Open antwoord (gasten zien erbij dat ze geen gevoelige gegevens moeten invullen){% endif %}</p>
+        <p class="hint vaste-vraag__antwoord">{% if v.type == "yesno" %}Antwoord: ja of nee{% elif v.type == "choice" %}Antwoord: {{ v.options|join:", " }}{% else %}Open antwoord{% endif %}</p>
         {% include "studio/_check.html" with field=verplicht %}
       </div>
       {% endfor %}
@@ -40,11 +41,11 @@
     {% if form.old_question_fields %}
     <div class="notice notice--warning oude-vraag">
       <strong>Eigen vragen van eerder</strong>
-      <p>Deze vragen maakte je voordat alleen vaste vragen mogelijk waren. Ze blijven staan, maar je kunt ze niet meer wijzigen. Haal ze liever weg als ze naar gevoelige gegevens vragen.</p>
+      <p>Deze blijven staan, maar je kunt ze niet meer wijzigen. Haal ze weg als ze naar gevoelige gegevens vragen.</p>
       {% for q, weg in form.old_question_fields %}<div class="oude-vraag__rij"><p>"{{ q.label }}"</p>{% include "studio/_check.html" with field=weg %}</div>{% endfor %}
     </div>
     {% endif %}
-  </section>
+  </details>
   {% include "studio/_actions.html" %}
 </form>
 {% endblock %}

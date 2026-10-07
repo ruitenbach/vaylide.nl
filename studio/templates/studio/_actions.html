@@ -1,7 +1,8 @@
-<div class="step-actions">
+<div class="step-actions step-actions--bar">
   <input type="hidden" name="rev" value="{{ rev }}">
-  <button type="submit" name="actie" value="vorige" class="btn btn--ghost" formnovalidate>&larr; Vorige</button>
-  <button type="submit" name="actie" value="opslaan" class="btn btn--secondary" formnovalidate>{% if anonymous %}Opslaan en later verder{% else %}Opslaan{% endif %}</button>
-  {% if snel_afronden %}<button type="submit" name="actie" value="snel" class="btn btn--goud step-actions__snel">Snel afronden</button>{% endif %}
-  <button type="submit" name="actie" value="volgende" class="btn btn--primary step-actions__next" data-default-action>Volgende &rarr;</button>
+  <input type="hidden" name="naar" value="" data-ga-naar>
+  <button type="submit" name="actie" value="opslaan" class="btn btn--ghost step-actions__opslaan" formnovalidate>Opslaan</button>
+  {% if snel_afronden %}<button type="submit" name="actie" value="snel" class="btn btn--goud step-actions__snel">Snel afronden</button>
+  {% elif controle_knop %}<button type="submit" name="actie" value="controle" class="btn btn--secondary step-actions__controle" formnovalidate>Bekijk mijn kaart</button>{% endif %}
+  <button type="submit" name="actie" value="volgende" class="btn btn--primary step-actions__next" data-default-action>{{ volgende_tekst }} &rarr;</button>
 </div>

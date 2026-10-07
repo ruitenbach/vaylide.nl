@@ -269,17 +269,17 @@ def publish_issues(content: dict, occasion: str, *, first_publication: bool, now
             if wens and gezien > 1:
                 continue
             if not str(names.get(key) or "").strip():
-                issues.append(Issue("gegevens", key, f"Vul '{label}' in."))
+                issues.append(Issue("gegevens", key, f"'{label}' is nog leeg: dit staat dan niet op je kaart.", blocking=False))
     # Een kerstkaart zonder datum en locatie is een groet: dan hoort er geen evenement bij.
     with_event = event_expected(content, occasion)
     if with_event:
         day = parse_date(content.get("date"))
         if not day:
-            issues.append(Issue("gegevens", "date", "Vul de datum van het evenement in."))
+            issues.append(Issue("gegevens", "date", "De datum is nog leeg: gasten zien geen datum.", blocking=False))
         if not parse_time(content.get("start_time")):
-            issues.append(Issue("gegevens", "start_time", "Vul de begintijd in."))
+            issues.append(Issue("gegevens", "start_time", "De begintijd is nog leeg: gasten zien geen tijd.", blocking=False))
         if not str(content.get("venue_name") or "").strip():
-            issues.append(Issue("gegevens", "venue_name", "Vul de naam van de locatie in."))
+            issues.append(Issue("gegevens", "venue_name", "De locatie is nog leeg: gasten zien geen locatie.", blocking=False))
         if not str(content.get("address") or "").strip():
             issues.append(Issue("gegevens", "address", "Vul het adres van de locatie in, zodat de routeknop werkt.", blocking=False))
     times = event_times(content if with_event else without_event(content))
@@ -288,8 +288,8 @@ def publish_issues(content: dict, occasion: str, *, first_publication: bool, now
     sections = content.get("sections") or {}
     if sections.get("rsvp") and with_event:
         rsvp = content.get("rsvp") or {}
-        if not parse_date(rsvp.get("deadline")):
-            issues.append(Issue("aanmelden", "deadline", "Kies een aanmelddeadline (of zet aanmelden uit)."))
+        if occasion == "bruiloft" or not parse_date(rsvp.get("deadline")):
+            pass    # een deadline is optioneel (bij een bruiloft bestaat hij niet)
         elif times.start and times.rsvp_deadline and times.rsvp_deadline.date() > times.start.date():
             issues.append(Issue("aanmelden", "deadline", "De aanmelddeadline ligt na de datum van het evenement."))
         elif first_publication and times.rsvp_deadline and times.rsvp_deadline < now:

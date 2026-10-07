@@ -210,10 +210,12 @@ class AtelierSiteTests(VaylideTestCase):
         client.force_login(owner)
         inv = self.make_invitation(owner=owner)
         html = client.get(f"/maken/{inv.uid}/ontwerp/").content.decode()
-        self.assertIn("data-occasion-radio", html)
-        self.assertIn('data-occasions="bruiloft verloving jubileum"', html)  # Eucalyptus
-        # Ontwerpen voor de gekozen gelegenheid staan vooraan.
-        self.assertLess(html.index('value="eucalyptus"'), html.index('value="confetti"'))
+        self.assertIn('class="chip-link is-current"', html)                    # de gelegenheid, met de andere gelegenheden als keuze
+        self.assertIn('value="eucalyptus"', html)                             # een bruiloftsontwerp
+        self.assertNotIn('value="confetti"', html)                            # een verjaardagsontwerp hoort niet bij deze gelegenheid
+        verjaardag = client.get(f"/maken/{inv.uid}/ontwerp/?gelegenheid=verjaardag").content.decode()
+        self.assertIn('value="confetti"', verjaardag)
+        self.assertNotIn('value="eucalyptus"', verjaardag)
 
     def test_search_finds_new_designs(self):
         self.assertContains(Client().get("/zoeken/", {"q": "neon"}), "/ontwerpen/neon/")

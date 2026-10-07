@@ -158,18 +158,17 @@ class StudioWenskaartTests(VaylideTestCase):
         self.c.force_login(self.owner)
 
     def test_start_toont_de_keuze_met_prijzen_incl_btw(self):
-        html = self.c.get("/maken/").content.decode()
-        self.assertIn("Wat wil je maken?", html)
+        html = self.c.get("/maken/", {"gelegenheid": "bruiloft"}).content.decode()
         self.assertIn("Uitnodiging", html)
-        self.assertIn("€ 14,95", html)
-        self.assertIn("€ 24,95", html)
-        self.assertIn("incl. btw", html)
-        self.assertIn("pakket", html.lower())   # bij een uitnodiging blijft de pakketkeuze zoals die was
+        self.assertIn("Wenskaart &middot; € 14,95", html.replace("·", "&middot;"))
+        self.assertNotIn('name="pakket"', html)     # het pakket kies je pas bij het bestellen
         wens = self.c.get("/maken/", {"soort": "wenskaart", "gelegenheid": "bruiloft"}).content.decode()
         self.assertIn('name="soort" value="wenskaart"', wens)
         self.assertNotIn('name="pakket"', wens)     # een wenskaart heeft geen pakket
         self.assertIn("€ 14,95", wens)
-        self.assertRegex(wens, r"design-pick__prijs")
+        self.assertIn("€ 24,95", wens)
+        self.assertIn("incl. btw", wens)
+        self.assertRegex(wens, r"kaart-keuze__prijs")
 
     def test_start_met_wenskaart_maakt_een_wenskaart_zonder_pakket_en_slaat_envelop_en_aanmelden_over(self):
         response = self.c.post("/maken/", {"occasion": "bruiloft", "template": "liefde-op-papier", "soort": "wenskaart", "pakket": "compleet"})
@@ -178,14 +177,13 @@ class StudioWenskaartTests(VaylideTestCase):
         self.assertEqual(inv.package_code, "")
         self.assertRedirects(response, f"/maken/{inv.uid}/gegevens/", fetch_redirect_response=False)
         self.assertRedirects(self.c.get(f"/maken/{inv.uid}/aanmelden/"), f"/maken/{inv.uid}/fotos/", fetch_redirect_response=False)
-        self.assertRedirects(self.c.get(f"/maken/{inv.uid}/envelop/"), f"/maken/{inv.uid}/gegevens/", fetch_redirect_response=False)
+        self.assertRedirects(self.c.get(f"/maken/{inv.uid}/envelop/"), f"/maken/{inv.uid}/stijl/", fetch_redirect_response=False)
 
     def test_gegevens_van_een_wenskaart_tonen_alleen_het_nodige(self):
         inv = wens_draft(self, self.owner)
         page = self.c.get(f"/maken/{inv.uid}/gegevens/").content.decode()
         self.assertIn("Je persoonlijke boodschap", page)
         self.assertRegex(page, r'aria-labelledby="blok-wanneer" data-alleen-uitnodiging hidden')
-        self.assertRegex(page, r'aria-labelledby="blok-waar" data-alleen-uitnodiging hidden')
         self.assertIn("Snel afronden", page)
         fotos = self.c.get(f"/maken/{inv.uid}/fotos/").content.decode()
         self.assertNotIn("blok-verhaal", fotos)
@@ -195,7 +193,7 @@ class StudioWenskaartTests(VaylideTestCase):
         for naam in ("s_story", "s_gallery", "s_music", "s_program", "s_countdown"):
             self.assertNotIn(f'name="{naam}"', stijl, naam)
 
-    def test_snel_afronden_gaat_naar_het_voorbeeld_en_vraagt_alleen_de_naam(self):
+    def test_snel_afronden_gaat_naar_het_voorbeeld_en_vraagt_niets(self):
         inv = wens_draft(self, self.owner)
         data = {"rev": inv.draft_rev, "actie": "snel", "soort": "wenskaart", "name_partner_1": "Anna", "name_partner_2": "Bram",
                 "welcome_text": "Gefeliciteerd!", "timezone": "Europe/Amsterdam"}
@@ -203,12 +201,10 @@ class StudioWenskaartTests(VaylideTestCase):
         self.assertRedirects(response, f"/maken/{inv.uid}/voorbeeld/", fetch_redirect_response=False)
         inv.refresh_from_db()
         self.assertEqual(inv.draft_content["welcome_text"], "Gefeliciteerd!")
-        # Zonder naam blijft hij op de pagina en wijst de ontbrekende naam aan; datum en locatie zijn niet nodig.
+        # Ook zonder naam kan de kaart door naar het voorbeeld: niets is verplicht.
         data.update({"rev": inv.draft_rev, "name_partner_1": "", "name_partner_2": ""})
         response = self.c.post(f"/maken/{inv.uid}/gegevens/", data)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Vul &#x27;naam partner 1&#x27; in.")
-        self.assertNotContains(response, "Vul de datum in.")
+        self.assertRedirects(response, f"/maken/{inv.uid}/voorbeeld/", fetch_redirect_response=False)
 
     def test_snel_afronden_bestaat_niet_bij_een_uitnodiging(self):
         inv = self.make_invitation(owner=self.owner)
@@ -220,8 +216,7 @@ class StudioWenskaartTests(VaylideTestCase):
     def test_voorbeeld_en_bestellen_van_een_wenskaart(self):
         inv = wens_draft(self, self.owner)
         voorbeeld = self.c.get(f"/maken/{inv.uid}/voorbeeld/").content.decode()
-        self.assertIn("Doorgaan naar betalen", voorbeeld)
-        self.assertIn("€ 14,95 incl. btw", voorbeeld)
+        self.assertIn("Bestellen &middot; € 14,95 incl. btw", voorbeeld.replace("·", "&middot;"))
         bestellen = self.c.get(f"/maken/{inv.uid}/bestellen/").content.decode()
         self.assertIn("Jouw wenskaart", bestellen)
         self.assertIn("€ 14,95", bestellen)

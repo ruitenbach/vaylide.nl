@@ -41,7 +41,8 @@ from orders.pricing import PricingError, compare_packages, optional_addons, reco
 from orders.services import CheckoutError, invitation_is_paid, start_checkout
 
 from .forms import FORM_CLASSES, CheckoutForm, DesignForm
-from .steps import ENVELOP_SKIP, STEP_LABELS, STEPS, WENSKAART_LABELS, WENSKAART_SKIP, heeft_envelopstap, next_step, previous_step, progress
+from .steps import (ENVELOP_SKIP, PERSONALISEER, STEP_KEYS, STEP_LABELS, WENSKAART_LABELS, WENSKAART_SKIP, heeft_envelopstap, next_step,
+                    previous_step, progress, substeps)
 
 MAX_PHOTOS_PER_INVITATION = 30
 
@@ -91,14 +92,50 @@ def _eigen_opening(inv: Invitation) -> dict | None:
 
 
 def _na_ontwerp(inv: Invitation) -> str:
-    """De stap na het kiezen van een ontwerp: Envelop & zegel als dat ontwerp die keuze heeft (niet bij een wenskaart), anders Gegevens."""
-    return "envelop" if _envelop_stap(inv) and not _wenskaart(inv) else "gegevens"
+    """Na het kiezen van een ontwerp gaat de klant direct door naar het invullen van de gegevens. De envelop is een onderdeel van
+    Personaliseer, voor wie die zelf wil kiezen."""
+    return "gegevens"
+
+
+def _ga_doel(naar: str, inv: Invitation, content: dict, huidig: str) -> str:
+    """Waar de klant na het wisselen van onderdeel heen gaat: een stap die bij deze kaart hoort, anders niets."""
+    if naar not in STEP_KEYS or naar == "gelegenheid" or naar == huidig:
+        return ""
+    if naar in _skip(inv, content):
+        return ""
+    if naar == "bestellen" and invitation_is_paid(inv):
+        return ""
+    return naar
+
+
+def _ga_url(inv: Invitation, doel: str, huidig: str) -> str:
+    url = reverse("studio:step", args=[inv.uid, doel])
+    return f"{url}?terug={huidig}" if doel == "ontwerp" and huidig in PERSONALISEER else url
+
+
+def _terug(request, inv: Invitation, default: str) -> str:
+    """De stap waar 'Wijzigen' vandaan kwam (?terug=...) en waar de klant na het kiezen van een ander ontwerp naar terugkeert."""
+    wens = request.POST.get("terug") or request.GET.get("terug") or ""
+    return wens if wens in PERSONALISEER and wens not in _skip(inv) else default
+
+
+def _knoppen(step: str, paid: bool, skip, labels) -> dict:
+    """De vervolgknop van de fase: 'Volgende: <onderdeel>' en bij het laatste onderdeel 'Verder naar controle'. Daarnaast, tussendoor, 'Bekijk mijn kaart'."""
+    volgende = next_step(step, paid=paid, skip=skip)
+    namen = {**STEP_LABELS, **(labels or {})}
+    laatste = volgende not in PERSONALISEER
+    return {
+        "volgende_stap": volgende,
+        "volgende_tekst": "Verder naar controle" if laatste else f"Volgende: {namen.get(volgende, '')}",
+        "controle_knop": step in PERSONALISEER and not laatste,
+    }
 
 
 def _context(request, inv: Invitation, step: str, **extra) -> dict:
     paid = invitation_is_paid(inv)
     wens = _wenskaart(inv)
-    items = progress(step, paid=paid, skip=_skip(inv), labels=WENSKAART_LABELS if wens else None)
+    labels = WENSKAART_LABELS if wens else None
+    items = progress(step, paid=paid, skip=_skip(inv), labels=labels)
     current = next((i for i in items if i["state"] == "current"), items[0])
     ctx = {
         "inv": inv,
@@ -111,6 +148,9 @@ def _context(request, inv: Invitation, step: str, **extra) -> dict:
         "progress": items,
         "progress_current": current,
         "progress_pct": round(100 * current["number"] / len(items)),
+        "substeps": substeps(step, skip=_skip(inv), labels=labels),
+        **_knoppen(step, paid, _skip(inv), labels),
+        "gekozen_ontwerp": inv.template_version.template,
         "paid": paid,
         "occasion_label": OCCASION_LABELS.get(inv.occasion, ""),
         "is_staff_edit": request.user.is_authenticated and request.user.is_staff,
@@ -138,7 +178,7 @@ def start(request):
     if request.method == "POST":
         form = DesignForm(request.POST, templates=templates)
         if form.is_valid():
-            if not rate_limit(f"start:{ip_fingerprint(request)}", 40, 3600):
+            if not rate_limit(f"start:{ip_fingerprint(request)}", 100, 3600):
                 messages.error(request, "Je hebt veel ontwerpen gestart. Probeer het later opnieuw.")
                 return redirect("studio:start")
             owner = request.user if request.user.is_authenticated and not request.user.is_staff else None
@@ -159,9 +199,6 @@ def start(request):
     soort = request.GET.get("soort") or request.POST.get("soort") or ""
     soort = soort if soort in ("uitnodiging", "wenskaart") else ""
     wens_start = soort == "wenskaart"
-    packages = pakket.active_packages()
-    wanted = request.GET.get("pakket") or request.POST.get("pakket") or ""
-    chosen_pkg = next((p for p in packages if p.code == wanted), None) or pakket.default_package(packages)
     existing = []
     if request.user.is_authenticated and not request.user.is_staff:
         existing = list(Invitation.objects.filter(owner=request.user, status=Invitation.Status.DRAFT).order_by("-updated_at")[:3])
@@ -172,11 +209,14 @@ def start(request):
         "studio/start.html",
         {
             "form": form,
-            "occasions": [(key, label, occasion_config(key)["intro"]) for key, label in OCCASION_CHOICES],
+            "occasions": [(key, label) for key, label in OCCASION_CHOICES],
             "occasion": occasion,
             "occasion_label": OCCASION_LABELS.get(occasion, ""),
             "templates": shown,
             "chosen": chosen,
+            "chosen_template": next((t for t in shown if t.slug == chosen), None),
+            # Vanaf een ontwerppagina ("Kies dit ontwerp") start de kaart direct: de keuze staat vast en de klant komt meteen bij Personaliseren.
+            "direct": request.method == "GET" and request.GET.get("direct") == "1",
             "kleur": (request.GET.get("kleur") or request.POST.get("kleur") or "")[:40],
             "soort": soort,
             "wenskaart": wens_start,
@@ -184,12 +224,10 @@ def start(request):
             "wenskaart_prijs_special": format_euro(wenskaart.PRIJS_SPECIAL_CENTS),
             "special_slugs": [t.slug for t in shown if t.special],
             "existing": existing,
-            "packages": packages,
-            "chosen_package": chosen_pkg.code if chosen_pkg else "",
             "login_url": f"{reverse('accounts:login')}?next={request.get_full_path()}",
-            "progress": progress("gelegenheid" if not occasion else "ontwerp", skip=ENVELOP_SKIP),
-            "progress_current": {"number": 1 if not occasion else 2, "label": "Gelegenheid" if not occasion else "Ontwerp"},
-            "progress_pct": round(100 * (1 if not occasion else 2) / (len(STEPS) - 1)),
+            "progress": progress("ontwerp"),
+            "progress_current": {"number": 1, "label": "Kies kaart"},
+            "progress_pct": 25,
         },
     )
 
@@ -247,13 +285,21 @@ def step(request, uid, step):
             new_content = form.apply(copy.deepcopy(content))
             # 'Snel afronden' (alleen bij een wenskaart): bewaar wat er staat en ga direct naar het voorbeeld.
             snel = action == "snel" and card_kind(new_content, inv.occasion) == "wenskaart" and not invitation_is_paid(inv)
-            verder = action == "volgende" or snel
+            verder = action in ("volgende", "controle") or snel
+            # 'ga': de klant wisselt van onderdeel (balk, voortgang of Wijzigen): bewaar wat er staat en ga daarheen.
+            ga = action == "ga" and _ga_doel(request.POST.get("naar", ""), inv, new_content, step)
             missing = form.missing() if verder else {}
             paid = invitation_is_paid(inv)
-            target = ("voorbeeld" if snel else next_step(step, paid=paid, skip=_skip(inv, new_content))) if verder and not missing else step
+            if snel or action == "controle":
+                volgende = "voorbeeld"
+            elif ga:
+                volgende = ga
+            else:
+                volgende = next_step(step, paid=paid, skip=_skip(inv, new_content))
+            target = volgende if (verder or ga) and not missing else step
             try:
                 inv = save_draft(inv, expected_rev=posted_rev, content=new_content, user=request.user, source=_source(request),
-                                 step=target if verder and not missing else None)
+                                 step=target if (verder or ga) and not missing else None)
             except DraftConflict as exc:
                 conflict = _conflict_info(exc.invitation, new_content, step)
                 rev = exc.invitation.draft_rev
@@ -270,6 +316,8 @@ def step(request, uid, step):
                     return redirect("studio:step", uid=inv.uid, step=step)
                 elif action == "vorige":
                     return redirect("studio:step", uid=inv.uid, step=previous_step(step, skip=_skip(inv, new_content)))
+                elif ga:
+                    return redirect(_ga_url(inv, ga, step))
                 else:
                     return redirect("studio:step", uid=inv.uid, step=target)
         else:
@@ -393,8 +441,10 @@ def _conflict_info(latest: Invitation, mine: dict, step: str) -> dict:
 
 
 def design_step(request, inv: Invitation):
+    """Een ander ontwerp kiezen ('Wijzigen'): een tik op een kaart bewaart de keuze en brengt de klant terug waar hij was."""
     templates = _active_templates()
     paid = invitation_is_paid(inv)
+    terug = _terug(request, inv, _na_ontwerp(inv))
     if request.method == "POST":
         form = DesignForm(request.POST, templates=templates)
         try:
@@ -416,15 +466,17 @@ def design_step(request, inv: Invitation):
             except DraftConflict:
                 messages.error(request, "Deze uitnodiging is intussen gewijzigd. Bekijk de nieuwste versie en kies opnieuw.")
                 return redirect("studio:step", uid=inv.uid, step="ontwerp")
-            messages.success(request, "Ontwerp en gelegenheid zijn bijgewerkt.")
-            return redirect("studio:step", uid=inv.uid, step=_na_ontwerp(inv))
+            return redirect("studio:step", uid=inv.uid, step=_terug(request, inv, _na_ontwerp(inv)))
     else:
         form = DesignForm(initial={"occasion": inv.occasion, "template": inv.template_version.template.slug}, templates=templates)
+    occasion = request.GET.get("gelegenheid") or request.POST.get("occasion") or inv.occasion
+    if occasion not in OCCASION_LABELS:
+        occasion = inv.occasion
     return render(
         request,
         "studio/step_ontwerp.html",
-        _context(request, inv, "ontwerp", form=form, rev=inv.draft_rev, templates=by_occasion(templates, inv.occasion),
-                 occasions=OCCASION_CHOICES, paid=paid),
+        _context(request, inv, "ontwerp", form=form, rev=inv.draft_rev, templates=by_occasion([t for t in templates if t.supports(occasion)], occasion),
+                 occasions=OCCASION_CHOICES, occasion=occasion, occasion_label=OCCASION_LABELS.get(occasion, ""), paid=paid, terug=terug if terug in PERSONALISEER else ""),
     )
 
 
@@ -459,7 +511,8 @@ def preview_step(request, inv: Invitation):
         "studio/step_voorbeeld.html",
         _context(request, inv, "voorbeeld", issues=issues, blocking=blocking, rev=inv.draft_rev,
                  frame_url=reverse("studio:preview_frame", args=[inv.uid]), unpaid_features=unpaid_features,
-                 has_changes=inv.has_unpublished_changes, envelop_stap=_envelop_stap(inv)),
+                 has_changes=inv.has_unpublished_changes, envelop_stap=_envelop_stap(inv),
+                 aanpassen=substeps("gegevens", skip=_skip(inv, content), labels=WENSKAART_LABELS if _wenskaart(inv, content) else None)),
     )
 
 
@@ -760,7 +813,7 @@ def checkout_step(request, inv: Invitation):
         if not request.user.is_authenticated or inv.owner_id != request.user.id:
             error = "Bevestig eerst je e-mailadres om te kunnen bestellen."
         elif issues:
-            error = "Je uitnodiging is nog niet compleet. Bekijk de punten hieronder."
+            error = "Je kaart is nog niet klaar om te bestellen. Bekijk de punten hieronder."
         elif form.is_valid():
             if form.cleaned_data.get("nieuwsbrief"):
                 from accounts.newsletter import subscribe

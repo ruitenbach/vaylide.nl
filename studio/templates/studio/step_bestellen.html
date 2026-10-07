@@ -1,10 +1,9 @@
 {% extends "studio/base_studio.html" %}{% load static vl %}
 {% block title %}Bestellen{% endblock %}
 {% block studio %}
-<div class="studio-intro studio-intro--bijna">
-  <p class="studio-intro__kicker">Laatste stap</p>
-  <h1>Je bent er bijna voor je unieke kaart!</h1>
-  <p class="lead">Nog één klik en je {% if wenskaart_vast %}wenskaart{% else %}uitnodiging{% endif %} is klaar om te delen. Je betaalt eenmalig; zodra je betaling is bevestigd, staat je kaart automatisch online met je eigen link en QR-code.</p>
+<div class="studio-intro studio-intro--kort">
+  <h1>Bestellen</h1>
+  <p class="lead">Je betaalt eenmalig. Na de bevestiging staat je kaart online met een eigen link en QR-code.</p>
 </div>
 {% if error %}<div class="form-errors" role="alert">{{ error }}</div>{% endif %}
 {% include "studio/_controle.html" with issues=issues alleen_nodig=True %}
@@ -39,7 +38,6 @@
   {% if losse_extras %}
   <section class="studio-block" aria-labelledby="losse-titel">
     <h2 class="studio-block__title" id="losse-titel">Los bij te kopen bij {{ quote.package.name }}</h2>
-    <p class="hint">Gebruik je een onderdeel, dan staat het vanzelf op je rekening. Zet je het uit, dan vervalt de meerprijs.</p>
     <ul class="losse-extras">
       {% for x in losse_extras %}
       <li class="losse-extra{% if x.in_use %} is-in-gebruik{% endif %}">
@@ -80,7 +78,7 @@
   <section class="studio-block" aria-labelledby="account-titel">
     <h2 class="studio-block__title" id="account-titel">Jouw e-mailadres</h2>
     {% if anonymous or not user.is_authenticated %}
-      <p>Bevestig je e-mailadres met een code. Daarmee bewaar je je ontwerp, ontvang je je link en log je later in bij Mijn VAYLIDE.</p>
+      <p>Bevestig je e-mailadres met een code, zonder wachtwoord. Je ontvangt je link en vindt je kaart terug in Mijn VAYLIDE.</p>
       <a class="btn btn--secondary" href="{{ login_url }}">E-mailadres bevestigen</a>
     {% elif user.is_staff %}
       <p class="notice notice--warning">Je bent ingelogd als beheerder. Bestellen kan alleen de klant zelf.</p>
@@ -101,9 +99,9 @@
     {% for e in form.online_dienst.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
   </div>
   {% if not user.newsletter %}<label class="check nieuwsbrief-check"><input type="checkbox" name="nieuwsbrief" value="on"{% if form.nieuwsbrief.value %} checked{% endif %}><span>{{ nieuwsbrief_tekst }} <span class="hint">Niet verplicht voor je bestelling.</span></span></label>{% endif %}
-  <p class="small muted privacy-link">Hoe we je bestel- en betaalgegevens gebruiken, lees je in de <a href="{% url 'core:privacy' %}" target="_blank" rel="noopener">privacyverklaring</a>.</p>
-  <div class="step-actions">
-    <a class="btn btn--ghost" href="{% url 'studio:step' inv.uid 'voorbeeld' %}">&larr; Terug naar voorbeeld</a>
+  <p class="small muted privacy-link">Meer over je gegevens: <a href="{% url 'core:privacy' %}" target="_blank" rel="noopener">privacyverklaring</a>.</p>
+  <div class="step-actions step-actions--bar">
+    <a class="btn btn--ghost" href="{% url 'studio:step' inv.uid 'voorbeeld' %}">&larr; Terug naar controle</a>
     <button type="submit" class="btn btn--primary step-actions__next" name="actie" value="betalen"{% if issues or anonymous or not user.is_authenticated or user.is_staff %} disabled{% endif %}>Bestellen en betalen{% if quote %} {{ quote.total_display }}{% endif %}</button>
   </div>
   {% if issues or anonymous or not user.is_authenticated %}<p class="betaal-hint small muted">{% if issues %}Betalen kan zodra de punten bovenaan zijn aangevuld.{% else %}Bevestig eerst je e-mailadres; daarna kun je betalen.{% endif %}</p>{% endif %}

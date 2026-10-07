@@ -1,20 +1,16 @@
 {% extends "studio/base_studio.html" %}
-{% block title %}{% if wenskaart %}Afsluiting{% else %}Programma en info{% endif %}{% endblock %}
+{% block title %}{% if wenskaart %}Afsluiting{% else %}Praktische info{% endif %}{% endblock %}
 {% block studio %}
-<div class="studio-intro">
-  {% if wenskaart %}<h1>Je afsluitende wens</h1>
-  <p class="lead">Sluit je {% if inv.occasion == "kerst" %}kerstkaart{% else %}wenskaart{% endif %} af met een persoonlijke wens. Dit is optioneel.</p>
-  {% else %}<h1>Programma en praktische informatie</h1>
-  <p class="lead">Alles is optioneel; lege onderdelen worden niet getoond.</p>{% endif %}
+<div class="studio-intro studio-intro--kort">
+  <h1>{% if wenskaart %}Je afsluitende wens{% else %}Praktische info{% endif %}</h1>
+  <p class="lead">{% if wenskaart %}Optioneel: sluit je {% if inv.occasion == "kerst" %}kerstkaart{% else %}wenskaart{% endif %} af met een eigen wens.{% else %}Programma, dresscode, tips en contact. Leeg gelaten onderdelen staan niet op je kaart.{% endif %}</p>
 </div>
-{% if wenskaart %}<p class="notice">Je maakt een wenskaart: {% if inv.occasion == "kerst" %}een warme kerstwens, {% endif %}zonder programma, dresscode, praktische informatie of contact. Hier schrijf je alleen je afsluitende wens.</p>{% endif %}
 {% include "studio/_conflict.html" %}
 <form method="post" class="form studio-form" data-once data-dirty-check novalidate>
   {% csrf_token %}
   {% if not wenskaart %}
-  <section class="studio-block" aria-labelledby="blok-programma">
-    <h2 class="studio-block__title" id="blok-programma">Programma</h2>
-    <p class="hint">{{ cfg.program_hint }}. Wordt automatisch op tijd gesorteerd.</p>
+  <details class="studio-deel" aria-labelledby="blok-programma"{% if form.programma_open %} open{% endif %}>
+    <summary class="studio-deel__kop" id="blok-programma">Programma</summary>
     <div class="repeat-list" data-repeat="programma">
       {% for time, title, desc in form.program_fields %}
       <div class="repeat-row program-row{% if not title.value and not time.value and forloop.counter > 3 %} is-empty{% endif %}" data-repeat-row>
@@ -25,22 +21,22 @@
       {% endfor %}
       <button type="button" class="btn btn--ghost btn--sm" data-repeat-add hidden>+ Onderdeel toevoegen</button>
     </div>
-  </section>
-  <section class="studio-block" aria-labelledby="blok-dresscode">
-    <h2 class="studio-block__title" id="blok-dresscode">Dresscode</h2>
+  </details>
+  <details class="studio-deel" aria-labelledby="blok-dresscode"{% if form.dresscode_open %} open{% endif %}>
+    <summary class="studio-deel__kop" id="blok-dresscode">Dresscode</summary>
     {% include "studio/_field.html" with field=form.dresscode_text %}
     <fieldset class="color-picks">
-      <legend class="label">Kleuren (optioneel)</legend>
+      <legend class="label">Kleuren</legend>
       <div class="color-picks__grid">
         {% for use, color in form.color_fields %}
         <div class="color-pick">{{ color }}<label class="check">{{ use }}<span>Toon<span class="visually-hidden"> kleur {{ forloop.counter }}</span></span></label>{% for e in color.errors %}<p class="field__error">{{ e }}</p>{% endfor %}</div>
         {% endfor %}
       </div>
     </fieldset>
-  </section>
-  <section class="studio-block" aria-labelledby="blok-praktisch">
-    <h2 class="studio-block__title" id="blok-praktisch">Praktische informatie</h2>
-    <p class="hint">Bijvoorbeeld parkeren, cadeautips, kinderen, overnachten.</p>
+  </details>
+  <details class="studio-deel" aria-labelledby="blok-tips"{% if form.tips_open %} open{% endif %}>
+    <summary class="studio-deel__kop" id="blok-tips">Tips voor gasten</summary>
+    <p class="hint">Bijvoorbeeld parkeren, cadeautips of overnachten.</p>
     <div class="repeat-list" data-repeat="praktisch">
       {% for title, text in form.practical_fields %}
       <div class="repeat-row practical-row" data-repeat-row>
@@ -50,22 +46,22 @@
       {% endfor %}
       <button type="button" class="btn btn--ghost btn--sm" data-repeat-add hidden>+ Kopje toevoegen</button>
     </div>
-  </section>
-  <section class="studio-block" aria-labelledby="blok-contact">
-    <h2 class="studio-block__title" id="blok-contact">Contactpersoon voor gasten</h2>
+  </details>
+  <details class="studio-deel" aria-labelledby="blok-contact"{% if form.contact_open %} open{% endif %}>
+    <summary class="studio-deel__kop" id="blok-contact">Contactpersoon</summary>
     <div class="form-row">
       {% include "studio/_field.html" with field=form.contact_name %}
       {% include "studio/_field.html" with field=form.contact_phone %}
       {% include "studio/_field.html" with field=form.contact_email %}
     </div>
     {% include "studio/_field.html" with field=form.contact_note %}
-  </section>
+  </details>
   {% endif %}
-  <section class="studio-block" aria-labelledby="blok-afsluiting">
-    <h2 class="studio-block__title" id="blok-afsluiting">Afsluiting</h2>
+  <details class="studio-deel" aria-labelledby="blok-afsluiting"{% if form.closing_text.value or wenskaart %} open{% endif %}>
+    <summary class="studio-deel__kop" id="blok-afsluiting">Afsluiting</summary>
     {% include "studio/_field.html" with field=form.closing_text %}
     {% include "studio/_ai.html" with ai_field="closing_text" %}
-  </section>
+  </details>
   {% include "studio/_actions.html" %}
 </form>
 {% endblock %}

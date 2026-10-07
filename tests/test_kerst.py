@@ -138,18 +138,19 @@ class KerstRenderTests(VaylideTestCase):
         content = greeting_only(demo_content("winterlicht", "kerst"))
         blocking = [i for i in publish_issues(content, "kerst", first_publication=True) if i.blocking]
         self.assertEqual(blocking, [])
-        # Wie kiest voor een uitnodiging en een datum invult, nodigt mensen uit: dan zijn begintijd en locatie wel nodig.
+        # Wie kiest voor een uitnodiging en een datum invult, nodigt mensen uit: een ontbrekende begintijd of locatie is dan een tip, geen blokkade.
         content["soort"] = "uitnodiging"
         content["date"] = future_date(60)
-        fields = {i.field for i in publish_issues(content, "kerst", first_publication=True) if i.blocking}
-        self.assertEqual(fields, {"start_time", "venue_name", "deadline"})
-        # Bij een uitnodiging voor een andere gelegenheid blijft een datum altijd verplicht; alleen een uitdrukkelijke wenskaart heeft er geen nodig.
+        issues = publish_issues(content, "kerst", first_publication=True)
+        self.assertTrue({"start_time", "venue_name"} <= {i.field for i in issues})
+        self.assertEqual({i.field for i in issues if i.blocking} - {"deadline"}, set())    # alleen een tegenstrijdige aanmelddeadline kan blokkeren
+        # Ook bij een uitnodiging voor een andere gelegenheid is niets verplicht; alleen een uitdrukkelijke wenskaart heeft er geen tips voor.
         other = greeting_only(demo_content("liefde-op-papier", "bruiloft"))
         self.assertEqual([i for i in publish_issues(other, "bruiloft", first_publication=True) if i.blocking], [])
         other["soort"] = "uitnodiging"
-        fields = {i.field for i in publish_issues(other, "bruiloft", first_publication=True) if i.blocking}
-        self.assertTrue({"date", "start_time", "venue_name"} <= fields)
-
+        issues = publish_issues(other, "bruiloft", first_publication=True)
+        self.assertTrue({"date", "start_time", "venue_name"} <= {i.field for i in issues})
+        self.assertFalse(any(i.blocking for i in issues))
 
 class KerstStudioTests(VaylideTestCase):
     def test_greeting_card_needs_no_date_venue_or_deadline(self):
@@ -160,7 +161,7 @@ class KerstStudioTests(VaylideTestCase):
         inv = Invitation.objects.get(uid=uid)
         page = c.get(f"/maken/{uid}/gegevens/")
         self.assertContains(page, "Van wie komt de kerstkaart?")
-        self.assertContains(page, "Wat voor kaart wordt het?")
+        self.assertContains(page, "Toch een uitnodiging maken?")
         self.assertContains(page, 'name="soort" value="wenskaart" checked')  # uitdrukkelijk gekozen aan het begin
         response = c.post(f"/maken/{uid}/gegevens/", {
             "rev": inv.draft_rev, "actie": "volgende", "soort": "wenskaart", "name_family": "Familie Jansen", "name_members": "Eva, Tom en Noor",
@@ -173,7 +174,7 @@ class KerstStudioTests(VaylideTestCase):
         # Uitdrukkelijk een wenskaart: de stap Aanmelden valt weg.
         self.assertRedirects(c.get(f"/maken/{uid}/aanmelden/"), f"/maken/{uid}/fotos/", fetch_redirect_response=False)
 
-    def test_partial_event_still_asks_for_time_and_venue(self):
+    def test_partial_event_geeft_alleen_tips_voor_begintijd_en_locatie(self):
         c = Client()
         response = c.post("/maken/", {"occasion": "kerst", "template": "winterlicht"})
         uid = response["Location"].split("/")[2]
@@ -181,9 +182,11 @@ class KerstStudioTests(VaylideTestCase):
         response = c.post(f"/maken/{uid}/gegevens/", {
             "rev": inv.draft_rev, "actie": "volgende", "name_family": "Familie Jansen", "date": future_date(60), "timezone": "Europe/Amsterdam",
         })
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Vul de begintijd in.")
-        self.assertContains(response, "Vul de naam van de locatie in.")
+        self.assertEqual(response.status_code, 302)        # niets is verplicht
+        inv.refresh_from_db()
+        issues = publish_issues(inv.draft_content, "kerst", first_publication=True)
+        self.assertTrue({"start_time", "venue_name"} <= {i.field for i in issues})
+        self.assertFalse(any(i.blocking for i in issues))
 
     def test_published_greeting_card(self):
         owner = self.make_customer()

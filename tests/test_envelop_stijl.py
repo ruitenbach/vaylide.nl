@@ -66,7 +66,7 @@ class UitlegEnKeuzesTests(VaylideTestCase):
     # --- stap Envelop & zegel
     def test_uitleg_bovenaan_en_ondertitel_met_de_naam_van_het_ontwerp(self):
         html = self.get(self.draft(self.OPTIONEEL), "envelop")
-        self.assertIn("De envelop bepaalt alleen hoe je gasten de uitnodiging openen. Je gekozen uitnodiging zelf verandert niet.", html)
+        self.assertIn("Hoe openen je gasten de kaart?", html)
         self.assertIn("De eigen opening van Puur moment", html)
         self.assertNotIn("Doorschijnend vel", html)          # interne omschrijving uit het manifest
         self.assertIn("Gasten zien direct je uitnodiging.", html)
@@ -91,22 +91,23 @@ class UitlegEnKeuzesTests(VaylideTestCase):
         self.assertIn("VAYLIDE Signature Ivory", bruiloft)
         self.assertNotIn("Signature Ivory envelop", bruiloft)
         self.assertNotIn("Rose Blush envelop", bruiloft)       # geen ontwerp met die naam
-        kerst = self.get(self.make_invitation(owner=self.customer, template="aan-tafel", occasion="kerst"), "gegevens")   # kerst: eigen opening, zie hieronder
-        self.assertIn("eigen opening", kerst)
+        kerst = self.get(self.make_invitation(owner=self.customer, template="aan-tafel", occasion="kerst"), "stijl")   # kerst: eigen opening, zie hieronder
+        self.assertIn("Eigen opening", kerst)
         # de codes en stijlnamen blijven zoals ze zijn
         self.assertEqual(ec.STIJLEN["midnight-emeraude"]["naam"], "Midnight Émeraude")
         self.assertIn('value="midnight-emeraude"', bruiloft)
 
     # --- ontwerp met een eigen opening
     def test_ingebouwd_ontwerp_zegt_dat_het_een_eigen_opening_heeft(self):
-        html = self.get(self.draft(self.INGEBOUWD), "gegevens")
-        self.assertIn("Dit ontwerp heeft een eigen opening", html)
+        html = self.get(self.draft(self.INGEBOUWD), "stijl")
+        self.assertIn("Eigen opening: ", html)
         self.assertIn("Smaragdgroene envelop met gouden zegel, met een filmische opening", html)
         self.assertNotIn("Envelope Collection", html)         # geen jargon
-        self.assertIn("hoef je hier geen envelop te kiezen", html)
+        self.assertNotIn("Envelop &amp; zegel</a>", self.get(self.draft(self.INGEBOUWD), "gegevens"))   # en geen onderdeel Envelop & zegel in de balk
 
     def test_optioneel_ontwerp_met_envelopstap_zegt_dat_niet(self):
-        self.assertNotIn("Dit ontwerp heeft een eigen opening", self.get(self.draft(self.OPTIONEEL), "gegevens"))
+        self.assertNotIn("Eigen opening", self.get(self.draft(self.OPTIONEEL), "stijl"))
+        self.assertIn("Envelop &amp; zegel</a>", self.get(self.draft(self.OPTIONEEL), "gegevens"))   # het onderdeel staat wel in de balk
 
     def test_stijlstap_ingebouwd_toont_alleen_wat_werkt(self):
         html = self.get(self.draft(self.INGEBOUWD), "stijl")
@@ -115,7 +116,7 @@ class UitlegEnKeuzesTests(VaylideTestCase):
         self.assertIn("Alleen de initialen kies je zelf", html)
         for dood in ('name="env_kleur"', 'name="zegel_kleur"', 'name="zegel"', 'name="zegel_logo"', "Kleur van de envelop", "Kleur van het lakzegel", "Eigen logo"):
             self.assertNotIn(dood, html, dood)
-        self.assertIn("Dit ontwerp heeft een eigen opening", html)
+        self.assertIn("Eigen opening", html)
         self.assertIn('name="opening"', html)                 # de schakelaar voor de opening werkt wel
         self.assertNotIn("(Envelope Collection)", html)
 
@@ -124,7 +125,7 @@ class UitlegEnKeuzesTests(VaylideTestCase):
             html = self.get(self.draft(slug, occasion), "stijl")
             self.assertNotIn('id="envelop"', html, slug)
             self.assertNotIn('name="initialen"', html, slug)
-            self.assertIn("Dit ontwerp heeft een eigen opening", html, slug)
+            self.assertIn("Eigen opening", html, slug)
 
     def test_stijlstap_klassieke_envelop_houdt_alle_keuzes(self):
         html = self.get(self.draft("balzaal"), "stijl")
@@ -178,7 +179,7 @@ class ZegelnamenEnAanpasLijstTests(VaylideTestCase):
     def test_voorbeeld_en_mijn_vaylide_bieden_envelop_en_zegel_aan_bij_optional(self):
         inv = self.draft("puur-moment")
         voorbeeld = self.client.get(f"/maken/{inv.uid}/voorbeeld/").content.decode()
-        self.assertIn(f'href="/maken/{inv.uid}/envelop/">Envelop en zegel</a>', voorbeeld)
+        self.assertIn(f'href="/maken/{inv.uid}/envelop/">Envelop &amp; zegel</a>', voorbeeld)
         mijn = self.client.get(f"/account/uitnodiging/{inv.uid}/").content.decode()
         self.assertIn(f'href="/maken/{inv.uid}/envelop/">Envelop en zegel</a>', mijn)
 

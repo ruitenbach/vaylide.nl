@@ -1,93 +1,60 @@
 {% extends "studio/base_studio.html" %}{% load static vl %}
-{% block title %}Maak jouw uitnodiging{% endblock %}
+{% block title %}Kies je kaart{% endblock %}
 {% block studio %}
-<div class="studio-intro">
-  <h1>{% if not occasion %}Wat ga je vieren?{% else %}Kies een ontwerp voor je {{ occasion_label|lower }}{% endif %}</h1>
-  <p class="lead">{% if not occasion %}Kies eerst de gelegenheid.{% else %}Kies een ontwerp. Je kunt later nog wisselen.{% endif %}</p>
+{% comment %}Kies kaart: een tik op een kaart bewaart de keuze en brengt de klant direct naar Personaliseren. Zonder JavaScript werkt dit ook: elke kaart is een verzendknop.{% endcomment %}
+<div class="studio-intro studio-intro--kort">
+  <h1>{% if not occasion %}Wat ga je vieren?{% else %}Kies je {% if wenskaart %}wenskaart{% else %}kaart{% endif %}{% endif %}</h1>
 </div>
 {% if existing %}
-<div class="notice resume-box">
+<div class="resume-box">
   <strong>Verder met je ontwerp?</strong>
-  <ul class="resume-list">{% for inv in existing %}<li><a href="{% url 'studio:resume' inv.uid %}">{{ inv.title|default:"Naamloos ontwerp" }}</a> <span class="muted small">({{ inv.get_occasion_display }}, bijgewerkt {{ inv.updated_at|date:"j F" }})</span></li>{% endfor %}</ul>
+  <ul class="resume-list">{% for inv in existing %}<li><a href="{% url 'studio:resume' inv.uid %}">{{ inv.title|default:"Naamloos ontwerp" }}</a> <span class="muted small">({{ inv.get_occasion_display }}, {{ inv.updated_at|date:"j F" }})</span></li>{% endfor %}</ul>
 </div>
 {% endif %}
-<form method="post" class="form" data-once>
+<form method="post" class="form kies" data-once{% if direct and chosen_template %} data-auto-start{% endif %}>
   {% csrf_token %}
   {% if kleur %}<input type="hidden" name="kleur" value="{{ kleur }}">{% endif %}
   {% if soort %}<input type="hidden" name="soort" value="{{ soort }}">{% endif %}
-  <fieldset class="studio-block" id="soort">
-    <legend class="studio-block__title">Wat wil je maken?</legend>
-    <div class="soort-grid">
-      <a class="soort-card{% if not wenskaart %} is-gekozen{% endif %}" href="?soort=uitnodiging{% if occasion %}&amp;gelegenheid={{ occasion }}{% endif %}{% if chosen %}&amp;ontwerp={{ chosen }}{% endif %}{% if kleur %}&amp;kleur={{ kleur }}{% endif %}#soort"{% if not wenskaart %} aria-current="true"{% endif %}>
-        <strong>Uitnodiging</strong><span class="small">Met datum, locatie, programma en aanmelden.</span>
-      </a>
-      <a class="soort-card{% if wenskaart %} is-gekozen{% endif %}" href="?soort=wenskaart{% if occasion %}&amp;gelegenheid={{ occasion }}{% endif %}{% if chosen %}&amp;ontwerp={{ chosen }}{% endif %}{% if kleur %}&amp;kleur={{ kleur }}{% endif %}#soort"{% if wenskaart %} aria-current="true"{% endif %}>
-        <strong>Wenskaart</strong><span class="small">Een persoonlijke groet: naam, boodschap en eventueel een foto. Snel klaar.</span>
-        <span class="soort-card__prijs">{{ wenskaart_prijs }} <span class="small">incl. btw</span> &middot; Special {{ wenskaart_prijs_special }} <span class="small">incl. btw</span></span>
-      </a>
-    </div>
-  </fieldset>
-  <fieldset class="studio-block">
-    <legend class="studio-block__title"><span class="studio-block__num">1</span> Gelegenheid</legend>
-    <div class="occasion-grid">
-      {% for key, label, intro in occasions %}
-      <label class="radio-card occasion-card">
-        <input type="radio" name="occasion" value="{{ key }}"{% if key == occasion %} checked{% endif %} required data-occasion-radio>
-        <strong>{{ label }}</strong><span class="small muted">{{ intro }}</span>
-        <a class="occasion-card__link" href="?gelegenheid={{ key }}{% if chosen %}&amp;ontwerp={{ chosen }}{% endif %}{% if soort %}&amp;soort={{ soort }}{% endif %}#ontwerpen">Kies</a>
-      </label>
-      {% endfor %}
-    </div>
-    {% if form.occasion.errors %}<p class="field__error">Kies een gelegenheid.</p>{% endif %}
-  </fieldset>
-  <fieldset class="studio-block" id="ontwerpen">
-    <legend class="studio-block__title"><span class="studio-block__num">2</span> Ontwerp</legend>
-    <div class="design-pick-grid">
-      {% for t in templates %}
-      <label class="radio-card design-pick" data-occasions="{{ t.occasions|join:' ' }}">
-        <input type="radio" name="template" value="{{ t.slug }}"{% if t.slug == chosen %} checked{% endif %} required>
-        <img src="{% design_image t.slug %}" alt="" width="400" height="500" loading="lazy">
-        <strong>{{ t.name }}</strong>
-        <span class="small muted">{{ t.tagline }}</span>
-        {% if wenskaart %}<span class="design-pick__prijs">{% if t.special %}{{ wenskaart_prijs_special }}{% else %}{{ wenskaart_prijs }}{% endif %} <span class="small">incl. btw</span></span>{% endif %}
-        <a class="design-pick__demo" href="{% url 'invitations:demo' t.slug %}{% if occasion %}?gelegenheid={{ occasion }}{% endif %}" target="_blank" rel="noopener">Bekijk voorbeeld<span class="visually-hidden"> van {{ t.name }} (opent in nieuw venster)</span></a>
-      </label>
-      {% endfor %}
-    </div>
-    {% if form.template.errors %}<p class="field__error">{{ form.template.errors.0 }}</p>{% endif %}
-  </fieldset>
-  {% if wenskaart %}
-  <fieldset class="studio-block" id="prijs">
-    <legend class="studio-block__title"><span class="studio-block__num">3</span> Prijs</legend>
-    <p>Een wenskaart kost <strong>{{ wenskaart_prijs }}</strong> incl. btw, een wenskaart in een special-ontwerp <strong>{{ wenskaart_prijs_special }}</strong> incl. btw. Je betaalt pas aan het eind, eenmalig, zonder pakket of extra's.</p>
-  </fieldset>
-  {% elif packages %}
-  <fieldset class="studio-block" id="pakket">
-    <legend class="studio-block__title"><span class="studio-block__num">3</span> Pakket</legend>
-    <p class="hint">Je betaalt pas aan het eind. De online periode telt vanaf de dag waarop je betaling is bevestigd. Kies je Essentieel, dan kun je bij het bestellen nog upgraden of losse onderdelen toevoegen.</p>
-    <div class="start-pakketten">
-      {% for p in packages %}
-      <label class="radio-card start-pakket{% if p.is_featured %} is-uitgelicht{% endif %}">
-        <input type="radio" name="pakket" value="{{ p.code }}"{% if p.code == chosen_package %} checked{% endif %}>
-        <span class="start-pakket__kop"><strong>{{ p.name }}</strong>{% if p.is_featured %}<span class="badge badge--live">Alles erin</span>{% endif %}</span>
-        <span class="start-pakket__prijs">{{ p.price_cents|euro }}</span>
-        <span class="small muted">{{ p.description }}</span>
-        <ul class="start-pakket__lijst">{% for h in p.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
-      </label>
-      {% endfor %}
-    </div>
-  </fieldset>
-  {% endif %}
-  <div class="step-actions step-actions--start">
-    {% if user.is_authenticated and not user.is_staff %}
-    <p class="start-account small">Je bent ingelogd als <strong>{{ user.email }}</strong>. Je ontwerp wordt bewaard in Mijn VAYLIDE.</p>
-    {% elif not user.is_authenticated %}
-    <div class="start-account">
-      <p class="small"><strong>Doorgaan als gast</strong> kan: je hebt pas een account nodig bij het bestellen (met een code per e-mail, geen wachtwoord).</p>
-      <p class="small muted">Al een account? <a href="{{ login_url }}">Log eerst in</a>, dan staat je ontwerp meteen in Mijn VAYLIDE, bij je andere ontwerpen en bestellingen.</p>
-    </div>
-    {% endif %}
-    <button class="btn btn--primary" type="submit">{% if user.is_authenticated %}Begin met dit ontwerp{% else %}Doorgaan als gast{% endif %} &rarr;</button>
+  {% if occasion %}<input type="hidden" name="occasion" value="{{ occasion }}">{% endif %}
+  {% if form.occasion.errors and not occasion %}<p class="field__error" role="alert">Kies eerst de gelegenheid.</p>{% endif %}
+
+  {% if not occasion %}
+  <div class="occasion-kiezer" role="group" aria-label="Gelegenheid">
+    {% for key, label in occasions %}<a class="occasion-kiezer__keuze" href="?gelegenheid={{ key }}{% if soort %}&amp;soort={{ soort }}{% endif %}{% if kleur %}&amp;kleur={{ kleur }}{% endif %}">{{ label }}</a>{% endfor %}
   </div>
+  {% else %}
+  <div class="kies__balk">
+    <div class="chip-rij" role="group" aria-label="Gelegenheid">
+      {% for key, label in occasions %}<a class="chip-link{% if key == occasion %} is-current{% endif %}" href="?gelegenheid={{ key }}{% if soort %}&amp;soort={{ soort }}{% endif %}{% if kleur %}&amp;kleur={{ kleur }}{% endif %}"{% if key == occasion %} aria-current="true"{% endif %}>{{ label }}</a>{% endfor %}
+    </div>
+    <div class="chip-rij chip-rij--soort" role="group" aria-label="Soort kaart">
+      <a class="chip-link{% if not wenskaart %} is-current{% endif %}" href="?soort=uitnodiging&amp;gelegenheid={{ occasion }}{% if kleur %}&amp;kleur={{ kleur }}{% endif %}"{% if not wenskaart %} aria-current="true"{% endif %}>Uitnodiging</a>
+      <a class="chip-link{% if wenskaart %} is-current{% endif %}" href="?soort=wenskaart&amp;gelegenheid={{ occasion }}{% if kleur %}&amp;kleur={{ kleur }}{% endif %}"{% if wenskaart %} aria-current="true"{% endif %}>Wenskaart &middot; {{ wenskaart_prijs }}</a>
+    </div>
+  </div>
+  {% if wenskaart %}<p class="kies__prijs small">Wenskaart {{ wenskaart_prijs }} &middot; Special {{ wenskaart_prijs_special }} (incl. btw), zonder pakket.</p>{% endif %}
+  {% if form.template.errors %}<p class="field__error" role="alert">{{ form.template.errors.0 }}</p>{% endif %}
+
+  {% if chosen_template %}
+  <div class="kaart-gekozen">
+    <img src="{% design_image chosen_template.slug %}" alt="" width="400" height="500">
+    <div class="kaart-gekozen__tekst">
+      <p class="kaart-gekozen__label"><span aria-hidden="true">&#10003;</span> Gekozen ontwerp</p>
+      <strong>{{ chosen_template.name }}</strong>
+      <a class="small" href="{% url 'invitations:demo' chosen_template.slug %}?gelegenheid={{ occasion }}" target="_blank" rel="noopener">Bekijk voorbeeld<span class="visually-hidden"> (opent in nieuw venster)</span></a>
+    </div>
+    <button type="submit" name="template" value="{{ chosen_template.slug }}" class="btn btn--primary btn--lg kaart-gekozen__cta">Verder met personaliseren &rarr;</button>
+    {% if direct %}<p class="kaart-gekozen__wacht small muted" data-auto-wacht hidden role="status">Je kaart wordt gestart&hellip;</p>{% endif %}
+  </div>
+  <details class="kies-ander">
+    <summary>Wijzigen</summary>
+    {% include "studio/_kaartkeuze.html" with kaarten=templates huidig=chosen %}
+  </details>
+  {% else %}
+  {% include "studio/_kaartkeuze.html" with kaarten=templates huidig="" %}
+  {% endif %}
+  {% endif %}
+
+  <p class="kies__account small muted">{% if user.is_authenticated and not user.is_staff %}Ingelogd als {{ user.email }}: je ontwerp staat in Mijn VAYLIDE.{% elif not user.is_authenticated %}Je hebt pas een account nodig bij het bestellen. Al een account? <a href="{{ login_url }}">Log in</a>.{% endif %}</p>
 </form>
 {% endblock %}

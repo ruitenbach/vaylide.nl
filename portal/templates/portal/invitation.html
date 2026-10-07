@@ -48,7 +48,7 @@
         <div class="stat"><span class="stat__num">{{ stats.no }}</span><span class="stat__label">afwezig</span></div>
       </div>
       {% if recent %}
-      <ul class="item-list">{% for r in recent %}<li class="item"><div class="item__top"><strong>{{ r.name }}</strong><span class="badge {% if r.attending %}badge--live{% else %}badge--offline{% endif %}">{% if r.attending %}Aanwezig{% if r.party_size > 1 %} · {{ r.party_size }} pers.{% endif %}{% else %}Afwezig{% endif %}</span></div>{% if r.remark %}<p class="item__meta">“{{ r.remark|truncatechars:140 }}”</p>{% endif %}<p class="item__meta">{{ r.updated_at|date:"j F H:i" }}</p></li>{% endfor %}</ul>
+      <ul class="item-list">{% for r in recent %}<li class="item"><div class="item__top"><strong>{{ r.name }}</strong><span class="badge {% if r.attending %}badge--live{% else %}badge--offline{% endif %}">{% if r.attending %}Aanwezig · {{ r.party_size }} {% if r.party_size == 1 %}persoon{% else %}personen{% endif %}{% else %}Afwezig{% endif %}</span></div>{% if r.remark %}<p class="item__meta">“{{ r.remark|truncatechars:140 }}”</p>{% endif %}<p class="item__meta">{{ r.updated_at|date:"j F H:i" }}</p></li>{% endfor %}</ul>
       <a class="link-arrow" href="{% url 'portal:guests' inv.uid %}">Alle aanmeldingen</a>
       {% else %}<p class="muted">{% if inv.is_published %}Nog geen aanmeldingen. Deel je link om te beginnen.{% else %}Aanmeldingen verschijnen hier zodra je uitnodiging online staat.{% endif %}</p>{% endif %}
     </section>{% endif %}
@@ -61,10 +61,10 @@
         <li><a href="{% url 'studio:step' inv.uid 'gegevens' %}">Gegevens</a></li>
         {% if wenskaart %}<li><a href="{% url 'studio:step' inv.uid 'programma' %}">Afsluiting</a></li>
         <li><a href="{% url 'studio:step' inv.uid 'fotos' %}">Foto</a></li>
-        <li><a href="{% url 'studio:step' inv.uid 'stijl' %}">Stijl</a></li>{% else %}<li><a href="{% url 'studio:step' inv.uid 'programma' %}">Programma en info</a></li>
+        <li><a href="{% url 'studio:step' inv.uid 'stijl' %}">Stijl</a></li>{% else %}<li><a href="{% url 'studio:step' inv.uid 'programma' %}">Praktische info</a></li>
         <li><a href="{% url 'studio:step' inv.uid 'aanmelden' %}">Aanmelden</a></li>
-        <li><a href="{% url 'studio:step' inv.uid 'fotos' %}">Foto's en verhaal</a></li>
-        <li><a href="{% url 'studio:step' inv.uid 'stijl' %}">Stijl en onderdelen</a></li>{% endif %}
+        <li><a href="{% url 'studio:step' inv.uid 'fotos' %}">Foto's &amp; verhaal</a></li>
+        <li><a href="{% url 'studio:step' inv.uid 'stijl' %}">Stijl</a></li>{% endif %}
         <li><a href="{% url 'studio:step' inv.uid 'voorbeeld' %}">Voorbeeld{% if paid %} en publiceren{% endif %}</a></li>
       </ul>
       <a class="btn btn--secondary btn--sm" href="{% url 'portal:wish_new' %}?uitnodiging={{ inv.uid }}">Extra wensen of hulp nodig?</a>

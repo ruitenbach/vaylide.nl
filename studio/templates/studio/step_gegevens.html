@@ -1,52 +1,50 @@
 {% extends "studio/base_studio.html" %}
 {% block title %}Gegevens{% endblock %}
 {% block studio %}
-<div class="studio-intro">
-  <h1>De gegevens van je {{ occasion_label|lower }}</h1>
-  <p class="lead">Velden met <span class="req">*</span> zijn verplicht.</p>
-  {% include "studio/_eigen_opening.html" %}
+<div class="studio-intro studio-intro--kort">
+  <h1>Gegevens</h1>
+  <p class="lead">Alles is optioneel. Wat je leeglaat, staat niet op je kaart.</p>
 </div>
 {% include "studio/_conflict.html" %}
 <form method="post" class="form studio-form" data-once data-dirty-check novalidate>
   {% csrf_token %}
   {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors.0 }}</div>{% endif %}
-  <fieldset class="studio-block" data-soort-keuze>
-    <legend class="studio-block__title">Wat voor kaart wordt het?</legend>
-    {% if form.soort.field.disabled %}<p class="hint">Dit ligt vast, want je kaart is al besteld. Je kunt de inhoud wel aanpassen.</p>{% endif %}
-    <div class="radio-cards">
-      <label class="radio-card"><input type="radio" name="soort" value="uitnodiging"{% if form.soort.value == "uitnodiging" %} checked{% endif %}{% if form.soort.field.disabled %} disabled{% endif %}><strong>Uitnodiging</strong><span class="hint">Nodig mensen uit{% if cfg.event_optional %}, bijvoorbeeld voor het kerstdiner, een borrel of brunch{% endif %}: met datum, locatie en aanmelden.</span></label>
-      <label class="radio-card"><input type="radio" name="soort" value="wenskaart"{% if form.soort.value == "wenskaart" %} checked{% endif %}{% if form.soort.field.disabled %} disabled{% endif %}><strong>Wenskaart</strong><span class="hint">{% if cfg.event_optional %}Alleen een warme kerstgroet, zonder datum, locatie of aanmelden. De kaart telt af naar kerst.{% else %}Alleen een persoonlijke groet, zonder datum, locatie of aanmelden. Een vaste prijs: {{ wenskaart_prijs }} incl. btw.{% endif %}</span></label>
-    </div>
-    {% if not form.soort.field.disabled %}<p class="hint">Je kunt dit later nog wijzigen. Wat je al hebt ingevuld, blijft bewaard.</p>{% endif %}
-  </fieldset>
   <section class="studio-block" aria-labelledby="blok-namen">
     <h2 class="studio-block__title" id="blok-namen">{% if inv.occasion == "zakelijk" %}Evenement{% elif inv.occasion == "kerst" %}Afzender{% else %}Namen{% endif %}</h2>
     <div class="form-row">
-      {% for name, key, label, required in form.name_keys %}{% for field in form %}{% if field.name == name %}{% include "studio/_field.html" with field=field req=required %}{% endif %}{% endfor %}{% endfor %}
+      {% for name, key, label, required in form.name_keys %}{% for field in form %}{% if field.name == name %}{% include "studio/_field.html" with field=field %}{% endif %}{% endfor %}{% endfor %}
     </div>
-    {% include "studio/_field.html" with field=form.headline %}
+    <details class="studio-more"{% if form.headline.value %} open{% endif %}><summary>Eigen kopregel</summary>
+      {% include "studio/_field.html" with field=form.headline %}
+    </details>
   </section>
   <section class="studio-block" aria-labelledby="blok-wanneer" data-alleen-uitnodiging{% if wenskaart %} hidden{% endif %}>
-    <h2 class="studio-block__title" id="blok-wanneer">Wanneer</h2>
-    <p class="hint">Alleen nodig bij een uitnodiging. Bij een wenskaart worden 'Wanneer' en 'Waar' niet getoond.</p>
-    <div class="form-row">
-      {% include "studio/_field.html" with field=form.date req=1 %}
-      {% include "studio/_field.html" with field=form.start_time req=1 %}
+    <h2 class="studio-block__title" id="blok-wanneer">Wanneer en waar</h2>
+    <div class="form-row form-row--wanneer">
+      {% include "studio/_field.html" with field=form.date %}
+      {% include "studio/_field.html" with field=form.start_time %}
       {% include "studio/_field.html" with field=form.end_time %}
     </div>
-    {% include "studio/_field.html" with field=form.timezone %}
-  </section>
-  <section class="studio-block" aria-labelledby="blok-waar" data-alleen-uitnodiging{% if wenskaart %} hidden{% endif %}>
-    <h2 class="studio-block__title" id="blok-waar">Waar</h2>
-    {% include "studio/_field.html" with field=form.venue_name req=1 %}
+    {% include "studio/_field.html" with field=form.venue_name %}
     {% include "studio/_field.html" with field=form.address %}
-    <details class="studio-more"><summary>Eigen routelink gebruiken</summary>{% include "studio/_field.html" with field=form.route_url %}</details>
+    <details class="studio-more"{% if form.route_url.value %} open{% endif %}><summary>Tijdzone of eigen routelink</summary>
+      {% include "studio/_field.html" with field=form.timezone %}
+      {% include "studio/_field.html" with field=form.route_url %}
+    </details>
   </section>
   <section class="studio-block" aria-labelledby="blok-welkom">
     <h2 class="studio-block__title" id="blok-welkom">{% if wenskaart %}Je persoonlijke boodschap{% else %}Welkomsttekst{% endif %}</h2>
     {% include "studio/_field.html" with field=form.welcome_text %}
     {% include "studio/_ai.html" with ai_field="welcome_text" %}
   </section>
+  <details class="studio-more" data-soort-keuze>
+    <summary>{% if wenskaart %}Toch een uitnodiging maken?{% else %}Liever een wenskaart zonder datum en plek?{% endif %}</summary>
+    {% if form.soort.field.disabled %}<p class="hint">Dit ligt vast, want je kaart is al besteld.</p>{% endif %}
+    <div class="radio-cards">
+      <label class="radio-card"><input type="radio" name="soort" value="uitnodiging"{% if form.soort.value == "uitnodiging" %} checked{% endif %}{% if form.soort.field.disabled %} disabled{% endif %}><strong>Uitnodiging</strong><span class="hint">Met datum, plek en aanmelden.</span></label>
+      <label class="radio-card"><input type="radio" name="soort" value="wenskaart"{% if form.soort.value == "wenskaart" %} checked{% endif %}{% if form.soort.field.disabled %} disabled{% endif %}><strong>Wenskaart</strong><span class="hint">Alleen een groet{% if not cfg.event_optional %}, vaste prijs {{ wenskaart_prijs }} incl. btw{% endif %}.</span></label>
+    </div>
+  </details>
   {% include "studio/_actions.html" %}
 </form>
 {% endblock %}

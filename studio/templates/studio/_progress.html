@@ -4,7 +4,7 @@
   <ol class="wizard-progress__list">
     {% for s in progress %}
     <li class="is-{{ s.state }}"{% if s.state == "current" %} aria-current="step"{% endif %}>
-      {% if inv and s.state != "current" %}<a href="{% if s.key == 'gelegenheid' %}{% url 'studio:step' inv.uid 'ontwerp' %}{% else %}{% url 'studio:step' inv.uid s.key %}{% endif %}">{% endif %}
+      {% if inv and s.state != "current" %}<a href="{% url 'studio:step' inv.uid s.step %}" data-ga="{{ s.step }}">{% endif %}
       <span class="wizard-progress__num" aria-hidden="true">{% if s.state == "done" %}&#10003;{% else %}{{ s.number }}{% endif %}</span>
       <span class="wizard-progress__label">{{ s.label }}{% if s.state == "done" %}<span class="visually-hidden"> (gedaan)</span>{% endif %}</span>
       {% if inv and s.state != "current" %}</a>{% endif %}

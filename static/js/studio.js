@@ -12,12 +12,6 @@
       var checked = group.querySelector("input[name=soort]:checked");
       var wens = checked && checked.value === "wenskaart";
       form.querySelectorAll("[data-alleen-uitnodiging]").forEach(function (el) { el.hidden = wens; });
-      // Een tweede verplichte naam (Naam partner 2) is alleen bij een uitnodiging verplicht; een wenskaart heeft aan één naam genoeg.
-      form.querySelectorAll("[data-alleen-uitnodiging-verplicht]").forEach(function (input) {
-        input.setAttribute("data-required", wens ? "" : "1");
-        var label = input.closest(".field") && input.closest(".field").querySelector("label");
-        if (label) label.querySelectorAll(".req, .visually-hidden").forEach(function (el) { el.hidden = wens; });
-      });
     }
     group.addEventListener("change", update);
     update();
@@ -70,6 +64,37 @@
       event.returnValue = "";
     });
     form.markDirty = function () { dirty = true; };
+    // Wisselen van onderdeel (balk, voortgang, Wijzigen): eerst bewaren wat er staat, daarna pas verder. Zonder wijzigingen is het een gewone link.
+    document.querySelectorAll("a[data-ga]").forEach(function (link) {
+      link.addEventListener("click", function (event) {
+        if (!dirty || event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        var naar = form.querySelector("[data-ga-naar]");
+        if (!naar || !form.requestSubmit) return;
+        event.preventDefault();
+        naar.value = link.getAttribute("data-ga");
+        var actie = document.createElement("input");
+        actie.type = "hidden"; actie.name = "actie"; actie.value = "ga";
+        form.appendChild(actie);
+        form.requestSubmit();
+      });
+    });
+  });
+
+  /* ---------- Kies kaart: vanaf een ontwerppagina start de gekozen kaart direct (één keer per tabblad, zodat 'terug' geen lus wordt) ---------- */
+  document.querySelectorAll("form[data-auto-start]").forEach(function (form) {
+    var knop = form.querySelector(".kaart-gekozen__cta");
+    if (!knop) return;
+    var sleutel = "vaylide-auto-start:" + window.location.search;
+    try { if (window.sessionStorage.getItem(sleutel)) return; window.sessionStorage.setItem(sleutel, "1"); } catch (e) { return; }
+    var wacht = form.querySelector("[data-auto-wacht]");
+    if (wacht) wacht.hidden = false;
+    if (form.requestSubmit) form.requestSubmit(knop); else knop.click();
+  });
+
+  /* ---------- Rijen met keuzes (gelegenheid, onderdelen): de gekozen staat in beeld ---------- */
+  document.querySelectorAll(".chip-rij, .deelnav__balk ul").forEach(function (rij) {
+    var nu = rij.querySelector(".is-current");
+    if (nu && rij.scrollWidth > rij.clientWidth) rij.scrollLeft = Math.max(0, nu.offsetLeft - (rij.clientWidth - nu.offsetWidth) / 2);
   });
 
   /* ---------- Start: ontwerpen filteren op gelegenheid ---------- */
@@ -352,6 +377,7 @@
       var wachtend = false;
       var controleer = function () {
         wachtend = false;
+        if (window.getComputedStyle(acties).position === "sticky") { weg.knoppen = false; zetKnop(); return; }   // vaste knoppenbalk: de knop 'Bekijk je kaart' staat erboven
         var r = acties.getBoundingClientRect();
         var strook = Math.max(80, box.querySelector("summary").getBoundingClientRect().height + 28);
         weg.knoppen = r.top < window.innerHeight && r.bottom > window.innerHeight - strook;

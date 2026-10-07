@@ -588,3 +588,146 @@ html:has(body.studio-page) { scrollbar-gutter: stable; }
 .muziekbron .check-line .badge { white-space: nowrap; }
 .muziek-eigen { margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid rgba(0, 0, 0, .1); }
 .muziek-eigen[hidden] { display: none !important; }
+
+/* ---------- Vereenvoudigde flow: Kies kaart → Personaliseer → Controleer → Bestel ---------- */
+.studio-intro--kort { margin: 1rem 0 .9rem; }
+.studio-intro--kort h1 { font-size: clamp(1.6rem, 4.5vw, 2.2rem); margin-bottom: .2rem; }
+.studio-intro--kort .lead { font-size: 1rem; margin: 0; }
+
+/* Vier fasen, ook op een telefoon: kort genoeg om naast elkaar te passen. */
+.wizard-progress__mobile, .wizard-progress__bar { display: none !important; }
+.wizard-progress__list { display: flex !important; flex-wrap: nowrap; gap: 0; }
+.wizard-progress__list li { flex: 1 1 0; justify-content: center; padding: .55rem .2rem; min-width: 0; }
+.wizard-progress__list li a { gap: .35rem; }
+.wizard-progress__label { white-space: nowrap; }
+@media (max-width: 480px) {
+  .wizard-progress { margin-top: 0; }
+  .wizard-progress__list li { flex-direction: column; gap: .1rem; padding: .4rem .1rem; font-size: .8rem; }
+  .wizard-progress__list li a { flex-direction: column; gap: .1rem; }
+  .wizard-progress__num { width: 1.25rem; height: 1.25rem; font-size: .78rem; }
+}
+
+/* Gekozen ontwerp met Wijzigen en de balk met onderdelen van Personaliseer. */
+.deelnav { margin: .7rem 0 0; display: grid; gap: .5rem; }
+.deelnav__ontwerp { margin: 0; display: flex; align-items: baseline; gap: .45rem; flex-wrap: wrap; font-size: .95rem; }
+.deelnav__vink { color: var(--success); font-weight: 700; }
+.deelnav__ontwerp a { margin-left: auto; font-weight: 600; }
+.deelnav__balk ul { list-style: none; margin: 0; padding: 0 0 .15rem; display: flex; gap: .4rem; overflow-x: auto; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+.deelnav__balk li { flex: 0 0 auto; }
+.deelnav__balk a { display: inline-flex; align-items: center; min-height: 44px; padding: .35rem 1rem; border-radius: 999px; border: 1px solid var(--line-strong); background: #fff; color: var(--ink); font-size: .92rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.deelnav__balk a:hover { border-color: var(--accent); }
+.deelnav__balk a.is-current { background: var(--accent); border-color: var(--accent); color: #fff; }
+.deelnav__balk a:focus-visible { outline: 3px solid var(--gold-deep); outline-offset: 2px; }
+
+/* Kies kaart */
+.kies { display: grid; gap: .9rem; }
+.kies__balk { display: grid; gap: .5rem; }
+.chip-rij { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .15rem; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+.chip-link { flex: 0 0 auto; display: inline-flex; align-items: center; min-height: 44px; padding: .3rem 1rem; border-radius: 999px; border: 1px solid var(--line-strong); background: #fff; color: var(--ink); font-size: .95rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.chip-link:hover { border-color: var(--accent); }
+.chip-link.is-current { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chip-link:focus-visible { outline: 3px solid var(--gold-deep); outline-offset: 2px; }
+.chip-rij--soort .chip-link { min-height: 40px; background: transparent; font-weight: 500; }
+.chip-rij--soort .chip-link.is-current { background: var(--gold-soft); border-color: var(--accent); color: var(--ink); font-weight: 600; }
+.kies__prijs, .kies__account { margin: 0; }
+.kies__terug { margin: .5rem 0 0; }
+.occasion-kiezer { display: grid; gap: .6rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 640px) { .occasion-kiezer { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.occasion-kiezer__keuze { display: grid; place-items: center; min-height: 64px; padding: .8rem; border: 1px solid var(--line-strong); border-radius: var(--radius); background: #fff; color: var(--ink); font-family: var(--font-display); font-size: 1.15rem; text-align: center; text-decoration: none; }
+.occasion-kiezer__keuze:hover { border-color: var(--accent); }
+.occasion-kiezer__keuze:focus-visible { outline: 3px solid var(--gold-deep); outline-offset: 2px; }
+
+.kaart-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: .7rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 640px) { .kaart-grid { grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr)); gap: .9rem; } }
+.kaart-keuze { position: relative; display: grid; align-content: start; gap: .25rem; min-width: 0; }
+.kaart-keuze__knop { all: unset; box-sizing: border-box; display: grid; gap: .25rem; align-content: start; cursor: pointer; padding: .4rem; border: 1px solid var(--line-strong); border-radius: var(--radius); background: #fff; color: var(--ink); text-align: left; }
+.kaart-keuze__knop:hover { border-color: var(--accent); box-shadow: 0 6px 18px -12px rgba(60, 40, 10, .45); }
+.kaart-keuze__knop:focus-visible { outline: 3px solid var(--gold-deep); outline-offset: 2px; }
+.kaart-keuze.is-gekozen .kaart-keuze__knop { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.kaart-keuze img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 8px; display: block; }
+.kaart-keuze__naam { font-size: .98rem; padding: 0 .15rem; }
+.kaart-keuze__tekst { padding: 0 .15rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.kaart-keuze__prijs { padding: 0 .15rem; font-weight: 600; color: var(--accent-text); }
+.kaart-keuze__demo { font-size: .88rem; font-weight: 600; padding: 0 .4rem .2rem; }
+@media (max-width: 639px) { .kaart-keuze__tekst { display: none; } }
+.kaart-grid__leeg { grid-column: 1 / -1; color: var(--muted); }
+
+.kaart-gekozen { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: .5rem .9rem; align-items: center; padding: .8rem; border: 1px solid var(--accent); border-radius: var(--radius); background: color-mix(in srgb, var(--gold-soft) 28%, #fff); }
+.kaart-gekozen img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 8px; grid-row: span 2; }
+.kaart-gekozen__tekst { display: grid; gap: .15rem; align-content: center; }
+.kaart-gekozen__tekst strong { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; }
+.kaart-gekozen__label { margin: 0; color: var(--success); font-weight: 700; font-size: .88rem; }
+.kaart-gekozen__cta { grid-column: 2; justify-self: stretch; white-space: normal; }
+@media (min-width: 640px) { .kaart-gekozen { grid-template-columns: 7rem minmax(0, 1fr) auto; } .kaart-gekozen img { grid-row: auto; } .kaart-gekozen__cta { grid-column: auto; justify-self: end; } }
+.kies-ander > summary { cursor: pointer; font-weight: 600; color: var(--accent-text); min-height: 44px; display: flex; align-items: center; }
+.kies-ander[open] > summary { margin-bottom: .5rem; }
+
+/* Acties onderaan: op een telefoon altijd bereikbaar. */
+.step-actions--bar { margin-top: 1rem; }
+.step-actions--bar .step-actions__next { margin-left: auto; }
+@media (max-width: 859px) {
+  .step-actions--bar { position: sticky; bottom: 0; z-index: 20; margin: 1rem -16px 0; padding: .55rem 16px calc(.55rem + env(safe-area-inset-bottom, 0px)); gap: .4rem .6rem; background: rgba(251, 248, 242, .97); border-top: 1px solid var(--line); box-shadow: 0 -10px 18px -16px rgba(40, 28, 8, .5); flex-wrap: wrap; }
+  .step-actions--bar .step-actions__next { order: -1; flex: 1 1 100%; margin-left: 0; }
+  .step-actions--bar .btn { flex: 1 1 0; min-width: 0; padding-left: .8rem; padding-right: .8rem; }
+  .step-actions--bar .btn:not(.step-actions__next) { min-height: 40px; padding-top: .25rem; padding-bottom: .25rem; font-size: .92rem; }
+  .step-actions--bar .step-actions__next { flex-basis: 100%; }
+  .studio-live .live-kaart__toggle { bottom: 7.4rem; }
+}
+
+.chip-rij, .deelnav__balk ul { position: relative; }
+
+/* Onderdelen van een stap als opvouwbaar blok: wat al is ingevuld staat open, de rest is één regel. */
+.studio-deel { border-top: 1px solid var(--line); padding: 0; margin: 0; display: block; }
+.studio-deel > :not(summary) { margin-top: .8rem; }
+.studio-deel > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: .6rem; min-height: 52px; font-family: var(--font-display); font-size: 1.25rem; }
+.studio-deel > summary::-webkit-details-marker { display: none; }
+.studio-deel > summary::after { content: "+"; margin-left: auto; width: 1.6rem; height: 1.6rem; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line-strong); color: var(--accent-text); font: 600 1.1rem/1 var(--font-body); }
+.studio-deel[open] > summary::after { content: "\2212"; }
+.studio-deel > summary:focus-visible { outline: 3px solid var(--gold-deep); outline-offset: 2px; }
+.studio-deel[open] { padding-bottom: 1.1rem; }
+.studio-deel + .studio-deel { margin-top: 0; }
+.studio-form > .studio-deel:last-of-type { border-bottom: 1px solid var(--line); margin-bottom: 1.2rem; }
+.studio-block--rustig { margin-bottom: 1.2rem; }
+.studio-more > summary { cursor: pointer; font-weight: 600; color: var(--accent-text); min-height: 44px; display: flex; align-items: center; }
+.form-row--wanneer { grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); }
+
+/* Controle: aanpassen als chips. */
+.edit-links { margin: 1rem 0; }
+.edit-links__kop { margin: 0 0 .4rem; font-weight: 600; }
+.chip-lijst { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+
+/* Compacter op een telefoon: minder witruimte tussen blokken en velden. */
+@media (max-width: 640px) {
+  .studio { padding-top: .8rem; padding-bottom: 1.5rem; }
+  .studio-block { padding-top: 1rem; margin-bottom: 1.2rem; gap: .7rem; }
+  .studio-block__title { font-size: 1.2rem; }
+  .studio-form .form-row { gap: .6rem; }
+  .studio-header__inner { min-height: 3.2rem; }
+}
+.deelnav, .kies__balk, .kies { grid-template-columns: minmax(0, 1fr); }
+.deelnav > *, .kies__balk > *, .kies > * { min-width: 0; }
+
+.step-actions--cta { margin-top: .6rem; }
+.step-actions--cta .step-actions__next { flex: 1 1 100%; justify-content: center; margin-left: 0; text-align: center; }
+.step-actions__noot { flex: 1 1 100%; margin: 0; }
+/* Controle: op een telefoon eerst de uitkomst, dan de voorvertoning, met de vervolgknop vast onderaan; op een computer de voorvertoning links en rechts de uitkomst met de knop eronder. */
+@media (max-width: 979px) {
+  .preview-layout { display: flex; flex-direction: column; align-items: stretch; gap: 1rem; }
+  .preview-layout .preview-aside { order: 1; position: static; }
+  .preview-layout .preview-stage { order: 2; }
+  .preview-layout .step-actions--cta { order: 3; }
+}
+@media (min-width: 980px) {
+  .preview-layout { grid-template-columns: 1fr 22rem; grid-template-rows: auto 1fr; }
+  .preview-layout .preview-stage { grid-column: 1; grid-row: 1 / span 2; }
+  .preview-layout .preview-aside { grid-column: 2; grid-row: 1; position: static; }
+  .preview-layout .step-actions--cta { grid-column: 2; grid-row: 2; position: sticky; top: 5.5rem; align-self: start; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; }
+}
+
+/* Controle-punten compact op een telefoon: de tekst en 'Aanpassen' op één regel. */
+@media (max-width: 520px) {
+  .controle__item { grid-template-columns: auto minmax(0, 1fr) auto; gap: .6rem; padding: .6rem 0; }
+  .controle__fix { grid-column: auto; justify-self: end; padding: .3rem .7rem; font-size: .85rem; }
+  .controle__label { font-size: .72rem; }
+  .controle__text { font-size: .95rem; }
+}

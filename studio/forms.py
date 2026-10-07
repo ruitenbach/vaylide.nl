@@ -23,7 +23,6 @@ from invitations.content import (
     SOORTEN,
     TIMEZONES,
     card_kind,
-    event_expected,
     parse_date,
 )
 
@@ -125,12 +124,10 @@ class DetailsForm(StepForm):
         new_fields = {}
         # Bij een wenskaart is één naam genoeg: alleen het eerste verplichte naamveld blijft verplicht (bij een bruiloft Naam partner 1; een
         # wenskaart voor één persoon hoeft geen tweede naam). Een uitnodiging vraagt alle verplichte namen, zoals altijd.
-        eerste_verplicht = next((k for k, _l, req, *_ in cfg["name_fields"] if req), None)
         self.wenskaart = self._soort_nu() == "wenskaart"
         for key, label, required, max_len, help_text in cfg["name_fields"]:
             name = f"name_{key}"
-            extra_verplicht = bool(required) and key != eerste_verplicht
-            required = bool(required) and not (self.wenskaart and extra_verplicht)
+            required = False    # alle velden zijn optioneel: de klant bepaalt zelf wat er op de kaart komt
             self.name_keys.append((name, key, label, required))
             if key in ("age", "years"):
                 field = forms.IntegerField(label=label, required=False, min_value=1, max_value=150, help_text=help_text,
@@ -138,9 +135,7 @@ class DetailsForm(StepForm):
                                                            "max_value": "Vul een realistisch getal in."})
             else:
                 field = forms.CharField(label=label, required=False, max_length=max_len, help_text=help_text)
-            field.widget.attrs["data-required"] = "1" if required else ""
-            if extra_verplicht:
-                field.widget.attrs["data-alleen-uitnodiging-verplicht"] = "1"    # studio.js: verplicht alleen bij een uitnodiging
+            field.widget.attrs["data-required"] = ""
             if "names" in self.locked:
                 field.disabled = True
             new_fields[name] = field
@@ -200,23 +195,8 @@ class DetailsForm(StepForm):
         return content
 
     def missing(self) -> dict[str, str]:
-        d = self.cleaned_data
-        errors = {}
-        for name, key, label, required in self.name_keys:
-            if required and not _s(d.get(name)):
-                errors[name] = f"Vul '{label.lower()}' in."
-        # Een wenskaart heeft geen datum of locatie nodig, bij elke gelegenheid.
-        soort = d.get("soort")
-        if soort == "wenskaart":
-            return errors
-        # Zonder keuze is het een uitnodiging: leeg laten van datum en locatie maakt er nooit een wenskaart van.
-        if not d.get("date"):
-            errors["date"] = "Vul de datum in."
-        if not d.get("start_time"):
-            errors["start_time"] = "Vul de begintijd in."
-        if not _s(d.get("venue_name")):
-            errors["venue_name"] = "Vul de naam van de locatie in."
-        return errors
+        """Niets is verplicht: een leeg veld laat het bijbehorende onderdeel gewoon van de kaart weg."""
+        return {}
 
 
 class ProgramForm(StepForm):
@@ -293,6 +273,25 @@ class ProgramForm(StepForm):
                 highest = max(highest, int(m.group(1)))
         return highest + 1
 
+    def _ingevuld(self, *namen) -> bool:
+        return any(self[naam].value() for naam in namen if naam in self.fields)
+
+    @property
+    def programma_open(self) -> bool:
+        return self._ingevuld(*[f"p{i}_{k}" for i in range(self.program_rows) for k in ("title", "time", "description")])
+
+    @property
+    def dresscode_open(self) -> bool:
+        return self._ingevuld("dresscode_text") or any(self[f"dc{i}_use"].value() for i in range(self.COLOR_SLOTS))
+
+    @property
+    def tips_open(self) -> bool:
+        return self._ingevuld(*[f"k{i}_{k}" for i in range(self.practical_rows) for k in ("title", "text")])
+
+    @property
+    def contact_open(self) -> bool:
+        return self._ingevuld("contact_name", "contact_phone", "contact_email", "contact_note")
+
     @property
     def program_fields(self):
         return [(self[f"p{i}_time"], self[f"p{i}_title"], self[f"p{i}_description"]) for i in range(self.program_rows)]
@@ -324,9 +323,12 @@ class ProgramForm(StepForm):
 
     def apply(self, content: dict) -> dict:
         d = self.cleaned_data
+        sections = content.setdefault("sections", {})
+        sections["closing"] = True    # ingevuld = zichtbaar, leeg = weg; een eerdere schakelaar bij Stijl bestaat niet meer
         if self.only_closing:
             content["closing_text"] = _s(d.get("closing_text"))
             return content
+        sections.update({key: True for key in ("program", "dresscode", "practical", "contact")})
         program = []
         for i in range(self.program_rows):
             title = _s(d.get(f"p{i}_title"))
@@ -358,18 +360,16 @@ class RsvpSettingsForm(StepForm):
     (invitations/vragen.py); geen eigen vraagteksten of antwoordopties, zodat er geen gevoelige gegevens worden
     uitgevraagd. Oude eigen vragen blijven staan tot de organisator ze weghaalt."""
 
-    enabled = forms.BooleanField(label="Gasten kunnen zich aanmelden via de uitnodiging", required=False)
-    deadline = forms.DateField(label="Aanmelden kan tot en met", required=False, widget=DATE_WIDGET,
+    enabled = forms.BooleanField(label="Gasten kunnen zich aanmelden", required=False)
+    deadline = forms.DateField(label="Aanmelden kan tot en met (optioneel)", required=False, widget=DATE_WIDGET,
                                error_messages={"invalid": "Vul een geldige datum in."})
-    max_party_size = forms.IntegerField(label="Maximaal aantal personen per aanmelding", min_value=1, max_value=10, initial=2,
-                                        help_text="Inclusief de gast zelf. Kies 1 als iedere gast alleen zichzelf aanmeldt.",
+    max_party_size = forms.IntegerField(label="Personen per aanmelding (maximaal)", min_value=1, max_value=10, initial=2, required=False,
+                                        help_text="Gasten kiezen met hoeveel personen ze komen, inclusief zichzelf. 1 = alleen de gast zelf.",
                                         error_messages={"min_value": "Minimaal 1.", "max_value": "Maximaal 10.", "invalid": "Vul een getal in."})
-    capacity = forms.IntegerField(label="Maximaal aantal gasten in totaal (optioneel)", min_value=1, max_value=5000, required=False,
-                                  help_text="Als dit aantal is bereikt, sluit het aanmelden automatisch.",
+    capacity = forms.IntegerField(label="Maximaal aantal gasten in totaal", min_value=1, max_value=5000, required=False,
+                                  help_text="Is dit aantal bereikt, dan sluit het aanmelden vanzelf.",
                                   error_messages={"min_value": "Minimaal 1.", "invalid": "Vul een getal in."})
-    ask_remark = forms.BooleanField(label="Gasten kunnen een korte toelichting meesturen", required=False,
-                                    help_text="Bijvoorbeeld dat iemand later komt. Gasten zien erbij dat ze geen gevoelige "
-                                              "gegevens moeten invullen. De vraag zelf ligt vast.")
+    ask_remark = forms.BooleanField(label="Gasten kunnen een korte toelichting meesturen", required=False)
     remark_standaard = forms.BooleanField(label="Gebruik de standaardvraag bij de toelichting", required=False)
     max_vragen = MAX_QUESTIONS
 
@@ -387,6 +387,10 @@ class RsvpSettingsForm(StepForm):
             self.fields[f"verplicht_{v['key']}"] = forms.BooleanField(label="Verplicht", required=False)
         for i, _q in enumerate(self.oude_vragen):
             self.fields[f"oud_{i}_weg"] = forms.BooleanField(label="Deze vraag weghalen", required=False)
+        # Bij een bruiloft vragen we geen aanmeldperiode: het onderdeel 'Aanmelden tot en met' hoort niet meer bij het personaliseren.
+        self.zonder_deadline = self.occasion == "bruiloft"
+        if self.zonder_deadline:
+            del self.fields["deadline"]
         if not self.is_bound:
             self.initial["enabled"] = bool((self.content.get("sections") or {}).get("rsvp"))
             self.initial["deadline"] = parse_date(rsvp.get("deadline"))
@@ -396,6 +400,10 @@ class RsvpSettingsForm(StepForm):
             for key, q in chosen.items():
                 self.initial[f"vraag_{key}"] = True
                 self.initial[f"verplicht_{key}"] = bool(q.get("required"))
+
+    @property
+    def vragen_open(self) -> bool:
+        return any(self[f"vraag_{v['key']}"].value() for v in vragen.VRAGEN) or bool(self.oude_vragen)
 
     @property
     def question_fields(self):
@@ -429,8 +437,8 @@ class RsvpSettingsForm(StepForm):
         standaard = vragen.TOELICHTING_LABEL_U if self.formal else vragen.TOELICHTING_LABEL
         remark_label = self.oude_toelichting if self.oude_toelichting and not d.get("remark_standaard") else standaard
         content["rsvp"] = {
-            "deadline": d["deadline"].isoformat() if d.get("deadline") else "",
-            "max_party_size": d.get("max_party_size") or 1,
+            "deadline": "" if self.zonder_deadline else (d["deadline"].isoformat() if d.get("deadline") else ""),
+            "max_party_size": d.get("max_party_size") or 2,    # leeg gelaten: de standaard, twee personen
             "capacity": d.get("capacity"),
             "ask_remark": bool(d.get("ask_remark")),
             "remark_label": remark_label,
@@ -439,11 +447,7 @@ class RsvpSettingsForm(StepForm):
         return content
 
     def missing(self) -> dict[str, str]:
-        d = self.cleaned_data
-        # Een kerstkaart zonder evenement toont geen aanmelden; dan is ook geen deadline nodig.
-        if d.get("enabled") and not d.get("deadline") and event_expected(self.content, self.occasion):
-            return {"deadline": "Kies tot wanneer gasten zich kunnen aanmelden."}
-        return {}
+        return {}   # ook een aanmelddeadline is optioneel
 
 
 class PhotosForm(StepForm):
@@ -663,14 +667,10 @@ class EnvelopeForm(StepForm):
 class StyleForm(StepForm):
     palette = forms.ChoiceField(label="Kleurvariant", widget=forms.RadioSelect)
     opening = forms.BooleanField(label="Openingsanimatie tonen", required=False,
-                                 help_text="Gasten openen de uitnodiging met een tik. Zonder animatie zien ze direct de inhoud.")
+                                 help_text="Zonder animatie zien gasten direct de inhoud.")
+    # Alleen de extra's. Programma, dresscode, praktische info, contact en afsluiting staan bij 'Praktische info': ingevuld = zichtbaar, leeg = weg.
     SECTION_FIELDS = [
         ("countdown", "Afteller"),
-        ("program", "Programma"),
-        ("dresscode", "Dresscode"),
-        ("practical", "Praktische informatie"),
-        ("contact", "Contactpersoon"),
-        ("closing", "Afsluitende tekst"),
         ("story", "Persoonlijk verhaal"),
         ("gallery", "Fotogalerij"),
         ("music", "Muziek"),

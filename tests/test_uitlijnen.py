@@ -90,6 +90,6 @@ class AutoPlacementTests(VaylideTestCase):
     def test_drag_hint_and_no_js_sliders(self):
         self.upload(couple_jpeg())
         page = self.client.get(f"{self.base}/fotos/")
-        self.assertContains(page, "Sleep de foto met je muis of vinger")
+        self.assertContains(page, "Sleep een foto of zoom in")
         self.assertContains(page, "data-focus-xy")  # zonder JavaScript blijven de schuifbalken werken
         self.assertContains(page, "Automatisch uitlijnen")

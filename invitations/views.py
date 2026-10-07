@@ -175,9 +175,11 @@ def _success_texts(view, result):
     first = result.response.name.split(" ")[0]
     formal = view.get("formal")
     if result.response.attending:
+        aantal = result.response.party_size
+        met = f" Aangemeld met {aantal} personen." if aantal and aantal > 1 else ""
         message = (
             "Fijn dat u erbij bent! Uw antwoord is opgeslagen." if formal else "Wat fijn dat je erbij bent! Je antwoord is opgeslagen."
-        )
+        ) + met
     else:
         message = (
             "Jammer dat u er niet bij kunt zijn. Uw antwoord is opgeslagen."

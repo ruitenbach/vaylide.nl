@@ -78,9 +78,8 @@ class LivePhoneTests(VaylideTestCase):
 
     def test_photo_step_explains_where_things_go(self):
         page = self.client.get(f"{self.base}/fotos/")
-        self.assertContains(page, "Waar komt wat op je kaart?")
-        self.assertContains(page, "Hoofdfoto")
-        self.assertContains(page, "Fotogalerij")
+        self.assertContains(page, "komt pas op je kaart als je hem kiest als hoofdfoto")
+        self.assertContains(page, "voor de galerij")
 
     def test_other_customers_get_404(self):
         other = Client()
@@ -111,7 +110,7 @@ class PreviewFrameAndCheckoutTests(VaylideTestCase):
         self.assertNotIn("inv-kader", self.client.get(f"{self.base}/voorbeeld/weergave/").content.decode())
 
     def test_checkout_invites_to_finish(self):
-        self.assertContains(self.client.get(f"{self.base}/bestellen/"), "Je bent er bijna voor je unieke kaart!")
+        self.assertContains(self.client.get(f"{self.base}/bestellen/"), "Je betaalt eenmalig.")
 
     def test_live_card_has_shine_that_respects_reduced_motion(self):
         from django.conf import settings

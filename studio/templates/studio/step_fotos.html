@@ -1,20 +1,10 @@
 {% extends "studio/base_studio.html" %}
 {% block title %}Foto's en verhaal{% endblock %}
 {% block studio %}
-<div class="studio-intro">
-  <h1>{% if wenskaart_vast %}Een foto op je wenskaart{% else %}Foto's, verhaal en muziek{% endif %}</h1>
-  <p class="lead">{% if wenskaart_vast %}Een foto is optioneel. Kies welk deel in beeld komt. Locatiegegevens halen we automatisch weg.{% else %}Kies per foto welk deel in beeld komt. Locatiegegevens halen we automatisch weg.{% endif %}</p>
+<div class="studio-intro studio-intro--kort">
+  <h1>{% if wenskaart_vast %}Foto{% else %}Foto's &amp; verhaal{% endif %}</h1>
+  <p class="lead">Alles is optioneel. Een foto komt pas op je kaart als je hem kiest als hoofdfoto{% if not wenskaart_vast %} of voor de galerij{% endif %}.</p>
 </div>
-<section class="waar-komt-wat" aria-labelledby="waar-titel">
-  <h2 class="waar-komt-wat__title" id="waar-titel">Waar komt wat op je kaart?</h2>
-  <ol class="waar-komt-wat__lijst">
-    <li><strong>Hoofdfoto</strong> <span>De grote foto op je kaart, bij jullie namen of welkomsttekst (dat verschilt per ontwerp). Je kiest er één.</span></li>
-    {% if not wenskaart_vast %}<li><strong>Fotogalerij</strong> <span>Een fotoblok verderop op de kaart, tot 12 foto's, elk met een eigen onderschrift.</span></li>
-    <li><strong>Verhaal</strong> <span>Een eigen blok met de titel die je kiest, onder de foto's.</span></li>
-    <li><strong>Muziek</strong> <span>Een knop op de kaart. Speelt pas als een gast erop tikt.</span></li>{% endif %}
-  </ol>
-  <p class="small muted">Geüploade foto's komen pas op je kaart als je ze hieronder kiest als hoofdfoto of voor de galerij. Op je kaart ernaast (op een telefoon: "Bekijk je kaart") zie je met een gouden rand waar ze staan.</p>
-</section>
 {% include "studio/_conflict.html" %}
 <section class="studio-block" id="uploads" aria-labelledby="blok-upload">
   <h2 class="studio-block__title" id="blok-upload">Foto's uploaden</h2>
@@ -25,7 +15,7 @@
       <span class="hint">JPG, PNG of WebP · max. {{ upload_limits.photo_max_bytes|filesizeformat }} per foto · minimaal {{ upload_limits.photo_min_side }} pixels</span>
       <input id="upload-fotos" type="file" name="fotos" accept="image/jpeg,image/png,image/webp" multiple>
     </label>
-    <p class="hint privacy-link">Upload alleen foto's die je met je genodigden mag delen. Onze eigen server lijnt ze uit op de gezichten; niemand wordt herkend. Meer in de <a href="{% url 'core:privacy' %}#fotos" target="_blank" rel="noopener">privacyverklaring</a>.</p>
+    <p class="hint privacy-link">Upload alleen foto's die je met je gasten mag delen. <a href="{% url 'core:privacy' %}#fotos" target="_blank" rel="noopener">Privacy</a></p>
     <p class="upload-status" data-upload-status aria-live="polite"></p>
     <button type="submit" class="btn btn--secondary btn--sm" data-upload-submit>Uploaden</button>
   </form>
@@ -36,7 +26,7 @@
   <section class="studio-block" aria-labelledby="blok-fotos">
     <h2 class="studio-block__title" id="blok-fotos">Jouw foto's</h2>
     {% if photos %}
-    <p class="hint">We lijnen elke foto automatisch uit op de gezichten. Liever anders? Sleep de foto met je muis of vinger en zoom in met de schuifbalk. Je kaart ernaast laat direct zien hoe het staat.</p>
+    <p class="hint">Automatisch uitgelijnd op de gezichten. Sleep een foto of zoom in om de uitsnede te wijzigen.</p>
     <fieldset>
       <legend class="visually-hidden">Hoofdfoto</legend>
       <div class="photo-grid">
@@ -63,7 +53,7 @@
       <label class="check photo-none"><input type="radio" name="hero" value=""{% if not form.hero.value %} checked{% endif %}><span>Geen hoofdfoto gebruiken</span></label>
     </fieldset>
     {% else %}
-    <p class="empty-state">Je hebt nog geen foto's geüpload. Een uitnodiging zonder foto kan ook: het ontwerp past zich aan.</p>
+    <p class="empty-state">Nog geen foto's. Zonder foto past het ontwerp zich aan.</p>
     {% endif %}
   </section>
 
@@ -77,7 +67,7 @@
   <section class="studio-block" aria-labelledby="blok-muziek">
     {% if form.ontwerp_muziek %}
     <h2 class="studio-block__title" id="blok-muziek">Muziek</h2>
-    <p class="hint">Start nooit vanzelf: gasten zetten de muziek zelf aan met de knop op de kaart.</p>
+    <p class="hint">Gasten zetten de muziek zelf aan.</p>
     <fieldset class="muziekbron">
       <legend class="label">Kies de muziek</legend>
       {% for choice in form.music_source %}<div class="check-line">{{ choice }}{% if choice.data.value == "design" %} <span class="badge">Inbegrepen</span>{% elif choice.data.value == "none" %} <span class="badge">Geen kosten</span>{% else %} <span class="badge">{{ feature_badges.music }}</span>{% endif %}</div>{% endfor %}
@@ -85,7 +75,7 @@
     </fieldset>
     <div class="muziek-eigen" data-muziek-eigen>
       <h3 class="label">Eigen muziek</h3>
-      <p class="small muted">Alleen nodig bij "Eigen muziek uploaden". MP3 of M4A, max. {{ upload_limits.audio_max_bytes|filesizeformat }}. Eigen muziek gaat altijd voor de muziek van het ontwerp.</p>
+      <p class="small muted">MP3 of M4A, max. {{ upload_limits.audio_max_bytes|filesizeformat }}.</p>
       {% if audio %}
       <fieldset>
         <legend class="label">Kies je bestand</legend>
@@ -103,7 +93,7 @@
     </div>
     {% else %}
     <h2 class="studio-block__title" id="blok-muziek">Muziek <span class="badge">{{ feature_badges.music }}</span></h2>
-    <p class="hint">Start nooit vanzelf. MP3 of M4A, max. {{ upload_limits.audio_max_bytes|filesizeformat }}.</p>
+    <p class="hint">Gasten zetten de muziek zelf aan. MP3 of M4A, max. {{ upload_limits.audio_max_bytes|filesizeformat }}.</p>
     {% if audio %}
     <fieldset>
       <legend class="label">Kies de muziek</legend>

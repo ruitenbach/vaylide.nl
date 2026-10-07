@@ -1,9 +1,8 @@
 {% extends "studio/base_studio.html" %}
-{% block title %}Voorbeeld{% endblock %}
+{% block title %}Controleer je kaart{% endblock %}
 {% block studio %}
-<div class="studio-intro">
-  <h1>Je persoonlijke voorbeeld</h1>
-  <p class="lead">Zo ziet je {% if wenskaart %}wenskaart{% else %}uitnodiging{% endif %} eruit.</p>
+<div class="studio-intro studio-intro--kort">
+  <h1>Controleer je kaart</h1>
 </div>
 <div class="preview-layout">
   <div class="preview-stage" data-preview>
@@ -13,33 +12,35 @@
       <a class="chip" href="{{ frame_url }}" target="_blank" rel="noopener">Volledig scherm<span class="visually-hidden"> (nieuw venster)</span></a>
     </div>
     <div class="preview-frame preview-frame--telefoon" data-preview-frame>
-      <iframe src="{{ frame_url }}?kader=1" title="Voorbeeld van je uitnodiging"></iframe>
+      <iframe src="{{ frame_url }}?kader=1" title="Voorbeeld van je kaart"></iframe>
     </div>
   </div>
   <aside class="preview-aside">
     {% include "studio/_controle.html" with issues=issues %}
-    <ul class="edit-links">
-      {% if envelop_stap %}<li><a href="{% url 'studio:step' inv.uid 'envelop' %}">Envelop en zegel</a></li>{% endif %}
-      <li><a href="{% url 'studio:step' inv.uid 'gegevens' %}">Gegevens aanpassen</a></li>
-      {% if wenskaart %}<li><a href="{% url 'studio:step' inv.uid 'programma' %}">Afsluiting</a></li>{% else %}
-      <li><a href="{% url 'studio:step' inv.uid 'programma' %}">Programma en info</a></li>
-      <li><a href="{% url 'studio:step' inv.uid 'aanmelden' %}">Aanmelden</a></li>{% endif %}
-      <li><a href="{% url 'studio:step' inv.uid 'fotos' %}">{% if wenskaart_vast %}Foto{% else %}Foto's en verhaal{% endif %}</a></li>
-      <li><a href="{% url 'studio:step' inv.uid 'stijl' %}">{% if wenskaart_vast %}Stijl{% else %}Stijl en onderdelen{% endif %}</a></li>
-    </ul>
-    {% if paid %}
-      {% if unpaid_features %}<p class="notice notice--warning"><strong>Niet in je pakket</strong>{{ unpaid_features|join:", " }} staat aan, maar zit niet in je bestelling. Dit onderdeel wordt niet getoond. <a href="{% url 'portal:wish_new' %}?uitnodiging={{ inv.uid }}">Vraag naar de mogelijkheden</a>.</p>{% endif %}
-      {% if has_changes %}
-      <form method="post" action="{% url 'studio:publish' inv.uid %}" data-once>
-        {% csrf_token %}<input type="hidden" name="rev" value="{{ rev }}">
-        <button type="submit" class="btn btn--primary btn--block"{% if blocking %} disabled{% endif %}>Wijzigingen publiceren</button>
-        <p class="small muted">Je gasten zien de wijzigingen direct op dezelfde link.</p>
-      </form>
-      {% else %}<p class="notice"><strong>Geen nieuwe wijzigingen</strong>Wat je hier ziet, staat al online.</p>{% endif %}
-    {% else %}
-      <a class="btn btn--primary btn--block{% if blocking %} is-disabled{% endif %}" href="{% url 'studio:step' inv.uid 'bestellen' %}"{% if blocking %} aria-disabled="true"{% endif %}>{% if wenskaart_vast %}Doorgaan naar betalen &middot; {{ wenskaart_prijs }} incl. btw{% else %}Alles klopt, verder naar bestellen{% endif %} &rarr;</a>
-      {% if blocking %}<p class="small muted">Vul eerst de punten met 'Nodig' aan.</p>{% endif %}
-    {% endif %}
+    <div class="edit-links">
+      <p class="edit-links__kop">Iets aanpassen?</p>
+      <ul class="chip-lijst">
+        {% for s in aanpassen %}<li><a class="chip-link" href="{% url 'studio:step' inv.uid s.key %}">{{ s.label }}</a></li>{% endfor %}
+        <li><a class="chip-link" href="{% url 'studio:step' inv.uid 'ontwerp' %}">Ander ontwerp</a></li>
+      </ul>
+    </div>
+    {% if paid and unpaid_features %}<p class="notice notice--warning"><strong>Niet in je pakket</strong>{{ unpaid_features|join:", " }} staat aan, maar zit niet in je bestelling en wordt niet getoond. <a href="{% url 'portal:wish_new' %}?uitnodiging={{ inv.uid }}">Vraag naar de mogelijkheden</a>.</p>{% endif %}
+    {% if paid and not has_changes %}<p class="notice"><strong>Geen nieuwe wijzigingen</strong>Wat je hier ziet, staat al online.</p>{% endif %}
   </aside>
+  {% comment %}De vervolgknop is een eigen onderdeel van de indeling: op een telefoon blijft hij onderaan in beeld, op een computer staat hij onder de controle.{% endcomment %}
+  {% if paid %}
+    {% if has_changes %}
+    <form method="post" action="{% url 'studio:publish' inv.uid %}" data-once class="step-actions step-actions--bar step-actions--cta">
+      {% csrf_token %}<input type="hidden" name="rev" value="{{ rev }}">
+      <button type="submit" class="btn btn--primary btn--lg step-actions__next"{% if blocking %} disabled{% endif %}>Wijzigingen publiceren</button>
+      <p class="small muted step-actions__noot">Gasten zien de wijzigingen direct op dezelfde link.</p>
+    </form>
+    {% endif %}
+  {% else %}
+    <div class="step-actions step-actions--bar step-actions--cta">
+      <a class="btn btn--primary btn--lg step-actions__next{% if blocking %} is-disabled{% endif %}" href="{% url 'studio:step' inv.uid 'bestellen' %}"{% if blocking %} aria-disabled="true"{% endif %}>{% if wenskaart_vast %}Bestellen &middot; {{ wenskaart_prijs }} incl. btw{% else %}Verder naar bestellen{% endif %} &rarr;</a>
+      {% if blocking %}<p class="small muted step-actions__noot">Pas eerst de punten met 'Nodig' aan.</p>{% endif %}
+    </div>
+  {% endif %}
 </div>
 {% endblock %}

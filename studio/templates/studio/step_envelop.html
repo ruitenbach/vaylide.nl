@@ -1,10 +1,9 @@
 {% extends "studio/base_studio.html" %}{% load static %}
 {% block title %}Envelop en zegel{% endblock %}
 {% block studio %}
-<div class="studio-intro studio-intro--compact">
+<div class="studio-intro studio-intro--kort">
   <h1>Envelop &amp; zegel</h1>
-  <p class="lead">Hoe openen je gasten <strong>{{ inv.template_version.template.name }}</strong>? Kies een envelop en een zegel; je ziet het meteen op je kaart. <a href="{% url 'studio:step' inv.uid 'ontwerp' %}">Ander ontwerp</a></p>
-  <p class="studio-opening" id="envelop-uitleg">De envelop bepaalt alleen hoe je gasten de uitnodiging openen. Je gekozen uitnodiging zelf verandert niet.</p>
+  <p class="lead">Hoe openen je gasten de kaart? Je ziet de keuze meteen.</p>
 </div>
 {% include "studio/_conflict.html" %}
 {% comment %}De Envelope Collection als losse laag om het ontwerp. Zonder JavaScript blijft alles bruikbaar: kies een envelop, tik op Opslaan en de passende zegels staan er.
@@ -35,7 +34,6 @@ Met JavaScript (static/js/studio.js, data-envelop-kiezer) tonen we meteen alleen
   </fieldset>
   <fieldset class="studio-block" id="zegel" data-zegel-blok{% if not form.zegel_zichtbaar %} hidden{% endif %}>
     <legend class="studio-block__title">Kies je zegel</legend>
-    <p class="hint">Alleen de zegels die bij deze envelop passen.</p>
     <div class="zegel-grid">
       {% for z in form.zegel_opties %}
       <label class="zegel-kaart" data-envelopen="{{ z.envelopen }}"{% if not z.zichtbaar %} hidden{% endif %}>

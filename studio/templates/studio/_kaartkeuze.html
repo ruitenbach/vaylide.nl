@@ -1,0 +1,15 @@
+{% load vl %}{% comment %}De kaarten om uit te kiezen: een tik op een kaart is de keuze (verzendknop met name=template). Verwacht: kaarten, huidig (slug van het gekozen ontwerp), wenskaart.{% endcomment %}
+<ul class="kaart-grid">
+  {% for t in kaarten %}
+  <li class="kaart-keuze{% if t.slug == huidig %} is-gekozen{% endif %}">
+    <button type="submit" name="template" value="{{ t.slug }}" class="kaart-keuze__knop"{% if t.slug == huidig %} aria-current="true"{% endif %}>
+      <img src="{% design_image t.slug %}" alt="" width="400" height="500" loading="lazy">
+      <strong class="kaart-keuze__naam">{{ t.name }}{% if t.slug == huidig %} <span aria-hidden="true">&#10003;</span><span class="visually-hidden"> (gekozen)</span>{% endif %}</strong>
+      <span class="kaart-keuze__tekst small muted">{{ t.tagline }}</span>
+      {% if wenskaart %}<span class="kaart-keuze__prijs">{% if t.special %}{{ wenskaart_prijs_special }}{% else %}{{ wenskaart_prijs }}{% endif %} <span class="small">incl. btw</span></span>{% endif %}
+    </button>
+    <a class="kaart-keuze__demo" href="{% url 'invitations:demo' t.slug %}{% if occasion %}?gelegenheid={{ occasion }}{% endif %}" target="_blank" rel="noopener">Voorbeeld<span class="visually-hidden"> van {{ t.name }} (opent in nieuw venster)</span></a>
+  </li>
+  {% empty %}<li class="kaart-grid__leeg">Er zijn geen ontwerpen voor deze keuze.</li>
+  {% endfor %}
+</ul>

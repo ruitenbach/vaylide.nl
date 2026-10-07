@@ -1,33 +1,23 @@
 {% extends "studio/base_studio.html" %}{% load static vl %}
-{% block title %}Ontwerp en gelegenheid{% endblock %}
+{% block title %}Ander ontwerp{% endblock %}
 {% block studio %}
-<div class="studio-intro">
-  <h1>Ontwerp en gelegenheid</h1>
-  <p class="lead">Wissel gerust: je ingevulde gegevens blijven bewaard.</p>
+<div class="studio-intro studio-intro--kort">
+  <h1>Ander ontwerp kiezen</h1>
+  <p class="lead">Je gegevens blijven bewaard.</p>
 </div>
-{% if paid %}<p class="notice notice--warning">Let op: een ander ontwerp of andere gelegenheid wordt pas zichtbaar voor je gasten als je opnieuw publiceert.</p>{% endif %}
-<form method="post" class="form" data-once data-dirty-check>
+{% if paid %}<p class="notice notice--warning">Een ander ontwerp wordt pas zichtbaar voor je gasten als je opnieuw publiceert.</p>{% endif %}
+<form method="post" class="form kies" data-once>
   {% csrf_token %}
   <input type="hidden" name="rev" value="{{ rev }}">
-  <fieldset class="studio-block">
-    <legend class="studio-block__title">Gelegenheid</legend>
-    <div class="occasion-grid occasion-grid--compact">
-      {% for key, label in occasions %}<label class="radio-card"><input type="radio" name="occasion" value="{{ key }}"{% if key == inv.occasion %} checked{% endif %} data-occasion-radio><strong>{{ label }}</strong></label>{% endfor %}
+  <input type="hidden" name="occasion" value="{{ occasion }}">
+  {% if terug %}<input type="hidden" name="terug" value="{{ terug }}">{% endif %}
+  <div class="kies__balk">
+    <div class="chip-rij" role="group" aria-label="Gelegenheid">
+      {% for key, label in occasions %}<a class="chip-link{% if key == occasion %} is-current{% endif %}" href="?gelegenheid={{ key }}{% if terug %}&amp;terug={{ terug }}{% endif %}"{% if key == occasion %} aria-current="true"{% endif %}>{{ label }}</a>{% endfor %}
     </div>
-  </fieldset>
-  <fieldset class="studio-block">
-    <legend class="studio-block__title">Ontwerp</legend>
-    <div class="design-pick-grid">
-      {% for t in templates %}
-      <label class="radio-card design-pick" data-occasions="{{ t.occasions|join:' ' }}">
-        <input type="radio" name="template" value="{{ t.slug }}"{% if t.pk == inv.template_version.template_id %} checked{% endif %}>
-        <img src="{% design_image t.slug %}" alt="" width="400" height="500" loading="lazy">
-        <strong>{{ t.name }}</strong><span class="small muted">{{ t.occasion_labels|join:", " }}</span>
-      </label>
-      {% endfor %}
-    </div>
-    {% if form.template.errors %}<p class="field__error">{{ form.template.errors.0 }}</p>{% endif %}
-  </fieldset>
-  <div class="step-actions"><button type="submit" class="btn btn--primary step-actions__next">Opslaan en verder &rarr;</button></div>
+  </div>
+  {% if form.template.errors %}<p class="field__error" role="alert">{{ form.template.errors.0 }}</p>{% endif %}
+  {% include "studio/_kaartkeuze.html" with kaarten=templates huidig=inv.template_version.template.slug wenskaart=False %}
+  {% if terug %}<p class="kies__terug"><a class="btn btn--ghost" href="{% url 'studio:step' inv.uid terug %}">&larr; Houd dit ontwerp</a></p>{% else %}<p class="kies__terug"><a class="btn btn--ghost" href="{% url 'studio:step' inv.uid 'gegevens' %}">&larr; Houd dit ontwerp</a></p>{% endif %}
 </form>
 {% endblock %}

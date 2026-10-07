@@ -1,0 +1,11 @@
+{% comment %}Fase 2 (Personaliseer): het gekozen ontwerp met 'Wijzigen' en de balk met onderdelen. Wisselen van onderdeel bewaart wat er staat (static/js/studio.js, data-ga).{% endcomment %}
+{% if substeps %}
+<div class="deelnav">
+  <p class="deelnav__ontwerp"><span class="deelnav__vink" aria-hidden="true">&#10003;</span> <span>Gekozen ontwerp: <strong>{{ gekozen_ontwerp.name }}</strong></span> <a href="{% url 'studio:step' inv.uid 'ontwerp' %}?terug={{ step }}" data-ga="ontwerp">Wijzigen</a></p>
+  <nav class="deelnav__balk" aria-label="Onderdelen van je kaart">
+    <ul>
+      {% for s in substeps %}<li><a href="{% url 'studio:step' inv.uid s.key %}"{% if s.current %} aria-current="page" class="is-current"{% endif %} data-ga="{{ s.key }}">{{ s.label }}</a></li>{% endfor %}
+    </ul>
+  </nav>
+</div>
+{% endif %}

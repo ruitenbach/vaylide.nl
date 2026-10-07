@@ -31,13 +31,13 @@ class EditAfterPublicationTests(VaylideTestCase):
         self.assertContains(Client().get(f"/u/{slug}/"), "Nieuwe Locatie")
         self.assertEqual(self.inv.versions.count(), 2)
 
-    def test_publish_is_blocked_when_required_data_removed(self):
-        content = dict(self.inv.draft_content, venue_name="")
+    def test_publish_is_not_blocked_when_data_removed(self):
+        content = dict(self.inv.draft_content, venue_name="")      # niets is verplicht: een leeggemaakt veld verdwijnt gewoon van de kaart
         self.inv = save_draft(self.inv, expected_rev=None, content=content, user=self.owner)
         response = self.c.post(f"/maken/{self.inv.uid}/publiceren/", {"rev": self.inv.draft_rev}, follow=True)
-        self.assertContains(response, "Nog niet compleet")
-        self.assertContains(Client().get(self.inv.public_path), "Kasteel Test")
-
+        self.assertNotContains(response, "Nog niet compleet")
+        self.inv.refresh_from_db()
+        self.assertEqual(self.inv.versions.count(), 2)
 
 class ConflictTests(VaylideTestCase):
     def setUp(self):

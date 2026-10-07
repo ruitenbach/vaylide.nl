@@ -25,7 +25,7 @@ OCCASIONS: dict[str, dict] = {
         "label": "Bruiloft",
         "intro": "Voor jullie trouwdag, van ceremonie tot feest.",
         "name_fields": [
-            ("partner_1", "Naam partner 1", True, 60, "Zoals je hem op de uitnodiging wilt zien, bijv. alleen de voornaam."),
+            ("partner_1", "Naam partner 1", True, 60, ""),
             ("partner_2", "Naam partner 2", True, 60, ""),
         ],
         "default_headline": "Wij gaan trouwen",
@@ -126,11 +126,26 @@ OCCASIONS: dict[str, dict] = {
 _FAMILY_WORDS = {"familie", "fam", "fam.", "gezin", "het", "de", "van", "der", "den", "ten", "ter", "te", "'t", "family", "the"}
 
 
+def _aangemaakt(template) -> int:
+    """De dag (als getal) waarop het ontwerp aan de catalogus is toegevoegd; hoger = nieuwer. Een ontwerp zonder datum telt als oud."""
+    moment = getattr(template, "created_at", None)
+    if not moment:
+        return 0
+    from django.utils import timezone
+
+    return timezone.localtime(moment).date().toordinal() if timezone.is_aware(moment) else moment.date().toordinal()
+
+
 def by_occasion(designs, occasion: str) -> list:
-    """Eerst de ontwerpen die voor deze gelegenheid zijn gemaakt (eerste in hun lijst), daarna de rest."""
-    if not occasion:
-        return list(designs)
-    return sorted(designs, key=lambda t: (0 if (t.occasions or [""])[0] == occasion else 1, t.sort_order, t.name))
+    """De volgorde van de collectie, centraal: eerst de ontwerpen die voor deze gelegenheid zijn gemaakt (eerste in hun lijst), daarna de rest.
+    Binnen elk deel staan de nieuwste ontwerpen vooraan (op de dag waarop ze zijn toegevoegd) en de oudere daarna. Een nieuw ontwerp staat dus
+    automatisch bovenaan, zonder nummers aan te passen; `sort_order` bepaalt alleen de volgorde van ontwerpen van dezelfde dag.
+    Wie de lijst filtert op actief (is_active en een versie) houdt alleen gepubliceerde ontwerpen over."""
+    def sleutel(t):
+        eerst = 0 if (not occasion or (t.occasions or [""])[0] == occasion) else 1
+        return (eerst, -_aangemaakt(t), t.sort_order, t.name)
+
+    return sorted(designs, key=sleutel)
 
 
 def occasion_config(key: str) -> dict:

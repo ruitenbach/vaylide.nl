@@ -28,12 +28,12 @@ class CardKindTests(VaylideTestCase):
         content["date"] = "2020-01-01"  # een oude datum blijft bewaard, maar telt niet mee
         self.assertEqual([i for i in publish_issues(content, "kerst", first_publication=True) if i.blocking], [])
 
-    def test_invitation_needs_date_and_venue(self):
+    def test_invitation_mist_datum_en_locatie_is_alleen_een_tip(self):
         content = demo_content("aan-tafel", "kerst")
         content.update({"soort": "uitnodiging", "date": "", "start_time": "", "venue_name": ""})
-        fields = {i.field for i in publish_issues(content, "kerst", first_publication=True) if i.blocking}
-        self.assertTrue({"date", "start_time", "venue_name"} <= fields)
-
+        issues = publish_issues(content, "kerst", first_publication=True)
+        self.assertTrue({"date", "start_time", "venue_name"} <= {i.field for i in issues})
+        self.assertFalse(any(i.blocking for i in issues))
 
 class StudioChoiceTests(VaylideTestCase):
     def start(self, **extra):
@@ -44,7 +44,7 @@ class StudioChoiceTests(VaylideTestCase):
     def test_choice_is_shown_and_saved(self):
         c, inv = self.start(soort="uitnodiging")
         page = c.get(f"/maken/{inv.uid}/gegevens/")
-        self.assertContains(page, "Wat voor kaart wordt het?")
+        self.assertContains(page, "Liever een wenskaart zonder datum en plek?")
         self.assertContains(page, 'name="soort" value="uitnodiging" checked')
         self.assertContains(page, "data-alleen-uitnodiging")
         # Wenskaart: datum en locatie mogen leeg; wat er al stond blijft bewaard.
@@ -56,21 +56,19 @@ class StudioChoiceTests(VaylideTestCase):
         inv.refresh_from_db()
         self.assertEqual(inv.draft_content["soort"], "wenskaart")
         self.assertEqual(inv.draft_content["date"], future_date(60))
-        self.assertContains(c.get(f"/maken/{inv.uid}/programma/"), "Je maakt een wenskaart")
+        self.assertContains(c.get(f"/maken/{inv.uid}/programma/"), "Je afsluitende wens")
         self.assertRedirects(c.get(f"/maken/{inv.uid}/aanmelden/"), f"/maken/{inv.uid}/fotos/", fetch_redirect_response=False)
         preview = c.get(f"/maken/{inv.uid}/voorbeeld/weergave/").content.decode()
         self.assertIn("Een kerstgroet voor jou", preview)
         self.assertNotIn('class="at-plaats"', preview)  # geen datumkaartje
         self.assertNotIn('id="aanmelden"', preview)
 
-    def test_invitation_asks_for_date_time_and_venue(self):
+    def test_invitation_zonder_datum_tijd_en_locatie_kan_door(self):
         c, inv = self.start()
         response = c.post(f"/maken/{inv.uid}/gegevens/", {
             "rev": inv.draft_rev, "actie": "volgende", "soort": "uitnodiging", "name_family": "Familie Jansen", "timezone": "Europe/Amsterdam",
         })
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Vul de datum in.")
-        self.assertContains(response, "Vul de naam van de locatie in.")
+        self.assertRedirects(response, f"/maken/{inv.uid}/programma/", fetch_redirect_response=False)
 
     def test_start_keeps_the_choice_from_the_design_page(self):
         response = Client().get("/maken/", {"ontwerp": "aan-tafel", "gelegenheid": "kerst", "soort": "wenskaart"})
@@ -103,7 +101,7 @@ class DesignPageAndDemoTests(VaylideTestCase):
         self.assertIn("Fijne feestdagen</span>", at)
         self.assertIn("Kerstgroet</p>", at)
         self.assertIn("Voorbeeldwenskaart", at)
-        self.assertIn("soort=wenskaart\">Maak jouw wenskaart", at)
+        self.assertIn("soort=wenskaart&amp;direct=1\">Maak jouw wenskaart", at)
         mn = Client().get("/voorbeeld/middernacht/", {"soort": "wenskaart"}).content.decode()
         self.assertIn("Een kerstgroet voor jou", mn)
         self.assertNotIn("toegangskaart", mn)
@@ -175,10 +173,10 @@ class GreetingOnlyTests(VaylideTestCase):
         stijl = c.get(f"/maken/{inv.uid}/stijl/").content.decode()
         for key in ("program", "dresscode", "practical", "contact"):
             self.assertNotIn(f'name="s_{key}"', stijl, key)
-        self.assertIn('name="s_closing"', stijl)
+        self.assertNotIn('name="s_closing"', stijl)     # de afsluiting staat bij Afsluiting: ingevuld = zichtbaar
         inv.refresh_from_db()
         palette = inv.draft_content["style"]["palette"]
-        c.post(f"/maken/{inv.uid}/stijl/", {"rev": inv.draft_rev, "actie": "opslaan", "palette": palette, "opening": "on", "s_closing": "on"})
+        c.post(f"/maken/{inv.uid}/stijl/", {"rev": inv.draft_rev, "actie": "opslaan", "palette": palette, "opening": "on"})
         inv.refresh_from_db()
         self.assertTrue(inv.draft_content["sections"]["dresscode"])
         self.assertTrue(inv.draft_content["sections"]["contact"])
