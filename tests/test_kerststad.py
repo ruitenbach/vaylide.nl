@@ -221,3 +221,17 @@ class KerststadWenskaartTests(VaylideTestCase):
         html = Client().get("/ontwerpen/kerststad/", {"soort": "wenskaart"}).content.decode()
         self.assertIn('data-soort="wenskaart" aria-current="true"', html)
         self.assertIn("€ 24,95 incl. btw", html)
+
+
+class ManifestPastInDeDatabaseTests(VaylideTestCase):
+    def test_alle_manifestvelden_passen_in_de_databasekolommen(self):
+        """SQLite negeert max_length, PostgreSQL (staging en production) niet: een te lange tekst laat de registratie bij het opstarten stilzwijgend mislukken."""
+        from catalog.models import Template, TemplateVersion
+
+        grenzen = {veld: Template._meta.get_field(veld).max_length for veld in ("name", "tagline", "style_notes", "slug")}
+        for pad in (settings.BASE_DIR / "designs").glob("*/v*/manifest.json"):
+            data = json.loads(pad.read_text(encoding="utf-8"))
+            for veld, grens in grenzen.items():
+                self.assertLessEqual(len(data.get(veld, "")), grens, f"{pad.parent.parent.name}: {veld} is {len(data.get(veld, ''))} tekens (maximaal {grens})")
+            renderer = f"{pad.parent.parent.name}/{pad.parent.name}"
+            self.assertLessEqual(len(renderer), TemplateVersion._meta.get_field("renderer").max_length)
