@@ -257,6 +257,11 @@ class NewDesignTests(VaylideTestCase):
         from catalog.assets import design_image_path
         from catalog.models import TemplateVersion
 
+        from unittest import mock
+
+        from catalog import collectie
+
+        self.enterContext(mock.patch("catalog.collectie.toegevoegd", return_value={**collectie.toegevoegd(), "nieuw-ontwerp-test": timezone.now()}))
         base = Template.objects.get(slug="liefde-op-papier").current_version
         template = Template.objects.create(slug="nieuw-ontwerp-test", name="Nieuw ontwerp test", occasions=["bruiloft"], sort_order=99)
         version = TemplateVersion.objects.create(template=template, number=1, renderer=base.renderer, manifest=dict(base.manifest, slug="nieuw-ontwerp-test"))
@@ -285,13 +290,15 @@ class DesignManifestValidationTests(VaylideTestCase):
 
         from catalog.seed import DesignError, validate_manifest
 
-        good = {"slug": "nieuw", "version": 1, "name": "Nieuw", "occasions": ["bruiloft"],
+        good = {"slug": "nieuw", "version": 1, "name": "Nieuw", "occasions": ["bruiloft"], "added_at": "2026-10-07T07:59:37Z",
                 "palettes": [{"key": "a", "name": "A", "vars": {"--x": "#fff"}}]}
         with tempfile.TemporaryDirectory() as root:
             path = self.make_folder(root)
             validate_manifest(path, good)  # geen fout
             for bad, fragment in [
                 (dict(good, name=""), "mist: name"),
+                ({k: v for k, v in good.items() if k != "added_at"}, "mist: added_at"),
+                (dict(good, added_at="gisteren"), "geen geldige tijd met tijdzone"),
                 (dict(good, slug="anders"), "gelijk zijn aan de mapnaam"),
                 (dict(good, version=2), "hoort bij map v2"),
                 (dict(good, occasions=["feest"]), "onbekende gelegenheid"),

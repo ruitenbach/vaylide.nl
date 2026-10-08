@@ -6,6 +6,7 @@ import re
 
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -23,8 +24,8 @@ from catalog.specials import is_special, special_addon
 from studio import pakket
 from core.ai import AIUnavailable, suggest_text
 from core.utils import ip_fingerprint, rate_limit, wants_json
-from invitations.access import get_accessible_invitation, remember_draft, session_drafts
-from invitations.content import SECTION_LABELS, card_kind, muziek_bij_ontwerp, normalize_content, publish_issues, referenced_assets
+from invitations.access import can_access, get_accessible_invitation, remember_draft, session_drafts
+from invitations.content import SECTION_LABELS, SOORTEN, card_kind, muziek_bij_ontwerp, normalize_content, publish_issues, referenced_assets
 from invitations.images import UploadError, process_logo, process_photo, sniff_audio
 from invitations.models import Invitation, MediaAsset, Source
 from invitations.render import PathResolver, RenderOptions, build_view
@@ -168,6 +169,29 @@ def _context(request, inv: Invitation, step: str, **extra) -> dict:
 
 # ------------------------------------------------------------------ starten
 
+ACTIEF_CONCEPT = "vierlief_actief_concept"
+
+
+def _onthoud_actief(request, inv: Invitation) -> None:
+    """Het concept van het lopende Studio-traject, met de versie (`draft_rev`) waarop het nog onaangeroerd is: er is alleen een ontwerp gekozen, nog niets ingevuld."""
+    request.session[ACTIEF_CONCEPT] = {"uid": str(inv.uid), "rev": inv.draft_rev}
+
+
+def _onaangeroerd_concept(request) -> Invitation | None:
+    """Het concept van dit Studio-traject als de klant er nog niets in heeft ingevuld (hij koos alleen een ontwerp). Dan werkt een nieuwe kaartkeuze dat concept bij,
+    in plaats van een nieuw concept te maken: terug naar de keuze en een ander ontwerp aantikken levert dus nooit een tweede concept op."""
+    actief = request.session.get(ACTIEF_CONCEPT) or {}
+    try:
+        inv = Invitation.objects.select_related("template_version__template").filter(uid=actief.get("uid")).first()
+    except (ValueError, ValidationError):
+        return None
+    if inv is None or inv.draft_rev != actief.get("rev") or inv.status != Invitation.Status.DRAFT:
+        return None
+    if not can_access(request, inv) or inv.customer_locked or invitation_is_paid(inv):
+        return None
+    return inv
+
+
 @require_http_methods(["GET", "POST"])
 def start(request):
     templates = _active_templates()
@@ -178,12 +202,16 @@ def start(request):
     if request.method == "POST":
         form = DesignForm(request.POST, templates=templates)
         if form.is_valid():
-            if not rate_limit(f"start:{ip_fingerprint(request)}", 100, 3600):
+            inv = _werk_onaangeroerd_concept_bij(request, form)
+            if inv is not None:
+                return redirect("studio:step", uid=inv.uid, step=_na_ontwerp(inv))
+            if not rate_limit(f"start:{ip_fingerprint(request)}", 40, 3600):
                 messages.error(request, "Je hebt veel ontwerpen gestart. Probeer het later opnieuw.")
                 return redirect("studio:start")
             owner = request.user if request.user.is_authenticated and not request.user.is_staff else None
             inv = create_draft(occasion=form.cleaned_data["occasion"], template=form.cleaned_data["template_obj"], owner=owner,
                                palette=request.POST.get("kleur", "")[:40], soort=request.POST.get("soort", "")[:20])
+            _onthoud_actief(request, inv)
             package_code = request.POST.get("pakket", "")
             # Een wenskaart heeft geen pakket: de prijs staat vast (catalog/wenskaart.py).
             if not _wenskaart(inv) and package_code in {p.code for p in pakket.active_packages()}:
@@ -230,6 +258,37 @@ def start(request):
             "progress_pct": 25,
         },
     )
+
+
+def _werk_onaangeroerd_concept_bij(request, form) -> Invitation | None:
+    """Een nieuwe kaartkeuze in een lopend traject waarin nog niets is ingevuld: hetzelfde concept krijgt het nieuwe ontwerp (en de gekozen gelegenheid, soort en kleur)."""
+    inv = _onaangeroerd_concept(request)
+    if inv is None:
+        return None
+    template = form.cleaned_data["template_obj"]
+    occasion = form.cleaned_data["occasion"]
+    version = template.current_version
+    soort = request.POST.get("soort", "")[:20]
+    keys = [p.get("key") for p in version.palettes]
+    kleur = request.POST.get("kleur", "")[:40]
+    content = normalize_content(_content(inv), occasion)
+    content["soort"] = soort if soort in SOORTEN else ""
+    content["style"]["palette"] = kleur if kleur in keys else version.default_palette_key
+    muziek_bij_ontwerp(content, version.manifest)
+    try:
+        inv = save_draft(inv, expected_rev=inv.draft_rev, content=content, template_version=version, occasion=occasion,
+                         user=request.user, source=_source(request), step="gegevens")
+    except DraftConflict:
+        return None
+    package_code = request.POST.get("pakket", "")
+    if not _wenskaart(inv) and package_code in {p.code for p in pakket.active_packages()}:
+        inv.package_code = package_code
+        inv.save(update_fields=["package_code"])
+    elif _wenskaart(inv) and inv.package_code:
+        inv.package_code = ""
+        inv.save(update_fields=["package_code"])
+    _onthoud_actief(request, inv)
+    return inv
 
 
 def resume(request, uid):
@@ -452,6 +511,8 @@ def design_step(request, inv: Invitation):
         except ValueError:
             posted_rev = 0
         if form.is_valid():
+            actief = request.session.get(ACTIEF_CONCEPT) or {}
+            onaangeroerd = actief.get("uid") == str(inv.uid) and actief.get("rev") == inv.draft_rev     # nog niets ingevuld
             template = form.cleaned_data["template_obj"]
             occasion = form.cleaned_data["occasion"]
             version = inv.template_version if template.pk == inv.template_version.template_id else template.current_version
@@ -466,6 +527,8 @@ def design_step(request, inv: Invitation):
             except DraftConflict:
                 messages.error(request, "Deze uitnodiging is intussen gewijzigd. Bekijk de nieuwste versie en kies opnieuw.")
                 return redirect("studio:step", uid=inv.uid, step="ontwerp")
+            if onaangeroerd:
+                _onthoud_actief(request, inv)     # een ontwerpwissel is geen invoer: een nieuwe keuze op de startpagina werkt dit concept nog steeds bij
             return redirect("studio:step", uid=inv.uid, step=_terug(request, inv, _na_ontwerp(inv)))
     else:
         form = DesignForm(initial={"occasion": inv.occasion, "template": inv.template_version.template.slug}, templates=templates)

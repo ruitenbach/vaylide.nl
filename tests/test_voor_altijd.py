@@ -86,4 +86,5 @@ class VoorAltijdTests(VaylideTestCase):
 
     def test_listed_first_for_weddings(self):
         response = Client().get("/ontwerpen/?gelegenheid=bruiloft")
-        self.assertEqual(response.context["cards"][0]["template"].slug, "voor-altijd")
+        slugs = [c["template"].slug for c in response.context["cards"]]
+        self.assertEqual(slugs[:2], ["eerste-dans", "voor-altijd"])                    # nieuwste eerst (added_at): Eerste dans is nieuwer, Voor altijd staat direct erachter

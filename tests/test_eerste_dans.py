@@ -107,7 +107,6 @@ class EersteDansTests(VaylideTestCase):
     def test_in_the_collection_for_weddings(self):
         response = Client().get("/ontwerpen/?gelegenheid=bruiloft")
         slugs = [c["template"].slug for c in response.context["cards"]]
-        self.assertEqual(slugs[0], "voor-altijd")
-        self.assertIn("eerste-dans", slugs)
-        self.assertLess(slugs.index("liefde-op-papier"), slugs.index("eerste-dans"))   # eerste-dans is B: na de A-ontwerpen
+        self.assertEqual(slugs[0], "eerste-dans")                                      # het nieuwst toegevoegde gewone bruiloftsontwerp staat vooraan (added_at)
+        self.assertLess(slugs.index("eerste-dans"), slugs.index("liefde-op-papier"))
         self.assertContains(Client().get("/ontwerpen/eerste-dans/"), "Paleisdeuren met lakzegel")
