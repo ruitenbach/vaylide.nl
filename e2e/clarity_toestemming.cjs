@@ -6,7 +6,9 @@ const BASIS = process.argv[2] || "http://127.0.0.1:8010";
 const TYPE = { chromium, firefox, webkit }[process.argv[3] || "chromium"];
 let fouten = 0; const ok = (n, w, e) => { if (!w) fouten++; console.log(`${w ? "OK  " : "FOUT"} ${n}${e ? " | " + e : ""}`); };
 // Nep-tag: verwerkt de wachtrij zoals Clarity, zet de cookies die Clarity bij 'granted' zou zetten en wist ze bij 'denied'.
+// Het logboek staat ook in sessionStorage: bij intrekken laadt de pagina meteen opnieuw.
 const NEP_TAG = `(function(){var q=(window.clarity&&window.clarity.q)||[];window.__clarityLog=[];function f(){var a=[].slice.call(arguments);window.__clarityLog.push(JSON.stringify(a));
+ try{sessionStorage.setItem("__clarityLog",(sessionStorage.getItem("__clarityLog")||"")+JSON.stringify(a)+"\\n")}catch(e){}
  if(a[0]==="consentv2"){if(a[1].analytics_Storage==="granted"){document.cookie="_clck=nep; Path=/; Max-Age=3600";document.cookie="_clsk=nep; Path=/; Max-Age=3600";}
  else{document.cookie="_clck=; Path=/; Max-Age=0";document.cookie="_clsk=; Path=/; Max-Age=0";}}}
  q.forEach(function(a){f.apply(null,a)});window.clarity=f;window.__clarityTagGeladen=(window.__clarityTagGeladen||0)+1;})();`;
@@ -75,10 +77,9 @@ const NEP_TAG = `(function(){var q=(window.clarity&&window.clarity.q)||[];window
     await p.evaluate(() => { window.__voorIntrekken = true; });
     await klik(p, "[data-cookie-instellingen]");
     ok(`[${maat}] Cookie-instellingen opent de keuze opnieuw`, await p.locator("[data-toestemming]").isVisible());
-    const laatsteLog = p.evaluate(() => new Promise((r) => { const t = setInterval(() => { const l = window.__clarityLog || []; if (l.some((x) => x.includes('"analytics_Storage":"denied"'))) { clearInterval(t); r(l); } }, 20); setTimeout(() => r(window.__clarityLog || []), 1500); }));
     await klik(p, '[data-toestemming-keuze="nee"]');
-    const intrekLog = await laatsteLog.catch(() => []);
     await p.waitForLoadState("load"); await p.waitForTimeout(1200);
+    const intrekLog = (await p.evaluate(() => sessionStorage.getItem("__clarityLog") || "")).split("\n").filter(Boolean);
     ck = await cookies(c);
     const naHerladen = await p.evaluate(() => ({ herladen: !window.__voorIntrekken, geladen: !!window.__clarityTagGeladen }));
     ok(`[${maat}] intrekken: consentv2 met beide op denied`, intrekLog.includes(JSON.stringify(["consentv2", { ad_Storage: "denied", analytics_Storage: "denied" }])), intrekLog.slice(-1).join(""));

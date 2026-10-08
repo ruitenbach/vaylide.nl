@@ -130,6 +130,15 @@ class ToestemmingScriptTests(VaylideTestCase):
         # Toestemming gaat vóór het laden van het script in de wachtrij.
         self.assertLess(JS_CODE.index('analytics_Storage: "granted"'), JS_CODE.index("document.head.appendChild(s)"))
 
+    def test_intrekken_stopt_clarity_zonder_herstart_en_zonder_laatste_pakket(self):
+        # Clarity plant na consentv2 'denied' zelf een herstart zonder cookies (nieuw ID) en stuurt bij het stoppen nog een laatste pakket.
+        stop = JS_CODE[JS_CODE.index("function stopClarity()"):JS_CODE.index("function laadClarity()")]
+        self.assertIn("csp.content = \"connect-src 'self'\";", stop)
+        self.assertLess(stop.index("document.head.appendChild(csp)"), stop.index('analytics_Storage: "denied"'))   # eerst dicht, dan denied
+        self.assertIn("window.setTimeout = plan;", stop)
+        self.assertIn("gepland.forEach(function (t) { window.clearTimeout(t); })", stop)                      # de herstart vervalt
+        self.assertLess(JS_CODE.index("stopClarity();"), JS_CODE.index("location.reload();"))                 # pas daarna herladen
+
     def test_eenmaal_laden_async_en_alleen_met_toestemming_op_een_toegestane_pagina(self):
         self.assertIn("if (!id || !hier || window.__vaylideClarity) return;", JS_CODE)
         self.assertIn("s.async = true;", JS_CODE)
@@ -158,7 +167,9 @@ class PrivacyTekstTests(VaylideTestCase):
         for nodig in ("Microsoft Clarity", "sessieopnames", "klikken", "scrollen", "gebruiksgegevens", "<code>_clck</code>", "<code>_clsk</code>",
                       "Microsoft Azure", "Microsoft Ireland Operations Limited", "Microsoft Corporation in de Verenigde Staten",
                       "zelfstandig verwerkingsverantwoordelijke", "opnames 30 dagen", "toestemming altijd intrekken", "Cookie-instellingen",
-                      "https://privacy.microsoft.com/privacystatement", "vaylide_analytics", "Concept, juridisch nog te beoordelen"):
+                      "https://privacy.microsoft.com/privacystatement", "vaylide_analytics", "Concept, juridisch nog te beoordelen",
+                      "je IP-adres, waaruit Microsoft je land en je globale locatie afleidt", "het volledige adres (URL) van elke pagina",
+                      "willekeurige code van je ontwerp", "muisbewegingen", "Dan stopt de meting direct"):
             self.assertIn(nodig, html, nodig)
         self.assertNotIn("Wij gebruiken geen advertentie-, analyse- of volgcookies", html)
         self.assertIn("Microsoft Ireland Operations Limited (Ierland) en Microsoft Corporation (Verenigde Staten)", html)   # bij de partijen en de doorgifte

@@ -7,6 +7,10 @@ Stand: 8 oktober 2026, branch `claude/clarity`. Alleen op staging; production (`
 - `VIERLIEF_CLARITY_ID` (project-id, kleine letters en cijfers). Leeg = uit: geen script, geen toestemmingsbanner, geen link
   "Cookie-instellingen" en geen extra domeinen in de Content-Security-Policy. Staging: `yuemn2aqz1` (`render.staging.yaml`).
   Neemt Render de blueprint-waarde niet vanzelf over, zet hem dan in Render bij de dienst `vaylide-staging` → Environment.
+- Twee projecten in Clarity, zodat testbezoeken en echte bezoekers niet door elkaar lopen: `yuemn2aqz1` (in Clarity "VAYLIDE") alleen
+  voor staging en testen; `yui4h1kh8c` ("VAYLIDE Production", https://vaylide.nl) voor later op production. Beide Strict. Copilot staat
+  bij `yuemn2aqz1` uit; bij `yui4h1kh8c` staat het nog aan (standaard) en moet het uit vóór production. Het production-ID staat nog
+  nergens in Render.
 - **Live start niet met Clarity zolang de privacytekst een open besluit is**: `CLARITY_BESLUITEN` in `core/privacyverklaring.py`
   (goedkeuring, rol van Microsoft, bewaartermijn). Rol en bewaartermijn staan ingevuld uit de officiële FAQ van Clarity
   (learn.microsoft.com/clarity/faq: "GDPR-compliant as a data controller"; opnames 30 dagen, favorieten en steekproef tot 9 maanden;
@@ -33,8 +37,18 @@ banner opnieuw.
 - **Accepteren**: Clarity laadt één keer (asynchroon, `async`), met vóór het eerste gegeven
   `clarity("consentv2", {ad_Storage: "denied", analytics_Storage: "granted"})`.
 - **Weigeren** of geen keuze: Clarity laadt niet. Geen script, geen Clarity-cookies, geen cookieloze meting.
-- **Intrekken** (eerst ja, daarna Weigeren): als Clarity op de pagina geladen was `consentv2` met beide op `denied` (Clarity wist dan zijn
-  cookies en beëindigt de sessie), daarna wissen we `_clck` en `_clsk` zelf en laadt de pagina opnieuw, zonder Clarity.
+- **Intrekken** (eerst ja, daarna Weigeren), als Clarity op de pagina geladen was (`stopClarity` in `toestemming.js`):
+  1. een extra CSP-regel `connect-src 'self'` via een meta-tag: vanaf dat moment blokkeert de browser elk verzoek van deze pagina naar Clarity;
+  2. `consentv2` met beide op `denied`: Clarity wist `_clck`/`_clsk` en stopt;
+  3. de herstart die Clarity daarna zelf plant, annuleren;
+  4. `_clck` en `_clsk` ook zelf wissen, dan pas de pagina opnieuw laden, zonder Clarity.
+
+  Waarom: bij `consentv2` 'denied' doet Clarity `stop()` (met een laatste pakket via `sendBeacon`) en daarna
+  `window.setTimeout(start, 250)`. Die herstart draait zonder cookies, met een nieuw bezoekers- en sessie-ID, en stuurt bij het herladen
+  een eigen sessie van ongeveer een seconde (clarity-js `data/metadata.ts`, functie `consentv2`; live 0.8.72-beta). Op staging gaf dat op
+  8 oktober een extra sessie van 1 seconde op /prijzen/. Na de oplossing gaat er na het intrekken niets meer naar Clarity
+  (`e2e/clarity_intrekken.cjs`, met het echte script, in Chromium, Firefox en WebKit). In de console staat dan één melding dat de browser
+  Clarity's laatste pakket heeft geblokkeerd; dat is de bedoeling.
   Cookies die Microsoft op zijn eigen domeinen zette (MUID e.d.) kan de site niet wissen.
 
 ## Afschermen (masking)
@@ -47,6 +61,13 @@ banner opnieuw.
 - Zet in het Clarity-dashboard Settings → Masking op **Strict**: dan is alle tekst afgeschermd en blijven klikken, scrollen, heatmaps en
   pagina's zichtbaar. De attributen hierboven blijven gelden (een element met `data-clarity-mask` wordt nooit zichtbaar, ook niet in
   een lossere stand).
+
+## Adressen van pagina's
+
+Clarity leest het adres zelf uit `location.href` (bij elke pagina en elk pakket) en de vorige pagina uit `document.referrer`. Alleen
+queryparameters kan Clarity weglaten (de instelling `drop`); voor het pad bestaat niets. Het concept-ID in `/maken/<uuid>/…` gaat dus
+mee, tenzij het echte adres verandert. Dat doen we niet. Het ID is willekeurig en geeft zonder de browsersessie of het account geen
+toegang (`invitations/access.py: can_access`). Paginatitels gaan ook mee; daarin staan geen namen.
 
 ## Controleren
 
