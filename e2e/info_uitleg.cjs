@@ -25,9 +25,33 @@ const open = async (p) => p.evaluate(() => [...document.querySelectorAll("[data-
   await c.addCookies([{ name: "vaylide_analytics", value: "nee", url: BASIS }]);   // geen toestemmingsbanner over de schermafbeeldingen
   const p = await c.newPage();
   const fout = []; p.on("pageerror", (e) => fout.push(String(e).slice(0, 140)));
+  p.on("dialog", (d) => d.accept());                                   // niet-opgeslagen keuze: gewoon verder
   await p.goto(BASIS + "/maken/?ontwerp=liefde-op-papier&gelegenheid=bruiloft&soort=uitnodiging&direct=1", { waitUntil: "load" });
   await p.waitForURL(/\/gegevens\//, { timeout: 15000 });
   const basis = p.url().replace(/gegevens\/.*$/, "");
+  let s;
+
+  // --- Gegevens: Uitnodiging of wenskaart (de (i) naast de uitklapregel) ---
+  const soortOpen = () => p.evaluate(() => document.querySelector("[data-soort-keuze]").open);
+  const soortKnop = p.locator('[aria-controls="info-soort"]');
+  await soortKnop.click(); await p.waitForTimeout(250);
+  s = await staat(p, "soort");
+  ok("Gegevens: (i) opent de uitleg, het uitklapblok blijft dicht", s.open && s.expanded === "true" && !(await soortOpen()));
+  const rij = await p.evaluate(() => { const sm = document.querySelector("[data-soort-keuze] > summary").getBoundingClientRect(); const k = document.querySelector('[aria-controls="info-soort"]').getBoundingClientRect(); return { gat: Math.round(k.left - sm.right), midden: Math.round((k.top + k.bottom) / 2 - (sm.top + sm.bottom) / 2) }; });
+  ok("Gegevens: icoon direct naast de uitklapregel, op dezelfde hoogte", rij.gat >= 0 && rij.gat <= 16 && Math.abs(rij.midden) <= 6, JSON.stringify(rij));
+  await p.keyboard.press("Escape"); await p.waitForTimeout(200);
+  s = await staat(p, "soort");
+  ok("Gegevens: Escape sluit, focus terug op het icoon", !s.open && s.focusOpKnop);
+  await p.locator("[data-soort-keuze] > summary").click(); await p.waitForTimeout(200);
+  await p.locator("label.radio-card", { has: p.locator('input[name="soort"][value="wenskaart"]') }).click(); await p.waitForTimeout(300);
+  const gegevensAdres = p.url();
+  await soortKnop.click(); await p.waitForTimeout(250);
+  if (SHOTS) await p.screenshot({ path: `${SHOTS}/info-soort-1366.png` });
+  await p.locator("#info-soort .info__tekst").click(); await p.waitForTimeout(150);
+  await p.mouse.click(1300, 120); await p.waitForTimeout(250);
+  s = await staat(p, "soort");
+  const gekozen = await p.evaluate(() => (document.querySelector('input[name="soort"]:checked') || {}).value);
+  ok("Gegevens: keuze 'Wenskaart' blijft staan, blok blijft open, geen submit", !s.open && gekozen === "wenskaart" && (await soortOpen()) && p.url() === gegevensAdres, `${gekozen}`);
 
   // --- Aanmelden, desktop 1366 ---
   await p.goto(basis + "aanmelden/", { waitUntil: "load" });
@@ -35,7 +59,7 @@ const open = async (p) => p.evaluate(() => [...document.querySelectorAll("[data-
   const adres = p.url();
   const knop = p.locator('[aria-controls="info-aanmelden"]');
   await knop.click(); await p.waitForTimeout(250);
-  let s = await staat(p, "aanmelden");
+  s = await staat(p, "aanmelden");
   ok("klik opent het paneel, aria-expanded true, focus in het paneel", s.open && s.expanded === "true" && s.focusInPaneel, JSON.stringify(s));
   ok("desktop: compact paneel vlak bij het icoon", s.paneel[2] <= 330 && Math.abs(s.paneel[1] - s.knop[2]) <= 16 && Math.abs(s.paneel[0] - s.knop[0]) <= 40, `paneel ${s.paneel} knop ${s.knop}`);
   if (SHOTS) await p.screenshot({ path: `${SHOTS}/info-aanmelden-1366.png` });
@@ -96,6 +120,13 @@ const open = async (p) => p.evaluate(() => [...document.querySelectorAll("[data-
 
   // --- Mobiel 390 ---
   await p.setViewportSize({ width: 390, height: 844 });
+  await p.goto(basis + "gegevens/", { waitUntil: "load" });
+  await p.locator('[aria-controls="info-soort"]').scrollIntoViewIfNeeded();
+  await p.locator('[aria-controls="info-soort"]').click(); await p.waitForTimeout(350);
+  s = await staat(p, "soort");
+  ok("390 Gegevens: sheet onderaan, geen horizontale scroll, blok blijft dicht", s.open && s.paneel[0] === 0 && Math.abs(s.paneel[1] + s.paneel[3] - s.vh) <= 1 && !s.overflow && !(await soortOpen()), `${s.paneel}`);
+  if (SHOTS) await p.screenshot({ path: `${SHOTS}/info-soort-390.png` });
+  await p.keyboard.press("Escape"); await p.waitForTimeout(200);
   await p.goto(basis + "aanmelden/", { waitUntil: "load" });
   await p.locator('[aria-controls="info-aanmelden"]').click(); await p.waitForTimeout(350);
   s = await staat(p, "aanmelden");

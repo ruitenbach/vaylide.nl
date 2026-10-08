@@ -67,6 +67,15 @@ def muziek_uitleg(package: Package | None, ontwerp_muziek: bool) -> str:
     return tekst
 
 
+def soort_uitleg(wenskaart_prijs: str | None) -> str:
+    """De uitleg bij 'Uitnodiging of wenskaart?'. Zonder prijs (gelegenheden met een optioneel moment, zoals kerst) geen prijszin,
+    net als bij de keuze zelf."""
+    tekst = ("Kies Uitnodiging als je gasten wilt uitnodigen voor een moment met datum, locatie en eventueel aanmelden. "
+             "Kies Wenskaart als je alleen een persoonlijke kaart wilt versturen, zonder datum, locatie of aanmeldingen")
+    tekst += f", voor een vaste prijs van {wenskaart_prijs}." if wenskaart_prijs else "."
+    return tekst + " Je ziet daarna alleen de stappen die bij je keuze horen. Na het bestellen ligt je keuze vast."
+
+
 def upgrade_target(package: Package, packages: list[Package]) -> Package | None:
     """Het volgende, uitgebreidere pakket (bij Essentieel: Compleet)."""
     bigger = [p for p in packages if p.price_cents > package.price_cents and set(package.features or []) <= set(p.features or [])]

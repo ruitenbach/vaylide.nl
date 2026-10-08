@@ -36,6 +36,8 @@
     {% include "studio/_field.html" with field=form.welcome_text %}
     {% include "studio/_ai.html" with ai_field="welcome_text" %}
   </section>
+  {% comment %}De (i) staat náást de uitklapregel, niet erin: een knop in een summary is voor schermlezers onbetrouwbaar.{% endcomment %}
+  <div class="met-info met-info--keuze">
   <details class="studio-more" data-soort-keuze>
     <summary>{% if wenskaart %}Toch een uitnodiging maken?{% else %}Liever een wenskaart zonder datum en plek?{% endif %}</summary>
     {% if form.soort.field.disabled %}<p class="hint">Dit ligt vast, want je kaart is al besteld.</p>{% endif %}
@@ -44,6 +46,8 @@
       <label class="radio-card"><input type="radio" name="soort" value="wenskaart"{% if form.soort.value == "wenskaart" %} checked{% endif %}{% if form.soort.field.disabled %} disabled{% endif %}><strong>Wenskaart</strong><span class="hint">Alleen een groet{% if not cfg.event_optional %}, vaste prijs {{ wenskaart_prijs }} incl. btw{% endif %}.</span></label>
     </div>
   </details>
+  {% include "partials/info.html" with info_id="soort" titel="Uitnodiging of wenskaart?" tekst=soort_uitleg %}
+  </div>
   {% include "studio/_actions.html" %}
 </form>
 {% endblock %}

@@ -114,8 +114,32 @@ class InfoTests(VaylideTestCase):
 
     def test_geen_info_bij_gewone_velden(self):
         inv = self.make_invitation(owner=self.owner)
-        for naam in ("gegevens", "programma", "stijl"):
+        for naam in ("programma", "stijl"):
             self.assertNotIn("data-info-knop", self.stap(inv, naam), naam)
+        gegevens = self.stap(inv, "gegevens")
+        self.assertEqual(gegevens.count("data-info-knop"), 1)                                   # alleen bij Uitnodiging of wenskaart
+        self.assertEqual(self.stap(inv, "aanmelden").count("data-info-knop"), 1)                 # niet bij Aantal personen
+
+    def test_uitnodiging_of_wenskaart(self):
+        inv = self.make_invitation(owner=self.owner)
+        html = self.stap(inv, "gegevens")
+        (knop, paneel), = componenten(html)
+        self.assertIn('aria-label="Uitleg: Uitnodiging of wenskaart?"', knop)
+        self.assertIn("Kies Uitnodiging als je gasten wilt uitnodigen voor een moment met datum, locatie en eventueel aanmelden. "
+                      "Kies Wenskaart als je alleen een persoonlijke kaart wilt versturen, zonder datum, locatie of aanmeldingen, "
+                      "voor een vaste prijs van € 14,95. Je ziet daarna alleen de stappen die bij je keuze horen. "
+                      "Na het bestellen ligt je keuze vast.", paneel)
+        # Naast de uitklapregel, niet erin (een knop in een summary is voor schermlezers onbetrouwbaar).
+        self.assertRegex(html, r'<div class="met-info met-info--keuze">\s*<details class="studio-more" data-soort-keuze>')
+        self.assertRegex(html, r'</details>\s*<span class="info" data-info>')
+        summary = re.search(r"<summary>.*?</summary>", html[html.index("data-soort-keuze"):], re.S).group(0)
+        self.assertNotIn("data-info", summary)
+
+    def test_uitnodiging_of_wenskaart_zonder_prijs_bij_kerst(self):
+        tekst = pakket.soort_uitleg(None)                                                          # zoals de keuze zelf bij kerst
+        self.assertNotIn("vaste prijs", tekst)
+        self.assertIn("zonder datum, locatie of aanmeldingen. Je ziet daarna", tekst)
+        self.assertTrue(tekst.endswith("Na het bestellen ligt je keuze vast."))
 
     def test_script_leest_of_wijzigt_geen_formulieren(self):
         self.assertNotIn(".value", JS_CODE)

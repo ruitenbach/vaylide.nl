@@ -167,6 +167,9 @@ def _context(request, inv: Invitation, step: str, **extra) -> dict:
             ctx["muziek_uitleg"] = pakket.muziek_uitleg(gekozen, ontwerp_muziek=isinstance(track, dict) and bool(track.get("src")))
     if step in ("gegevens", "stijl"):
         ctx["eigen_opening"] = _eigen_opening(inv)
+    if step == "gegevens":
+        prijs = None if occasion_config(inv.occasion).get("event_optional") else ctx["wenskaart_prijs"]
+        ctx["soort_uitleg"] = pakket.soort_uitleg(prijs)
     ctx.update(extra)
     return ctx
 
