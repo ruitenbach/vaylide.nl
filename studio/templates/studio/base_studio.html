@@ -20,7 +20,7 @@
   </div>
 </header>
 {% endblock %}
-{% block footer %}<footer class="studio-footer"><div class="container"><p>&copy; {{ CURRENT_YEAR }} VAYLIDE · <a href="{% url 'core:privacy' %}">Privacy</a> · <a href="{% url 'core:terms' %}">Voorwaarden</a> · <a href="{% url 'core:contact' %}">Contact</a></p></div></footer>{% endblock %}
+{% block footer %}<footer class="studio-footer"><div class="container"><p>&copy; {{ CURRENT_YEAR }} VAYLIDE · <a href="{% url 'core:privacy' %}">Privacy</a> · <a href="{% url 'core:terms' %}">Voorwaarden</a> · <a href="{% url 'core:contact' %}">Contact</a>{% if CLARITY %} · <button type="button" class="cookie-link" data-cookie-instellingen hidden>Cookie-instellingen</button>{% endif %}</p></div></footer>{% endblock %}
 {% block content %}
 <div class="studio">
   <div class="container">
@@ -28,7 +28,7 @@
     {% include "studio/_deelnav.html" %}
     {% if is_staff_edit and inv %}<p class="notice notice--warning studio-staff-note"><strong>Je bewerkt als VAYLIDE-team.</strong> Wijzigingen worden opgeslagen als handmatige aanpassing en zijn zichtbaar in de versiegeschiedenis. <a href="{% url 'beheer:invitation' inv.uid %}">Terug naar het beheer</a></p>{% endif %}
     {% if paid and inv and not is_staff_edit %}<p class="studio-paid-note small muted">Wijzigingen gaan pas online als je publiceert bij <a href="{% url 'studio:step' inv.uid 'voorbeeld' %}">Voorbeeld</a>. De link blijft hetzelfde.</p>{% endif %}
-    <div class="{% if live_url %}studio-live{% endif %}">
+    <div class="{% if live_url %}studio-live{% endif %}"{% if inv %} data-clarity-mask="True"{% endif %}>
       <div class="studio-live__main">{% block studio %}{% endblock %}</div>
       {% if live_url %}{% include "studio/_live.html" %}{% endif %}
     </div>

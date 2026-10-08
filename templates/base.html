@@ -28,6 +28,7 @@
 {% block extra_css %}{% endblock %}
 <script src="{% static 'js/site.js' %}" defer></script>
 <script src="{% static 'js/media-bescherming.js' %}" defer></script>
+{% if CLARITY %}<script src="{% static 'js/toestemming.js' %}" defer></script>{% endif %}
 {% block extra_js %}{% endblock %}
 {% for item in jsonld %}{{ item|json_ld }}
 {% endfor %}</head>
@@ -35,10 +36,11 @@
 <a class="skip-link" href="#inhoud">Direct naar de inhoud</a>
 {% if TEST_MODE %}<div class="test-banner" role="note"><strong>Testomgeving</strong> · {{ TEST_BANNER }}</div>{% endif %}
 {% block header %}{% include "partials/header.html" %}{% endblock %}
-{% if messages %}<div class="container flash-wrap">{% for message in messages %}<p class="flash flash--{{ message.tags }}" role="status">{{ message }}</p>{% endfor %}</div>{% endif %}
+{% if messages %}<div class="container flash-wrap" data-clarity-mask="True">{% for message in messages %}<p class="flash flash--{{ message.tags }}" role="status">{{ message }}</p>{% endfor %}</div>{% endif %}
 <main id="inhoud" tabindex="-1">
 {% block content %}{% endblock %}
 </main>
 {% block footer %}{% include "partials/footer.html" %}{% endblock %}
+{% if CLARITY %}{% include "partials/toestemming.html" %}{% endif %}
 </body>
 </html>

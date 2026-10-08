@@ -9,6 +9,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.middleware.gzip import GZipMiddleware
 
+from .analytics import csp_bronnen
 from .csp import SCRIPT_HASHES
 from .utils import ip_fingerprint, rate_limit
 
@@ -46,18 +47,20 @@ class SecurityHeadersMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
         frame_ancestors = "'self'" if response.get("X-Frame-Options") == "SAMEORIGIN" else "'none'"
+        extra = csp_bronnen(request.path)     # Microsoft Clarity, alleen als het is ingesteld en alleen op de pagina's waar het mag
+        bij = lambda richtlijn: "".join(" " + bron for bron in extra.get(richtlijn, ()))  # noqa: E731
         response.setdefault(
             "Content-Security-Policy",
             "; ".join(
                 [
                     "default-src 'self'",
-                    "script-src 'self' " + " ".join(SCRIPT_HASHES),
+                    "script-src 'self' " + " ".join(SCRIPT_HASHES) + bij("script-src"),
                     "style-src 'self'",
                     "style-src-attr 'unsafe-inline'",
-                    "img-src 'self' data: blob:",
+                    "img-src 'self' data: blob:" + bij("img-src"),
                     "font-src 'self'",
                     "media-src 'self' blob:",
-                    "connect-src 'self'",
+                    "connect-src 'self'" + bij("connect-src"),
                     "frame-src 'self'",
                     "object-src 'none'",
                     "base-uri 'self'",

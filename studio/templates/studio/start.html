@@ -6,7 +6,7 @@
   <h1>{% if not occasion %}Wat ga je vieren?{% else %}Kies je {% if wenskaart %}wenskaart{% else %}kaart{% endif %}{% endif %}</h1>
 </div>
 {% if existing %}
-<div class="resume-box">
+<div class="resume-box" data-clarity-mask="True">
   <strong>Verder met je ontwerp?</strong>
   <ul class="resume-list">{% for inv in existing %}<li><a href="{% url 'studio:resume' inv.uid %}">{{ inv.title|default:"Naamloos ontwerp" }}</a> <span class="muted small">({{ inv.get_occasion_display }}, {{ inv.updated_at|date:"j F" }})</span></li>{% endfor %}</ul>
 </div>
@@ -55,6 +55,6 @@
   {% endif %}
   {% endif %}
 
-  <p class="kies__account small muted">{% if user.is_authenticated and not user.is_staff %}Ingelogd als {{ user.email }}: je ontwerp staat in Mijn VAYLIDE.{% elif not user.is_authenticated %}Je hebt pas een account nodig bij het bestellen. Al een account? <a href="{{ login_url }}">Log in</a>.{% endif %}</p>
+  <p class="kies__account small muted" data-clarity-mask="True">{% if user.is_authenticated and not user.is_staff %}Ingelogd als {{ user.email }}: je ontwerp staat in Mijn VAYLIDE.{% elif not user.is_authenticated %}Je hebt pas een account nodig bij het bestellen. Al een account? <a href="{{ login_url }}">Log in</a>.{% endif %}</p>
 </form>
 {% endblock %}

@@ -283,6 +283,11 @@ PAYMENT_METHODS_SHOWN = env_list("VIERLIEF_PAYMENT_METHODS_SHOWN", "ideal,credit
 # Standaard UIT. Pas aanzetten na akkoord over beeld-API, kosten, kwaliteit, privacytekst en de prijs (extra optie
 # met functie 'gezichten' in Beheer → Prijzen). Zonder sleutel of optie blijft de knop onzichtbaar.
 FACES_ENABLED = env_bool("VIERLIEF_FACES_ENABLED", False)
+
+# Microsoft Clarity (bezoekersanalyse, alleen na toestemming; zie core/analytics.py en docs/CLARITY.md). Leeg = uit.
+CLARITY_ID = env("VIERLIEF_CLARITY_ID", "").strip().lower()
+if CLARITY_ID and not __import__("re").fullmatch(r"[a-z0-9]{6,20}", CLARITY_ID):
+    raise RuntimeError("VIERLIEF_CLARITY_ID is geen geldig Clarity-project-id (kleine letters en cijfers).")
 FACES_PROVIDER = env("VIERLIEF_FACES_PROVIDER", "gemini").lower()  # gemini, of test (alleen in testmodus: nagebootst)
 GEMINI_API_KEY = env("GEMINI_API_KEY")
 FACES_MODEL = env("VIERLIEF_FACES_MODEL", "gemini-3-pro-image")

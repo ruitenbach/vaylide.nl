@@ -56,6 +56,9 @@ services:
         value: voorbeeld
       - key: VIERLIEF_PREVIEW_PASSWORD
         sync: false
+      # Microsoft Clarity (bezoekersanalyse, alleen na toestemming; docs/CLARITY.md). Eerst alleen op staging; render.yaml (live) heeft dit niet.
+      - key: VIERLIEF_CLARITY_ID
+        value: yuemn2aqz1
 
 databases:
   - name: vaylide-staging-db

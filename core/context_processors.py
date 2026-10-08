@@ -4,6 +4,7 @@ from django.utils import timezone
 from orders.methods import available_methods
 
 from .ai import ai_configured
+from .analytics import clarity_op_pagina
 from .company import company
 from .social import social_links
 
@@ -33,4 +34,6 @@ def vierlief(request):
         "SLOGAN": "Elk bijzonder moment begint met een uitnodiging.",
         # Tekstvoorstellen via Anthropic (alleen met sleutel); de uitleg bij de knop hangt ervan af.
         "AI_EXTERN": ai_configured,
+        # Microsoft Clarity: alleen als het project-id is ingesteld; 'hier' zegt of het op deze pagina mag draaien (na toestemming).
+        "CLARITY": {"id": settings.CLARITY_ID, "hier": clarity_op_pagina(request.path)} if settings.CLARITY_ID else None,
     }

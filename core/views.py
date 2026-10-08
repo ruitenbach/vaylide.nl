@@ -254,6 +254,7 @@ def privacy(request):
         "open_punten": pv.open_points(), "aanbieders": pv.suppliers(), "cookies": pv.cookies(),
         "ai_actief": pv.ai_active(), "email_actief": pv.email_active(), "backup_actief": pv.backup_offsite_active(),
         "gezichten_actief": dj_settings.FACES_ENABLED,
+        "clarity_actief": pv.clarity_active(), "clarity_goedgekeurd": pv.CLARITY_TEKST_GOEDGEKEURD, "clarity_besluit": pv.CLARITY_BESLUITEN,
     })
 
 

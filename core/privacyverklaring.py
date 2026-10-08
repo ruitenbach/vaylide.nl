@@ -49,6 +49,16 @@ BESLUITEN: dict[str, str | None] = {
     "bewaar_logs": "7 dagen bij onze hostingpartij Render; daarna verwijdert Render ze automatisch",
 }
 
+# Microsoft Clarity (bezoekersanalyse, alleen na toestemming): de tekst in de verklaring is een concept. Zolang hier None staat, is het een
+# open juridisch besluit: de testversie toont het concept met een gele markering en in live-modus start de site niet met VIERLIEF_CLARITY_ID.
+# Na beoordeling: vul alle drie in (wie het goedkeurde en wanneer, de rol van Microsoft en de bewaartermijn bij Clarity).
+CLARITY_BESLUITEN: dict[str, str | None] = {
+    "goedgekeurd": None,       # bijvoorbeeld "Goedgekeurd door ... op 12-10-2026"
+    "rol_microsoft": None,     # rol van Microsoft bij Clarity (verwerker of zelfstandig verantwoordelijke), zoals in de voorwaarden van Clarity
+    "bewaartermijn": None,     # hoe lang Clarity opnames en gegevens bewaart (volgens Microsoft), zoals in de verklaring
+}
+CLARITY_TEKST_GOEDGEKEURD = all(CLARITY_BESLUITEN.values())
+
 LABELS = {
     "rol_gasten": "rol en grondslag bij gastgegevens",
     "grondslag_kaartinhoud": "grondslag voor gegevens van anderen op de kaart",
@@ -64,6 +74,7 @@ LABELS = {
     "backup_aanbieder": "aanbieder tweede back-uplocatie (naam en vestigingsland; in de EER of onderdeel 8 aanvullen)",
     "ai_afspraken": "afspraken met Anthropic (verwerkersovereenkomst en doorgifte buiten de EER)",
     "gezichten": "de functie eigen gezichten staat aan, maar de gegevensverwerking is niet beoordeeld",
+    "clarity": "tekst over Microsoft Clarity (bezoekersanalyse, cookies, doorgifte naar de VS) juridisch beoordelen en goedkeuren",
 }
 
 
@@ -75,6 +86,10 @@ def ai_active() -> bool:
 
 def email_active() -> bool:
     return settings.EMAIL_MODE == "smtp"
+
+
+def clarity_active() -> bool:
+    return bool(settings.CLARITY_ID)
 
 
 def backup_offsite_active() -> bool:
@@ -131,6 +146,17 @@ def suppliers() -> list[dict]:
             "rol": "Verwerker",
             "doorgifte": settings.PRIVACY_AI_AFSPRAKEN or None,
         })
+    if clarity_active():
+        rows.append({
+            "naam": "Microsoft Corporation (Verenigde Staten)",
+            "dienst": "Bezoekersanalyse met Microsoft Clarity, alleen als je daar toestemming voor geeft",
+            "gegevens": "Gebruiksgegevens van je bezoek: welke pagina's je bekijkt, waar je klikt en scrollt, je apparaat en browser, "
+                        "een opname van het bezoek en een cookie-id. Wat je invult, de inhoud van je kaart en antwoorden van gasten "
+                        "worden afgeschermd en gaan niet naar Microsoft.",
+            "rol": CLARITY_BESLUITEN["rol_microsoft"],      # concept: juridisch vast te stellen (CLARITY_BESLUITEN)
+            "doorgifte": "Microsoft verwerkt en bewaart de gegevens van Clarity in Microsoft Azure, in datacenters van Microsoft in de "
+                         "Verenigde Staten. Microsoft is gecertificeerd onder het EU-VS Data Privacy Framework.",
+        })
     return rows
 
 
@@ -148,7 +174,21 @@ def cookies() -> list[dict]:
         {"naam": "vierlief-beweging", "soort": "Lokale opslag in je browser",
          "doel": "Onthoudt of je bewegende effecten op een uitnodiging hebt uitgezet. Alleen als je daarop tikt.",
          "duur": "Tot je het wist of weer aanzet"},
-    ]
+    ] + (CLARITY_COOKIES if clarity_active() else [])
+
+
+CLARITY_COOKIES = [
+    {"naam": "vaylide_analytics", "soort": "Cookie (noodzakelijk)",
+     "doel": "Onthoudt of je toestemming gaf voor de bezoekersanalyse met Microsoft Clarity, zodat we het niet steeds opnieuw vragen.",
+     "duur": "12 maanden"},
+    {"naam": "_clck", "soort": "Cookie van Microsoft Clarity (alleen na toestemming)",
+     "doel": "Een willekeurig id, zodat Clarity je bezoeken aan deze site aan elkaar kan koppelen.", "duur": "1 jaar"},
+    {"naam": "_clsk", "soort": "Cookie van Microsoft Clarity (alleen na toestemming)",
+     "doel": "Koppelt de pagina's van één bezoek aan elkaar tot één opname.", "duur": "1 dag"},
+    {"naam": "MUID, CLID, ANONCHK, MR, SM", "soort": "Cookies van Microsoft op clarity.ms of bing.com (alleen na toestemming)",
+     "doel": "Zet Microsoft zelf, onder meer om browsers te herkennen. Wij geven geen toestemming voor advertenties (ad_Storage: denied).",
+     "duur": "Volgens Microsoft"},
+]
 
 
 def open_points() -> list[str]:
@@ -165,6 +205,8 @@ def open_points() -> list[str]:
         points.append(LABELS["ai_afspraken"])
     if settings.FACES_ENABLED:
         points.append(LABELS["gezichten"])
+    if clarity_active() and not CLARITY_TEKST_GOEDGEKEURD:
+        points.append(LABELS["clarity"])
     return points
 
 

@@ -72,7 +72,7 @@
   <div class="table-wrap"><table class="table-simple table-stapel">
     <thead><tr><th scope="col">Partij</th><th scope="col">Waarvoor</th><th scope="col">Welke gegevens</th><th scope="col">Rol</th></tr></thead>
     <tbody>{% for s in aanbieders %}
-      <tr><td data-label="Partij">{{ s.naam|invul:"[naam en land aanbieder]" }}</td><td data-label="Waarvoor">{{ s.dienst }}</td><td data-label="Welke gegevens">{{ s.gegevens }}</td><td data-label="Rol">{{ s.rol }}</td></tr>{% endfor %}
+      <tr><td data-label="Partij">{{ s.naam|invul:"[naam en land aanbieder]" }}</td><td data-label="Waarvoor">{{ s.dienst }}</td><td data-label="Welke gegevens">{{ s.gegevens }}</td><td data-label="Rol">{{ s.rol|invul:"[rol vaststellen]" }}</td></tr>{% endfor %}
     </tbody>
   </table></div>
   <p>Met partijen die voor ons werken (verwerkers) gelden verwerkersafspraken. Mollie verwerkt je betaling onder eigen verantwoordelijkheid, met een eigen <a href="https://www.mollie.com/legal/privacy" rel="noopener">privacyverklaring</a>. Klik je op een uitnodiging op een link naar Google Maps, Google Agenda of WhatsApp, dan ga je naar die dienst en gelden hun regels; de uitnodiging laadt zelf niets van die diensten.</p>
@@ -111,7 +111,17 @@
   <p>De fiscale bewaarplicht betekent niet dat wij foto's of gastenlijsten zeven jaar bewaren. Wat uit de site is verwijderd, kan nog in een back-up staan tot die back-up is vervangen. Moeten wij een back-up terugzetten, dan verwijderen wij gegevens die al verwijderd hadden moeten zijn opnieuw.</p>
 
   <h2 id="cookies">10. Cookies en opslag in je browser</h2>
+  {% if clarity_actief %}
+  {% if not clarity_goedgekeurd %}<p class="notice notice--test"><strong>Concept, juridisch nog te beoordelen</strong>De tekst over Microsoft Clarity hieronder is een concept. In de live-versie start de site niet met Clarity zolang deze tekst niet is goedgekeurd.</p>{% endif %}
+  <p>Wij gebruiken cookies en browseropslag die nodig zijn voor de werking en beveiliging van de site. Daarnaast gebruiken wij, alleen als je daar toestemming voor geeft, Microsoft Clarity voor bezoekersanalyse. Wij gebruiken geen advertentiecookies.</p>
+  <h3 id="clarity">Bezoekersanalyse met Microsoft Clarity (alleen met jouw toestemming)</h3>
+  <p>Geef je toestemming, dan zien wij met Microsoft Clarity hoe bezoekers de site gebruiken: welke pagina's ze bekijken, waar ze klikken, hoe ver ze scrollen en of ze een telefoon of computer gebruiken. Clarity maakt daarvoor opnames van een bezoek (sessieopnames) en heatmaps, en verzamelt gebruiksgegevens zoals je apparaat, browser en schermgrootte. Zo zien wij waar de site onduidelijk is en kunnen wij hem verbeteren.</p>
+  <p>Wat je invult, zoals namen, e-mailadressen, telefoonnummers, adressen, de teksten van je kaart en antwoorden van gasten, schermen wij af, net als foto's, je kaart in de voorvertoning en je bestel- en betaalgegevens. Die gaan niet naar Microsoft. Clarity draait alleen op de homepage, de collectie en de ontwerppagina's, Inspiratie, Prijzen en het samenstellen van je kaart tot en met bestellen. Niet op uitnodigingen, in Mijn VAYLIDE, bij het inloggen, bij het betalen of in het beheer.</p>
+  <p>Clarity zet daarvoor cookies, zoals <code>_clck</code> en <code>_clsk</code>, en Microsoft kan eigen cookies zetten (zie de tabel hieronder). Microsoft verwerkt en bewaart de gegevens in Microsoft Azure, in datacenters van Microsoft in de Verenigde Staten. Hoe lang Clarity de gegevens bewaart: {{ clarity_besluit.bewaartermijn|invul:"[bewaartermijn bij Microsoft Clarity vaststellen]" }}. De grondslag is je toestemming. Lees ook de <a href="https://privacy.microsoft.com/privacystatement" rel="noopener">privacyverklaring van Microsoft</a>.</p>
+  <p>Zonder toestemming laden wij Clarity niet: dan gaat er niets naar Microsoft. Je keuze bewaren wij 12 maanden in de cookie <code>vaylide_analytics</code>. Je kunt je toestemming altijd intrekken via 'Cookie-instellingen' onderaan de pagina. Dan stopt de meting, laadt de pagina opnieuw zonder Clarity en wissen wij de Clarity-cookies op deze site. Cookies die Microsoft op zijn eigen domeinen zette, wis je in de instellingen van je browser.</p>
+  {% else %}
   <p>Wij gebruiken alleen cookies en browseropslag die nodig zijn voor de werking en beveiliging van de site. Wij gebruiken geen advertentie-, analyse- of volgcookies en laden geen video's, lettertypen of andere onderdelen van andere partijen. Daarom vragen wij geen toestemming voor cookies.</p>
+  {% endif %}
   <div class="table-wrap"><table class="table-simple table-stapel">
     <thead><tr><th scope="col">Naam</th><th scope="col">Soort</th><th scope="col">Waarvoor</th><th scope="col">Hoe lang</th></tr></thead>
     <tbody>{% for c in cookies %}
