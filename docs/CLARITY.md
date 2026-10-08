@@ -10,13 +10,14 @@ Stand: 8 oktober 2026, branch `claude/clarity`. Alleen op staging; production (`
 - Twee projecten in Clarity, zodat testbezoeken en echte bezoekers niet door elkaar lopen: `yuemn2aqz1` (in Clarity "VAYLIDE") alleen
   voor staging en testen; `yui4h1kh8c` ("VAYLIDE Production", https://vaylide.nl) voor later op production. Beide Strict en bij
   beide staat Copilot (de AI-samenvattingen) uit, sinds 8 oktober 2026. Het production-ID staat nog nergens in Render.
-- **Live start niet met Clarity zolang de privacytekst een open besluit is**: `CLARITY_BESLUITEN` in `core/privacyverklaring.py`
-  (goedkeuring, rol van Microsoft, bewaartermijn). Rol en bewaartermijn staan ingevuld uit de officiële FAQ van Clarity
+- **De privacytekst over Clarity is goedgekeurd door de eigenaar op 8 oktober 2026** (`CLARITY_BESLUITEN["goedgekeurd"]` in
+  `core/privacyverklaring.py`); de conceptmarkering is daarmee weg. Verandert de tekst inhoudelijk, zet de goedkeuring dan weer op `None`:
+  dan is het weer een concept en start de live-modus niet met Clarity. Rol en bewaartermijn staan ingevuld uit de officiële FAQ van Clarity
   (learn.microsoft.com/clarity/faq: "GDPR-compliant as a data controller"; afspeelgegevens van opnames 30 dagen; klik- en heatmapgegevens, gelabelde en favoriete
   opnames en een willekeurige steekproef tot 9 maanden;
   opslag in Azure; EU-gebruikers contracteren met Microsoft Ireland Operations Limited, met SCC's naar Microsoft Corporation in de VS).
-  De goedkeuring is bewust leeg: de tekst blijft een concept. Zolang daar iets leeg is, staat het in de open punten van de verklaring en weigert
-  `manage.py check` (en dus `migrate` bij het starten) in live-modus.
+  Zolang daar iets leeg is, staat het in de open punten van de verklaring en weigert `manage.py check` (en dus `migrate` bij het
+  starten) in live-modus. Production draait nu nog met `VIERLIEF_MODE=test`; daar is de enige rem dat er geen `VIERLIEF_CLARITY_ID` staat.
 
 ## Waar Clarity draait
 

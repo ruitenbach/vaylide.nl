@@ -2,6 +2,7 @@
 gevoelige inhoud afgeschermd, en live niet zonder goedgekeurde privacytekst. Zie docs/CLARITY.md."""
 import re
 from pathlib import Path
+from unittest import mock
 
 from django.conf import settings
 from django.test import Client, override_settings
@@ -193,14 +194,14 @@ class StudioVoorbeeldTitelTests(VaylideTestCase):
 
 @override_settings(CLARITY_ID=ID)
 class PrivacyTekstTests(VaylideTestCase):
-    def test_concepttekst_staat_klaar_en_is_een_open_besluit(self):
+    def test_goedgekeurde_tekst_staat_er_zonder_conceptmarkering(self):
         html = Client().get("/privacy/").content.decode()
         for nodig in ("Microsoft Clarity", "sessieopnames", "klikken", "scrollen", "gebruiksgegevens", "<code>_clck</code>", "<code>_clsk</code>",
                       "Microsoft Azure", "Microsoft Ireland Operations Limited", "Microsoft Corporation in de Verenigde Staten",
                       "zelfstandig verwerkingsverantwoordelijke", "Microsoft Clarity bewaart afspeelgegevens van sessieopnames 30 dagen.",
                       "Klikgegevens en heatmapgegevens worden tot 9 maanden bewaard.",
                       "Gelabelde of als favoriet gemarkeerde sessies en een willekeurig gekozen steekproef van sessieopnames worden tot 9 maanden bewaard.", "toestemming altijd intrekken", "Cookie-instellingen",
-                      "https://privacy.microsoft.com/privacystatement", "vaylide_analytics", "Concept, juridisch nog te beoordelen",
+                      "https://privacy.microsoft.com/privacystatement", "vaylide_analytics",
                       "je IP-adres, waaruit Microsoft je land en je globale locatie afleidt", "het volledige adres (URL) van elke pagina",
                       "willekeurige codes van je ontwerp en van foto's", "muisbewegingen", "Dan stopt de meting direct",
                       "de titel van de pagina", "gegevens over je apparaat en browser", "je foto's en hun bestandsnamen",
@@ -213,10 +214,19 @@ class PrivacyTekstTests(VaylideTestCase):
         self.assertEqual(html.count("Klikgegevens en heatmapgegevens worden tot 9 maanden bewaard."), 2)   # onderdeel 9 en 10
         self.assertNotIn("Wij gebruiken geen advertentie-, analyse- of volgcookies", html)
         self.assertIn("Microsoft Ireland Operations Limited (Ierland) en Microsoft Corporation (Verenigde Staten)", html)   # bij de partijen en de doorgifte
-        self.assertIn(pv.LABELS["clarity"], pv.open_points())
-
-    def test_live_start_niet_met_clarity_zolang_de_tekst_open_staat(self):
+        self.assertTrue(pv.CLARITY_TEKST_GOEDGEKEURD)
+        self.assertNotIn("Concept, juridisch nog te beoordelen", html)
+        self.assertNotIn(pv.LABELS["clarity"], pv.open_points())
         with override_settings(TEST_MODE=False):
             fouten = pv.check_privacy_statement()
+        self.assertFalse(any(pv.LABELS["clarity"] in f.msg for f in fouten))            # Clarity blokkeert de live-modus niet meer
+
+    def test_zonder_goedkeuring_weer_concept_en_geen_live_start(self):
+        with mock.patch.object(pv, "CLARITY_TEKST_GOEDGEKEURD", False):
+            html = Client().get("/privacy/").content.decode()
+            self.assertIn("Concept, juridisch nog te beoordelen", html)
+            self.assertIn(pv.LABELS["clarity"], pv.open_points())
+            with override_settings(TEST_MODE=False):
+                fouten = pv.check_privacy_statement()
         self.assertTrue(fouten)
         self.assertIn(pv.LABELS["clarity"], fouten[0].msg)

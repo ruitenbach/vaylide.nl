@@ -49,15 +49,15 @@ BESLUITEN: dict[str, str | None] = {
     "bewaar_logs": "7 dagen bij onze hostingpartij Render; daarna verwijdert Render ze automatisch",
 }
 
-# Microsoft Clarity (bezoekersanalyse, alleen na toestemming): de tekst in de verklaring is een concept. Zolang hier None staat, is het een
-# open juridisch besluit: de testversie toont het concept met een gele markering en in live-modus start de site niet met VIERLIEF_CLARITY_ID.
+# Microsoft Clarity (bezoekersanalyse, alleen na toestemming). Staat hier iets op None, dan is de tekst een open juridisch besluit: de
+# testversie toont hem als concept met een gele markering en in live-modus start de site niet met VIERLIEF_CLARITY_ID.
 # Rol en bewaartermijn zijn ingevuld uit de officiële FAQ van Clarity (learn.microsoft.com/clarity/faq, bijgewerkt 21-09-2026): "Clarity is
 # GDPR-compliant as a data controller"; "Clarity retains recordings for 30 days ... Favorite recordings and randomly selected sample of
 # recordings are retained for up to 9 months"; "You can access heat maps for up to 9 months"; "Labels can be retained for up to 9 months".
-# De bewaartermijn staat als volledige zinnen in onderdeel 9 en 10. Dit blijft een concept: pas als iemand de tekst juridisch heeft
-# beoordeeld, komt bij "goedgekeurd" wie en wanneer (bijvoorbeeld "Goedgekeurd door ... op 12-10-2026").
+# De bewaartermijn staat als volledige zinnen in onderdeel 9 en 10. Verandert de tekst inhoudelijk, zet "goedgekeurd" dan weer op None
+# tot de nieuwe tekst is beoordeeld.
 CLARITY_BESLUITEN: dict[str, str | None] = {
-    "goedgekeurd": None,
+    "goedgekeurd": "Goedgekeurd door de eigenaar op 08-10-2026",
     "rol_microsoft": "Zelfstandig verwerkingsverantwoordelijke (volgens Microsoft)",
     "bewaartermijn": "Microsoft Clarity bewaart afspeelgegevens van sessieopnames 30 dagen. Klikgegevens en heatmapgegevens worden tot "
                      "9 maanden bewaard. Gelabelde of als favoriet gemarkeerde sessies en een willekeurig gekozen steekproef van "
@@ -161,7 +161,7 @@ def suppliers() -> list[dict]:
                         "foto's, klikken, scrollen, muisbewegingen en hoe je navigeert, je apparaat en browser, een opname van het bezoek "
                         "en een willekeurig bezoekers- en sessie-id. Wat je invult en wat op je kaart staat, wordt afgeschermd en gaat "
                         "niet naar Microsoft.",
-            "rol": CLARITY_BESLUITEN["rol_microsoft"],      # concept: juridisch vast te stellen (CLARITY_BESLUITEN)
+            "rol": CLARITY_BESLUITEN["rol_microsoft"],      # goedgekeurd 08-10-2026 (CLARITY_BESLUITEN)
             "doorgifte": "Microsoft bewaart de gegevens van Clarity in Microsoft Azure. Voor gebruikers in de EU is Microsoft Ireland "
                          "Operations Limited (Ierland) de contractpartij; die geeft gegevens met EU-standaardcontractbepalingen door aan "
                          "Microsoft Corporation in de Verenigde Staten.",
