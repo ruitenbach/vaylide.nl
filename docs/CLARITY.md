@@ -8,9 +8,8 @@ Stand: 8 oktober 2026, branch `claude/clarity`. Alleen op staging; production (`
   "Cookie-instellingen" en geen extra domeinen in de Content-Security-Policy. Staging: `yuemn2aqz1` (`render.staging.yaml`).
   Neemt Render de blueprint-waarde niet vanzelf over, zet hem dan in Render bij de dienst `vaylide-staging` → Environment.
 - Twee projecten in Clarity, zodat testbezoeken en echte bezoekers niet door elkaar lopen: `yuemn2aqz1` (in Clarity "VAYLIDE") alleen
-  voor staging en testen; `yui4h1kh8c` ("VAYLIDE Production", https://vaylide.nl) voor later op production. Beide Strict. Copilot staat
-  bij `yuemn2aqz1` uit; bij `yui4h1kh8c` staat het nog aan (standaard) en moet het uit vóór production. Het production-ID staat nog
-  nergens in Render.
+  voor staging en testen; `yui4h1kh8c` ("VAYLIDE Production", https://vaylide.nl) voor later op production. Beide Strict en bij
+  beide staat Copilot (de AI-samenvattingen) uit, sinds 8 oktober 2026. Het production-ID staat nog nergens in Render.
 - **Live start niet met Clarity zolang de privacytekst een open besluit is**: `CLARITY_BESLUITEN` in `core/privacyverklaring.py`
   (goedkeuring, rol van Microsoft, bewaartermijn). Rol en bewaartermijn staan ingevuld uit de officiële FAQ van Clarity
   (learn.microsoft.com/clarity/faq: "GDPR-compliant as a data controller"; opnames 30 dagen, favorieten en steekproef tot 9 maanden;
