@@ -422,3 +422,50 @@ class OveralDezelfdeVolgordeTests(VaylideTestCase):
         gewoon = [c["template"].slug for c in antwoord.context["cards"]]
         self.assertEqual(specials[:3], ["kerststad", "golden-noel", "kerstbol"])
         self.assertEqual(gewoon[:2], ["winterlicht", "gloria"])
+
+
+class AddedAtVerplichtTests(VaylideTestCase):
+    """Geen stille terugval op de registratietijd in een database: zonder (geldige) `added_at` faalt het duidelijk."""
+
+    def manifest(self, **wijzigingen):
+        import json
+        from pathlib import Path
+
+        from django.conf import settings
+
+        pad = Path(settings.BASE_DIR) / "designs" / "kerststad" / "v1" / "manifest.json"
+        data = json.loads(pad.read_text(encoding="utf-8"))
+        data.update(wijzigingen)
+        for sleutel in [k for k, v in wijzigingen.items() if v is None]:
+            data.pop(sleutel)
+        return pad, data
+
+    def test_een_manifest_zonder_added_at_wordt_geweigerd(self):
+        from catalog.seed import DesignError, validate_manifest
+
+        pad, data = self.manifest(added_at=None)
+        with self.assertRaisesMessage(DesignError, "added_at"):
+            validate_manifest(pad, data)
+
+    def test_een_ongeldige_added_at_wordt_geweigerd(self):
+        from catalog.seed import DesignError, validate_manifest
+
+        for fout in ("gisteren", "2026-10-07", "2026-10-07T07:59:37", "", 12):     # geen datum, alleen een datum, geen tijdzone, leeg, geen tekst
+            pad, data = self.manifest(added_at=fout)
+            with self.assertRaisesMessage(DesignError, "added_at"):
+                validate_manifest(pad, data)
+
+    def test_een_geldige_added_at_wordt_geaccepteerd(self):
+        from catalog.seed import validate_manifest
+
+        pad, data = self.manifest(added_at="2026-10-07T09:59:37+02:00")
+        validate_manifest(pad, data)
+
+    def test_sorteren_gebruikt_nooit_de_registratietijd(self):
+        from catalog import collectie
+        from catalog.seed import DesignError
+
+        zonder = {k: v for k, v in collectie.toegevoegd().items() if k != "kerststad"}
+        with mock.patch("catalog.collectie.toegevoegd", return_value=zonder):
+            with self.assertRaisesMessage(DesignError, "added_at"):
+                collectie_volgorde(list(Template.objects.filter(slug__in=["kerststad", "balzaal"])))

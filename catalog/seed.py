@@ -77,7 +77,21 @@ class DesignError(ValueError):
     """Een ontwerpmap is niet compleet of niet consistent."""
 
 
-REQUIRED_MANIFEST_KEYS = ("slug", "version", "name", "occasions", "palettes")
+REQUIRED_MANIFEST_KEYS = ("slug", "version", "name", "occasions", "palettes", "added_at")
+
+
+def parse_added_at(value, where: str):
+    """De vaste toevoegtijd van een ontwerp (`added_at` in het manifest, ISO met tijdzone, bijv. 2026-10-07T07:59:37Z). Verplicht: het is de enige bron voor
+    'nieuwste ontwerp' (catalog.occasions.collectie_volgorde), zodat elke database dezelfde volgorde geeft."""
+    from datetime import datetime
+
+    try:
+        moment = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError:
+        moment = None
+    if moment is None or moment.tzinfo is None:
+        raise DesignError(f"{where}: 'added_at' ({value!r}) is geen geldige tijd met tijdzone. Gebruik bijvoorbeeld 2026-10-07T07:59:37Z (de tijd van toevoegen).")
+    return moment
 
 
 def validate_manifest(path: Path, data: dict) -> None:
@@ -86,6 +100,7 @@ def validate_manifest(path: Path, data: dict) -> None:
     missing = [key for key in REQUIRED_MANIFEST_KEYS if not data.get(key)]
     if missing:
         raise DesignError(f"{where}/manifest.json mist: {', '.join(missing)}.")
+    parse_added_at(data["added_at"], f"{where}/manifest.json")
     if data["slug"] != folder.parent.name:
         raise DesignError(f"{where}: 'slug' in het manifest ({data['slug']}) moet gelijk zijn aan de mapnaam ({folder.parent.name}).")
     if f"v{data['version']}" != folder.name:

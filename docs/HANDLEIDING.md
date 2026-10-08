@@ -117,7 +117,7 @@ Een onbekende keuze geeft bij het inlezen een duidelijke melding. De kop `getal`
 Zo voeg je er een toe:
 
 1. **Beschrijf het ontwerp** in `tools/atelier/specs.py`: kopieer een bestaand ontwerp dat erop lijkt en pas aan:
-   - `slug`, `name`, `added_at` (de tijd van toevoegen, ISO met tijdzone, bijv. `2026-10-07T07:59:37Z`; bepaalt 'nieuwste eerst'), `sort_order`, `tagline`, `description`, `style_notes`;
+   - `slug`, `name`, `added_at` (verplicht: de tijd van toevoegen, ISO met tijdzone, bijv. `2026-10-07T07:59:37Z`; de enige bron voor "nieuwste eerst"), `sort_order`, `tagline`, `description`, `style_notes`;
    - `occasions`: de eerste is de gelegenheid waarvoor het ontwerp gemaakt is (bepaalt de volgorde in de collectie en het standaardvoorbeeld);
    - `atelier`: de keuzes uit de tabel;
    - `fonts`: letters per rol (`display`, `body`, `script`, `ui`, en optioneel `text` voor ondertitel en welkomsttekst en `number` voor cijfers). Kies uit de lijst `FONTS` in `tools/atelier/ontwerpen.py`; de bestanden staan in `static/fonts/` (open source, licentie ernaast);

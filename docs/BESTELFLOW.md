@@ -59,8 +59,9 @@ boven de teksten), de ontwerpkeuze in de Studio en 'Meer voor…' op de ontwerpp
 "Nieuwst" komt uit de code, niet uit de database: elk manifest heeft een vaste `added_at` (ISO-tijd met tijdzone, bijv. `2026-10-07T07:59:37Z`),
 gelezen door `catalog/collectie.py: toegevoegd()`. `Template.created_at` (de registratietijd in een specifieke database) doet niet mee; staging,
 production en een nieuwe database geven dus dezelfde volgorde, ook na `sync_designs` of een nieuwe deploy. Bij gelijke tijd beslist `sort_order`.
-**Een nieuw ontwerp krijgt in zijn manifest een `added_at` met de tijd van toevoegen**; `tests/test_flow_eenvoudig.py` (`VasteToevoegdatumTests`) laat
-de tests falen als die ontbreekt. De waarden van de bestaande ontwerpen komen uit de git-geschiedenis (de commit waarin het ontwerp is toegevoegd).
+**`added_at` is verplicht**: een nieuw ontwerp krijgt in zijn manifest de tijd van toevoegen. Ontbreekt hij of is hij ongeldig (geen ISO-tijd met tijdzone),
+dan weigert `validate_manifest` het manifest met een duidelijke `DesignError` (dus ook `sync_designs`, de start en de tests falen) en zoekt de sortering nooit
+stilletjes naar `Template.created_at`. Zo kunnen staging en production nooit verschillende volgordes krijgen. De waarden van de bestaande ontwerpen komen uit de git-geschiedenis (de commit waarin het ontwerp is toegevoegd).
 Gevolg: de A/B-indeling uit `catalog/collectie.py` bepaalt de volgorde alleen nog voor ontwerpen die op hetzelfde moment zijn toegevoegd.
 
 ## Controles

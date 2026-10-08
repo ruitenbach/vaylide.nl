@@ -135,9 +135,14 @@ def collectie_volgorde(designs) -> list:
     from . import collectie
 
     def sleutel(t):
-        # Zonder added_at in het manifest (een ontwerp van een ontwikkelaar die het vergat) telt de registratietijd; de test bewaakt dat elk manifest er een heeft.
-        moment = collectie.toegevoegd().get(t.slug) or getattr(t, "created_at", None)
-        return (0 if getattr(t, "special", False) else 1, -(moment.timestamp() if moment else 0), t.sort_order, t.name)
+        # Geen terugval op de registratietijd in de database: `added_at` uit het manifest is de enige bron (verplicht, zie catalog/seed.py).
+        try:
+            moment = collectie.toegevoegd()[t.slug]
+        except KeyError:
+            from .seed import DesignError
+
+            raise DesignError(f"{t.slug}: geen manifest met 'added_at' gevonden; 'nieuwste eerst' komt alleen uit het manifest.") from None
+        return (0 if getattr(t, "special", False) else 1, -moment.timestamp(), t.sort_order, t.name)
 
     return sorted(designs, key=sleutel)
 

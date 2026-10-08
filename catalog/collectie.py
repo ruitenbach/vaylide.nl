@@ -12,12 +12,7 @@ bestaande databases krijgen ze één keer via migratie 0006 (daarna beslist Behe
 """
 from __future__ import annotations
 
-import json
-from datetime import datetime, timezone
 from functools import lru_cache
-from pathlib import Path
-
-from django.conf import settings
 
 A = (
     "aurora-nocturne", "midnight-emeraude", "rose-royale", "balzaal", "golden-noel", "gouden-avond", "kerstbol", "kerstkaart", "kerststad",      # specials
@@ -54,17 +49,14 @@ SORT_ORDER = {
 # `sync_designs`, deployen of opnieuw registreren veranderen niets. Een nieuw ontwerp krijgt in zijn manifest de tijd van toevoegen (tests/test_collectie.py bewaakt dat).
 @lru_cache(maxsize=1)
 def toegevoegd() -> dict:
-    """slug -> tijdstip (met tijdzone) uit de manifesten; bij meerdere versies telt de vroegste."""
+    """slug -> tijdstip (met tijdzone) uit de manifesten; bij meerdere versies telt de vroegste. Een ontbrekende of ongeldige `added_at` is een duidelijke fout
+    (DesignError), geen stille terugval: ook `sync_designs` en de tests laten het dan falen."""
+    from .seed import design_manifests, parse_added_at
+
     gevonden: dict = {}
-    for pad in sorted((Path(settings.BASE_DIR) / "designs").glob("*/v*/manifest.json")):
-        try:
-            data = json.loads(pad.read_text(encoding="utf-8"))
-            moment = datetime.fromisoformat(str(data["added_at"]).replace("Z", "+00:00"))
-        except (ValueError, KeyError, OSError):
-            continue
-        if moment.tzinfo is None:
-            moment = moment.replace(tzinfo=timezone.utc)
-        slug = data.get("slug") or pad.parent.parent.name
+    for pad, data in design_manifests():
+        moment = parse_added_at(data["added_at"], f"{pad.parent.parent.name}/{pad.parent.name}/manifest.json")
+        slug = data["slug"]
         if slug not in gevonden or moment < gevonden[slug]:
             gevonden[slug] = moment
     return gevonden
