@@ -52,13 +52,16 @@ BESLUITEN: dict[str, str | None] = {
 # Microsoft Clarity (bezoekersanalyse, alleen na toestemming): de tekst in de verklaring is een concept. Zolang hier None staat, is het een
 # open juridisch besluit: de testversie toont het concept met een gele markering en in live-modus start de site niet met VIERLIEF_CLARITY_ID.
 # Rol en bewaartermijn zijn ingevuld uit de officiële FAQ van Clarity (learn.microsoft.com/clarity/faq, bijgewerkt 21-09-2026): "Clarity is
-# GDPR-compliant as a data controller"; opnames 30 dagen, favorieten en een willekeurige steekproef tot 9 maanden. Dit blijft een concept:
-# pas als iemand de tekst juridisch heeft beoordeeld, komt bij "goedgekeurd" wie en wanneer (bijvoorbeeld "Goedgekeurd door ... op 12-10-2026").
+# GDPR-compliant as a data controller"; "Clarity retains recordings for 30 days ... Favorite recordings and randomly selected sample of
+# recordings are retained for up to 9 months"; "You can access heat maps for up to 9 months"; "Labels can be retained for up to 9 months".
+# De bewaartermijn staat als volledige zinnen in onderdeel 9 en 10. Dit blijft een concept: pas als iemand de tekst juridisch heeft
+# beoordeeld, komt bij "goedgekeurd" wie en wanneer (bijvoorbeeld "Goedgekeurd door ... op 12-10-2026").
 CLARITY_BESLUITEN: dict[str, str | None] = {
     "goedgekeurd": None,
     "rol_microsoft": "Zelfstandig verwerkingsverantwoordelijke (volgens Microsoft)",
-    "bewaartermijn": "opnames 30 dagen; opnames die wij als favoriet markeren en een willekeurige steekproef van opnames tot 9 maanden "
-                     "(volgens Microsoft)",
+    "bewaartermijn": "Microsoft Clarity bewaart afspeelgegevens van sessieopnames 30 dagen. Klikgegevens en heatmapgegevens worden tot "
+                     "9 maanden bewaard. Gelabelde of als favoriet gemarkeerde sessies en een willekeurig gekozen steekproef van "
+                     "sessieopnames worden tot 9 maanden bewaard. Dit zijn de termijnen volgens Microsoft.",
 }
 CLARITY_TEKST_GOEDGEKEURD = all(CLARITY_BESLUITEN.values())
 

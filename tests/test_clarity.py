@@ -197,7 +197,9 @@ class PrivacyTekstTests(VaylideTestCase):
         html = Client().get("/privacy/").content.decode()
         for nodig in ("Microsoft Clarity", "sessieopnames", "klikken", "scrollen", "gebruiksgegevens", "<code>_clck</code>", "<code>_clsk</code>",
                       "Microsoft Azure", "Microsoft Ireland Operations Limited", "Microsoft Corporation in de Verenigde Staten",
-                      "zelfstandig verwerkingsverantwoordelijke", "opnames 30 dagen", "toestemming altijd intrekken", "Cookie-instellingen",
+                      "zelfstandig verwerkingsverantwoordelijke", "Microsoft Clarity bewaart afspeelgegevens van sessieopnames 30 dagen.",
+                      "Klikgegevens en heatmapgegevens worden tot 9 maanden bewaard.",
+                      "Gelabelde of als favoriet gemarkeerde sessies en een willekeurig gekozen steekproef van sessieopnames worden tot 9 maanden bewaard.", "toestemming altijd intrekken", "Cookie-instellingen",
                       "https://privacy.microsoft.com/privacystatement", "vaylide_analytics", "Concept, juridisch nog te beoordelen",
                       "je IP-adres, waaruit Microsoft je land en je globale locatie afleidt", "het volledige adres (URL) van elke pagina",
                       "willekeurige codes van je ontwerp en van foto's", "muisbewegingen", "Dan stopt de meting direct",
@@ -208,6 +210,7 @@ class PrivacyTekstTests(VaylideTestCase):
                       "Bezoekersanalyse met Microsoft Clarity: zien hoe bezoekers", "Gegevens van de bezoekersanalyse (Microsoft Clarity)"):
             self.assertIn(nodig, html, nodig)
         self.assertEqual(html.count('href="#clarity"'), 1)                               # verwijzing vanuit onderdeel 2
+        self.assertEqual(html.count("Klikgegevens en heatmapgegevens worden tot 9 maanden bewaard."), 2)   # onderdeel 9 en 10
         self.assertNotIn("Wij gebruiken geen advertentie-, analyse- of volgcookies", html)
         self.assertIn("Microsoft Ireland Operations Limited (Ierland) en Microsoft Corporation (Verenigde Staten)", html)   # bij de partijen en de doorgifte
         self.assertIn(pv.LABELS["clarity"], pv.open_points())

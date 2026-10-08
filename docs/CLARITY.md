@@ -12,7 +12,8 @@ Stand: 8 oktober 2026, branch `claude/clarity`. Alleen op staging; production (`
   beide staat Copilot (de AI-samenvattingen) uit, sinds 8 oktober 2026. Het production-ID staat nog nergens in Render.
 - **Live start niet met Clarity zolang de privacytekst een open besluit is**: `CLARITY_BESLUITEN` in `core/privacyverklaring.py`
   (goedkeuring, rol van Microsoft, bewaartermijn). Rol en bewaartermijn staan ingevuld uit de officiële FAQ van Clarity
-  (learn.microsoft.com/clarity/faq: "GDPR-compliant as a data controller"; opnames 30 dagen, favorieten en steekproef tot 9 maanden;
+  (learn.microsoft.com/clarity/faq: "GDPR-compliant as a data controller"; afspeelgegevens van opnames 30 dagen; klik- en heatmapgegevens, gelabelde en favoriete
+  opnames en een willekeurige steekproef tot 9 maanden;
   opslag in Azure; EU-gebruikers contracteren met Microsoft Ireland Operations Limited, met SCC's naar Microsoft Corporation in de VS).
   De goedkeuring is bewust leeg: de tekst blijft een concept. Zolang daar iets leeg is, staat het in de open punten van de verklaring en weigert
   `manage.py check` (en dus `migrate` bij het starten) in live-modus.
