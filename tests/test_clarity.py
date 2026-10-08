@@ -156,11 +156,12 @@ class PrivacyTekstTests(VaylideTestCase):
     def test_concepttekst_staat_klaar_en_is_een_open_besluit(self):
         html = Client().get("/privacy/").content.decode()
         for nodig in ("Microsoft Clarity", "sessieopnames", "klikken", "scrollen", "gebruiksgegevens", "<code>_clck</code>", "<code>_clsk</code>",
-                      "Microsoft Azure", "datacenters van Microsoft in de Verenigde Staten", "toestemming altijd intrekken", "Cookie-instellingen",
+                      "Microsoft Azure", "Microsoft Ireland Operations Limited", "Microsoft Corporation in de Verenigde Staten",
+                      "zelfstandig verwerkingsverantwoordelijke", "opnames 30 dagen", "toestemming altijd intrekken", "Cookie-instellingen",
                       "https://privacy.microsoft.com/privacystatement", "vaylide_analytics", "Concept, juridisch nog te beoordelen"):
             self.assertIn(nodig, html, nodig)
         self.assertNotIn("Wij gebruiken geen advertentie-, analyse- of volgcookies", html)
-        self.assertIn("Microsoft Corporation (Verenigde Staten)", html)                 # bij de partijen en de doorgifte
+        self.assertIn("Microsoft Ireland Operations Limited (Ierland) en Microsoft Corporation (Verenigde Staten)", html)   # bij de partijen en de doorgifte
         self.assertIn(pv.LABELS["clarity"], pv.open_points())
 
     def test_live_start_niet_met_clarity_zolang_de_tekst_open_staat(self):

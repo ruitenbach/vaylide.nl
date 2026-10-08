@@ -8,7 +8,10 @@ Stand: 8 oktober 2026, branch `claude/clarity`. Alleen op staging; production (`
   "Cookie-instellingen" en geen extra domeinen in de Content-Security-Policy. Staging: `yuemn2aqz1` (`render.staging.yaml`).
   Neemt Render de blueprint-waarde niet vanzelf over, zet hem dan in Render bij de dienst `vaylide-staging` → Environment.
 - **Live start niet met Clarity zolang de privacytekst een open besluit is**: `CLARITY_BESLUITEN` in `core/privacyverklaring.py`
-  (goedkeuring, rol van Microsoft, bewaartermijn). Zolang daar iets leeg is, staat het in de open punten van de verklaring en weigert
+  (goedkeuring, rol van Microsoft, bewaartermijn). Rol en bewaartermijn staan ingevuld uit de officiële FAQ van Clarity
+  (learn.microsoft.com/clarity/faq: "GDPR-compliant as a data controller"; opnames 30 dagen, favorieten en steekproef tot 9 maanden;
+  opslag in Azure; EU-gebruikers contracteren met Microsoft Ireland Operations Limited, met SCC's naar Microsoft Corporation in de VS).
+  De goedkeuring is bewust leeg: de tekst blijft een concept. Zolang daar iets leeg is, staat het in de open punten van de verklaring en weigert
   `manage.py check` (en dus `migrate` bij het starten) in live-modus.
 
 ## Waar Clarity draait

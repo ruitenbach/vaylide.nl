@@ -51,11 +51,14 @@ BESLUITEN: dict[str, str | None] = {
 
 # Microsoft Clarity (bezoekersanalyse, alleen na toestemming): de tekst in de verklaring is een concept. Zolang hier None staat, is het een
 # open juridisch besluit: de testversie toont het concept met een gele markering en in live-modus start de site niet met VIERLIEF_CLARITY_ID.
-# Na beoordeling: vul alle drie in (wie het goedkeurde en wanneer, de rol van Microsoft en de bewaartermijn bij Clarity).
+# Rol en bewaartermijn zijn ingevuld uit de officiële FAQ van Clarity (learn.microsoft.com/clarity/faq, bijgewerkt 21-09-2026): "Clarity is
+# GDPR-compliant as a data controller"; opnames 30 dagen, favorieten en een willekeurige steekproef tot 9 maanden. Dit blijft een concept:
+# pas als iemand de tekst juridisch heeft beoordeeld, komt bij "goedgekeurd" wie en wanneer (bijvoorbeeld "Goedgekeurd door ... op 12-10-2026").
 CLARITY_BESLUITEN: dict[str, str | None] = {
-    "goedgekeurd": None,       # bijvoorbeeld "Goedgekeurd door ... op 12-10-2026"
-    "rol_microsoft": None,     # rol van Microsoft bij Clarity (verwerker of zelfstandig verantwoordelijke), zoals in de voorwaarden van Clarity
-    "bewaartermijn": None,     # hoe lang Clarity opnames en gegevens bewaart (volgens Microsoft), zoals in de verklaring
+    "goedgekeurd": None,
+    "rol_microsoft": "Zelfstandig verwerkingsverantwoordelijke (volgens Microsoft)",
+    "bewaartermijn": "opnames 30 dagen; opnames die wij als favoriet markeren en een willekeurige steekproef van opnames tot 9 maanden "
+                     "(volgens Microsoft)",
 }
 CLARITY_TEKST_GOEDGEKEURD = all(CLARITY_BESLUITEN.values())
 
@@ -148,14 +151,15 @@ def suppliers() -> list[dict]:
         })
     if clarity_active():
         rows.append({
-            "naam": "Microsoft Corporation (Verenigde Staten)",
+            "naam": "Microsoft Ireland Operations Limited (Ierland) en Microsoft Corporation (Verenigde Staten)",
             "dienst": "Bezoekersanalyse met Microsoft Clarity, alleen als je daar toestemming voor geeft",
             "gegevens": "Gebruiksgegevens van je bezoek: welke pagina's je bekijkt, waar je klikt en scrollt, je apparaat en browser, "
                         "een opname van het bezoek en een cookie-id. Wat je invult, de inhoud van je kaart en antwoorden van gasten "
                         "worden afgeschermd en gaan niet naar Microsoft.",
             "rol": CLARITY_BESLUITEN["rol_microsoft"],      # concept: juridisch vast te stellen (CLARITY_BESLUITEN)
-            "doorgifte": "Microsoft verwerkt en bewaart de gegevens van Clarity in Microsoft Azure, in datacenters van Microsoft in de "
-                         "Verenigde Staten. Microsoft is gecertificeerd onder het EU-VS Data Privacy Framework.",
+            "doorgifte": "Microsoft bewaart de gegevens van Clarity in Microsoft Azure. Voor gebruikers in de EU is Microsoft Ireland "
+                         "Operations Limited (Ierland) de contractpartij; die geeft gegevens met EU-standaardcontractbepalingen door aan "
+                         "Microsoft Corporation in de Verenigde Staten.",
         })
     return rows
 
