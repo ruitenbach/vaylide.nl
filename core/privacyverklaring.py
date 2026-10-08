@@ -154,9 +154,10 @@ def suppliers() -> list[dict]:
             "naam": "Microsoft Ireland Operations Limited (Ierland) en Microsoft Corporation (Verenigde Staten)",
             "dienst": "Bezoekersanalyse met Microsoft Clarity, alleen als je daar toestemming voor geeft",
             "gegevens": "Gebruiksgegevens van je bezoek: je IP-adres en de globale locatie die Microsoft daaruit afleidt, welke pagina's "
-                        "je bekijkt (met het volledige adres), waar je klikt en scrollt en hoe je navigeert, je apparaat en browser, "
-                        "een opname van het bezoek en een cookie-id. Wat je invult, de inhoud van je kaart en antwoorden van gasten "
-                        "worden afgeschermd en gaan niet naar Microsoft.",
+                        "je bekijkt (met het volledige adres en de titel), de opbouw van de pagina met willekeurige codes van je ontwerp en "
+                        "foto's, klikken, scrollen, muisbewegingen en hoe je navigeert, je apparaat en browser, een opname van het bezoek "
+                        "en een willekeurig bezoekers- en sessie-id. Wat je invult en wat op je kaart staat, wordt afgeschermd en gaat "
+                        "niet naar Microsoft.",
             "rol": CLARITY_BESLUITEN["rol_microsoft"],      # concept: juridisch vast te stellen (CLARITY_BESLUITEN)
             "doorgifte": "Microsoft bewaart de gegevens van Clarity in Microsoft Azure. Voor gebruikers in de EU is Microsoft Ireland "
                          "Operations Limited (Ierland) de contractpartij; die geeft gegevens met EU-standaardcontractbepalingen door aan "

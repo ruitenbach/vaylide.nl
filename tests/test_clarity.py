@@ -32,6 +32,7 @@ class ZonderClarityTests(VaylideTestCase):
         privacy = Client().get("/privacy/").content.decode()
         self.assertIn("Wij gebruiken geen advertentie-, analyse- of volgcookies", privacy)
         self.assertNotIn("Microsoft Clarity", privacy)
+        self.assertNotIn("Bezoekersanalyse", privacy)
         self.assertNotIn(pv.LABELS["clarity"], pv.open_points())
 
 
@@ -199,8 +200,14 @@ class PrivacyTekstTests(VaylideTestCase):
                       "zelfstandig verwerkingsverantwoordelijke", "opnames 30 dagen", "toestemming altijd intrekken", "Cookie-instellingen",
                       "https://privacy.microsoft.com/privacystatement", "vaylide_analytics", "Concept, juridisch nog te beoordelen",
                       "je IP-adres, waaruit Microsoft je land en je globale locatie afleidt", "het volledige adres (URL) van elke pagina",
-                      "willekeurige code van je ontwerp", "muisbewegingen", "Dan stopt de meting direct"):
+                      "willekeurige codes van je ontwerp en van foto's", "muisbewegingen", "Dan stopt de meting direct",
+                      "de titel van de pagina", "gegevens over je apparaat en browser", "je foto's en hun bestandsnamen",
+                      "je kaart in de voorvertoning en je bestelgegevens", "uitnodigingen (<code>/u/…</code>), in Mijn VAYLIDE, bij het inloggen, "
+                      "in het beheer, bij het betalen", "buiten de Europese Economische Ruimte", "Copilot",
+                      "ook geen meting zonder cookies", "Wij koppelen deze gegevens niet aan je account",
+                      "Bezoekersanalyse met Microsoft Clarity: zien hoe bezoekers", "Gegevens van de bezoekersanalyse (Microsoft Clarity)"):
             self.assertIn(nodig, html, nodig)
+        self.assertEqual(html.count('href="#clarity"'), 1)                               # verwijzing vanuit onderdeel 2
         self.assertNotIn("Wij gebruiken geen advertentie-, analyse- of volgcookies", html)
         self.assertIn("Microsoft Ireland Operations Limited (Ierland) en Microsoft Corporation (Verenigde Staten)", html)   # bij de partijen en de doorgifte
         self.assertIn(pv.LABELS["clarity"], pv.open_points())
