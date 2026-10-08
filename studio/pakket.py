@@ -38,6 +38,35 @@ def feature_badges(package: Package | None) -> dict[str, str]:
     return badges
 
 
+def looptijd_uitleg(packages: list[Package], wenskaart_pakket: Package | None = None) -> str:
+    """De uitleg bij 'Hoe lang blijft mijn kaart online?', uit dezelfde pakketten als de bestelling (Beheer)."""
+    vanaf = "gerekend vanaf de bevestigde betaling"
+    if wenskaart_pakket is not None:
+        return f"Je wenskaart blijft {wenskaart_pakket.availability_months} maanden online, {vanaf}."
+    if not packages:
+        return ""
+    eerste, *rest = packages
+    if not rest:
+        return f"Met {eerste.name} blijft je kaart {eerste.availability_months} maanden online, {vanaf}."
+    overige = ". ".join(f"Met {p.name} {p.availability_months} maanden" for p in rest)
+    return f"Met {eerste.name} blijft je kaart {eerste.availability_months} maanden online. {overige}, {vanaf}."
+
+
+def muziek_uitleg(package: Package | None, ontwerp_muziek: bool) -> str:
+    """De uitleg bij eigen muziek, met de prijs uit Beheer (dezelfde AddOn als op de rekening). Leeg als eigen muziek niet kan."""
+    if package is not None and "music" in (package.features or []):
+        prijs = f"In {package.name} zit dit erbij, zonder extra kosten."
+    else:
+        addon = AddOn.objects.filter(is_active=True, feature="music").order_by("price_cents").first()
+        if addon is None:
+            return ""
+        prijs = f"Deze toevoeging kost {format_euro(addon.price_cents)}."
+    tekst = f"Upload je eigen nummer voor deze kaart. {prijs}"
+    if ontwerp_muziek:
+        tekst += " Muziek die al onderdeel is van een ontwerp kost niets extra."
+    return tekst
+
+
 def upgrade_target(package: Package, packages: list[Package]) -> Package | None:
     """Het volgende, uitgebreidere pakket (bij Essentieel: Compleet)."""
     bigger = [p for p in packages if p.price_cents > package.price_cents and set(package.features or []) <= set(p.features or [])]

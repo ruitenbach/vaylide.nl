@@ -160,7 +160,11 @@ def _context(request, inv: Invitation, step: str, **extra) -> dict:
         "step_labels": STEP_LABELS,
     }
     if step in ("fotos", "stijl", "aanmelden"):
-        ctx["feature_badges"] = pakket.feature_badges(pakket.chosen_package(inv))
+        gekozen = pakket.chosen_package(inv)
+        ctx["feature_badges"] = pakket.feature_badges(gekozen)
+        if step == "fotos":
+            track = (inv.template_version.manifest or {}).get("music")
+            ctx["muziek_uitleg"] = pakket.muziek_uitleg(gekozen, ontwerp_muziek=isinstance(track, dict) and bool(track.get("src")))
     if step in ("gegevens", "stijl"):
         ctx["eigen_opening"] = _eigen_opening(inv)
     ctx.update(extra)
@@ -898,5 +902,7 @@ def checkout_step(request, inv: Invitation):
                  selected_extras=selected_extras, issues=issues, error=error, test_payments=settings.PAYMENT_PROVIDER == "test",
                  upgrade=upgrade, downgrade=downgrade, nieuwsbrief_tekst=_newsletter_text(),
                  voorwaarden=_terms_info(), **_consent_texts(), looptijd=_availability_hint({**content, "date": ""} if wens else content, quote), losse_extras=pakket.extras_for(quote.package, quote) if quote and not wens else [],
+                 looptijd_uitleg=pakket.looptijd_uitleg(packages, wenskaart_pakket=quote.package if wens and quote else None),
+                 rsvp_aan=bool((content.get("sections") or {}).get("rsvp")),
                  login_url=f"{reverse('accounts:login')}?doel=bewaren&next={reverse('studio:step', args=[inv.uid, 'bestellen'])}"),
     )

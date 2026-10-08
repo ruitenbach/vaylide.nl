@@ -1,0 +1,19 @@
+{% comment %}Info-knop (i) met een korte uitleg bij een keuze. Gedrag: static/js/info.js, opmaak: vierlief.css (.info).
+Gebruik:  {% include "partials/info.html" with info_id="uniek-op-de-pagina" titel="…" tekst="…" link=url link_tekst="Meer lezen" %}
+link en link_tekst zijn optioneel. Alleen vaste producttekst: nooit klantgegevens of ingevulde waarden (ook geen data-attributen).
+Zet hem náást een titel (in een .met-info), niet in een kop of label: dan hoort de uitleg niet bij de naam van die kop.{% endcomment %}
+<span class="info" data-info>
+  <button type="button" class="info__knop" popovertarget="info-{{ info_id }}" aria-controls="info-{{ info_id }}" aria-expanded="false" aria-haspopup="dialog" aria-label="Uitleg: {{ titel }}" data-info-knop>
+    <svg class="info__icoon" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="10" cy="6.2" r="1.05" fill="currentColor"/><path d="M10 8.9v5.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+  </button>
+  <span class="info__paneel" id="info-{{ info_id }}" popover role="dialog" aria-labelledby="info-{{ info_id }}-titel" aria-describedby="info-{{ info_id }}-tekst" tabindex="-1" data-info-paneel>
+    <span class="info__kop">
+      <span class="info__titel" id="info-{{ info_id }}-titel">{{ titel }}</span>
+      <button type="button" class="info__sluit" popovertarget="info-{{ info_id }}" popovertargetaction="hide" aria-label="Sluiten" data-info-sluit>
+        <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </span>
+    <span class="info__tekst" id="info-{{ info_id }}-tekst">{{ tekst }}</span>
+    {% if link %}<a class="info__link" href="{{ link }}">{{ link_tekst|default:"Meer lezen" }}</a>{% endif %}
+  </span>
+</span>

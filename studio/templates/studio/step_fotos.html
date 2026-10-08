@@ -70,7 +70,7 @@
     <p class="hint">Gasten zetten de muziek zelf aan.</p>
     <fieldset class="muziekbron">
       <legend class="label">Kies de muziek</legend>
-      {% for choice in form.music_source %}<div class="check-line">{{ choice }}{% if choice.data.value == "design" %} <span class="badge">Inbegrepen</span>{% elif choice.data.value == "none" %} <span class="badge">Geen kosten</span>{% else %} <span class="badge">{{ feature_badges.music }}</span>{% endif %}</div>{% endfor %}
+      {% for choice in form.music_source %}<div class="check-line">{{ choice }}{% if choice.data.value == "design" %} <span class="badge">Inbegrepen</span>{% elif choice.data.value == "none" %} <span class="badge">Geen kosten</span>{% else %} <span class="badge">{{ feature_badges.music }}</span>{% if muziek_uitleg %}{% include "partials/info.html" with info_id="muziek" titel="Eigen muziek" tekst=muziek_uitleg %}{% endif %}{% endif %}</div>{% endfor %}
       {% if form.music_source.errors %}<p class="field-error" role="alert">{{ form.music_source.errors.0 }}</p>{% endif %}
     </fieldset>
     <div class="muziek-eigen" data-muziek-eigen>
@@ -92,7 +92,10 @@
       {% for a in audio %}<p class="small">{{ a.original_name }} · <button type="submit" class="link-button" form="delete-{{ a.uid }}">verwijderen</button></p>{% endfor %}
     </div>
     {% else %}
-    <h2 class="studio-block__title" id="blok-muziek">Muziek <span class="badge">{{ feature_badges.music }}</span></h2>
+    <div class="met-info">
+      <h2 class="studio-block__title" id="blok-muziek">Muziek <span class="badge">{{ feature_badges.music }}</span></h2>
+      {% if muziek_uitleg %}{% include "partials/info.html" with info_id="muziek" titel="Eigen muziek" tekst=muziek_uitleg %}{% endif %}
+    </div>
     <p class="hint">Gasten zetten de muziek zelf aan. MP3 of M4A, max. {{ upload_limits.audio_max_bytes|filesizeformat }}.</p>
     {% if audio %}
     <fieldset>

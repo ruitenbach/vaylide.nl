@@ -28,6 +28,7 @@
 {% block extra_css %}{% endblock %}
 <script src="{% static 'js/site.js' %}" defer></script>
 <script src="{% static 'js/media-bescherming.js' %}" defer></script>
+<script src="{% static 'js/info.js' %}" defer></script>
 {% if CLARITY %}<script src="{% static 'js/toestemming.js' %}" defer></script>{% endif %}
 {% block extra_js %}{% endblock %}
 {% for item in jsonld %}{{ item|json_ld }}

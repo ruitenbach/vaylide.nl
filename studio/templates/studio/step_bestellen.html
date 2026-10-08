@@ -13,7 +13,10 @@
   {% if quote %}
   <input type="hidden" name="package" value="{{ quote.package.code }}">
   <section class="studio-block" aria-labelledby="pakket-titel">
-    <h2 class="studio-block__title" id="pakket-titel">{% if wenskaart_vast %}Jouw wenskaart{% else %}Jouw pakket{% endif %}</h2>
+    <div class="met-info">
+      <h2 class="studio-block__title" id="pakket-titel">{% if wenskaart_vast %}Jouw wenskaart{% else %}Jouw pakket{% endif %}</h2>
+      {% if looptijd_uitleg %}{% include "partials/info.html" with info_id="looptijd" titel="Hoe lang blijft mijn kaart online?" tekst=looptijd_uitleg %}{% endif %}
+    </div>
     <div class="pakket-keuze{% if upgrade %} pakket-keuze--met-upgrade{% endif %}">
       <article class="pakket-kaart pakket-kaart--gekozen" aria-label="Gekozen pakket: {{ quote.package.name }}">
         <p class="pakket-kaart__label">Jouw keuze</p>
@@ -66,7 +69,10 @@
 
   {% if quote %}
   <section class="studio-block bon" aria-labelledby="overzicht-titel">
-    <h2 class="studio-block__title" id="overzicht-titel">Overzicht</h2>
+    <div class="met-info">
+      <h2 class="studio-block__title" id="overzicht-titel">Overzicht</h2>
+      {% if rsvp_aan and not wenskaart_vast %}{% include "partials/info.html" with info_id="na-betaling" titel="Wat gebeurt er na betaling?" tekst="Na een geslaagde betaling wordt je kaart geactiveerd. Daarna kun je de uitnodiging delen en reacties beheren vanuit Mijn VAYLIDE." %}{% else %}{% include "partials/info.html" with info_id="na-betaling" titel="Wat gebeurt er na betaling?" tekst="Na een geslaagde betaling wordt je kaart geactiveerd. Daarna kun je de kaart delen vanuit Mijn VAYLIDE." %}{% endif %}
+    </div>
     <table class="bon__tabel">
       <tbody>{% for line in quote.lines %}<tr><td>{{ line.description }}{% if line.reason %}<span class="bon__reden">{{ line.reason }}</span>{% endif %}</td><td class="num">{{ line.total_display }}</td></tr>{% endfor %}</tbody>
       <tfoot><tr><th>Totaal <span class="bon__btw">incl. btw</span></th><th class="num">{{ quote.total_display }}</th></tr></tfoot>

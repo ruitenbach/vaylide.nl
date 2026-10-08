@@ -10,7 +10,10 @@
 <form method="post" class="form studio-form" data-once data-dirty-check novalidate>
   {% csrf_token %}
   <section class="studio-block studio-block--rustig" aria-labelledby="blok-rsvp">
-    <h2 class="studio-block__title" id="blok-rsvp">Gasten laten aanmelden</h2>
+    <div class="met-info">
+      <h2 class="studio-block__title" id="blok-rsvp">Gasten laten aanmelden</h2>
+      {% include "partials/info.html" with info_id="aanmelden" titel="Hoe werkt aanmelden?" tekst="Gasten kunnen via de uitnodiging aangeven of ze wel of niet komen en met hoeveel personen. Hun reactie komt automatisch in Mijn VAYLIDE terecht, zodat je alle aanmeldingen op één plek kunt bekijken." %}
+    </div>
     {% include "studio/_check.html" with field=form.enabled %}
     <div class="form-row">
       {% include "studio/_field.html" with field=form.max_party_size %}
