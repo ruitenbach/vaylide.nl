@@ -160,6 +160,36 @@ class ToestemmingScriptTests(VaylideTestCase):
         self.assertRegex(html, r'<section class="toestemming" data-toestemming[^>]*hidden>')   # verschijnt pas via het script
 
 
+class StudioVoorbeeldTitelTests(VaylideTestCase):
+    """Clarity neemt de kaders in de Studio mee en schermt hun <title> niet af: daar nooit namen of andere klantgegevens in de titel.
+    De echte uitnodiging (/u/…, zonder Clarity) houdt de titel met namen."""
+
+    @staticmethod
+    def titel(html):
+        return re.search(r"<title>(.*?)</title>", html, re.S).group(1)
+
+    def test_voorbeelden_in_de_studio_hebben_een_neutrale_titel(self):
+        owner = self.make_customer()
+        inv = self.make_invitation(owner=owner)
+        c = Client()
+        c.force_login(owner)
+        for adres in (f"/maken/{inv.uid}/voorbeeld/live/", f"/maken/{inv.uid}/voorbeeld/live/?deel=gegevens",
+                      f"/maken/{inv.uid}/voorbeeld/weergave/?kader=1", f"/maken/{inv.uid}/voorbeeld/weergave/"):
+            html = c.get(adres).content.decode()
+            titel = self.titel(html)
+            self.assertEqual(titel, "Voorbeeld · VAYLIDE", adres)
+            for geheim in ("Anna", "Bram", "Kasteel Test", "Teststraat", "Utrecht", "Welkom op onze bruiloft"):
+                self.assertNotIn(geheim, titel, adres)
+            self.assertIn("Anna", html, adres)                                          # de kaart zelf is ongewijzigd
+
+    def test_publieke_uitnodiging_houdt_de_titel_met_namen(self):
+        inv = self.published()
+        titel = self.titel(Client().get(f"/u/{inv.slug}/").content.decode())
+        self.assertIn("Anna", titel)
+        self.assertIn("Bram", titel)
+        self.assertNotIn("Voorbeeld", titel)
+
+
 @override_settings(CLARITY_ID=ID)
 class PrivacyTekstTests(VaylideTestCase):
     def test_concepttekst_staat_klaar_en_is_een_open_besluit(self):

@@ -198,7 +198,12 @@ class RenderOptions:
     direct_open: bool = False  # meteen de kaart zelf, zonder openingsscherm (de kleine kaart op de bedankpagina)
     kader: bool = False  # in een kader in de editor (stap Voorbeeld): geen scrollbalk, wel de testbalk
     live: str = ""  # de live kaart in de editor: welk deel extra aandacht krijgt (bijv. 'fotos')
+    studio: bool = False  # voorbeeld in de Studio: neutrale <title> zonder namen (bezoekersanalyse neemt het kader mee)
 
+
+# Titel van een voorbeeld in de Studio. Microsoft Clarity neemt de kaders in de Studio mee en schermt de <title> niet af;
+# de echte uitnodiging (/u/…, zonder Clarity) houdt de titel met namen.
+STUDIO_TITEL = "Voorbeeld · VAYLIDE"
 
 # Standaard lakzegel (zonder de functie 'zegel'): een motief in plaats van initialen, in rood of in groen.
 SEAL_COLORS = {
@@ -542,7 +547,7 @@ def build_view(
         "occasion": occasion,
         "occasion_label": cfg["label"],
         "title": title,
-        "page_title": f"{title} · {'wenskaart' if wenskaart and occasion != 'kerst' else doc_kind(occasion)}",
+        "page_title": STUDIO_TITEL if options.studio else f"{title} · {'wenskaart' if wenskaart and occasion != 'kerst' else doc_kind(occasion)}",
         "doc_kind": "wenskaart" if wenskaart and occasion != "kerst" else doc_kind(occasion),
         "names": names,
         # Kleine regel onder de namen (bij een kerstkaart: de namen van het gezin).

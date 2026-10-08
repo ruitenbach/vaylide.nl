@@ -60,6 +60,10 @@ banner opnieuw.
 - Zet in het Clarity-dashboard Settings → Masking op **Strict**: dan is alle tekst afgeschermd en blijven klikken, scrollen, heatmaps en
   pagina's zichtbaar. De attributen hierboven blijven gelden (een element met `data-clarity-mask` wordt nooit zichtbaar, ook niet in
   een lossere stand).
+- Clarity neemt ook de kaders met de kaart in de Studio mee (live kaart en Controleer; zelfde domein). Hun inhoud is afgeschermd, maar
+  hun `<title>` niet. Daarom heeft elk voorbeeld in de Studio de titel "Voorbeeld · VAYLIDE" (`invitations/render.py: STUDIO_TITEL`,
+  `RenderOptions.studio`, gezet in `studio/views.py: _preview_options`). De echte uitnodiging `/u/…` (zonder Clarity) houdt de titel
+  met namen. Gevonden op 8 oktober 2026 door de echte pakketten van staging uit te pakken.
 
 ## Adressen van pagina's
 
@@ -71,6 +75,10 @@ toegang (`invitations/access.py: can_access`). Paginatitels gaan ook mee; daarin
 ## Controleren
 
 - Tests: `tests/test_clarity.py`. Browser: `e2e/clarity_toestemming.cjs` (onderschept clarity.ms; er gaat niets naar Microsoft).
+  Met het echte script (lokale kopie, alles onderschept): `e2e/clarity_intrekken.cjs` (na Weigeren niets meer) en
+  `e2e/clarity_studio_pakketten.cjs` (pakt de pakketten uit en zoekt de ingevulde testwaarden; die mogen er niet in staan).
+- Clarity zet sessies uit een geautomatiseerde browser apart als bot en toont daar geen opname van. Controleer masking daarom op de
+  pakketten zelf (onderscheppen en uitpakken); een opname bekijken kan alleen van een sessie die een mens doorloopt.
 - Eerste sessie: open staging (met het previewwachtwoord), kies Accepteren en klik wat rond. In het Clarity-dashboard (project
   `yuemn2aqz1`) verschijnt de sessie meestal binnen een paar minuten onder Recordings; Dashboard en Heatmaps volgen later (tot ongeveer
   een uur). In de browser: Network → een verzoek naar `www.clarity.ms/tag/yuemn2aqz1` en daarna `…clarity.ms/collect`.

@@ -555,6 +555,7 @@ def _preview_options(inv: Invitation, content: dict) -> RenderOptions:
         max_gallery_photos=inv.max_gallery_photos if paid else 12,
         resolver=PathResolver(f"/maken/{inv.uid}/media", assets),
         share_url=inv.public_url,
+        studio=True,
     )
 
 
