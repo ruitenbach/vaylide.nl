@@ -180,7 +180,7 @@ def suppliers() -> list[dict]:
         rows.append({
             "naam": "Google Ireland Limited (Ierland) en Google LLC (Verenigde Staten)",
             "dienst": "Bezoekersanalyse met Google Analytics 4 via Google Tag Manager, alleen als je daar toestemming voor geeft",
-            "gegevens": "Gebruiksgegevens van je bezoek: je IP-adres (dat Google niet opslaat in Google Analytics), welke pagina's je bekijkt "
+            "gegevens": "Gebruiksgegevens van je bezoek: je IP-adres (dat Google Analytics tijdens de verwerking gebruikt om onder meer globale locatiegegevens af te leiden; voor gebruikers in de EU/EER registreert of bewaart Google Analytics het afzonderlijke IP-adres niet), welke pagina's je bekijkt "
                         "(met het adres zonder de codes van je ontwerp of bestelling), hoe diep je scrolt, op welke uitgaande links je klikt, "
                         "je apparaat, browser en globale locatie, de pagina waar je vandaan komt en een willekeurig bezoekers-id in een cookie. "
                         "Bij vijf stappen van het samenstellen en bestellen sturen we ook het gekozen ontwerp, de gelegenheid, het pakket en "

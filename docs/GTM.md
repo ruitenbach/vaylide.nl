@@ -37,10 +37,10 @@ betalen, voorbeelden van ontwerpen en kaartframes. De CSP krijgt de Google-bronn
 ### Geen persoonsgegevens
 
 * `page_location`: eigen adres, pad **zonder id's** (`/maken/<uuid>/gegevens/` wordt `/maken/:id/gegevens/`, `/bestelling/<uuid>/` wordt `/bestelling/:id/`) en van de query alleen
-  `gelegenheid` en `ontwerp` met een vaste vorm. `page_referrer`: zonder query en binnen de site zonder id's. **De paginatitel (`dt`, `page_title`) gaat wel mee**: de Google-tag stuurt
-  hem automatisch mee en wij sturen hem niet apart weg. De titels zijn generiek (bijvoorbeeld `Gegevens · VAYLIDE`, `Bestellen · VAYLIDE`, `Collectie digitale uitnodigingen · VAYLIDE`), er staat geen
-  tekst van de klant in. Kanttekening (gemeten op staging, 10 oktober 2026): de titel van de bevestigingspagina bevat het bestelnummer (`Bestelling VL26-00001 · VAYLIDE`) en de `page_referrer` daar
-  kan het adres van de testbetaalpagina bevatten (`/betalen/test/<referentie>/`); zie *Open punten*. Er wordt verder niets uit de pagina gelezen en Enhanced Measurement staat zonder zoeken, formulieren en
+  `gelegenheid` en `ontwerp` met een vaste vorm. `page_referrer`: zonder query en binnen de site zonder id's. **De paginatitel (`dt`, `page_title`) gaat wel mee**: de Google-tag stuurt hem automatisch mee en wij sturen hem niet apart weg. De titels zijn generiek (bijvoorbeeld `Gegevens · VAYLIDE`, `Bestellen · VAYLIDE`,
+  `Collectie digitale uitnodigingen · VAYLIDE`), er staat geen tekst van de klant in. **Uitzondering, opgeschoond:** de zichtbare titel van de bevestigingspagina bevat het bestelnummer; daar krijgt Google
+  de vaste titel `Bestelling bevestigd · VAYLIDE` (datalaag `pagina_titel`, in de Google-tag als `page_title`) en geen verwijzer (`pagina_ref` leeg; een verwijzer van `/betalen/…` of van de betaalprovider kan een
+  betaalreferentie bevatten). Er wordt verder niets uit de pagina gelezen en Enhanced Measurement staat zonder zoeken, formulieren en
   geschiedeniswijzigingen (zie hieronder).
 * De gebeurtenissen hebben alleen openbare waarden: `design` (slug van het ontwerp), `occasion` (gelegenheid), `package` (pakketcode), `value` en `currency`. Geen namen, e-mail, telefoon,
   adressen, kaartteksten, RSVP-inhoud, bestelnummer of order-id.
@@ -56,7 +56,7 @@ betalen, voorbeelden van ontwerpen en kaartframes. De CSP krijgt de Google-bronn
 | `select_design` | een ontwerp is gekozen op *Kies kaart* (POST) | `studio.views.start` | `design`, `occasion` |
 | `start_studio` | eerste keer in Personaliseren (stap Gegevens) per concept en sessie | `studio.views.step` → `studiostap_bekeken` | `design`, `occasion` |
 | `reach_checkout` | eerste keer bij de stap Bestellen per concept en sessie | idem | `design`, `occasion`, `package` (als gekozen) |
-| `purchase_success` | de bevestigingspagina van een **betaalde** bestelling (`order.status == paid`, bevestigd door de betaalprovider), eenmaal per sessie | `orders.views.status` → `bestelling_betaald` | `package`, `value`, `currency` (EUR) |
+| `purchase_success` | de bevestigingspagina van een **betaalde** bestelling (`order.status == paid`, bevestigd door de betaalprovider), eenmaal per bestelling en sessie | `orders.views.status` → `bestelling_betaald` | `design`, `occasion`, `package`, `value`, `currency` (EUR; GA4 stuurt dit als `cu`) |
 
 Alle events hebben bovendien `environment` (`productie` of `staging`).
 
@@ -64,11 +64,11 @@ Alle events hebben bovendien `environment` (`productie` of `staging`).
 
 Het bestand `docs/gtm/vaylide-container.json` bevat de volledige configuratie (importeren via *Beheer → Container importeren → Samenvoegen*):
 
-* **Variabelen** (Data Layer Variable, versie 2): `DLV pagina_url`, `DLV pagina_ref`, `DLV omgeving`, `DLV debug`, `DLV design`, `DLV occasion`, `DLV package`, `DLV value`, `DLV currency`.
+* **Variabelen** (Data Layer Variable, versie 2): `DLV pagina_url`, `DLV pagina_ref`, `DLV pagina_titel`, `DLV omgeving`, `DLV debug`, `DLV design`, `DLV occasion`, `DLV package`, `DLV value`, `DLV currency`.
 * **Triggers** (Aangepaste gebeurtenis, exacte naam): `Event view_collection`, `Event select_design`, `Event start_studio`, `Event reach_checkout`, `Event purchase_success`.
 * **Tags:**
   * `Google-tag G-80DM1Z9L7F` (type Google-tag): trigger *Initialization – All Pages*; configuratie `page_location = {{DLV pagina_url}}`, `page_referrer = {{DLV pagina_ref}}`,
-    `environment = {{DLV omgeving}}`, `debug_mode = {{DLV debug}}`. Dit stuurt de ene `page_view`.
+    `page_title = {{DLV pagina_titel}}` (alleen gevuld op de bevestiging), `environment = {{DLV omgeving}}`, `debug_mode = {{DLV debug}}`. Dit stuurt de ene `page_view`.
   * Vijf tags `GA4 event <naam>` (type GA4-gebeurtenis, Measurement ID `G-80DM1Z9L7F`) met de bijbehorende trigger en parameters uit de tabel.
 * Geen selectors op teksten of knoppen, geen Custom HTML-tags, geen advertentietags.
 
@@ -87,12 +87,6 @@ Aan: paginaweergaven, scrollen, uitgaande klikken, video-engagement, bestandsdow
 en `_ga_…`; ze verschijnen alleen als `VIERLIEF_GTM_ID` is ingesteld. **De tekst is een concept** (gele markering) en een open juridisch punt (`GOOGLE_TEKST_GOEDGEKEURD`):
 in live-modus (`VIERLIEF_MODE` niet `test`) start de site niet met `VIERLIEF_GTM_ID` zolang de eigenaar niet akkoord is. Productie draait nu in testmodus en heeft geen
 `VIERLIEF_GTM_ID`, dus daar verandert niets.
-
-## Open punten (gemeten op staging, 10 oktober 2026)
-
-* `purchase_success` stuurt `package`, `value`, `currency` (als `cu=EUR`) en `environment`, zoals in de tabel; **`design` en `occasion` zitten er niet bij** (bewust niet in de eerste opzet).
-* De titel van de bevestigingspagina bevat het bestelnummer en de verwijzer daar kan een betaalreferentie bevatten. Beide zijn geen naam of e-mailadres, maar wel een bestelidentificatie. Besluit van de
-  eigenaar nodig voor productie (titel en verwijzer op die pagina schoonmaken, of accepteren).
 
 ## Controleren
 

@@ -183,10 +183,24 @@ class StudioEnBestelEventsTests(VaylideTestCase):
         html = c.get(f"/bestelling/{order.uid}/").content.decode()
         e = events(html)
         self.assertEqual(len(e), 1)
-        self.assertEqual(e[0], {"event": "purchase_success", "package": order.package_code, "value": round(order.total_cents / 100, 2), "currency": "EUR"})
+        self.assertEqual(e[0], {"event": "purchase_success", "design": inv.template_version.template.slug, "occasion": inv.occasion,
+                                "package": order.package_code, "value": round(order.total_cents / 100, 2), "currency": "EUR"})
+        # Google krijgt op de bevestiging een vaste titel en geen verwijzer: de zichtbare titel heeft het bestelnummer, de verwijzer kan een betaalreferentie hebben.
+        self.assertIn(order.number, html.split("<title>")[1].split("</title>")[0])
+        self.assertIn(f'data-gtm-titel="{analytics.BESTELLING_TITEL}"', html)
+        self.assertIn('data-gtm-ref-leeg="1"', html)
+        for waarde in ("data-gtm-url", "data-gtm-titel", "data-gtm-events"):
+            deel = html.split(waarde + '="')[1].split('"')[0]
+            self.assertNotIn(order.number, deel)
+            self.assertNotIn(str(order.uid), deel)
         self.assertNotIn(str(order.uid), html.split('data-gtm-url="')[1].split('"')[0])
         self.assertNotIn(order.number, html.split('data-gtm-events="')[1].split('"')[0] if "data-gtm-events" in html else "")
         self.assertEqual(events(c.get(f"/bestelling/{order.uid}/").content.decode()), [])      # herladen telt niet nog een keer
+
+    def test_andere_paginas_houden_hun_eigen_titel_en_verwijzer(self):
+        html = Client().get("/ontwerpen/").content.decode()
+        self.assertNotIn("data-gtm-titel", html)
+        self.assertNotIn("data-gtm-ref-leeg", html)
 
     def test_geen_purchase_success_zolang_de_provider_niet_heeft_bevestigd(self):
         klant = self.make_customer()
@@ -221,6 +235,8 @@ class ToestemmingScriptTests(VaylideTestCase):
             self.assertNotIn(verboden, blok, verboden)
         self.assertIn("replace(UUID, \":id\")", blok)                                      # de verwijzer zonder id's, zonder query
         self.assertIn("u.origin + u.pathname", blok)
+        self.assertIn('data-gtm-ref-leeg', blok)
+        self.assertIn('gegevens.pagina_titel = banner.getAttribute("data-gtm-titel")', blok)
 
     def test_intrekken_sluit_eerst_het_verkeer_dan_denied_dan_cookies_dan_herladen(self):
         klik = JS[JS.index("// Weigeren of intrekken"):JS.index('document.querySelectorAll("[data-cookie-instellingen]")')]
@@ -242,6 +258,10 @@ class PrivacyverklaringTests(VaylideTestCase):
         html = Client().get("/privacy/").content.decode()
         self.assertIn("Google Analytics 4 en Google Tag Manager", html)
         self.assertIn("De tekst over Google Analytics en Google Tag Manager hieronder is een concept", html)
+        self.assertIn("Voor gebruikers in de EU/EER registreert of bewaart Google Analytics het afzonderlijke IP-adres niet.", html)
+        self.assertNotIn("Google slaat je IP-adres niet op", html)
+        self.assertIn("2 maanden en gegevens die aan het willekeurige bezoekers-id in de cookie zijn gekoppeld 14 maanden", html)       # zoals in GA4 ingesteld
+        self.assertIn("je foto's, de antwoorden van gasten en je bestelnummer", html)                                                  # waar zolang titel en verwijzer schoon zijn
         for cookie in ("<code>_ga</code>", "<code>vaylide_analytics</code>"):
             self.assertIn(cookie, html)
         self.assertIn(pv.LABELS["google"], pv.open_points())

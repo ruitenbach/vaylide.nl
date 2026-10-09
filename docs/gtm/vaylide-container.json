@@ -6,7 +6,7 @@
     "accountId": "6381649927",
     "containerId": "266637518",
     "containerVersionId": "0",
-    "name": "VAYLIDE: GA4 en vijf gebeurtenissen",
+    "name": "VAYLIDE: schone titel en verwijzer op de bevestiging, purchase_success met ontwerp en gelegenheid",
     "description": "Google-tag (GA4 G-80DM1Z9L7F) met schone paginalocatie, plus de gebeurtenissen view_collection, select_design, start_studio, reach_checkout en purchase_success. Zie docs/GTM.md.",
     "container": {
       "path": "accounts/6381649927/containers/266637518",
@@ -63,6 +63,21 @@
                     "type": "TEMPLATE",
                     "key": "parameterValue",
                     "value": "{{DLV pagina_ref}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "parameter",
+                    "value": "page_title"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "parameterValue",
+                    "value": "{{DLV pagina_titel}}"
                   }
                 ]
               },
@@ -456,6 +471,36 @@
             "type": "LIST",
             "key": "eventSettingsTable",
             "list": [
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "parameter",
+                    "value": "design"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "parameterValue",
+                    "value": "{{DLV design}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "parameter",
+                    "value": "occasion"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "parameterValue",
+                    "value": "{{DLV occasion}}"
+                  }
+                ]
+              },
               {
                 "type": "MAP",
                 "map": [
@@ -880,6 +925,31 @@
             "type": "TEMPLATE",
             "key": "name",
             "value": "currency"
+          }
+        ],
+        "formatValue": {}
+      },
+      {
+        "accountId": "6381649927",
+        "containerId": "266637518",
+        "variableId": "10",
+        "name": "DLV pagina_titel",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "pagina_titel"
           }
         ],
         "formatValue": {}

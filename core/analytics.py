@@ -74,8 +74,10 @@ UUID = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-
 # Uit de query gaat alleen mee wat een vaste, openbare keuze is.
 _QUERY_TOEGESTAAN = {"gelegenheid": re.compile(r"^[a-z-]{3,24}$"), "ontwerp": re.compile(r"^[a-z0-9-]{2,40}$")}
 # Op de bevestiging van een bestelling (/bestelling/<id>/) draait Clarity nooit, maar de GA4-gebeurtenis purchase_success hoort daar. Er gaat geen
-# order- of klantgegeven mee: de pagina wordt gemeld als /bestelling/:id/ en de gebeurtenis heeft alleen pakket, bedrag en valuta.
+# order- of klantgegeven mee: de pagina wordt gemeld als /bestelling/:id/ met een vaste titel en zonder verwijzer, en de gebeurtenis heeft alleen ontwerp, gelegenheid, pakket, bedrag en valuta.
 _BESTELLING = re.compile(r"^/bestelling/[0-9a-fA-F-]{36}/$")
+# De zichtbare titel van de bevestiging bevat het bestelnummer; Google krijgt daar een vaste titel en geen verwijzer (die kan een betaalreferentie bevatten).
+BESTELLING_TITEL = "Bestelling bevestigd · VAYLIDE"
 SESSIE_EVENTS = "gtm_events"
 SESSIE_GEZIEN = "gtm_gezien"
 
@@ -163,8 +165,10 @@ def bestelling_betaald(request, order) -> None:
 
     if order.status != Order.Status.PAID:
         return
-    zet_gebeurtenis_in_wachtrij(request, "purchase_success", f"purchase_success:{order.uid}", package=order.package_code,
-                                value=round(order.total_cents / 100, 2), currency="EUR")
+    inv = order.invitation
+    ontwerp = inv.template_version.template.slug if inv and inv.template_version_id else ""
+    zet_gebeurtenis_in_wachtrij(request, "purchase_success", f"purchase_success:{order.uid}", design=ontwerp, occasion=inv.occasion if inv else "",
+                                package=order.package_code, value=round(order.total_cents / 100, 2), currency="EUR")
 
 
 def gtm_context(request) -> dict | None:
@@ -172,8 +176,9 @@ def gtm_context(request) -> dict | None:
     if not gtm_actief():
         return None
     hier = gtm_op_pagina(request.path)
+    bevestiging = bool(_BESTELLING.match(request.path))
     gebeurtenissen = (pagina_gebeurtenis(request) + neem_gebeurtenissen_uit_wachtrij(request)) if hier else []
     return {
         "id": settings.GTM_ID, "hier": hier, "omgeving": settings.ANALYTICS_OMGEVING, "debug": settings.ANALYTICS_OMGEVING != "productie",
-        "url": schone_url(request) if hier else "", "events": json.dumps(gebeurtenissen, separators=(",", ":")) if gebeurtenissen else "",
+        "url": schone_url(request) if hier else "", "titel": BESTELLING_TITEL if bevestiging else "", "ref_leeg": bevestiging, "events": json.dumps(gebeurtenissen, separators=(",", ":")) if gebeurtenissen else "",
     }

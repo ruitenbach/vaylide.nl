@@ -103,6 +103,8 @@
     // Toestemming vóór alles: alleen meten, geen advertenties (Consent Mode v2). Google Tag Manager laadt pas na het klikken op Accepteren.
     gtag("consent", "default", { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied", analytics_storage: "granted" });
     var gegevens = { pagina_url: banner.getAttribute("data-gtm-url") || "", pagina_ref: schoneVerwijzer(), omgeving: banner.getAttribute("data-gtm-omgeving") || "" };
+    if (banner.hasAttribute("data-gtm-ref-leeg")) gegevens.pagina_ref = "";            // bestelbevestiging: geen verwijzer (kan een betaalreferentie bevatten)
+    if (banner.getAttribute("data-gtm-titel")) gegevens.pagina_titel = banner.getAttribute("data-gtm-titel");   // vaste titel waar de zichtbare titel een bestelnummer bevat
     if (banner.hasAttribute("data-gtm-debug")) gegevens.debug = true;   // testomgevingen meten als testverkeer (GA4 debug_mode), niet in de echte rapporten
     dl.push(gegevens);
     dl.push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
