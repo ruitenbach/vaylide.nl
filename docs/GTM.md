@@ -30,7 +30,7 @@ De site laadt alleen de container. Het Measurement ID staat in de container (de 
 
 ### Waar het draait (`core/analytics.py`)
 
-Op dezelfde pagina's als Clarity (homepage, Collectie en ontwerppagina's, Inspiratie, Prijzen, de Studio tot en met Bestellen) en daarnaast op **de bevestiging van een
+Op dezelfde pagina's als Clarity (homepage, Collectie en ontwerppagina's, Inspiratie, Prijzen, Digitale trouwkaarten, de Studio tot en met Bestellen) en daarnaast op **de bevestiging van een
 bestelling** (`/bestelling/<id>/`, alleen daar voor `purchase_success`; Clarity draait er nooit). Nooit op uitnodigingen (`/u/…`), Mijn VAYLIDE, inloggen, beheer,
 betalen, voorbeelden van ontwerpen en kaartframes. De CSP krijgt de Google-bronnen alleen op die pagina's.
 

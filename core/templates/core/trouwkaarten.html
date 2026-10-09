@@ -1,0 +1,161 @@
+{% extends "base.html" %}{% load static vl %}
+{% block title %}Digitale trouwkaart maken | Luxe online trouwuitnodiging{% endblock %}
+{% block description %}Maak een digitale trouwkaart die echt tot leven komt. Met interactieve opening, RSVP, programma, locatie en eenvoudig delen via WhatsApp of QR-code.{% endblock %}
+{% block og_title %}Digitale trouwkaart maken | Luxe online trouwuitnodiging · VAYLIDE{% endblock %}
+{% block og_description %}Maak een digitale trouwkaart die echt tot leven komt. Met interactieve opening, RSVP, programma, locatie en eenvoudig delen via WhatsApp of QR-code.{% endblock %}
+{% block body_class %}page-trouw{% endblock %}
+{% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
+{% block content %}
+{# Kop: tekst met twee knoppen en drie echte trouwontwerpen uit de collectie. #}
+<section class="paginakop trouw-kop" data-sparkles aria-labelledby="trouw-titel">
+  {% include "partials/paginakop_wereld.html" %}
+  <div class="container trouw-kop__inner">
+    <div class="trouw-kop__tekst">
+      <p class="eyebrow">Digitale trouwkaarten</p>
+      <h1 id="trouw-titel">Digitale trouwkaarten die je gasten <em>echt beleven</em></h1>
+      <p class="lead">Een trouwkaart die opent als echte post: met een envelop, gouden deuren of een ringdoosje. Met aanmelden, programma, route en eenvoudig delen via WhatsApp of QR-code.</p>
+      <div class="btn-row">
+        <a class="btn btn--primary btn--lg" href="{% url 'studio:start' %}?gelegenheid=bruiloft">Maak jullie trouwkaart {% icon "pijl" %}</a>
+        <a class="btn btn--secondary btn--lg" href="#trouwontwerpen">Bekijk de trouwontwerpen</a>
+      </div>
+      <ul class="hero__checks"><li>{% icon "vink" %}Interactieve opening</li><li>{% icon "vink" %}RSVP &amp; gastenlijst</li><li>{% icon "vink" %}Delen via WhatsApp of QR</li><li>{% icon "vink" %}Zonder app of account voor gasten</li></ul>
+    </div>
+    <ul class="trouw-waaier" style="--n:{{ kop_cards|length }}">
+      {% for card in kop_cards %}<li class="trouw-waaier__kaart" style="--i:{{ forloop.counter0 }}"><a href="{{ card.detail_url }}"><img src="{{ card.image }}" alt="Trouwkaart {{ card.template.name }}" width="800" height="1000"{% if forloop.first %} fetchpriority="high"{% endif %} decoding="async"><span class="trouw-waaier__naam">{{ card.template.name }}</span></a></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+{# Echte trouwontwerpen, direct onder de kop. #}
+<section class="section" id="trouwontwerpen" aria-labelledby="ontwerpen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">De collectie</p>
+      <h2 id="ontwerpen-titel">Kies jullie trouwontwerp</h2>
+      <p>{{ wedding_count }} ontwerpen voor jullie bruiloft, van romantisch en licht tot filmisch en donker. Elk met een eigen opening en kleurvarianten. Probeer ze op je eigen telefoon.</p>
+    </div>
+    <div class="trouw-grid">
+      {% for card in cards %}{% include "partials/design_card.html" %}{% endfor %}
+    </div>
+    <p class="trouw-meer"><a class="btn btn--secondary" href="{% url 'core:designs' %}?gelegenheid=bruiloft">Bekijk alle {{ wedding_count }} trouwontwerpen {% icon "pijl" %}</a></p>
+  </div>
+</section>
+
+{# Een echt, werkend voorbeeld in een telefoon. #}
+<section class="section section--flush" aria-labelledby="meer-titel">
+  <div class="container">
+    <div class="feature-panel feature-panel--licht">
+      <div class="feature-panel__inner">
+        <div class="phone-demo">
+          <div class="phone">
+            <div class="phone__screen" data-lazy-frame="{% url 'invitations:demo' 'liefde-op-papier' %}?gelegenheid=bruiloft&amp;kleur=blush&amp;embed=1" data-frame-title="Werkend voorbeeld van een trouwkaart (fictief evenement)">
+              <img class="phone__poster" src="{% static 'img/site/telefoon-voorbeeld.webp' %}" alt="" width="540" height="1152" loading="lazy" decoding="async">
+              <a class="phone__fallback" href="{% url 'invitations:demo' 'liefde-op-papier' %}?gelegenheid=bruiloft&amp;kleur=blush">Open het werkende voorbeeld</a>
+            </div>
+          </div>
+        </div>
+        <div class="feature-panel__text">
+          <p class="eyebrow">Probeer het zelf</p>
+          <h2 id="meer-titel">Alles wat je gasten nodig hebben, in één kaart</h2>
+          <p>Eén link met afteller, programma, locatie en aanmelden. Je gasten openen hem met één tik, zonder app en zonder account.</p>
+          <ul class="feature-icons">{% for icon_name, label in features %}<li>{% icon icon_name 30 %}{{ label }}</li>{% endfor %}</ul>
+          <div class="btn-row">
+            <a class="btn btn--primary btn--lg" href="{% url 'studio:start' %}?gelegenheid=bruiloft">Begin met jullie kaart {% icon "pijl" %}</a>
+            <a class="link-arrow" href="{% url 'core:how' %}">Zo werkt het</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="voordelen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Waarom digitaal</p>
+      <h2 id="voordelen-titel">Een trouwkaart die je gasten niet vergeten</h2>
+    </div>
+    <ul class="trouw-voordelen">
+      {% for icon_name, title, text in benefits %}
+      <li class="trouw-voordeel">
+        <span class="trouw-voordeel__icoon">{% icon icon_name 30 %}</span>
+        <h3>{{ title }}</h3>
+        <p>{{ text }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="section section--flush" aria-labelledby="stappen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">In vier stappen</p>
+      <h2 id="stappen-titel">Zo maak je jullie digitale trouwkaart</h2>
+    </div>
+    <ol class="stappenrij">
+      {% for icon_name, title, text in steps %}
+      <li class="stapkaart" style="--i:{{ forloop.counter0 }}">
+        <span class="stapkaart__num" aria-hidden="true">{{ forloop.counter }}</span>
+        <span class="stapkaart__icoon">{% icon icon_name 30 %}</span>
+        <h3><span class="visually-hidden">Stap {{ forloop.counter }}: </span>{{ title }}</h3>
+        <p>{{ text }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="stappenrij__voet"><span>Ontwerpen en bekijken is gratis. Je betaalt pas bij het publiceren.</span><a class="link-arrow" href="{% url 'core:how' %}">Bekijk alle stappen</a></p>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="prijs-titel">
+  <div class="container container--mid">
+    <div class="sectie-kop">
+      <p class="eyebrow">Prijzen</p>
+      <h2 id="prijs-titel">Eén keer betalen, geen kosten per gast</h2>
+      {% if config.prices_provisional %}<p><span class="provisional">Voorlopige prijzen</span></p>{% endif %}
+    </div>
+    <div class="trouw-prijzen">
+      {% for p in packages %}
+      <article class="trouw-prijs{% if p.is_featured %} trouw-prijs--uitgelicht{% endif %}">
+        <h3>{{ p.name }}</h3>
+        <p class="trouw-prijs__bedrag">{{ p.price_display }} <small>eenmalig</small></p>
+        <p>{{ p.description }}</p>
+        <p class="trouw-prijs__duur">{{ p.availability_months }} maanden online</p>
+      </article>
+      {% endfor %}
+    </div>
+    <p class="trouw-prijzen__voet">Specials hebben een eigen meerprijs, die je vóór het afrekenen ziet. <a class="link-arrow" href="{% url 'core:pricing' %}">Alle prijzen en opties</a></p>
+  </div>
+</section>
+
+<section class="section section--flush home-faq" aria-labelledby="faq-titel">
+  <div class="container container--mid">
+    <div class="sectie-kop">
+      <p class="eyebrow">Goed om te weten</p>
+      <h2 id="faq-titel">Veelgestelde vragen over digitale trouwkaarten</h2>
+    </div>
+    <div class="faq-lijst">
+      {% for question, answer in faq %}<details class="faq-item"><summary>{{ question }}</summary><p>{{ answer }}</p></details>{% endfor %}
+    </div>
+    <p class="home-faq__meer"><a class="link-arrow" href="{% url 'core:faq' %}">Alle veelgestelde vragen</a></p>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="cta-titel">
+  <div class="container">
+    <div class="trouw-cta">
+      <div class="trouw-cta__tekst">
+        <p class="eyebrow">Jullie trouwdag</p>
+        <h2 id="cta-titel">Jullie trouwkaart, klaar om te openen</h2>
+        <p>Kies een ontwerp, vul jullie gegevens in en zie direct hoe jullie kaart eruitziet. Betalen doe je pas als alles klopt.</p>
+        <div class="btn-row">
+          <a class="btn btn--goud btn--lg" href="{% url 'studio:start' %}?gelegenheid=bruiloft">Maak jullie trouwkaart {% icon "pijl" %}</a>
+          <a class="btn btn--secondary-dark btn--lg" href="{% url 'core:designs' %}?gelegenheid=bruiloft">Bekijk de trouwontwerpen</a>
+        </div>
+        <p class="trouw-cta__voet">Ook een verloving of jubileum vieren? Bekijk de <a href="{% url 'core:designs' %}?gelegenheid=verloving">verlovingsontwerpen</a> of <a href="{% url 'core:designs' %}?gelegenheid=jubileum">jubileumontwerpen</a>.</p>
+      </div>
+      <div class="trouw-cta__beeld" aria-hidden="true"><img src="{% design_image 'strandboog' %}" alt="" width="800" height="1000" loading="lazy" decoding="async"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}

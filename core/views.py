@@ -19,7 +19,8 @@ from invitations.demo import DEFAULT_DEMO_OCCASION
 
 from . import seo
 from .content import (ABOUT_POINTS, FAQ, FEATURE_GROUPS, FEATURES, HERO_CHECKS, HOME_DESIGNS, HOME_FAQ_EXTRA, HOME_FAQ_QUESTIONS,
-                      HOME_FEATURES, HOME_KERST, OCCASION_TILE_NOTES, OCCASION_TILES, STEPS, STEPS_SHORT, TEXT_SAMPLES, TIPS, VALUES)
+                      HOME_FEATURES, HOME_KERST, OCCASION_TILE_NOTES, OCCASION_TILES, STEPS, STEPS_SHORT, TEXT_SAMPLES, TIPS, TROUW_FAQ, TROUW_KOP,
+                      TROUW_UITGELICHT, TROUW_VOORDELEN, VALUES)
 from .forms import ContactForm
 from .models import ContactMessage, SiteConfig
 from .utils import form_age_seconds, ip_fingerprint, rate_limit, signed_timestamp
@@ -76,6 +77,36 @@ def home(request):
     )
 
 
+def wedding_cards(request):
+    """SEO-landingspagina /digitale-trouwkaarten/: echte trouwontwerpen uit de collectie, uitleg, prijzen en vragen."""
+    wedding = [d for d in _designs() if "bruiloft" in d.occasions]
+    by_slug = {d.slug: d for d in wedding}
+    kop = [by_slug[s] for s in TROUW_KOP if s in by_slug]
+    featured = [by_slug[s] for s in TROUW_UITGELICHT if s in by_slug]
+    packages = list(Package.objects.filter(is_active=True))
+    prices = {p.code: p.price_display for p in packages}
+    faq = [(q, a.format(essentieel=prices.get("essentieel", ""), compleet=prices.get("compleet", ""))) for q, a in TROUW_FAQ]
+    cheapest = min(packages, key=lambda p: p.price_cents) if packages else None
+    path = reverse("core:wedding_cards")
+    return render(
+        request,
+        "core/trouwkaarten.html",
+        {
+            "kop_cards": _design_cards(kop, "bruiloft"),
+            "cards": _design_cards(featured, "bruiloft"),
+            "wedding_count": len(wedding),
+            "benefits": TROUW_VOORDELEN,
+            "features": HOME_FEATURES,
+            "steps": STEPS_SHORT,
+            "packages": packages,
+            "faq": faq,
+            "from_price": cheapest.price_display if cheapest else "",
+            "config": SiteConfig.get(),
+            "jsonld": [seo.breadcrumbs([("Home", "/"), ("Digitale trouwkaarten", path)]), seo.faq_page(faq)],
+        },
+    )
+
+
 def designs(request):
     occasion = request.GET.get("gelegenheid", "")
     if occasion not in OCCASION_LABELS:
@@ -94,6 +125,8 @@ def designs(request):
         list_path = f"{list_path}?gelegenheid={occasion}"
         seo_title, seo_description = seo.OCCASION_SEO[occasion]
         crumbs.append((f"Ontwerpen voor {OCCASION_LABELS[occasion].lower()}", list_path))
+        if occasion == "bruiloft":
+            list_path = reverse("core:wedding_cards")       # de canonical van het bruiloftfilter is de landingspagina Digitale trouwkaarten
     return render(
         request,
         "core/designs.html",
@@ -342,7 +375,11 @@ def sitemap_xml(request):
     ]
     designs_list = _designs()
     # Elke gelegenheid met ontwerpen is een eigen pagina (eigen titel, beschrijving en canonical).
-    paths += [f"{reverse('core:designs')}?gelegenheid={key}" for key, _label in OCCASION_CHOICES if any(key in d.occasions for d in designs_list)]
+    # De pagina Digitale trouwkaarten is de landingspagina voor de bruiloft: het filter ?gelegenheid=bruiloft werkt in de site, maar zijn canonical
+    # wijst naar die pagina en hij staat daarom niet in de sitemap.
+    paths.append(reverse("core:wedding_cards"))
+    paths += [f"{reverse('core:designs')}?gelegenheid={key}" for key, _label in OCCASION_CHOICES
+              if key != "bruiloft" and any(key in d.occasions for d in designs_list)]
     paths += [reverse("core:design_detail", args=[t.slug]) for t in designs_list]
     urls = "".join(f"<url><loc>{settings.BASE_URL}{p}</loc></url>" for p in paths)
     body = f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>'

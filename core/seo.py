@@ -103,6 +103,17 @@ def breadcrumbs(items: list[tuple[str, str]]) -> dict:
     }
 
 
+def faq_page(pairs: list[tuple[str, str]]) -> dict:
+    """FAQPage voor een pagina waarop dezelfde vragen en antwoorden zichtbaar staan (pairs: (vraag, antwoord) in gewone tekst)."""
+    return {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in pairs
+        ],
+    }
+
+
 def render_json_ld(data: dict) -> str:
     """Veilige <script type="application/ld+json">: een gegevensblok, geen uitvoerbaar script."""
     payload = json.dumps(data, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")

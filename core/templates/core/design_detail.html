@@ -53,6 +53,9 @@
     </div>
   </div>
 </section>
+{% if "bruiloft" in template.occasions %}
+<p class="trouw-verwijzing container">Een trouwkaart zoeken? Lees meer over <a href="{% url 'core:wedding_cards' %}">digitale trouwkaarten</a> van VAYLIDE.</p>
+{% endif %}
 {% if others %}
 <section class="section section--line" aria-labelledby="andere-titel">
   <div class="container">

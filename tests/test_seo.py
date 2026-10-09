@@ -3,6 +3,7 @@
 Alleen feiten die op de website staan: geen reviews, beoordelingen, prijzen of bedrijfsgegevens in de gestructureerde gegevens.
 """
 import base64
+import html as html_lib
 import json
 import re
 
@@ -85,7 +86,9 @@ class GelegenheidspaginaSeoTests(VaylideTestCase):
             self.assertEqual(meta(html, "description"), beschrijving, sleutel)
             self.assertGreaterEqual(len(beschrijving), 70, sleutel)
             self.assertLessEqual(len(beschrijving), 160, sleutel)
-            self.assertEqual(canonical(html), f"{settings.BASE_URL}/ontwerpen/?gelegenheid={sleutel}", sleutel)
+            # Het bruiloftfilter werkt gewoon, maar zijn canonical is de landingspagina Digitale trouwkaarten.
+            verwacht = f"{settings.BASE_URL}/digitale-trouwkaarten/" if sleutel == "bruiloft" else f"{settings.BASE_URL}/ontwerpen/?gelegenheid={sleutel}"
+            self.assertEqual(canonical(html), verwacht, sleutel)
             self.assertEqual(meta(html, "og:url", "property"), canonical(html), sleutel)
             kruimels = [b for b in json_ld(html) if b["@type"] == "BreadcrumbList"][0]
             self.assertEqual([i["name"] for i in kruimels["itemListElement"]], ["Home", "Collectie", f"Ontwerpen voor {OCCASION_LABELS[sleutel].lower()}"], sleutel)
@@ -128,7 +131,8 @@ class OntwerppaginaSeoTests(VaylideTestCase):
 class SitemapRobotsEnNoindexTests(VaylideTestCase):
     def test_sitemap_bevat_publieke_pagina_s_en_gelegenheden_maar_niets_privés(self):
         sitemap = Client().get("/sitemap.xml").content.decode()
-        for pad in ("/", "/ontwerpen/", "/ontwerpen/?gelegenheid=kerst", "/ontwerpen/?gelegenheid=bruiloft", "/ontwerpen/kerstkaart/", "/ontwerpen/kerstbol/", "/ontwerpen/gouden-avond/",
+        self.assertNotIn("?gelegenheid=bruiloft", sitemap)          # het bruiloftfilter staat niet in de sitemap: de landingspagina is zijn vervanger
+        for pad in ("/", "/ontwerpen/", "/ontwerpen/?gelegenheid=kerst", "/digitale-trouwkaarten/", "/ontwerpen/kerstkaart/", "/ontwerpen/kerstbol/", "/ontwerpen/gouden-avond/",
                     "/prijzen/", "/zo-werkt-het/"):
             self.assertIn(f"<loc>{settings.BASE_URL}{pad}</loc>", sitemap, pad)
         for pad in ("/voorbeeld/", "/u/", "/maken/", "/account/", "/inloggen/", "/zoeken/", "/voorwaarden/versie/", "/beheer/", "kerstman"):
@@ -160,3 +164,57 @@ class SitemapRobotsEnNoindexTests(VaylideTestCase):
             self.assertIn("noindex", response.headers.get("X-Robots-Tag", ""), pad)
             self.assertEqual(Client().get(pad).status_code, 401, pad)   # zonder wachtwoord ziet een zoekmachine niets
         self.assertEqual(Client().get("/robots.txt", **auth).content.decode(), "User-agent: *\nDisallow: /\n")
+
+
+class TrouwkaartenHubTests(VaylideTestCase):
+    """/digitale-trouwkaarten/: de landingspagina voor de bruiloft, met het bruiloftfilter als gewone UI."""
+
+    def setUp(self):
+        self.response = Client().get("/digitale-trouwkaarten/")
+        self.html = self.response.content.decode()
+
+    def test_pagina_is_indexeerbaar_met_eigen_titel_beschrijving_h1_en_self_canonical(self):
+        self.assertEqual(self.response.status_code, 200)
+        self.assertNotIn("X-Robots-Tag", self.response.headers)
+        self.assertEqual(meta(self.html, "robots"), "")
+        self.assertEqual(titel(self.html), "Digitale trouwkaart maken | Luxe online trouwuitnodiging · VAYLIDE")
+        self.assertEqual(meta(self.html, "description"), "Maak een digitale trouwkaart die echt tot leven komt. Met interactieve opening, RSVP, programma, locatie en eenvoudig delen via WhatsApp of QR-code.")
+        self.assertEqual(canonical(self.html), f"{settings.BASE_URL}/digitale-trouwkaarten/")
+        self.assertEqual(meta(self.html, "og:url", "property"), canonical(self.html))
+        self.assertEqual(re.findall(r"<h1[^>]*>(.*?)</h1>", self.html, re.S), ["Digitale trouwkaarten die je gasten <em>echt beleven</em>"])
+
+    def test_gestructureerde_gegevens_zijn_geldig_en_de_faq_staat_zichtbaar_op_de_pagina(self):
+        blokken = {b["@type"]: b for b in json_ld(self.html)}
+        self.assertEqual([i["name"] for i in blokken["BreadcrumbList"]["itemListElement"]], ["Home", "Digitale trouwkaarten"])
+        self.assertEqual(blokken["BreadcrumbList"]["itemListElement"][1]["item"], f"{settings.BASE_URL}/digitale-trouwkaarten/")
+        vragen = blokken["FAQPage"]["mainEntity"]
+        self.assertGreaterEqual(len(vragen), 5)
+        zichtbaar = html_lib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", self.html)))
+        for v in vragen:
+            self.assertEqual(v["@type"], "Question")
+            self.assertEqual(v["acceptedAnswer"]["@type"], "Answer")
+            self.assertIn(v["name"], zichtbaar)
+            self.assertIn(v["acceptedAnswer"]["text"], zichtbaar)
+
+    def test_de_pagina_linkt_naar_collectie_prijzen_uitleg_vragen_en_trouwontwerpen(self):
+        for pad in ("/ontwerpen/?gelegenheid=bruiloft", "/prijzen/", "/zo-werkt-het/", "/veelgestelde-vragen/", "/ontwerpen/balzaal/?gelegenheid=bruiloft"):
+            self.assertIn(f'href="{pad}"', self.html, pad)
+
+    def test_sitemap_heeft_de_pagina_en_het_bruiloftfilter_blijft_gewoon_werken(self):
+        sitemap = Client().get("/sitemap.xml").content.decode()
+        self.assertIn(f"<loc>{settings.BASE_URL}/digitale-trouwkaarten/</loc>", sitemap)
+        self.assertNotIn("gelegenheid=bruiloft", sitemap)
+        for gelegenheid in ("verloving", "verjaardag", "jubileum", "babyshower", "zakelijk", "kerst"):
+            self.assertIn(f"gelegenheid={gelegenheid}</loc>", sitemap, gelegenheid)
+        filter_pagina = Client().get("/ontwerpen/?gelegenheid=bruiloft")
+        self.assertEqual(filter_pagina.status_code, 200)
+        self.assertIn("Ontwerpen voor bruiloft", filter_pagina.content.decode())
+
+    def test_de_homepage_en_trouwontwerpen_linken_naar_de_pagina(self):
+        home = Client().get("/").content.decode()
+        self.assertIn('<a href="/digitale-trouwkaarten/">digitale trouwkaarten</a>', home)
+        trouw = Client().get("/ontwerpen/balzaal/").content.decode()
+        self.assertIn('href="/digitale-trouwkaarten/"', trouw)
+        zonder = Client().get("/ontwerpen/kerstbol/").content.decode()          # geen bruiloftontwerp: geen verwijzing
+        self.assertNotIn('href="/digitale-trouwkaarten/"', zonder)
+

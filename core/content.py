@@ -166,3 +166,43 @@ VALUES = [
     ("slot", "Privé", "Niet vindbaar in zoekmachines. Alleen jij ziet de aanmeldingen."),
     ("vink", "Duidelijk geprijsd", "Eén keer betalen, geen kosten per gast. Bijzondere wensen alleen na jouw akkoord."),
 ]
+
+
+# SEO-landingspagina /digitale-trouwkaarten/ (core/templates/core/trouwkaarten.html). Alleen ontwerpen die er zijn en bij de bruiloft horen
+# (ontbrekende worden overgeslagen). Het kopbeeld toont drie echte kaartbeelden; daaronder staat de keuze.
+TROUW_KOP = ["balzaal", "strandboog", "midnight-emeraude"]
+TROUW_UITGELICHT = ["gouden-avond", "rose-royale", "aurora-nocturne", "eerste-dans", "voor-altijd", "liefde-op-papier", "rozentuin", "eucalyptus"]
+
+TROUW_VOORDELEN = [
+    ("envelop", "Een opening die indruk maakt",
+     "Je gasten tikken op het zegel, de envelop of de deuren gaan open en jullie kaart verschijnt. Het voelt als echte post, maar dan met beweging."),
+    ("gasten", "Aanmeldingen op één plek",
+     "Gasten geven met één tik door of ze komen en met hoeveel personen, zonder account. Jij ziet de lijst in Mijn VAYLIDE en exporteert hem voor Excel of Numbers."),
+    ("potlood", "Wijzigen zonder opnieuw te versturen",
+     "Verandert de tijd of de locatie? Pas de kaart aan en publiceer opnieuw. De link en de QR-code blijven hetzelfde, dus niemand hoeft iets nieuws te ontvangen."),
+]
+
+TROUW_FAQ = [
+    ("Wat is een digitale trouwkaart?",
+     "Een trouwkaart die je gasten als link openen op hun telefoon of computer, in plaats van een kaart in de brievenbus. "
+     "Bij VAYLIDE heeft elke kaart een eigen opening, zoals een envelop met lakzegel, en staan datum, programma, route en aanmelden op één plek."),
+    ("Kunnen gasten zich aanmelden zonder account?",
+     "Ja. Gasten openen de link en geven aan of ze komen, eventueel met hoeveel personen. Ze hoeven geen account aan te maken en kunnen hun antwoord later zelf wijzigen."),
+    ("Hoe deel ik de trouwkaart met mijn gasten?",
+     "Na je betaling krijg je een eigen link en een QR-code. Die deel je via WhatsApp of e-mail, of je zet de QR-code op een kaartje. "
+     "Gasten openen de kaart in hun browser, zonder app."),
+    ("Kan ik de kaart nog aanpassen als hij al gedeeld is?",
+     "Ja. Je wijzigt de gegevens in Mijn VAYLIDE, bekijkt een voorbeeld en publiceert opnieuw. De link en de QR-code blijven hetzelfde."),
+    ("Wat kost een digitale trouwkaart?",
+     "Je betaalt eenmalig, zonder kosten per gast. Essentieel kost {essentieel} en Compleet {compleet}. "
+     "Specials hebben een eigen meerprijs, die je vóór het afrekenen ziet. Ontwerpen en bekijken is gratis; je betaalt pas bij het publiceren."),
+    ("Hoe lang blijft de trouwkaart online?",
+     "Essentieel 6 maanden en Compleet 12 maanden, gerekend vanaf de aankoopdatum: de dag waarop je betaling is bevestigd. "
+     "Langer online is als extra optie mogelijk; er is geen automatische verlenging."),
+    ("Kan ik foto's en muziek toevoegen?",
+     "Ja, met het pakket Compleet of als extra optie: een fotogalerij met maximaal 12 foto's en eigen muziek. "
+     "De muziek start pas als een gast er zelf op tikt."),
+    ("Is mijn trouwkaart te vinden via Google?",
+     "Nee. Een trouwkaart is alleen bereikbaar via de link en we vragen zoekmachines om hem niet op te nemen. Alleen jij ziet de gastenlijst."),
+]
+
