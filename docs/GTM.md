@@ -37,8 +37,11 @@ betalen, voorbeelden van ontwerpen en kaartframes. De CSP krijgt de Google-bronn
 ### Geen persoonsgegevens
 
 * `page_location`: eigen adres, pad **zonder id's** (`/maken/<uuid>/gegevens/` wordt `/maken/:id/gegevens/`, `/bestelling/<uuid>/` wordt `/bestelling/:id/`) en van de query alleen
-  `gelegenheid` en `ontwerp` met een vaste vorm. `page_referrer`: zonder query en binnen de site zonder id's. De pagina's tonen GA nooit de titel of tekst: de Google-tag krijgt die
-  velden niet mee en Enhanced Measurement staat zonder zoeken, formulieren en geschiedeniswijzigingen (zie hieronder).
+  `gelegenheid` en `ontwerp` met een vaste vorm. `page_referrer`: zonder query en binnen de site zonder id's. **De paginatitel (`dt`, `page_title`) gaat wel mee**: de Google-tag stuurt
+  hem automatisch mee en wij sturen hem niet apart weg. De titels zijn generiek (bijvoorbeeld `Gegevens · VAYLIDE`, `Bestellen · VAYLIDE`, `Collectie digitale uitnodigingen · VAYLIDE`), er staat geen
+  tekst van de klant in. Kanttekening (gemeten op staging, 10 oktober 2026): de titel van de bevestigingspagina bevat het bestelnummer (`Bestelling VL26-00001 · VAYLIDE`) en de `page_referrer` daar
+  kan het adres van de testbetaalpagina bevatten (`/betalen/test/<referentie>/`); zie *Open punten*. Er wordt verder niets uit de pagina gelezen en Enhanced Measurement staat zonder zoeken, formulieren en
+  geschiedeniswijzigingen (zie hieronder).
 * De gebeurtenissen hebben alleen openbare waarden: `design` (slug van het ontwerp), `occasion` (gelegenheid), `package` (pakketcode), `value` en `currency`. Geen namen, e-mail, telefoon,
   adressen, kaartteksten, RSVP-inhoud, bestelnummer of order-id.
 * Studio-gebeurtenissen komen uit **serverstatus**, niet uit teksten op de pagina: de server zet ze in de sessie (`core/analytics.py`) of leidt ze af uit de route, en toont ze op
@@ -84,6 +87,12 @@ Aan: paginaweergaven, scrollen, uitgaande klikken, video-engagement, bestandsdow
 en `_ga_…`; ze verschijnen alleen als `VIERLIEF_GTM_ID` is ingesteld. **De tekst is een concept** (gele markering) en een open juridisch punt (`GOOGLE_TEKST_GOEDGEKEURD`):
 in live-modus (`VIERLIEF_MODE` niet `test`) start de site niet met `VIERLIEF_GTM_ID` zolang de eigenaar niet akkoord is. Productie draait nu in testmodus en heeft geen
 `VIERLIEF_GTM_ID`, dus daar verandert niets.
+
+## Open punten (gemeten op staging, 10 oktober 2026)
+
+* `purchase_success` stuurt `package`, `value`, `currency` (als `cu=EUR`) en `environment`, zoals in de tabel; **`design` en `occasion` zitten er niet bij** (bewust niet in de eerste opzet).
+* De titel van de bevestigingspagina bevat het bestelnummer en de verwijzer daar kan een betaalreferentie bevatten. Beide zijn geen naam of e-mailadres, maar wel een bestelidentificatie. Besluit van de
+  eigenaar nodig voor productie (titel en verwijzer op die pagina schoonmaken, of accepteren).
 
 ## Controleren
 
