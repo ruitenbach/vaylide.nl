@@ -84,9 +84,14 @@ Aan: paginaweergaven, scrollen, uitgaande klikken, video-engagement, bestandsdow
 ## Privacyverklaring
 
 `core/templates/core/privacy.html` en `core/privacyverklaring.py` bevatten de tekst over Google Analytics en Google Tag Manager (onderdelen 3, 6, 7, 9, 10) en de cookies `_ga`
-en `_ga_…`; ze verschijnen alleen als `VIERLIEF_GTM_ID` is ingesteld. **De tekst is een concept** (gele markering) en een open juridisch punt (`GOOGLE_TEKST_GOEDGEKEURD`):
-in live-modus (`VIERLIEF_MODE` niet `test`) start de site niet met `VIERLIEF_GTM_ID` zolang de eigenaar niet akkoord is. Productie draait nu in testmodus en heeft geen
-`VIERLIEF_GTM_ID`, dus daar verandert niets.
+en `_ga_…`; ze verschijnen alleen als `VIERLIEF_GTM_ID` is ingesteld. **De tekst is door de eigenaar goedgekeurd op 10 oktober 2026**
+(`GOOGLE_TEKST_GOEDGEKEURD = True`); daarmee staat de conceptmarkering er niet meer en is het geen open punt meer voor live-modus. Verandert de tekst inhoudelijk, zet de vlag dan weer op
+`False`. Bewaartermijnen volgens de GA4-instelling: gebeurtenisgegevens 2 maanden, gebruikersgegevens 14 maanden.
+
+## Productie
+
+`VIERLIEF_GTM_ID=GTM-M8N863VG` en `VIERLIEF_ANALYTICS_OMGEVING=productie` (let op: de code kent `productie`, niet `production`; elke andere waarde dan `productie` meet als testverkeer met `debug_mode` en valt
+dan uit de rapporten) staan in het Render-dashboard van de dienst `vaylide`, net als `VIERLIEF_CLARITY_ID`.
 
 ## Controleren
 

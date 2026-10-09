@@ -103,9 +103,10 @@ def google_active() -> bool:
     return bool(settings.GTM_ID)
 
 
-# Google Analytics 4 via Google Tag Manager (alleen na toestemming). De tekst is een concept totdat de eigenaar hem goedkeurt; in live-modus start de
-# site niet met VIERLIEF_GTM_ID zolang dat niet is gebeurd. Zet hier True nadat de eigenaar de tekst in privacy.html heeft goedgekeurd.
-GOOGLE_TEKST_GOEDGEKEURD = False
+# Google Analytics 4 via Google Tag Manager (alleen na toestemming). In live-modus start de site niet met VIERLIEF_GTM_ID zolang dit niet True is.
+# Goedgekeurd door de eigenaar op 10-10-2026 (de tekst in privacy.html over Google Analytics en Google Tag Manager, met IP-adres en bewaartermijn zoals in GA4 ingesteld).
+# Verandert die tekst inhoudelijk, zet dit dan weer op False.
+GOOGLE_TEKST_GOEDGEKEURD = True
 
 
 def backup_offsite_active() -> bool:

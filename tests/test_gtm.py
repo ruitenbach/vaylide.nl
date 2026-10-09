@@ -3,6 +3,7 @@ zonder iets van wat een klant of gast invult, met vaste gebeurtenissen uit besta
 import html as htmllib
 import json
 import re
+from unittest import mock
 
 from django.conf import settings
 from django.test import Client, override_settings
@@ -254,16 +255,23 @@ class ToestemmingScriptTests(VaylideTestCase):
 
 @override_settings(GTM_ID=GTM, ANALYTICS_OMGEVING="staging")
 class PrivacyverklaringTests(VaylideTestCase):
-    def test_concepttekst_cookies_en_open_punt_zolang_de_eigenaar_niet_akkoord_is(self):
+    def test_goedgekeurde_tekst_cookies_en_geen_conceptmarkering(self):
         html = Client().get("/privacy/").content.decode()
         self.assertIn("Google Analytics 4 en Google Tag Manager", html)
-        self.assertIn("De tekst over Google Analytics en Google Tag Manager hieronder is een concept", html)
+        self.assertTrue(pv.GOOGLE_TEKST_GOEDGEKEURD)
+        self.assertNotIn("De tekst over Google Analytics en Google Tag Manager hieronder is een concept", html)
         self.assertIn("Voor gebruikers in de EU/EER registreert of bewaart Google Analytics het afzonderlijke IP-adres niet.", html)
         self.assertNotIn("Google slaat je IP-adres niet op", html)
         self.assertIn("2 maanden en gegevens die aan het willekeurige bezoekers-id in de cookie zijn gekoppeld 14 maanden", html)       # zoals in GA4 ingesteld
         self.assertIn("je foto's, de antwoorden van gasten en je bestelnummer", html)                                                  # waar zolang titel en verwijzer schoon zijn
         for cookie in ("<code>_ga</code>", "<code>vaylide_analytics</code>"):
             self.assertIn(cookie, html)
-        self.assertIn(pv.LABELS["google"], pv.open_points())
+        self.assertNotIn(pv.LABELS["google"], pv.open_points())
         self.assertIn("Google Ireland Limited", html)
         self.assertNotIn("Wij gebruiken geen advertentie-, analyse- of volgcookies", html)
+
+    def test_zonder_goedkeuring_blijft_het_een_concept_en_een_open_punt(self):
+        with mock.patch.object(pv, "GOOGLE_TEKST_GOEDGEKEURD", False):
+            html = Client().get("/privacy/").content.decode()
+            self.assertIn("De tekst over Google Analytics en Google Tag Manager hieronder is een concept", html)
+            self.assertIn(pv.LABELS["google"], pv.open_points())
