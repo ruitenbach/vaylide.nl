@@ -10,7 +10,7 @@
   var html = document.documentElement;
   var q = function (sel) { return hero.querySelector(sel); };
   var video = q("[data-sb-video]"), open = q("[data-sb-open]"), overslaan = q("[data-sb-skip]"), bekijk = q("[data-sb-bekijk]");
-  var replay = q("[data-sb-replay]"), status = q("[data-sb-status]");
+  var vKnop = q("[data-sb-v]"), status = q("[data-sb-status]"), eindBeeld = q(".sb-eind");
   var inhoud = document.querySelector(".sb-body");
   var reduceQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
   var heeftOpening = hero.hasAttribute("data-sb-opening");
@@ -28,11 +28,22 @@
   function gezien() { try { return !!window.sessionStorage.getItem(opslagSleutel); } catch (e) { return false; } }
   function onthoud() { if (html.classList.contains("inv-embed")) return; try { window.sessionStorage.setItem(opslagSleutel, "1"); } catch (e) { /* privémodus */ } }
   function zetStand(namen) { STAND.forEach(function (n) { hero.classList.toggle(n, namen.indexOf(n) >= 0); }); }
-  function vervolgknop() {
-    if (!replay) return;
-    replay.hidden = false;
-    replay.textContent = (!afgespeeld || geblokkeerd || rustig()) ? "Speel de scène af ▷" : "Opnieuw beleven ↺";
+  // De V in de boog (op het eindbeeld) is de bediening om de scène (opnieuw) af te spelen: een onzichtbare, grote tikvlak op de V, zonder zichtbare knop.
+  // De plek volgt de bijsnijding van het eindbeeld (object-fit: cover, object-position): V in poster-eind.jpg is 78 × 77 px met het midden op (355, 494) van 720 × 1280.
+  function plaatsV() {
+    if (!vKnop) return;
+    var w = hero.clientWidth, h = hero.clientHeight;
+    if (!w || !h) return;
+    var s = Math.max(w / 720, h / 1280), pos = (window.getComputedStyle(eindBeeld).objectPosition || "50% 50%").split(" ");
+    var fx = parseFloat(pos[0]) / 100, fy = parseFloat(pos[1]) / 100;
+    if (isNaN(fx)) fx = 0.5; if (isNaN(fy)) fy = 0.5;
+    var cx = (w - 720 * s) * fx + 355 * s, cy = (h - 1280 * s) * fy + 494 * s;
+    vKnop.style.setProperty("--sb-vx", cx.toFixed(1) + "px");
+    vKnop.style.setProperty("--sb-vy", cy.toFixed(1) + "px");
+    vKnop.style.setProperty("--sb-vd", Math.max(96, 78 * s * 1.5).toFixed(1) + "px");
   }
+  function vervolgknop() { plaatsV(); }
+
   function rewind() { if (!video) return; video.pause(); try { video.currentTime = 0; } catch (e) { /* nog geen metadata */ } }
 
   function afronden(metFocus) {
@@ -101,7 +112,6 @@
   function opnieuw() {
     rewind();
     bezig = true; afgelopen = false; afgespeeld = false; geblokkeerd = false;
-    replay.hidden = true;
     hero.classList.remove("sb-tekst");
     window.scrollTo(0, 0);
     vergrendel(true);
@@ -112,7 +122,10 @@
 
   if (open) open.addEventListener("click", begin);
   if (overslaan) overslaan.addEventListener("click", overslaanNu);
-  if (replay) replay.addEventListener("click", function () { if (rustig() || geblokkeerd || !afgespeeld) { bezig = true; afgelopen = false; hero.classList.remove("sb-tekst"); replay.hidden = true; speel(); } else opnieuw(); });
+  if (vKnop) vKnop.addEventListener("click", function () {
+    if (rustig() || geblokkeerd || !afgespeeld) { bezig = true; afgelopen = false; hero.classList.remove("sb-tekst"); speel(); } else opnieuw();
+  });
+  window.addEventListener("resize", plaatsV);
   if (bekijk) bekijk.addEventListener("click", function () {
     var doel = document.getElementById("sb-verder");
     if (doel) doel.scrollIntoView({ behavior: rustig() ? "auto" : "smooth", block: "start" });
@@ -142,5 +155,6 @@
     vergrendel(true);
     if (video) video.preload = "auto";  // de film moet klaar zijn als de gast tikt
   }
+  plaatsV();
   start();
 })();

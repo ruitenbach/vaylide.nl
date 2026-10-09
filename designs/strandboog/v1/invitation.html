@@ -34,13 +34,13 @@
     <div class="sb-rand" aria-hidden="true"></div>
     <p class="sb-flank sb-flank--l" aria-hidden="true">{{ v.names.0 }}</p>
     <p class="sb-flank sb-flank--r" aria-hidden="true">{% if v.is_couple %}{{ v.names.1 }}{% endif %}</p>
-    {% if v.opening_enabled %}<button type="button" class="sb-open" data-sb-open data-fx-origin aria-label="Open het ringdoosje en speel de scène af">
+    {% if v.opening_enabled %}<button type="button" class="sb-open" data-sb-open data-fx-origin aria-label="Tik om het doosje te openen en speel de scène af">
       <svg class="sb-open__ringen" viewBox="0 0 120 40" aria-hidden="true" focusable="false"><use href="#sb-ringen"/></svg>
       <span class="sb-open__tekst">Tik om het doosje te openen</span>
     </button>{% endif %}
   </div>
   <button type="button" class="sb-skip" data-sb-skip data-open>Opening overslaan</button>
-  <button type="button" class="sb-replay" data-sb-replay hidden>Speel de scène af ▷</button>
+  <button type="button" class="sb-v" data-sb-v aria-label="Speel de scène af"></button>
   <p class="sb-status" role="status" aria-live="polite" data-sb-status></p>
 </header>
 

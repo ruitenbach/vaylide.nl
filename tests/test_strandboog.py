@@ -84,7 +84,7 @@ class StrandboogWeergaveTests(VaylideTestCase):
     def test_demo_toont_doosje_overslaan_film_en_de_gedeelde_onderdelen(self):
         html = Client().get(DEMO).content.decode()
         for fragment in ("sb-hero", "data-sb-opening", "data-sb-open", "Tik om het doosje te openen", "data-sb-skip", "Opening overslaan",
-                         "data-sb-video", "sb-eind", "data-sb-replay", 'role="status"'):
+                         "data-sb-video", "sb-eind", "data-sb-v", 'role="status"'):
             self.assertIn(fragment, html, fragment)
         self.assertIn("Sanne", html)                       # namen uit de studiogegevens
         self.assertIn('id="aanmelden"', html)              # het bestaande aanmeldformulier, geen tweede RSVP-systeem
@@ -92,9 +92,22 @@ class StrandboogWeergaveTests(VaylideTestCase):
         self.assertIn("data-music-toggle", html)
         self.assertNotIn("data-cover", html, "de opening zit in de kop; invite.js heeft geen eigen openingsscherm nodig")
 
+    def test_de_v_in_de_boog_is_de_bediening_en_er_is_geen_zichtbare_afspeelknop(self):
+        html = Client().get(DEMO).content.decode()
+        self.assertRegex(html, r'<button[^>]*class="sb-v"[^>]*aria-label="Speel de scène af"[^>]*></button>')   # geen zichtbare tekst, wel een naam voor schermlezers
+        self.assertNotIn("data-sb-replay", html)
+        self.assertNotIn("Opnieuw beleven", html)
+        self.assertNotIn("▷", html)
+        css = (ONTWERP / "style.css").read_text(encoding="utf-8")
+        regel = re.search(r"\.sb-v \{[^}]*\}", css).group(0)
+        self.assertIn("cursor: pointer", regel)
+        self.assertIn("background: transparent", regel)
+        self.assertIn("border: 0", regel)
+        self.assertIn("max(96, 78 * s * 1.5)", (ONTWERP / "strandboog.js").read_text(encoding="utf-8"))   # tikvlak minstens 96 px
+
     def test_knop_en_film_zijn_toegankelijk_en_de_video_start_alleen_na_een_tik(self):
         html = Client().get(DEMO).content.decode()
-        self.assertIn('aria-label="Open het ringdoosje en speel de scène af"', html)
+        self.assertIn('aria-label="Tik om het doosje te openen en speel de scène af"', html)
         self.assertRegex(html, r'<video[^>]*\bmuted\b[^>]*\bplaysinline\b')
         self.assertNotRegex(html, r'<video[^>]*\bautoplay\b')
         self.assertNotRegex(html, r'<video[^>]*\bloop\b')

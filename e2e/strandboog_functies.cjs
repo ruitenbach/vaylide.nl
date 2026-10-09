@@ -9,9 +9,9 @@ const exe = process.env.CHROME;
 let goed = 0, fout = 0;
 const check = (naam, ok, extra) => { if (ok) goed++; else fout++; console.log((ok ? "  ok  " : "  FOUT ") + naam + (ok ? "" : "  -> " + JSON.stringify(extra))); };
 const stand = (page) => page.evaluate(() => {
-  const h = document.querySelector("[data-sb]"), v = document.querySelector("[data-sb-video]"), r = document.querySelector("[data-sb-replay]"), o = document.querySelector("[data-sb-open]");
+  const h = document.querySelector("[data-sb]"), v = document.querySelector("[data-sb-video]"), r = document.querySelector("[data-sb-v]"), o = document.querySelector("[data-sb-open]");
   return { klassen: [...h.classList].filter((c) => /^sb-(gate|speelt|tekst|klaar)$/.test(c)).sort().join(" "), bezig: document.documentElement.classList.contains("sb-bezig"),
-    inert: document.querySelector(".sb-body").inert, paused: v.paused, t: +v.currentTime.toFixed(2), replay: r.hidden ? null : r.textContent, openUit: o ? o.disabled : null,
+    inert: document.querySelector(".sb-body").inert, paused: v.paused, t: +v.currentTime.toFixed(2), vZichtbaar: getComputedStyle(r).display !== "none", vRect: (() => { const b = r.getBoundingClientRect(); return [Math.round(b.left + b.width / 2), Math.round(b.top + b.height / 2), Math.round(b.width), Math.round(b.height)]; })(), openUit: o ? o.disabled : null,
     status: document.querySelector("[data-sb-status]").textContent, scrollY: Math.round(scrollY), focus: document.activeElement && (document.activeElement.hasAttribute("data-sb-bekijk") ? "bekijk" : document.activeElement.className),
     eindZichtbaar: +getComputedStyle(document.querySelector(".sb-eind")).opacity, tekstZichtbaar: getComputedStyle(document.querySelector("[data-sb-caption]")).visibility === "visible" };
 });
@@ -43,11 +43,11 @@ async function nieuw(browser, opties = {}, init) {
   check("op 13,7 s: namen zichtbaar en pagina vrij terwijl de film nog loopt", s.klassen.includes("sb-tekst") && s.tekstZichtbaar && !s.bezig && !s.inert, s);
   await page.waitForFunction(() => document.querySelector("[data-sb]").classList.contains("sb-klaar"), null, { timeout: 8000 });
   s = await stand(page);
-  check("na het einde: eindbeeld, namen, geen herhaling, knop Opnieuw beleven", s.klassen === "sb-klaar" && s.paused && s.eindZichtbaar === 1 && s.tekstZichtbaar && s.replay === "Opnieuw beleven ↺" && !(await page.locator("[data-sb-skip]").isVisible()), s);
+  check("na het einde: eindbeeld, namen, geen herhaling, de V is de bediening (grote onzichtbare tikvlak, geen zichtbare knop)", s.klassen === "sb-klaar" && s.paused && s.eindZichtbaar === 1 && s.tekstZichtbaar && s.vZichtbaar && s.vRect[2] >= 96 && s.vRect[3] >= 96 && !(await page.locator("[data-sb-skip]").isVisible()), s);
   check("de film herhaalt zichzelf niet", await page.evaluate(async () => { const v = document.querySelector("video"); await new Promise((r) => setTimeout(r, 1200)); return v.paused && !v.loop; }));
 
   console.log("3. Opnieuw beleven en overslaan");
-  await page.click("[data-sb-replay]"); await page.waitForTimeout(1700);
+  await page.click("[data-sb-v]"); await page.waitForTimeout(1700);
   s = await stand(page);
   check("opnieuw: film speelt, eindbeeld weg, vergrendeld, namen weg", s.klassen === "sb-speelt" && !s.paused && s.eindZichtbaar === 0 && s.bezig && !s.tekstZichtbaar, s);
   await page.click("[data-sb-skip]"); await page.waitForTimeout(500);
@@ -73,7 +73,7 @@ async function nieuw(browser, opties = {}, init) {
   await page.tap("[data-sb-open]"); await page.waitForTimeout(600); await page.click("[data-sb-skip]"); await page.waitForTimeout(300);
   await page.reload({ waitUntil: "load" }); await page.waitForTimeout(700);
   s = await stand(page);
-  check("tweede keer in dezelfde sessie: direct het eindbeeld met namen, geen vergrendeling", s.klassen === "sb-klaar" && !s.bezig && !s.inert && s.eindZichtbaar === 1 && s.tekstZichtbaar && s.replay === "Speel de scène af ▷", s);
+  check("tweede keer in dezelfde sessie: direct het eindbeeld met namen, geen vergrendeling", s.klassen === "sb-klaar" && !s.bezig && !s.inert && s.eindZichtbaar === 1 && s.tekstZichtbaar && s.vZichtbaar, s);
   await ctx.close();
   ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true }); page = await ctx.newPage();
   await page.goto(base + pad + "#aanmelden", { waitUntil: "load" }); await page.waitForTimeout(900);
@@ -83,12 +83,12 @@ async function nieuw(browser, opties = {}, init) {
   console.log("6. Minder beweging en geblokkeerde of mislukte film");
   ({ ctx, page } = await nieuw(browser, { reducedMotion: "reduce" }));
   s = await stand(page);
-  check("minder beweging: direct het eindbeeld, film stil, knop Speel de scène af", s.klassen === "sb-klaar" && s.paused && !s.bezig && s.eindZichtbaar === 1 && s.replay === "Speel de scène af ▷", s);
+  check("minder beweging: direct het eindbeeld, film stil, de V speelt de scène af", s.klassen === "sb-klaar" && s.paused && !s.bezig && s.eindZichtbaar === 1 && s.vZichtbaar, s);
   await ctx.close();
   ({ ctx, page } = await nieuw(browser, {}, () => { HTMLMediaElement.prototype.play = function () { return Promise.reject(new DOMException("blocked", "NotAllowedError")); }; }));
   await page.tap("[data-sb-open]"); await page.waitForTimeout(700);
   s = await stand(page);
-  check("play() geweigerd: geen vastlopen, direct het eindbeeld en de pagina vrij", s.klassen === "sb-klaar" && !s.bezig && !s.inert && s.replay === "Speel de scène af ▷", s);
+  check("play() geweigerd: geen vastlopen, direct het eindbeeld en de pagina vrij", s.klassen === "sb-klaar" && !s.bezig && !s.inert && s.vZichtbaar, s);
   await ctx.close();
 
   console.log("7. Zonder JavaScript");

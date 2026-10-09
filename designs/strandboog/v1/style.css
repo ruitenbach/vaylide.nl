@@ -82,12 +82,24 @@ html.sb-bezig .sb-caption { will-change: opacity, transform; }
 @keyframes sb-adem { 0%, 100% { box-shadow: 0 10px 34px -12px rgba(0, 0, 0, .55), 0 0 0 0 rgba(255, 240, 205, .32); } 50% { box-shadow: 0 10px 34px -12px rgba(0, 0, 0, .55), 0 0 0 10px rgba(255, 240, 205, 0); } }
 
 /* Opening overslaan en opnieuw afspelen: rustig, rechtsboven, op het beeld */
-.sb-skip, .sb-replay { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 20; min-height: 44px; padding: 8px 16px; border: 1px solid rgba(255, 240, 205, .55); border-radius: 30px;
+.sb-skip { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 20; min-height: 44px; padding: 8px 16px; border: 1px solid rgba(255, 240, 205, .55); border-radius: 30px;
   background: rgba(20, 26, 34, .32); color: #fff6e4; font: 600 12px var(--sb-ui); letter-spacing: .08em; cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); text-shadow: 0 1px 8px rgba(0, 0, 0, .4); transition: opacity .5s; }
-.sb-skip:hover, .sb-replay:hover { background: rgba(20, 26, 34, .5); }
+.sb-skip:hover { background: rgba(20, 26, 34, .5); }
 .sb-hero:not(.sb-gate):not(.sb-speelt) .sb-skip, html:not(.js) .sb-skip { opacity: 0; pointer-events: none; visibility: hidden; }
-.sb-replay[hidden] { display: none; }
-html:not(.js) .sb-replay { display: none; }
+
+/* De V in de boog als bediening: een onzichtbaar tikvlak (minstens 96 px) rond de V op het eindbeeld, geen zichtbare knop. Positie en maat zet strandboog.js
+   (--sb-vx, --sb-vy, --sb-vd) volgens de bijsnijding van het beeld. Zacht gouden gloed bij hover, focus en tik; onder .fx-motion een heel rustige ademhaling. */
+.sb-v { position: absolute; z-index: 8; left: var(--sb-vx, 50%); top: var(--sb-vy, 42%); width: var(--sb-vd, 96px); height: var(--sb-vd, 96px); display: none; margin: 0; padding: 0;
+  translate: -50% -50%; border: 0; border-radius: 50%; background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.sb-v::before { content: ""; position: absolute; inset: 8%; border-radius: 50%; pointer-events: none; opacity: .0; transform: scale(.82);
+  background: radial-gradient(circle, rgba(255, 240, 200, .62), rgba(255, 228, 170, .3) 42%, rgba(255, 226, 160, 0) 72%); transition: opacity .35s, transform .35s; }
+.sb-klaar .sb-v { display: block; }
+html:not(.js) .sb-v { display: none; }
+.sb-v:hover::before, .sb-v:focus-visible::before { opacity: 1; transform: scale(1.04); }
+.sb-v:active::before { opacity: 1; transform: scale(.94); }
+.sb-v:focus-visible { outline: 1.5px solid rgba(255, 240, 205, .75); outline-offset: -6px; }
+.fx-motion .sb-klaar .sb-v::before { animation: sb-v-adem 4.2s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes sb-v-adem { 0%, 100% { opacity: .0; transform: scale(.84); } 50% { opacity: .55; transform: scale(1); } }
 .sb-status { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* Eindbeeld met namen: geen opening ingesteld, geen JavaScript, minder beweging, al gezien */
@@ -108,7 +120,7 @@ html:not(.js) .sb-replay { display: none; }
 
 @media (max-width: 520px) {
   .sb-heading { text-align: left; padding: 0 0 0 20px; font-size: 16px; white-space: nowrap; }
-  .sb-skip, .sb-replay { padding: 8px 12px; }
+  .sb-skip { padding: 8px 12px; }
 }
 @media (min-width: 900px) { .sb-hero { --sb-focus: 50% 36%; } }
 @media (max-height: 620px) {
@@ -268,5 +280,5 @@ html:not(.js) .sb-replay { display: none; }
   body { background: var(--sb-page); }
 }
 @media print {
-  .sb-hero { height: auto; min-height: 0; } .sb-skip, .sb-open, .sb-replay { display: none; }
+  .sb-hero { height: auto; min-height: 0; } .sb-skip, .sb-open, .sb-v { display: none; }
 }
