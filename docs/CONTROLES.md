@@ -1165,3 +1165,10 @@ Nieuwe Special (kerst) op de lokale branch `claude/kerstbol`, vanaf `8c429a7`. Z
 - **Tests:** `tests/test_kerstbol.py` (16 tests) en de bestaande collectie-, effecten-, specials- en envelopstijltests (92 tests geslaagd). De hele suite en een volledige performance-audit zijn op verzoek niet gedraaid.
 - **Niet gedaan:** de hele klantreis met testbetaling, een echte telefoon, Safari en Firefox, beeldsnelheid op een trage telefoon. Er is geen prijs voor de Special (`special-kerstbol`): zonder die optie is het ontwerp niet te bestellen.
 
+## Special Strandboog (staging, 10 oktober 2026)
+
+Ringdoosje dat opengaat op een filmscène, rand tot rand (zie `docs/STRANDBOOG.md`). In de collectie als special in groep A (`sort_order` 12, 51 ontwerpen, A 16).
+
+- Gericht gedraaid (geen volledige suite): `tests.test_strandboog`, `test_collectie`, `test_effects`, `test_specials`, `test_gouden_avond`, `test_atelier`: 82 tests geslaagd.
+- Lokaal in Chrome (H.264): `e2e/strandboog_functies.cjs` 22 van 22 en `e2e/toegankelijkheid.cjs ... strandboog` 0 bevindingen, vóór het samenbrengen met de collectie. Op staging is alleen gericht gecontroleerd (zie de oplevering).
+- Niet gecontroleerd: Safari op een iPhone, Firefox, een oud Android-toestel, schermlezers.

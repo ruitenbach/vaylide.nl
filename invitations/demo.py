@@ -25,6 +25,7 @@ DEFAULT_DEMO_OCCASION = {
     "eerste-dans": "bruiloft",
     "balzaal": "bruiloft",
     "gouden-avond": "bruiloft",
+    "strandboog": "bruiloft",
 }
 
 DESIGN_IMAGES = {
@@ -73,6 +74,7 @@ DESIGN_IMAGES = {
     "eerste-dans": ["waterverf-bloesem", "rozen", "kaarslicht", "bloemblaadjes", "zijde-goud"],
     "balzaal": ["rozen", "waterverf-bloesem", "kaarslicht", "bloemblaadjes", "zijde-goud"],
     "gouden-avond": ["rozen", "waterverf-bloesem", "kaarslicht", "bloemblaadjes", "zijde-goud"],
+    "strandboog": ["zee-horizon", "rozen", "bloemblaadjes", "duinen-ochtend", "waterverf-bloesem"],
 }
 IMAGE_SIZES = {
     "waterverf-bloesem": (1200, 1500),

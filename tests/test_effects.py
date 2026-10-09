@@ -25,7 +25,7 @@ def manifests():
 class EffectChoicesTests(TestCase):
     def test_every_design_has_valid_effects(self):
         found = manifests()
-        self.assertEqual(len(found), 50)  # 33 ontwerpen, de kerstontwerpen Aan tafel, Middernacht, Gloria, Winterlicht, Ho ho ho, Sneeuwpret en Golden Noël, en de bruiloftsontwerpen Voor altijd, Eerste dans, Balzaal, Rosé Royale en Midnight Émeraude, de special Aurora Nocturne de special Gouden Avond, de special Kerstbol, de special Kerstkaart en de special Kerststad
+        self.assertEqual(len(found), 51)  # 33 ontwerpen, de kerstontwerpen Aan tafel, Middernacht, Gloria, Winterlicht, Ho ho ho, Sneeuwpret en Golden Noël, en de bruiloftsontwerpen Voor altijd, Eerste dans, Balzaal, Rosé Royale en Midnight Émeraude, de special Aurora Nocturne de special Gouden Avond, de special Kerstbol, de special Kerstkaart en de special Kerststad
         for slug, data in found.items():
             self.assertIn("effects", data, slug)
             self.assertEqual(effects_errors(data["effects"]), [], slug)

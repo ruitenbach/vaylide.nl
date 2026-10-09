@@ -1,0 +1,214 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Strandboog v1 — een ringdoosje gaat open, een bloemenboog aan zee in het avondlicht, een bloemenmeisje en opvliegende duiven (korte filmscène), daarna de namen en de datum.
+   Opening, kop en namen zijn één scène (.sb-hero) in het eigen script (strandboog.js): geen openingsscherm van invite.js, want het doosje onthult dezelfde video die daarna de kop is.
+   Namen, datum en alle onderdelen daaronder komen uit de gedeelde onderdelen (aftellen, programma, locatie, aanmelden). Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" as="image" href="{% static 'designs/strandboog/v1/media/poster.jpg' %}">
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<script src="{% static 'vendor/gsap/gsap.min.js' %}" defer></script>
+<script src="{% static 'vendor/gsap/ScrollTrigger.min.js' %}" defer></script>
+<script src="{% static 'designs/strandboog/v1/strandboog.js' %}" defer></script>{% endblock %}
+
+{% block content %}
+<header class="sb-hero{% if not v.opening_enabled %} sb-klaar{% endif %}" id="sb-hero" data-sb{% if v.opening_enabled %} data-sb-opening{% endif %} aria-label="De bloemenboog aan zee">
+  <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
+    <linearGradient id="sb-goud" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8a6430"/><stop offset=".28" stop-color="#e3c48a"/><stop offset=".5" stop-color="#fbeccb"/><stop offset=".74" stop-color="#c39a5c"/><stop offset="1" stop-color="#8a6430"/></linearGradient>
+    <symbol id="sb-ringen" viewBox="0 0 120 40"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 20H34M86 20H116"/><circle cx="52" cy="20" r="11"/><circle cx="68" cy="20" r="11"/></g><path d="M60 5L63 9H57Z" fill="currentColor"/></symbol>
+    <symbol id="sb-hoek" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 60V18C4 10 10 4 18 4H60"/><path d="M12 60V24C12 17 17 12 24 12H60" opacity=".55"/></g><circle cx="18" cy="18" r="2.6" fill="currentColor"/></symbol>
+  </defs></svg>
+
+  <i class="sb-zon" aria-hidden="true"></i>
+  <p class="sb-heading">Er ligt iets voor je klaar.</p>
+  <div class="sb-boog" data-sb-boog>
+    <div class="sb-scene">
+      <video id="sb-video" muted playsinline preload="metadata" poster="{% static 'designs/strandboog/v1/media/poster.jpg' %}" width="720" height="1280" aria-label="Een ringdoosje gaat open; een bloemenboog aan zee, een bloemenmeisje en opvliegende duiven (voorbeeldvideo, fictieve personen)" data-sb-video>
+        <source src="{% static 'designs/strandboog/v1/media/strandboog.mp4' %}" type="video/mp4">
+      </video>
+      <img class="sb-eind" src="{% static 'designs/strandboog/v1/media/poster-eind.jpg' %}" alt="" width="720" height="1280" decoding="async">
+      <div class="sb-caption" data-sb-caption>
+        <p class="sb-eyebrow">{{ v.kicker }}</p>
+        <h1 class="sb-names" id="sb-namen" tabindex="-1">{% if v.is_couple %}{{ v.names.0 }} <span class="sb-names__amp" aria-label="en">&amp;</span> {{ v.names.1 }}{% else %}{{ v.names.0 }}{% endif %}</h1>
+        {% if v.date_display %}<p class="sb-datum">{{ v.date_display|capfirst }}{% if v.time_display %} · {{ v.time_display }}{% endif %}</p>{% endif %}
+        <button type="button" class="sb-view" data-sb-bekijk>Bekijk de uitnodiging</button>
+      </div>
+    </div>
+    <div class="sb-rand" aria-hidden="true"></div>
+    <p class="sb-flank sb-flank--l" aria-hidden="true">{{ v.names.0 }}</p>
+    <p class="sb-flank sb-flank--r" aria-hidden="true">{% if v.is_couple %}{{ v.names.1 }}{% endif %}</p>
+    {% if v.opening_enabled %}<button type="button" class="sb-open" data-sb-open data-fx-origin aria-label="Open het ringdoosje en speel de scène af">
+      <svg class="sb-open__ringen" viewBox="0 0 120 40" aria-hidden="true" focusable="false"><use href="#sb-ringen"/></svg>
+      <span class="sb-open__tekst">Tik om het doosje te openen</span>
+    </button>{% endif %}
+  </div>
+  <button type="button" class="sb-skip" data-sb-skip data-open>Opening overslaan</button>
+  <button type="button" class="sb-replay" data-sb-replay hidden>Speel de scène af ▷</button>
+  <p class="sb-status" role="status" aria-live="polite" data-sb-status></p>
+</header>
+
+<div class="sb-body" id="sb-verder">
+{% if v.tagline %}
+<section class="sb-sec sb-avond sb-foto-sec sb-intro" aria-label="Welkom">
+  <img class="sb-bg" src="{% static 'designs/strandboog/v1/media/duif.webp' %}" alt="" width="1080" height="960" loading="lazy" decoding="async" data-sb-parallax>
+  <div class="sb-in" data-reveal>
+    <svg class="sb-ringen" viewBox="0 0 120 40" aria-hidden="true" focusable="false"><use href="#sb-ringen"/></svg>
+    <p class="sb-intro__tagline">{{ v.tagline }}</p>
+    <svg class="sb-ringen" viewBox="0 0 120 40" aria-hidden="true" focusable="false"><use href="#sb-ringen"/></svg>
+  </div>
+</section>
+{% endif %}
+
+{% if v.has_event and v.date %}
+<section class="sb-sec sb-zand sb-date" aria-labelledby="sb-date-title">
+  <div class="sb-in" data-reveal>
+    <h2 id="sb-date-title" class="sb-h2">Save the date</h2>
+    <p class="visually-hidden">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>
+    <div class="sb-venster" aria-hidden="true">
+      <img src="{% static 'designs/strandboog/v1/media/zee.webp' %}" alt="" width="1080" height="960" loading="lazy" decoding="async">
+      <div class="sb-datum-groot">
+        <span class="sb-weekdag">{{ v.weekday }}</span>
+        <strong class="sb-dag">{{ v.day }}</strong>
+        <span class="sb-maand">{{ v.month_name }}</span>
+        <span class="sb-jaar">{{ v.year }}</span>
+      </div>
+    </div>
+    {% if v.time_display %}<p class="sb-date__tijd">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.welcome or v.hero %}
+<section class="sb-sec sb-ivoor sb-letter" aria-label="Welkom">
+  <span class="sb-hoeken" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#sb-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#sb-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#sb-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#sb-hoek"/></svg></span>
+  <div class="sb-in" data-reveal>
+    {% if v.hero %}<figure class="sb-foto sb-letter__photo"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 380px, 76vw" %}</div></figure>{% endif %}
+    {% if v.welcome %}<div class="sb-letter__text">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="sb-sec sb-zand sb-story" aria-labelledby="sb-story-title">
+  <div class="sb-in" data-reveal>
+    <svg class="sb-ringen" viewBox="0 0 120 40" aria-hidden="true" focusable="false"><use href="#sb-ringen"/></svg>
+    <h2 id="sb-story-title" class="sb-h2">{{ v.story_title }}</h2>
+    <div class="sb-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="sb-sec sb-avond sb-foto-sec sb-program" aria-labelledby="sb-program-title">
+  <img class="sb-bg" src="{% static 'designs/strandboog/v1/media/zee.webp' %}" alt="" width="1080" height="960" loading="lazy" decoding="async" data-sb-parallax>
+  <div class="sb-in sb-in--breed" data-reveal>
+    <h2 id="sb-program-title" class="sb-h2">Het programma</h2>
+    <ol class="sb-tijdlijn" data-fx-stagger>
+      {% for item in v.program %}
+      <li class="sb-tl">
+        <span class="sb-tl__ring" aria-hidden="true"></span>
+        <div class="sb-tl__tekst">
+          {% if item.time %}<p class="sb-tl__tijd">{{ item.time }}</p>{% endif %}
+          <h3 class="sb-tl__titel">{{ item.title }}</h3>
+          {% if item.description %}<p class="sb-tl__desc">{{ item.description }}</p>{% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="sb-sec sb-zon-band sb-count" aria-labelledby="sb-count-title">
+  <div class="sb-in" data-reveal>
+    <h2 id="sb-count-title" class="sb-h2">{% if v.is_past %}Dank je wel{% else %}Nog even en het is zover{% endif %}</h2>
+    {% include "invitations/partials/countdown.html" %}
+    {% include "invitations/partials/calendar_buttons.html" %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="sb-sec sb-avond sb-foto-sec sb-place" aria-labelledby="sb-place-title">
+  <img class="sb-bg" src="{% static 'designs/strandboog/v1/media/duif.webp' %}" alt="" width="1080" height="960" loading="lazy" decoding="async" data-sb-parallax>
+  <div class="sb-in" data-reveal>
+    <h2 id="sb-place-title" class="sb-h2">Locatie</h2>
+    {% if v.venue %}<p class="sb-place__venue">{{ v.venue }}</p>{% endif %}
+    {% if v.address_lines %}<address class="sb-place__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+    {% if v.date_display %}<p class="sb-place__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+    {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="sb-sec sb-ivoor sb-dress" aria-labelledby="sb-dress-title">
+  <div class="sb-in" data-reveal>
+    <h2 id="sb-dress-title" class="sb-h2">Dresscode</h2>
+    {% if v.dresscode_colors %}<ul class="sb-kleuren" aria-label="Kleuren voor de dresscode">
+      {% for c in v.dresscode_colors %}<li class="sb-kleur" style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+    </ul>{% endif %}
+    {% for p in v.dresscode_text %}<p class="sb-dress__text">{{ p|linebreaksbr }}</p>{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="sb-sec sb-zand sb-gallery" aria-labelledby="sb-gallery-title">
+  <div class="sb-in sb-in--breed" data-reveal>
+    <h2 id="sb-gallery-title" class="sb-h2">Momenten</h2>
+    <ul class="sb-photos">
+      {% for photo in v.gallery %}<li class="sb-foto"><figure><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 600px) 250px, 44vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="sb-sec sb-ivoor sb-practical" aria-labelledby="sb-practical-title">
+  <div class="sb-in" data-reveal>
+    <h2 id="sb-practical-title" class="sb-h2">Goed om te weten</h2>
+    <dl class="sb-practical__list" data-fx-stagger>
+      {% for item in v.practical %}<div class="sb-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+    </dl>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="sb-sec sb-avond sb-foto-sec sb-rsvp" id="aanmelden" aria-labelledby="sb-rsvp-title">
+  <img class="sb-bg" src="{% static 'designs/strandboog/v1/media/bloemen.webp' %}" alt="" width="1080" height="960" loading="lazy" decoding="async" data-sb-parallax>
+  <div class="sb-in" data-reveal>
+    <h2 id="sb-rsvp-title" class="sb-h2">{% if v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+    <div class="sb-card">
+      <span class="sb-hoeken" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#sb-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#sb-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#sb-hoek"/></svg><svg viewBox="0 0 64 64"><use href="#sb-hoek"/></svg></span>
+      {% include "invitations/partials/rsvp.html" %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="sb-sec sb-ivoor sb-contact" aria-labelledby="sb-contact-title">
+  <div class="sb-in" data-reveal>
+    <h2 id="sb-contact-title" class="sb-h2">Vragen?</h2>
+    {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+    <p class="sb-contact__name">{{ v.contact.name }}</p>
+    <p class="sb-contact__links">
+      {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+      {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+      {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+    </p>
+  </div>
+</section>
+{% endif %}
+
+<section class="sb-sec sb-avond sb-foto-sec sb-closing" aria-label="Afsluiting">
+  <img class="sb-bg" src="{% static 'designs/strandboog/v1/media/zee.webp' %}" alt="" width="1080" height="960" loading="lazy" decoding="async" data-sb-parallax>
+  <div class="sb-in" data-reveal>
+    <svg class="sb-ringen" viewBox="0 0 120 40" aria-hidden="true" focusable="false"><use href="#sb-ringen"/></svg>
+    <p class="sb-closing__wish">Wij kijken ernaar uit</p>
+    {% if v.show.closing %}{% for p in v.closing %}<p class="sb-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+    {% include "invitations/partials/share_buttons.html" %}
+  </div>
+</section>
+</div>
+{% endblock %}

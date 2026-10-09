@@ -1,0 +1,73 @@
+{
+  "slug": "strandboog",
+  "added_at": "2026-10-09T20:00:00Z",
+  "version": 1,
+  "name": "Strandboog",
+  "tagline": "Een ringdoosje gaat open en daarachter wacht een bloemenboog aan zee",
+  "description": "Je ziet eerst een gesloten ringdoosje. Tik erop: het doosje gaat open met twee ringen, daarna sta je op het strand voor een bloemenboog in het avondlicht, een bloemenmeisje strooit blaadjes en duiven vliegen op naar de zon. Dan staan jullie namen en de datum in beeld en loopt de uitnodiging door met aftellen, programma, locatie en aanmelden, in de kleuren van de zonsondergang aan zee. De opening is over te slaan en rustig bij minder beweging. De filmscène is een gegenereerde voorbeeldvideo met fictieve personen.",
+  "style_notes": "Ringdoosje, bloemenboog aan zee, zonsondergang, duiven en bloemenmeisje; filmisch, licht en romantisch",
+  "occasions": [
+    "bruiloft",
+    "verloving"
+  ],
+  "sort_order": 12,
+  "special": true,
+  "opening": "ringdoosje",
+  "envelope_mode": "built_in",
+  "opening_label": "Een ringdoosje dat opengaat, een filmische opening",
+  "demo_melody": "canon",
+  "kaartbeeld": "open",
+  "palettes": [
+    {
+      "key": "zonsondergang",
+      "name": "Zonsondergang aan zee",
+      "swatch": [
+        "#FFF9EE",
+        "#F3D9B1",
+        "#2B3947"
+      ],
+      "vars": {
+        "--sb-page": "#EDE3D3",
+        "--sb-bg": "#FFF9EE",
+        "--sb-bg-2": "#F8ECDA",
+        "--sb-ink": "#33291F",
+        "--sb-muted": "#5B4C3C",
+        "--sb-accent": "#7A5025",
+        "--sb-accent-ink": "#FFFFFF",
+        "--sb-gold": "#C49A5A",
+        "--sb-gold-2": "#6C4A20",
+        "--sb-line": "#E6D6BA",
+        "--sb-hero-ink": "#4C3C2A",
+        "--fx-1": "#FFFFFF",
+        "--fx-2": "#F4D7A4",
+        "--fx-3": "#FBE9C8",
+        "--fx-4": "#FFF3DC",
+        "--fx-bg": "#FFF9EE",
+        "--sb-avond": "#25323F",
+        "--sb-avond-2": "#2F3E4E"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "zonlicht",
+    "knal": "geen",
+    "viering": "blaadjes",
+    "namen": "zacht",
+    "onthul": "zacht",
+    "extra": []
+  },
+  "changelog": "Eerste versie: ringdoosje dat opengaat, filmscène met bloemenboog aan zee, bloemenmeisje en duiven, daarna de namen en de datum; een knop om de opening over te slaan."
+}
