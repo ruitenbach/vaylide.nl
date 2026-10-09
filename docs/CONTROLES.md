@@ -240,6 +240,19 @@ In eerdere rondes al opgelost: overlappende knop in de mobiele kop, de testbalk 
 - `python manage.py check --deploy` met productie-instellingen (opnieuw in ronde 5): alleen de bewuste meldingen W005 en W021. `makemigrations --check`: geen wijzigingen in het datamodel.
 - Docker (vorige ronde): de image bouwt vanaf nul, start met migraties op een leeg volume, laadt de ontwerpen, draait als gewone gebruiker (uid 10001), serveert statische bestanden en de eigen 404, en de onderhoudscommando's werken.
 
+## Ronde 7: Gouden licht
+
+Alleen wat echt is uitgevoerd, op de ontwikkelserver in testmodus, in Chromium (Playwright), voor het nieuwe ontwerp `gouden-licht`:
+
+- **Tests**: 148 van 148 geslaagd (9 nieuwe in `tests/test_gouden_licht.py`: manifest en effecten, leesbare kleuren in alle vier de kleurvarianten (10 kleurparen, alle minstens 4,5:1), weergave van alle 16 combinaties van gelegenheid en kleur met één inline script (CSP), het zegel als gewone link met vaste naam, de afspraken voor beweging in de stylesheet (alle eindeloze animaties onder `.fx-motion` en met de pauzeknop, een rustige variant voor het openen), geen restanten van het ontwerp waaruit is gekopieerd, en dat het bloemenbestand precies is wat het script maakt). `test_effects` telt nu 34 ontwerpen.
+- **Toegankelijkheid** (`e2e/toegankelijkheid.cjs`): axe-core 4 en de contrastcontrole op **8 pagina's** (vier kleuren, dicht en geopend): **0 overtredingen en 0 contrastproblemen**. Een eerste run vond twee dingen die zijn opgelost: de initialen onderaan de pagina waren te licht op het zegel (1,3:1, overgenomen kleur) en de knop kreeg een axe-melding omdat de initialen tekst in de knop waren.
+- **Effecten** (`e2e/effecten.cjs`): **24 van 24 controles geslaagd** voor Gouden licht, Avondgoud en Liefde op papier (acht per ontwerp: deeltjes op het openingsscherm, knal, kop na het openen, feestje na aanmelden, geen consolefouten, stilzetten, onthouden, minder beweging). De controle van de knal wachtte een vaste 650 ms en faalde eerst voor Gouden licht, waarvan de knal bewust op 1,2 s valt; de controle leest nu `data-fx-delay`.
+- **Toetsenbord en zonder JavaScript**: Tab bereikt het zegel (na de sla-over-link) en daarna de muziekknop; Enter en de spatiebalk openen de uitnodiging, de focus gaat naar de kop en het openingsscherm is weg; zonder JavaScript is het openingsscherm niet zichtbaar en staan kop en aanmelden er gewoon.
+- **Met het oog bekeken**: dicht en tijdens het openen op 390 pixels (rust, glans, lichtdoorbraak, overspoeling, kop) in Bordeaux; dicht en geopend op 360 en 1366 pixels in Bordeaux; en tijdens het openen op 390 pixels in Nachtblauw, Smaragd en Aubergine. Op 768 pixels zijn beelden gemaakt maar niet bekeken. Bij 360 × 640 viel de hint onder de envelop uit beeld; de envelop is daarom kleiner gemaakt (hoogte minus 13 rem).
+- **Minder beweging**: het systeem op 'minder beweging' op 390 pixels geeft een uitnodiging die direct opent (`is-open`, 700 ms na de tik), zonder fouten in de console; de pauzeknop is gedekt door de effectencontrole hierboven.
+
+**Niet gedaan voor Gouden licht**: de volledige browsercontrole `e2e/controle2.cjs` (vier schermformaten, gedragscontroles), het snelheidsonderzoek met Lighthouse en de meting van de belasting op een vertraagde processor; ook niet getest in Safari, Firefox of op echte telefoons, en het geluid van de opname is niet beluisterd.
+
 ## Niet gecontroleerd
 
 - **Echte apparaten en andere browsers**: alleen Chromium is gebruikt, op telefoon- en computerformaat. Safari/WebKit (iPhone) en Firefox zijn niet getest. Test vóór de lancering op echte iPhones en Android-telefoons.

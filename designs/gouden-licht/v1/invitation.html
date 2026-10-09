@@ -1,0 +1,164 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Gouden licht v1 — een donkere envelop waar het licht doorheen breekt. Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/pinyon-script-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>{% endblock %}
+
+{% block cover %}
+<section class="cover gl-cover" data-cover data-duration="3600" data-fx-delay="1200" data-fx-intro="2800" aria-label="Openingsscherm">
+  {% include "gouden-licht/v1/bloemen.html" %}
+  <div class="fx-slot" data-fx-slot="cover" aria-hidden="true"></div>
+  <div class="gl-cover__inner">
+    <p class="gl-cover__kicker">Een uitnodiging voor jou</p>
+    <div class="gl-env-wrap" data-fx-tilt>
+      <div class="gl-env" aria-hidden="true">
+        <div class="gl-back"></div>
+        <div class="gl-flap gl-flap--l"><div class="gl-face">{% include "gouden-licht/v1/vlak.html" with pts="0,0 250,400 0,800" %}</div></div>
+        <div class="gl-flap gl-flap--r"><div class="gl-face">{% include "gouden-licht/v1/vlak.html" with pts="500,0 500,800 250,400" %}</div></div>
+        <div class="gl-flap gl-flap--b"><div class="gl-face">{% include "gouden-licht/v1/vlak.html" with pts="0,800 250,400 500,800" %}</div></div>
+        <div class="gl-light">
+          <span class="gl-light__core"></span>
+          <span class="gl-light__rays"></span>
+        </div>
+        <div class="gl-flap gl-flap--t">
+          <div class="gl-face">{% include "gouden-licht/v1/vlak.html" with pts="0,0 500,0 250,400" %}</div>
+          <div class="gl-face gl-face--inside"></div>
+        </div>
+      </div>
+      <a href="#uitnodiging" class="gl-seal fx-pulse" data-open data-fx-origin data-mono="{{ v.monogram }}" aria-label="Open de uitnodiging"></a>
+    </div>
+    <p class="gl-cover__hint">Tik op het zegel om te openen</p>
+    {% if v.show.music %}<button type="button" class="gl-cover__music" data-open data-open-music>Openen met muziek</button>{% endif %}
+  </div>
+  <div class="gl-flood" aria-hidden="true"></div>
+</section>
+{% endblock %}
+
+{% block content %}
+<header class="gl-hero">
+  <div class="gl-hero__card">
+    <svg class="gl-sprig gl-sprig--top" viewBox="0 0 240 48" aria-hidden="true" focusable="false" data-fx-draw><path d="M8 40c38-2 70-14 112-30M120 10c34 16 72 26 112 30M58 30c-6-10-2-18 8-22-2 10-2 16-8 22Zm28-10c-4-10 2-17 12-19-3 9-5 15-12 19Zm66 0c4-10-2-17-12-19 3 9 5 15 12 19Zm28 10c6-10 2-18-8-22 2 10 2 16 8 22Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="120" cy="10" r="3.2" fill="currentColor"/></svg>
+    <p class="gl-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
+    <h1 class="gl-names gl-names--{{ v.names_size }} fx-names">
+      {% if v.is_couple %}<span class="gl-names__one">{{ v.names.0 }}</span><span class="gl-names__amp" aria-label="en">&amp;</span><span class="gl-names__two">{{ v.names.1 }}</span>
+      {% else %}<span class="gl-names__one">{{ v.names.0 }}</span>{% endif %}
+    </h1>
+    <p class="gl-tagline fx-intro" style="--fx-d:5">{{ v.tagline }}</p>
+    {% if v.date %}
+    <div class="gl-date fx-intro" style="--fx-d:6">
+      <span class="gl-date__weekday">{{ v.weekday }}</span>
+      <span class="gl-date__day">{{ v.day }}</span>
+      <span class="gl-date__month">{{ v.month_name }} {{ v.year }}</span>
+    </div>
+    {% endif %}
+    {% if v.time_display or v.venue %}<p class="gl-hero__meta fx-intro" style="--fx-d:7">{% if v.time_display %}{{ v.time_display }}{% endif %}{% if v.time_display and v.venue %}<span aria-hidden="true"> · </span>{% endif %}{{ v.venue }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  </div>
+  {% if v.hero %}<figure class="gl-arch"><div class="ph gl-arch__img fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero eager=True sizes="(min-width: 900px) 420px, 80vw" %}</div></figure>{% endif %}
+</header>
+
+{% if v.welcome %}
+<section class="gl-section gl-welcome" data-reveal aria-label="Welkom">
+  {% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="gl-section gl-countdown" data-reveal aria-labelledby="gl-cd-title">
+  <h2 id="gl-cd-title" class="gl-h2">{% if v.is_past %}Dank je wel{% else %}Nog even geduld{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="gl-section gl-story" data-reveal aria-labelledby="gl-story-title">
+  <h2 id="gl-story-title" class="gl-h2">{{ v.story_title }}</h2>
+  <div class="gl-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="gl-section gl-program" data-reveal aria-labelledby="gl-program-title">
+  <h2 id="gl-program-title" class="gl-h2">Programma</h2>
+  <ol class="gl-timeline">
+    {% for item in v.program %}
+    <li class="gl-timeline__item">
+      {% if item.time %}<span class="gl-timeline__time">{{ item.time }}</span>{% endif %}
+      <span class="gl-timeline__dot" aria-hidden="true"></span>
+      <div class="gl-timeline__body">
+        <h3 class="gl-timeline__title">{{ item.title }}</h3>
+        {% if item.description %}<p>{{ item.description }}</p>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="gl-section gl-location" data-reveal aria-labelledby="gl-location-title">
+  <h2 id="gl-location-title" class="gl-h2">Locatie</h2>
+  <div class="gl-paper-card">
+    {% if v.venue %}<p class="gl-location__venue">{{ v.venue }}</p>{% endif %}
+    {% if v.address_lines %}<address class="gl-location__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+    {% if v.date_display %}<p class="gl-location__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>{% endif %}
+    {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Route plannen</a>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="gl-section gl-dresscode" data-reveal aria-labelledby="gl-dress-title">
+  <h2 id="gl-dress-title" class="gl-h2">Dresscode</h2>
+  {% for p in v.dresscode_text %}<p>{{ p|linebreaksbr }}</p>{% endfor %}
+  {% if v.dresscode_colors %}<ul class="gl-swatches" aria-label="Kleuren voor de dresscode">
+    {% for c in v.dresscode_colors %}<li class="gl-swatch" style="background:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="gl-section gl-practical" data-reveal aria-labelledby="gl-practical-title">
+  <h2 id="gl-practical-title" class="gl-h2">Goed om te weten</h2>
+  <dl class="gl-practical__list">
+    {% for item in v.practical %}<div class="gl-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="gl-section gl-gallery" data-reveal aria-labelledby="gl-gallery-title">
+  <h2 id="gl-gallery-title" class="gl-h2">Momenten</h2>
+  <ul class="gl-gallery__grid">
+    {% for photo in v.gallery %}<li class="gl-gallery__item gl-gallery__item--{{ photo.orientation }}"><figure class="ph">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 900px) 300px, 45vw" %}{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="gl-section gl-rsvp" id="aanmelden" data-reveal aria-labelledby="gl-rsvp-title">
+  <h2 id="gl-rsvp-title" class="gl-h2">{% if v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+  <div class="gl-paper-card gl-paper-card--form">
+    {% include "invitations/partials/rsvp.html" %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="gl-section gl-contact" data-reveal aria-labelledby="gl-contact-title">
+  <h2 id="gl-contact-title" class="gl-h2">Vragen?</h2>
+  {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+  <p class="gl-contact__name">{{ v.contact.name }}</p>
+  <p class="gl-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="gl-section gl-closing" data-reveal aria-label="Afsluiting">
+  {% if v.show.closing %}{% for p in v.closing %}<p class="gl-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  <p class="gl-closing__mono" aria-hidden="true"><span>{{ v.monogram }}</span></p>
+  {% include "invitations/partials/share_buttons.html" %}
+</section>
+{% endblock %}

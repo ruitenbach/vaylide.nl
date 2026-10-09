@@ -132,6 +132,8 @@ Zo voeg je er een toe:
 
 ### Volledig eigen ontwerp
 
+Voorbeelden: Liefde op papier, Avondgoud, Puur moment en Gouden licht. Gouden licht gebruikt een getekende bloemenlaag die `tools/gouden-licht/maak_bloemen.py` maakt (`.venv/bin/python tools/gouden-licht/maak_bloemen.py` schrijft `designs/gouden-licht/v1/bloemen.html`); wie andere bloemen wil, past het script aan en laat het opnieuw lopen, als nieuwe ontwerpversie.
+
 ```
 designs/
   mijn-ontwerp/          ← code van het ontwerp (kleine letters, koppeltekens)

@@ -16,12 +16,14 @@ DEFAULT_DEMO_OCCASION = {
     "liefde-op-papier": "bruiloft",
     "avondgoud": "verjaardag",
     "puur-moment": "verloving",
+    "gouden-licht": "bruiloft",
 }
 
 DESIGN_IMAGES = {
     "liefde-op-papier": ["waterverf-bloesem", "bloemblaadjes", "waterverf-lavendel", "zee-horizon", "duinen-staand"],
     "avondgoud": ["goud-lichtjes", "kaarslicht", "bloemblaadjes", "zee-horizon", "duinen-ochtend"],
     "puur-moment": ["duinen-ochtend", "zee-horizon", "duinen-staand", "waterverf-lavendel", "bloemblaadjes"],
+    "gouden-licht": ["rozen", "kaarslicht", "bloemblaadjes", "goud-lichtjes", "duinen-ochtend"],
     # Atelier-ontwerpen: eerste beeld is de kop, de rest de fotogalerij.
     "eucalyptus": ["eucalyptus", "bloemblaadjes", "zee-horizon", "duinen-staand", "waterverf-bloesem"],
     "gatsby": ["zijde-goud", "goud-lichtjes", "kaarslicht", "stadslicht", "zee-horizon"],

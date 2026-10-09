@@ -211,12 +211,44 @@ De eigenaar vroeg eerst: "vierlief moet worden aangepast naar Vaylia met een nie
 - **Eigen repository.** De eigenaar maakte `bootsman075-ops/vaylide.nl` aan, openbaar; op de vraag of dat zo mocht blijven, koos de eigenaar "Openbaar is goed". Vóór het versturen is de hele geschiedenis doorzocht op wachtwoorden en sleutels (niets gevonden). De eerste commit van de repository (een README van één regel) is samengevoegd; er is niets overschreven.
 - **De website zelf** is verder niet veranderd.
 
+## Ronde 7: Gouden licht
+
+De eigenaar stuurde de schermopname `Envelop.mp4` (14 seconden, een telefoon met een envelop die opengaat) en vroeg: "Kan je deze envelop namaken? Voor een intro van een kaart?" Het resultaat is een nieuw volledig eigen ontwerp, **Gouden licht** (`designs/gouden-licht/v1/`), met vier kleurvarianten (Bordeaux, Nachtblauw, Smaragd, Aubergine, steeds met goud).
+
+**Wat ik in de opname zag.** Ik heb de opname bekeken aan de hand van stilstaande beelden: twee per seconde als overzicht, en acht beelden op de belangrijke momenten (rust, glans, lichtdoorbraak, overspoeling, kaart). Het geluid heb ik niet kunnen beluisteren; de opname heeft een geluidsspoor, maar daar is niets van overgenomen.
+
+1. Een diepe bordeauxrode envelop met vier kleppen die in het midden samenkomen, reliëfbloemen in dezelfde kleur en een blozend lakzegel met initialen.
+2. De bloemen lichten goud op, als een glans die over het oppervlak gaat.
+3. Na een tik tilt de bovenklep op (de binnenkant is zacht roze) en de andere kleppen wijken een heel klein stukje. Door de naad onder het zegel breekt warm licht met stralen, en de bloemen krijgen een gouden rand.
+4. Het licht overspoelt het scherm. Daarin verschijnen de namen en de kaart.
+
+**Wat ik gemaakt heb.**
+
+- **Eigen tekeningen.** De bloemen (rozen, bladeren, knoppen) zijn zelf getekend uit krommen door `tools/gouden-licht/maak_bloemen.py`; er is niets uit de opname of van elders overgenomen. De uitkomst staat in `designs/gouden-licht/v1/bloemen.html` en een test controleert dat het bestand precies is wat het script maakt.
+- **Opbouw.** Vier kleppen in een gedeelde tekening van 500 x 800, zodat de bloemen met hun klep meebewegen. Per klep vier lagen: schaduw en rand (het reliëf), een lichtstreep die af en toe over de bloemen glijdt, en de gouden gloed bij het openen. Het licht is een gloeiend midden met stralen (een kegelverloop), de overspoeling een zich verbredende lichtcirkel die overgaat in het papier van de uitnodiging.
+- **Tijdlijn bij een tik** (3,6 s): 0,25 s bovenklep omhoog; 0,5 s de bloemen lichten op; 0,6 s het licht breekt door; 0,7 s de kleppen wijken; 1,2 s de knal (vonken, uit het bestaande effectenscript) vanuit het zegel; 1,8 s het zegel vervaagt; 2,2 s het licht overspoelt het scherm; 2,8 s de namen verschijnen; 3,0 s het openingsscherm vervaagt.
+- **Uitnodiging zelf.** Na het licht staat een zachte ivoren kaart met bordeaux, ink en goud, in dezelfde opbouw als Liefde op papier (handgeschreven namen, boog met foto, programma, aanmelden), voor bruiloft, verloving, jubileum en verjaardag.
+- **Beweging volgens de vaste regels.** Het zegel ademt, de lichtstreep glijdt over de bloemen en de envelop zweeft zacht, alleen onder `.fx-motion` en met `animation-play-state: var(--fx-play, running)`; bij 'minder beweging' of na een tik op **Beweging** opent de uitnodiging rustig binnen een kwart seconde. Er is één knal en geen flits: het licht groeit geleidelijk.
+
+**Bewust anders dan de opname.**
+
+- De opname is een volledig scherm op een telefoon; de envelop is hier een staande envelop (5 : 8) in het midden van het scherm, zodat hij ook op een computerscherm goed staat.
+- De kaart na het licht is een eigen, zachte ivoren kaart zonder de boog en zwanen uit de opname. Dat waren illustraties van het voorbeeld in de opname en horen niet bij Vaylide.
+- Het zegel is een geometrisch lakzegel met de initialen als ingedrukt midden (zoals bij Liefde op papier), geen nagemaakt reliëf.
+- De knal bij het openen valt op het moment dat het licht doorbreekt (1,2 s). `e2e/effecten.cjs` wacht daarom nu op de waarde van `data-fx-delay` in plaats van een vaste 650 ms.
+
+**Technische keuzes.**
+
+- De initialen in het zegel zijn gegenereerde inhoud (`data-mono`, `::before`) en geen tekst in de knop, zodat de knop alleen "Open de uitnodiging" heet (axe-regel `label-content-name-mismatch`; dezelfde melding komt bij Liefde op papier voor in de variant Bordeaux & goud). `::after` is bezet door de pulsring uit `effects.css`.
+- `designs/_atelier/v1/` is niet aangeraakt: dit is een eigen ontwerp in een eigen map. Een tweede ontwerp met hetzelfde mechanisme is dus een kopie, geen aanpassing van gedeelde onderdelen.
+- Het ontwerp staat op volgorde 15 (tussen Liefde op papier en Avondgoud); dat is aan te passen in Beheer → Ontwerpen.
+
 ## Referenties en schermopname
 
 Hier staat eerlijk wat wel en niet is bekeken.
 
 - **Websites** (webgencyinvitations.com, /order en /thesacredgarden, template3.tilda.ws) en de **twee Instagram-reels**: in deze werkomgeving geblokkeerd door het netwerkbeleid (403 bij de proxy). Aan het begin geprobeerd en aan het eind opnieuw, met hetzelfde resultaat. **Ik heb deze pagina's niet gezien.** Via een zoekmachine kwamen alleen korte samenvattingen van zoekresultaten binnen: Webgency biedt kant-en-klare ontwerpen die met eigen kleuren, foto's en tekst worden aangepast, naast maatwerk, en "The Sacred Garden" is een van die ontwerpen. Dat is tweedehands informatie; details, teksten en prijzen van Webgency zijn niet gebruikt.
-- **Schermopname** `Referentie_Vierlief_3_Voorbeelden.mp4`: niet ontvangen in deze sessie. Er was geen bijlage en het bestand staat nergens op de schijf. Begin- en eindtijden, openingsanimaties, overgangen en timing van de drie filmpjes zijn dus **niet** geanalyseerd.
+- **Schermopname** `Envelop.mp4` (ronde 7): wel ontvangen en beeld voor beeld bekeken; zie "Ronde 7: Gouden licht". De eerdere schermopname `Referentie_Vierlief_3_Voorbeelden.mp4` (drie voorbeelden): niet ontvangen in deze sessie. Er was geen bijlage en het bestand staat nergens op de schijf. Begin- en eindtijden, openingsanimaties, overgangen en timing van de drie filmpjes zijn dus **niet** geanalyseerd.
 - **Gevolg:** de drie ontwerpen volgen de eigen richtingen uit de opdracht en zijn **nog niet vergeleken met de opname of de referentiesites**:
 
 | Ontwerp | Richting | Opening |

@@ -1,0 +1,156 @@
+{
+  "slug": "gouden-licht",
+  "version": 1,
+  "name": "Gouden licht",
+  "tagline": "Een donkere envelop waar het licht doorheen breekt",
+  "description": "Een diepe envelop met reliëfbloemen en een lakzegel met jullie initialen. De bloemen lichten goud op, na een tik tilt de klep op en breekt er warm licht door de naad. Daarna verschijnt de uitnodiging.",
+  "style_notes": "Diepe envelopkleuren, reliëfbloemen, lakzegel, gouden lichtstralen, zachte ivoren kaart",
+  "occasions": [
+    "bruiloft",
+    "verloving",
+    "jubileum",
+    "verjaardag"
+  ],
+  "sort_order": 15,
+  "opening": "envelop-licht",
+  "opening_label": "Envelop met lichtdoorbraak",
+  "palettes": [
+    {
+      "key": "bordeaux",
+      "name": "Bordeaux & goud",
+      "swatch": [
+        "#F8EFE3",
+        "#4C1722",
+        "#E8B35F"
+      ],
+      "vars": {
+        "--gl-paper": "#F8EFE3",
+        "--gl-card": "#FFFBF4",
+        "--gl-ink": "#3A2328",
+        "--gl-muted": "#664C51",
+        "--gl-accent": "#7A2434",
+        "--gl-soft": "#EBD3C4",
+        "--gl-line": "#B8934F",
+        "--gl-seal": "#F0D2C8",
+        "--gl-seal-2": "#F9E6DE",
+        "--gl-seal-ink": "#7A3A42",
+        "--gl-env": "#4C1722",
+        "--gl-env-2": "#2F0B13",
+        "--gl-lining": "#B4716A",
+        "--gl-gold": "#E8B35F",
+        "--gl-gold-2": "#FFE3AE",
+        "--gl-stage": "#1B0509",
+        "--gl-stage-2": "#3A0F19"
+      }
+    },
+    {
+      "key": "nachtblauw",
+      "name": "Nachtblauw & goud",
+      "swatch": [
+        "#F3F1EA",
+        "#1C2B4A",
+        "#E0BC72"
+      ],
+      "vars": {
+        "--gl-paper": "#F3F1EA",
+        "--gl-card": "#FCFBF6",
+        "--gl-ink": "#1F2635",
+        "--gl-muted": "#4D566A",
+        "--gl-accent": "#23406E",
+        "--gl-soft": "#D6DCE8",
+        "--gl-line": "#A98C55",
+        "--gl-seal": "#E7D9C3",
+        "--gl-seal-2": "#F6ECDB",
+        "--gl-seal-ink": "#4A3C26",
+        "--gl-env": "#1C2B4A",
+        "--gl-env-2": "#0F1A30",
+        "--gl-lining": "#6F85AE",
+        "--gl-gold": "#E0BC72",
+        "--gl-gold-2": "#FBE7B5",
+        "--gl-stage": "#070D1A",
+        "--gl-stage-2": "#14213B"
+      }
+    },
+    {
+      "key": "smaragd",
+      "name": "Smaragd & goud",
+      "swatch": [
+        "#F3F2E8",
+        "#17402F",
+        "#E3BE70"
+      ],
+      "vars": {
+        "--gl-paper": "#F3F2E8",
+        "--gl-card": "#FCFBF3",
+        "--gl-ink": "#20302A",
+        "--gl-muted": "#4D5F55",
+        "--gl-accent": "#1E5C48",
+        "--gl-soft": "#D5E2D6",
+        "--gl-line": "#A8924F",
+        "--gl-seal": "#E9DDC2",
+        "--gl-seal-2": "#F7EEDB",
+        "--gl-seal-ink": "#3F5A3A",
+        "--gl-env": "#17402F",
+        "--gl-env-2": "#0B261C",
+        "--gl-lining": "#6E9B84",
+        "--gl-gold": "#E3BE70",
+        "--gl-gold-2": "#FCE8B2",
+        "--gl-stage": "#04120C",
+        "--gl-stage-2": "#0F2E22"
+      }
+    },
+    {
+      "key": "aubergine",
+      "name": "Aubergine & goud",
+      "swatch": [
+        "#F6EEF0",
+        "#41204A",
+        "#E8B96A"
+      ],
+      "vars": {
+        "--gl-paper": "#F6EEF0",
+        "--gl-card": "#FFFAFB",
+        "--gl-ink": "#33202F",
+        "--gl-muted": "#624A5D",
+        "--gl-accent": "#5E2A63",
+        "--gl-soft": "#E6D3E4",
+        "--gl-line": "#B1904E",
+        "--gl-seal": "#EBCFD6",
+        "--gl-seal-2": "#F8E4E8",
+        "--gl-seal-ink": "#6B3A5A",
+        "--gl-env": "#41204A",
+        "--gl-env-2": "#26112D",
+        "--gl-lining": "#A878AC",
+        "--gl-gold": "#E8B96A",
+        "--gl-gold-2": "#FFE5B3",
+        "--gl-stage": "#14061A",
+        "--gl-stage-2": "#321840"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "goudstof",
+    "knal": "vonken",
+    "viering": "harten",
+    "namen": "zacht",
+    "onthul": "zacht",
+    "extra": [
+      "kenburns",
+      "tik"
+    ]
+  },
+  "changelog": "Eerste versie."
+}
