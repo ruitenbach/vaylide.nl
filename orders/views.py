@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
 
 from catalog import wenskaart
+from core import analytics
 from catalog.occasions import doc_kind
 from processing.models import OutboundEmail
 
@@ -96,6 +97,7 @@ def status(request, uid):
     if greeting and order.invitation.occasion != "kerst":
         kind = "wenskaart"
     payment = order.latest_payment
+    analytics.bestelling_betaald(request, order)          # GA4: purchase_success, alleen bij een echt betaalde bestelling (alleen als Google Tag Manager aan staat)
     from .methods import LABELS
 
     method_label = LABELS.get((payment.method or "").lower(), "") if payment else ""

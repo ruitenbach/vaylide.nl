@@ -81,6 +81,7 @@ LABELS = {
     "ai_afspraken": "afspraken met Anthropic (verwerkersovereenkomst en doorgifte buiten de EER)",
     "gezichten": "de functie eigen gezichten staat aan, maar de gegevensverwerking is niet beoordeeld",
     "clarity": "tekst over Microsoft Clarity (bezoekersanalyse, cookies, doorgifte naar de VS) juridisch beoordelen en goedkeuren",
+    "google": "tekst over Google Analytics 4 en Google Tag Manager (bezoekersanalyse, cookies, doorgifte naar de VS) juridisch beoordelen en goedkeuren",
 }
 
 
@@ -96,6 +97,15 @@ def email_active() -> bool:
 
 def clarity_active() -> bool:
     return bool(settings.CLARITY_ID)
+
+
+def google_active() -> bool:
+    return bool(settings.GTM_ID)
+
+
+# Google Analytics 4 via Google Tag Manager (alleen na toestemming). De tekst is een concept totdat de eigenaar hem goedkeurt; in live-modus start de
+# site niet met VIERLIEF_GTM_ID zolang dat niet is gebeurd. Zet hier True nadat de eigenaar de tekst in privacy.html heeft goedgekeurd.
+GOOGLE_TEKST_GOEDGEKEURD = False
 
 
 def backup_offsite_active() -> bool:
@@ -166,6 +176,21 @@ def suppliers() -> list[dict]:
                          "Operations Limited (Ierland) de contractpartij; die geeft gegevens met EU-standaardcontractbepalingen door aan "
                          "Microsoft Corporation in de Verenigde Staten.",
         })
+    if google_active():
+        rows.append({
+            "naam": "Google Ireland Limited (Ierland) en Google LLC (Verenigde Staten)",
+            "dienst": "Bezoekersanalyse met Google Analytics 4 via Google Tag Manager, alleen als je daar toestemming voor geeft",
+            "gegevens": "Gebruiksgegevens van je bezoek: je IP-adres (dat Google niet opslaat in Google Analytics), welke pagina's je bekijkt "
+                        "(met het adres zonder de codes van je ontwerp of bestelling), hoe diep je scrolt, op welke uitgaande links je klikt, "
+                        "je apparaat, browser en globale locatie, de pagina waar je vandaan komt en een willekeurig bezoekers-id in een cookie. "
+                        "Bij vijf stappen van het samenstellen en bestellen sturen we ook het gekozen ontwerp, de gelegenheid, het pakket en "
+                        "het bedrag mee. Namen, e-mailadressen, telefoonnummers, adressen, teksten van je kaart en gegevens van gasten gaan "
+                        "nooit mee.",
+            "rol": "Verwerker (volgens de gegevensverwerkingsvoorwaarden van Google Analytics)",
+            "doorgifte": "Google verwerkt de gegevens van Google Analytics onder meer in de Verenigde Staten, buiten de Europese Economische "
+                         "Ruimte, op basis van de afspraken in de gegevensverwerkingsvoorwaarden van Google. Wij geven Google geen toestemming "
+                         "voor advertenties en delen geen gegevens met andere Google-producten.",
+        })
     return rows
 
 
@@ -183,13 +208,23 @@ def cookies() -> list[dict]:
         {"naam": "vierlief-beweging", "soort": "Lokale opslag in je browser",
          "doel": "Onthoudt of je bewegende effecten op een uitnodiging hebt uitgezet. Alleen als je daarop tikt.",
          "duur": "Tot je het wist of weer aanzet"},
-    ] + (CLARITY_COOKIES if clarity_active() else [])
+    ] + (ANALYSE_KEUZE_COOKIE if clarity_active() or google_active() else []) + (CLARITY_COOKIES if clarity_active() else []) + (GOOGLE_COOKIES if google_active() else [])
 
+
+ANALYSE_KEUZE_COOKIE = [
+    {"naam": "vaylide_analytics", "soort": "Cookie (noodzakelijk)",
+     "doel": "Onthoudt of je toestemming gaf voor de bezoekersanalyse (Microsoft Clarity en/of Google Analytics), zodat we het niet steeds opnieuw vragen.",
+     "duur": "12 maanden"},
+]
+
+GOOGLE_COOKIES = [
+    {"naam": "_ga", "soort": "Cookie van Google Analytics (alleen na toestemming, op deze site)",
+     "doel": "Een willekeurig id, zodat Google Analytics je bezoeken aan deze site aan elkaar kan koppelen.", "duur": "2 jaar"},
+    {"naam": "_ga_…", "soort": "Cookie van Google Analytics (alleen na toestemming, op deze site)",
+     "doel": "Bewaart de status van je huidige sessie (het deel na de streepjes hoort bij onze meetcode).", "duur": "2 jaar"},
+]
 
 CLARITY_COOKIES = [
-    {"naam": "vaylide_analytics", "soort": "Cookie (noodzakelijk)",
-     "doel": "Onthoudt of je toestemming gaf voor de bezoekersanalyse met Microsoft Clarity, zodat we het niet steeds opnieuw vragen.",
-     "duur": "12 maanden"},
     {"naam": "_clck", "soort": "Cookie van Microsoft Clarity (alleen na toestemming)",
      "doel": "Een willekeurig id, zodat Clarity je bezoeken aan deze site aan elkaar kan koppelen.", "duur": "1 jaar"},
     {"naam": "_clsk", "soort": "Cookie van Microsoft Clarity (alleen na toestemming)",
@@ -216,6 +251,8 @@ def open_points() -> list[str]:
         points.append(LABELS["gezichten"])
     if clarity_active() and not CLARITY_TEKST_GOEDGEKEURD:
         points.append(LABELS["clarity"])
+    if google_active() and not GOOGLE_TEKST_GOEDGEKEURD:
+        points.append(LABELS["google"])
     return points
 
 

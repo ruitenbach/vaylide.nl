@@ -22,6 +22,7 @@ from catalog.envelop import choice as envelop_choice
 from catalog import wenskaart
 from catalog.specials import is_special, special_addon
 from studio import pakket
+from core import analytics
 from core.ai import AIUnavailable, suggest_text
 from core.utils import ip_fingerprint, rate_limit, wants_json
 from invitations.access import can_access, get_accessible_invitation, remember_draft, session_drafts
@@ -211,6 +212,7 @@ def start(request):
         if form.is_valid():
             inv = _werk_onaangeroerd_concept_bij(request, form)
             if inv is not None:
+                analytics.zet_gebeurtenis_in_wachtrij(request, "select_design", design=form.cleaned_data["template_obj"].slug, occasion=form.cleaned_data["occasion"])
                 return redirect("studio:step", uid=inv.uid, step=_na_ontwerp(inv))
             if not rate_limit(f"start:{ip_fingerprint(request)}", 40, 3600):
                 messages.error(request, "Je hebt veel ontwerpen gestart. Probeer het later opnieuw.")
@@ -225,6 +227,7 @@ def start(request):
                 inv.package_code = package_code
                 inv.save(update_fields=["package_code"])
             remember_draft(request, inv)
+            analytics.zet_gebeurtenis_in_wachtrij(request, "select_design", design=form.cleaned_data["template_obj"].slug, occasion=form.cleaned_data["occasion"])
             return redirect("studio:step", uid=inv.uid, step=_na_ontwerp(inv))
     else:
         form = DesignForm(initial={"occasion": occasion, "template": chosen}, templates=templates)
@@ -320,6 +323,7 @@ def step(request, uid, step):
     if _needs_login(request, uid):
         return redirect(f"{reverse('accounts:login')}?next={request.path}")
     inv = get_accessible_invitation(request, uid)
+    analytics.studiostap_bekeken(request, inv, step)      # GA4: start_studio en reach_checkout (alleen als Google Tag Manager aan staat)
     if step == "ontwerp":
         return design_step(request, inv)
     if step == "voorbeeld":

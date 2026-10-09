@@ -20,7 +20,7 @@
   </div>
 </header>
 {% endblock %}
-{% block footer %}<footer class="studio-footer"><div class="container"><p>&copy; {{ CURRENT_YEAR }} VAYLIDE · <a href="{% url 'core:privacy' %}">Privacy</a> · <a href="{% url 'core:terms' %}">Voorwaarden</a> · <a href="{% url 'core:contact' %}">Contact</a>{% if CLARITY %} · <button type="button" class="cookie-link" data-cookie-instellingen hidden>Cookie-instellingen</button>{% endif %}</p></div></footer>{% endblock %}
+{% block footer %}<footer class="studio-footer"><div class="container"><p>&copy; {{ CURRENT_YEAR }} VAYLIDE · <a href="{% url 'core:privacy' %}">Privacy</a> · <a href="{% url 'core:terms' %}">Voorwaarden</a> · <a href="{% url 'core:contact' %}">Contact</a>{% if ANALYSE %} · <button type="button" class="cookie-link" data-cookie-instellingen hidden>Cookie-instellingen</button>{% endif %}</p></div></footer>{% endblock %}
 {% block content %}
 <div class="studio">
   <div class="container">

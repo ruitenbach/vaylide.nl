@@ -134,17 +134,20 @@ class ToestemmingScriptTests(VaylideTestCase):
 
     def test_intrekken_stopt_clarity_zonder_herstart_en_zonder_laatste_pakket(self):
         # Clarity plant na consentv2 'denied' zelf een herstart zonder cookies (nieuw ID) en stuurt bij het stoppen nog een laatste pakket.
-        stop = JS_CODE[JS_CODE.index("function stopClarity()"):JS_CODE.index("function laadClarity()")]
-        self.assertIn("csp.content = \"connect-src 'self'\";", stop)
-        self.assertLess(stop.index("document.head.appendChild(csp)"), stop.index('analytics_Storage: "denied"'))   # eerst dicht, dan denied
+        dicht = JS_CODE[JS_CODE.index("function sluitVerkeer()"):JS_CODE.index("function stopClarity()")]
+        self.assertIn("csp.content = \"connect-src 'self'; img-src 'self' data: blob:\";", dicht)
+        stop = JS_CODE[JS_CODE.index("function stopClarity()"):JS_CODE.index("function stopGtm()")]
+        self.assertIn('analytics_Storage: "denied"', stop)
         self.assertIn("window.setTimeout = plan;", stop)
         self.assertIn("gepland.forEach(function (t) { window.clearTimeout(t); })", stop)                      # de herstart vervalt
-        self.assertLess(JS_CODE.index("stopClarity();"), JS_CODE.index("location.reload();"))                 # pas daarna herladen
+        klik = JS_CODE[JS_CODE.index("// Weigeren of intrekken"):JS_CODE.index("document.querySelectorAll(\"[data-cookie-instellingen]\")")]
+        self.assertLess(klik.index("sluitVerkeer();"), klik.index("stopClarity();"))                           # eerst dicht, dan denied
+        self.assertLess(klik.index("stopClarity();"), klik.index("location.reload();"))                        # pas daarna herladen
 
     def test_eenmaal_laden_async_en_alleen_met_toestemming_op_een_toegestane_pagina(self):
         self.assertIn("if (!id || !hier || window.__vaylideClarity) return;", JS_CODE)
         self.assertIn("s.async = true;", JS_CODE)
-        self.assertIn('if (nu === "ja") laadClarity();', JS_CODE)
+        self.assertIn('if (nu === "ja") { laadClarity(); laadGtm(); }', JS_CODE)
         self.assertEqual(JS_CODE.count("laadClarity();"), 2)                          # alleen bij een bewaard 'ja' en bij Accepteren
         self.assertIn('Max-Age=" + JAAR', JS_CODE)
         self.assertIn("var JAAR = 365 * 24 * 60 * 60;", JS_CODE)

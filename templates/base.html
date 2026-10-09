@@ -29,7 +29,7 @@
 <script src="{% static 'js/site.js' %}" defer></script>
 <script src="{% static 'js/media-bescherming.js' %}" defer></script>
 <script src="{% static 'js/info.js' %}" defer></script>
-{% if CLARITY %}<script src="{% static 'js/toestemming.js' %}" defer></script>{% endif %}
+{% if ANALYSE %}<script src="{% static 'js/toestemming.js' %}" defer></script>{% endif %}
 {% block extra_js %}{% endblock %}
 {% for item in jsonld %}{{ item|json_ld }}
 {% endfor %}</head>
@@ -42,6 +42,6 @@
 {% block content %}{% endblock %}
 </main>
 {% block footer %}{% include "partials/footer.html" %}{% endblock %}
-{% if CLARITY %}{% include "partials/toestemming.html" %}{% endif %}
+{% if ANALYSE %}{% include "partials/toestemming.html" %}{% endif %}
 </body>
 </html>

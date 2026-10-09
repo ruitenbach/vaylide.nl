@@ -288,6 +288,14 @@ FACES_ENABLED = env_bool("VIERLIEF_FACES_ENABLED", False)
 CLARITY_ID = env("VIERLIEF_CLARITY_ID", "").strip().lower()
 if CLARITY_ID and not __import__("re").fullmatch(r"[a-z0-9]{6,20}", CLARITY_ID):
     raise RuntimeError("VIERLIEF_CLARITY_ID is geen geldig Clarity-project-id (kleine letters en cijfers).")
+# Google Analytics 4 via Google Tag Manager (alleen na dezelfde toestemming als Clarity; zie core/analytics.py en docs/GTM.md). Leeg = uit.
+# De GA4-tag zelf staat in de GTM-container (docs/gtm/); de site laadt alleen de container, en alleen na toestemming.
+GTM_ID = env("VIERLIEF_GTM_ID", "").strip().upper()
+if GTM_ID and not __import__("re").fullmatch(r"GTM-[A-Z0-9]{4,12}", GTM_ID):
+    raise RuntimeError("VIERLIEF_GTM_ID is geen geldig Google Tag Manager-container-ID (GTM-…).")
+# Waar de meting vandaan komt: 'productie' of bijvoorbeeld 'staging'. Alles behalve 'productie' meet als testverkeer (GA4 debug_mode),
+# zodat de gegevens van een testomgeving niet in de rapporten van de echte site komen.
+ANALYTICS_OMGEVING = env("VIERLIEF_ANALYTICS_OMGEVING", "productie").strip().lower() or "productie"
 FACES_PROVIDER = env("VIERLIEF_FACES_PROVIDER", "gemini").lower()  # gemini, of test (alleen in testmodus: nagebootst)
 GEMINI_API_KEY = env("GEMINI_API_KEY")
 FACES_MODEL = env("VIERLIEF_FACES_MODEL", "gemini-3-pro-image")

@@ -59,6 +59,12 @@ services:
       # Microsoft Clarity (bezoekersanalyse, alleen na toestemming; docs/CLARITY.md). Eerst alleen op staging; render.yaml (live) heeft dit niet.
       - key: VIERLIEF_CLARITY_ID
         value: yuemn2aqz1
+      # Google Analytics 4 via Google Tag Manager (alleen na dezelfde toestemming; docs/GTM.md). Eerst alleen op staging; render.yaml (live) heeft dit niet.
+      # Staging meldt zich als testverkeer (GA4 debug_mode), zodat de gegevens niet in de rapporten van de echte site komen.
+      - key: VIERLIEF_GTM_ID
+        value: GTM-M8N863VG
+      - key: VIERLIEF_ANALYTICS_OMGEVING
+        value: staging
 
 databases:
   - name: vaylide-staging-db

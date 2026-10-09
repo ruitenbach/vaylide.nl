@@ -1,10 +1,11 @@
 from django.conf import settings
 from django.utils import timezone
+from django.utils.functional import SimpleLazyObject
 
 from orders.methods import available_methods
 
 from .ai import ai_configured
-from .analytics import clarity_op_pagina
+from .analytics import analyse_op_pagina, clarity_op_pagina, gtm_context
 from .company import company
 from .social import social_links
 
@@ -36,4 +37,10 @@ def vierlief(request):
         "AI_EXTERN": ai_configured,
         # Microsoft Clarity: alleen als het project-id is ingesteld; 'hier' zegt of het op deze pagina mag draaien (na toestemming).
         "CLARITY": {"id": settings.CLARITY_ID, "hier": clarity_op_pagina(request.path)} if settings.CLARITY_ID else None,
+        # Google Analytics 4 via Google Tag Manager (zelfde toestemming). Lazy: de gebeurtenissen in de sessie worden pas uit de wachtrij gehaald als de
+        # toestemmingsbalk ze echt rendert (één keer per pagina), niet als een los stuk template (zoals de live kaart) dezelfde context krijgt.
+        "GTM": SimpleLazyObject(lambda: gtm_context(request)),
+        # Is er iets om toestemming voor te vragen (Clarity of Google), en mag er op deze pagina iets gemeten worden?
+        "ANALYSE": bool(settings.CLARITY_ID or settings.GTM_ID),
+        "ANALYSE_HIER": analyse_op_pagina(request.path),
     }
