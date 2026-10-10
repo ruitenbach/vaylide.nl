@@ -12,7 +12,7 @@ from django.views.decorators.http import require_http_methods
 from catalog.assets import design_image_url
 from catalog import wenskaart
 from catalog.models import AddOn, Package, Template, format_euro
-from catalog.specials import is_special
+from catalog.specials import is_special, special_prijszin
 from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, collectie_volgorde, occasion_config
 from catalog.effects import effect_card_label, effect_summary
 from invitations.demo import DEFAULT_DEMO_OCCASION
@@ -92,7 +92,7 @@ def wedding_cards(request):
     featured = [by_slug[s] for s in TROUW_UITGELICHT if s in by_slug]
     packages = list(Package.objects.filter(is_active=True))
     prices = {p.code: p.price_display for p in packages}
-    faq = [(q, a.format(essentieel=prices.get("essentieel", ""), compleet=prices.get("compleet", ""))) for q, a in TROUW_FAQ]
+    faq = [(q, a.format(essentieel=prices.get("essentieel", ""), compleet=prices.get("compleet", ""), special_zin=special_prijszin())) for q, a in TROUW_FAQ]
     cheapest = min(packages, key=lambda p: p.price_cents) if packages else None
     path = reverse("core:wedding_cards")
     return render(
@@ -244,7 +244,7 @@ def make_invitation(request):
         return _design_cards([ontwerpen[slug]], gelegenheid)[0] if slug in ontwerpen else None
 
     packages = {p.code: p.price_display for p in Package.objects.filter(is_active=True)}
-    prijzen = dict(essentieel=packages.get("essentieel", ""), compleet=packages.get("compleet", ""), wens=format_euro(wenskaart.PRIJS_CENTS))
+    prijzen = dict(essentieel=packages.get("essentieel", ""), compleet=packages.get("compleet", ""), wens=format_euro(wenskaart.PRIJS_CENTS), special_zin=special_prijszin())
     faq = [(q, a.format(**prijzen)) for q, a in UM_FAQ]
     kop = [{"label": label, "card": kaart(slug, key)} for key, label, slug in UM_KOP if slug in ontwerpen]
     routes = [{"label": label, "url": reverse(hub), "card": kaart(slug, key), "tekst": tekst} for key, label, hub, slug, tekst in UM_ROUTES if slug in ontwerpen]
@@ -504,6 +504,26 @@ def terms_pdf(request, version):
     response = HttpResponse(render_pdf(version), content_type="application/pdf")
     response["Content-Disposition"] = f'inline; filename="{pdf_filename(version)}"'
     return response
+
+
+def _root_icoon(naam: str, content_type: str):
+    """Een tabblad- of homescreen-icoon op het adres dat browsers en programma's zelf proberen (/favicon.ico, /apple-touch-icon.png).
+    De pagina's verwijzen met een eigen, versie-adres naar dezelfde bestanden; dit voorkomt alleen een 404 op de hoofdmap."""
+    from django.contrib.staticfiles import finders
+    from django.http import FileResponse
+
+    pad = finders.find(f"img/{naam}")
+    if not pad:
+        raise Http404
+    return FileResponse(open(pad, "rb"), content_type=content_type, headers={"Cache-Control": "public, max-age=86400"})
+
+
+def favicon(request):
+    return _root_icoon("favicon.ico", "image/x-icon")
+
+
+def apple_touch_icon(request):
+    return _root_icoon("apple-touch-icon.png", "image/png")
 
 
 def robots_txt(request):

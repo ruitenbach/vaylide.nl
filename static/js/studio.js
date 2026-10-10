@@ -80,12 +80,18 @@
     });
   });
 
-  /* ---------- Kies kaart: vanaf een ontwerppagina start de gekozen kaart direct (één keer per tabblad, zodat 'terug' geen lus wordt) ---------- */
+  /* ---------- Kies kaart: vanaf een ontwerppagina start de gekozen kaart direct. Niet bij 'terug' of verversen, zodat dat geen lus wordt;
+     wie dezelfde kaart later opnieuw kiest, komt wel gewoon direct bij Personaliseren (geen tweede keuzescherm). ---------- */
   document.querySelectorAll("form[data-auto-start]").forEach(function (form) {
     var knop = form.querySelector(".kaart-gekozen__cta");
     if (!knop) return;
-    var sleutel = "vaylide-auto-start:" + window.location.search;
-    try { if (window.sessionStorage.getItem(sleutel)) return; window.sessionStorage.setItem(sleutel, "1"); } catch (e) { return; }
+    var nav = window.performance && window.performance.getEntriesByType ? window.performance.getEntriesByType("navigation")[0] : null;
+    if (nav && nav.type) {
+      if (nav.type === "back_forward" || nav.type === "reload") return;
+    } else {
+      var sleutel = "vaylide-auto-start:" + window.location.search;
+      try { if (window.sessionStorage.getItem(sleutel)) return; window.sessionStorage.setItem(sleutel, "1"); } catch (e) { return; }
+    }
     var wacht = form.querySelector("[data-auto-wacht]");
     if (wacht) wacht.hidden = false;
     if (form.requestSubmit) form.requestSubmit(knop); else knop.click();

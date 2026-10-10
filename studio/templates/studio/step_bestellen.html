@@ -73,6 +73,17 @@
       <h2 class="studio-block__title" id="overzicht-titel">Overzicht</h2>
       {% if rsvp_aan and not wenskaart_vast %}{% include "partials/info.html" with info_id="na-betaling" titel="Wat gebeurt er na betaling?" tekst="Na een geslaagde betaling wordt je kaart geactiveerd. Daarna kun je de uitnodiging delen en reacties beheren vanuit Mijn VAYLIDE." %}{% else %}{% include "partials/info.html" with info_id="na-betaling" titel="Wat gebeurt er na betaling?" tekst="Na een geslaagde betaling wordt je kaart geactiveerd. Daarna kun je de kaart delen vanuit Mijn VAYLIDE." %}{% endif %}
     </div>
+    {% if kaart %}
+    <div class="bon-kaart" data-bestel-kaart>
+      <img class="bon-kaart__beeld" src="{% design_image kaart.template.slug %}" alt="" width="64" height="80" loading="lazy">
+      <div class="bon-kaart__tekst">
+        <span class="bon-kaart__label">Jouw kaart</span>
+        <strong class="bon-kaart__naam">{{ kaart.template.name }}{% if kaart.special %} <span class="bon-kaart__badge">Special</span>{% endif %}</strong>
+        <span class="small muted">{{ kaart.occasion }} &middot; {{ kaart.soort }}{% if kaart.kleur %} &middot; kleur {{ kaart.kleur }}{% endif %}</span>
+      </div>
+      <a class="bon-kaart__wijzig small" href="{% url 'studio:step' inv.uid 'ontwerp' %}">Wijzigen<span class="visually-hidden"> (andere kaart kiezen)</span></a>
+    </div>
+    {% endif %}
     <table class="bon__tabel">
       <tbody>{% for line in quote.lines %}<tr><td>{{ line.description }}{% if line.reason %}<span class="bon__reden">{{ line.reason }}</span>{% endif %}</td><td class="num">{{ line.total_display }}</td></tr>{% endfor %}</tbody>
       <tfoot><tr><th>Totaal <span class="bon__btw">incl. btw</span></th><th class="num">{{ quote.total_display }}</th></tr></tfoot>

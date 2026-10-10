@@ -193,13 +193,15 @@ class InvalidInputTests(VaylideTestCase):
 
     def test_leeg_gelaten_velden_blokkeren_niet_en_invoer_blijft_bewaard(self):
         response = self.post("gegevens", {"name_partner_1": "Anna", "timezone": "Europe/Amsterdam"})
-        self.assertEqual(response.status_code, 302)     # niets is verplicht: door naar het volgende onderdeel
+        self.assertEqual(response.status_code, 302)     # opslaan blokkeert niet: door naar het volgende onderdeel
         self.assertTrue(response["Location"].endswith("/programma/"))
         self.inv.refresh_from_db()
         self.assertEqual(self.inv.draft_content["names"]["partner_1"], "Anna")
         self.assertEqual(self.inv.draft_content["date"], "")
-        tips = [i for i in publish_issues(self.inv.draft_content, "bruiloft", first_publication=True)]
-        self.assertTrue(tips and not any(i.blocking for i in tips))     # ontbrekende gegevens zijn alleen een tip
+        problemen = publish_issues(self.inv.draft_content, "bruiloft", first_publication=True)
+        # Pas bij de eerste bestelling is het minimum nodig (naam en datum); tijd, locatie en de tweede naam blijven tips.
+        self.assertEqual([i.field for i in problemen if i.blocking], ["date"])
+        self.assertTrue({"partner_2", "start_time", "venue_name"} <= {i.field for i in problemen if not i.blocking})
 
     def test_invalid_formats_are_rejected(self):
         response = self.post("gegevens", {"name_partner_1": "A", "name_partner_2": "B", "date": "31-02-2027", "start_time": "25:99",

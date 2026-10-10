@@ -195,7 +195,7 @@ TROUW_FAQ = [
      "Ja. Je wijzigt de gegevens in Mijn VAYLIDE, bekijkt een voorbeeld en publiceert opnieuw. De link en de QR-code blijven hetzelfde."),
     ("Wat kost een digitale trouwkaart?",
      "Je betaalt eenmalig, zonder kosten per gast. Essentieel kost {essentieel} en Compleet {compleet}. "
-     "Specials hebben een eigen meerprijs, die je vóór het afrekenen ziet. Ontwerpen en bekijken is gratis; je betaalt pas bij het publiceren."),
+     "{special_zin} Ontwerpen en bekijken is gratis; je betaalt pas bij het publiceren."),
     ("Hoe lang blijft de trouwkaart online?",
      "Essentieel 6 maanden en Compleet 12 maanden, gerekend vanaf de aankoopdatum: de dag waarop je betaling is bevestigd. "
      "Langer online is als extra optie mogelijk; er is geen automatische verlenging."),
@@ -456,7 +456,7 @@ UM_FAQ = [
      "Voor een bruiloft, verloving, verjaardag, jubileum, babyshower, zakelijk evenement en kerst. Bij kerst kun je ook alleen een kerstgroet versturen, zonder datum en locatie."),
     ("Wat kost een digitale uitnodiging?",
      "Je betaalt eenmalig, zonder kosten per gast, inclusief btw: Essentieel kost {essentieel} en Compleet {compleet}. Essentieel staat 6 maanden online en Compleet 12 maanden, vanaf de dag dat je betaling is bevestigd. "
-     "Specials hebben een eigen meerprijs, die je vóór het afrekenen ziet. Alleen een groet, een wenskaart, kost {wens}."),
+     "{special_zin} Alleen een groet, een wenskaart, kost {wens}."),
     ("Kan ik mijn uitnodiging na het publiceren nog aanpassen?",
      "Ja. Je wijzigt de gegevens in Mijn VAYLIDE, bekijkt een voorbeeld en publiceert opnieuw. De link en de QR-code blijven hetzelfde."),
 ]

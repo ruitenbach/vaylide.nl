@@ -20,3 +20,21 @@ def special_addon(template):
     from .models import AddOn
 
     return AddOn.objects.filter(is_active=True, feature="special", code=addon_code(template.slug)).first()
+
+
+def special_prijszin() -> str:
+    """Eén zin over wat een special extra kost, passend bij wat er in Beheer → Prijzen is ingesteld (nooit een verzonnen prijs).
+    Alle teksten op de site die iets over de prijs van specials zeggen, gebruiken deze zin, zodat tekst en berekende prijs overeenkomen."""
+    from .models import AddOn, Template
+
+    slugs = list(Template.objects.filter(special=True, is_active=True).values_list("slug", flat=True))
+    if not slugs:
+        return ""
+    met = set(AddOn.objects.filter(is_active=True, feature="special", code__in=[addon_code(s) for s in slugs]).values_list("code", flat=True))
+    aantal = sum(1 for s in slugs if addon_code(s) in met)
+    if aantal == len(slugs):
+        return "Een special heeft een eigen meerprijs, die je vóór het afrekenen ziet."
+    if aantal == 0:
+        return "Bij een uitnodiging kost een special op dit moment niets extra: je betaalt de prijs van je pakket."
+    return "Sommige specials hebben een eigen meerprijs, die je vóór het afrekenen ziet; bij de andere betaal je de prijs van je pakket."
+

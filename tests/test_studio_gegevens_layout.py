@@ -61,11 +61,12 @@ class PartnerTweeTests(VaylideTestCase):
         self.assertEqual(inv.draft_content["names"]["partner_2"], "")
         self.assertEqual([i for i in publish_issues(inv.draft_content, "bruiloft", first_publication=True) if i.blocking], [])
 
-    def test_ook_bij_een_wenskaart_is_geen_naam_verplicht(self):
+    def test_bij_een_wenskaart_is_de_eerste_naam_nodig_om_te_bestellen_maar_opslaan_blokkeert_niet(self):
         inv = self.draft("wenskaart")
         response = post(self.c, inv, soort="wenskaart", name_partner_2="Bram")
         self.assertEqual(response.status_code, 302)
-        self.assertEqual([i.field for i in publish_issues(inv.draft_content, "bruiloft", first_publication=True) if i.blocking], [])
+        inv.refresh_from_db()
+        self.assertEqual([i.field for i in publish_issues(inv.draft_content, "bruiloft", first_publication=True) if i.blocking], ["partner_1"])
 
     def test_wisselen_van_wenskaart_naar_uitnodiging_vraagt_niets_meer(self):
         inv = self.draft("wenskaart")

@@ -71,3 +71,12 @@ def invul(value, placeholder):
 def json_ld(data):
     """Zet een dict om naar een JSON-LD-gegevensblok (zie core/seo.py)."""
     return render_json_ld(data)
+
+
+@register.simple_tag
+def special_zin():
+    """De zin over de prijs van specials, passend bij de ingestelde meerprijzen (catalog/specials.py)."""
+    from catalog.specials import special_prijszin
+
+    return special_prijszin()
+

@@ -11,8 +11,11 @@ volgorde), `studio/views.py`, `studio/templates/studio/`, `static/js/studio.js`.
   Personaliseren (Gegevens). Geen keuzerondjes, geen knop onderaan en geen pakketkeuze meer; het pakket kies je bij Bestel
   (een meegegeven `pakket` bij het starten blijft werken).
 - Komt de klant van een ontwerppagina (`/ontwerpen/<naam>/`, voorbeeld) via "Kies dit ontwerp" of "Maak jouw uitnodiging", dan staat in de
-  link `direct=1`: de pagina toont "Gekozen ontwerp ✓" en start de kaart meteen (één keer per tabblad, zodat 'terug' geen lus wordt). Zonder
+  link `direct=1`: de pagina toont "Gekozen ontwerp ✓" en start de kaart meteen. 'Terug' of 'herladen' naar die pagina start niet opnieuw (controle met
+  het navigatietype in `static/js/studio.js`, geen sessiesleutel per link meer: die gaf bij dezelfde kaart een tweede keuzescherm). Zonder
   JavaScript staat er één knop "Verder met personaliseren". De rest van de collectie zit achter "Wijzigen".
+- Een concept hergebruik je alleen zolang het onaangeroerd is en er geen bestelling bij hoort (`_onaangeroerd_concept`). Anders komt er een nieuw
+  concept; een bestaand concept met invoer of bestelling krijgt nooit stilzwijgend een ander ontwerp.
 - Gelegenheid en soort (uitnodiging of wenskaart) zijn chips boven de kaarten. Een wenskaart toont zijn prijs in de keuze.
 - "Wijzigen" in Personaliseren (`/maken/<id>/ontwerp/?terug=<onderdeel>`) kiest een ander ontwerp met dezelfde tik; de invoer blijft bewaard en
   de klant komt terug waar hij was. Gegevens blijven ook als de gelegenheid wisselt.
@@ -22,9 +25,13 @@ volgorde), `studio/views.py`, `studio/templates/studio/`, `static/js/studio.js`.
 Onderdelen in een balk boven het formulier: Gegevens, Praktische info, Aanmelden, Foto's & verhaal, Envelop & zegel (alleen bij een ontwerp met die
 keuze) en Stijl. Een wenskaart slaat Aanmelden en Envelop over en heeft Afsluiting, Foto en Stijl.
 
-- **Niets is verplicht.** Een leeg veld laat het onderdeel van de kaart weg; ontbrekende gegevens zijn een tip bij Controleer, geen blokkade
-  (`publish_issues` in `invitations/content.py`). Alleen tegenstrijdige gegevens blokkeren nog: een datum in het verleden en een
-  aanmelddeadline na het evenement.
+- **Bijna niets is verplicht.** Een leeg veld laat het onderdeel van de kaart weg; ontbrekende gegevens zijn een tip bij Controleer
+  (`publish_issues` in `invitations/content.py`). Blokkerend zijn tegenstrijdige gegevens (een datum in het verleden, een aanmelddeadline na
+  het evenement) en, **alleen bij de eerste bestelling**, het minimum per kaartcategorie: de eerste naam van de gelegenheid
+  (bruiloft/verloving: partner 1; verjaardag: naam; jubileum: feestvierders; babyshower: ouders; zakelijk: titel van het evenement; kerst:
+  afzender) en bij een uitnodiging de datum, behalve bij Kerst (`event_optional`). Een wenskaart heeft alleen de naam nodig. De tweede
+  naam, tijd en locatie blijven tips. Wijzigen van een gepubliceerde kaart krijgt geen nieuwe blokkades. Afgedwongen in `start_checkout`
+  en `checkout_step`, niet alleen in de knop.
 - **Wisselen bewaart.** Een klik op een onderdeel in de balk, op een fase in de voortgang of op Wijzigen stuurt eerst het formulier mee
   (`actie=ga`, `naar=<stap>`), bewaart en gaat daarna naar de gekozen stap. Zonder wijzigingen is het een gewone link. Fouten in een veld
   houden de klant op de pagina.
@@ -41,7 +48,12 @@ keuze) en Stijl. Een wenskaart slaat Aanmelden en Envelop over en heeft Afsluiti
 
 Controleer toont de kaart (telefoon of computer), de tips en "Iets aanpassen?" als chips; de vervolgknop "Verder naar bestellen" blijft op een
 telefoon onderaan in beeld. Bestel is ongewijzigd (pakket, extra's, voorwaarden, betalen) met kortere teksten; de juridische teksten uit
-`core/voorwaarden.py` zijn niet aangepast.
+`core/voorwaarden.py` zijn niet aangepast. Bovenaan het overzicht staat "Jouw kaart" (`data-bestel-kaart`): afbeelding, naam, een Special-badge,
+gelegenheid · soort · kleur en een link Wijzigen. Blokkerende punten staan boven de bestelknop; de knop blijft uit tot ze zijn opgelost.
+
+De zin over specials op `/ontwerpen/`, `/digitale-trouwkaarten/` en in de veelgestelde vragen komt uit één functie
+(`catalog/specials.py: special_prijszin`) en volgt de ingestelde meerprijzen (Beheer → Prijzen, functie `special`): alle, geen of sommige
+specials hebben een meerprijs. Prijzen zelf zijn niet aangepast.
 
 ## Aanmelden met aantal personen (gast → maker)
 

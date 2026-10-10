@@ -124,7 +124,7 @@
       </article>
       {% endfor %}
     </div>
-    <p class="trouw-prijzen__voet">Specials hebben een eigen meerprijs, die je vóór het afrekenen ziet. <a class="link-arrow" href="{% url 'core:pricing' %}">Alle prijzen en opties</a></p>
+    <p class="trouw-prijzen__voet">{% special_zin %} <a class="link-arrow" href="{% url 'core:pricing' %}">Alle prijzen en opties</a></p>
   </div>
 </section>
 

@@ -262,6 +262,11 @@ def publish_issues(content: dict, occasion: str, *, first_publication: bool, now
     names = content.get("names") or {}
     # Bij een wenskaart is één naam genoeg: alleen het eerste verplichte naamveld telt (bij een uitnodiging alle verplichte namen).
     wens = card_kind(content, occasion) == "wenskaart"
+    # Wat een kaart minstens nodig heeft om besteld te kunnen worden hangt af van de gelegenheid en de soort: het eerste verplichte
+    # naamveld (partner 1, de jarige, de jubilarissen, de ouders, de naam van het evenement, de afzender van de kerstkaart) en bij een
+    # uitnodiging de datum, behalve waar het evenement optioneel is (Kerst). Dat geldt alleen voor een eerste publicatie; het
+    # overige (de tweede naam, tijd, locatie) blijft een tip. Zo betaalt niemand per ongeluk voor een lege kaart.
+    eerste_naam = next((key for key, _label, required, *_ in cfg["name_fields"] if required), "")
     gezien = 0
     for key, label, required, *_ in cfg["name_fields"]:
         if required:
@@ -269,13 +274,19 @@ def publish_issues(content: dict, occasion: str, *, first_publication: bool, now
             if wens and gezien > 1:
                 continue
             if not str(names.get(key) or "").strip():
-                issues.append(Issue("gegevens", key, f"'{label}' is nog leeg: dit staat dan niet op je kaart.", blocking=False))
+                if first_publication and key == eerste_naam:
+                    issues.append(Issue("gegevens", key, f"'{label}' is nog leeg: vul dit in voordat je bestelt."))
+                else:
+                    issues.append(Issue("gegevens", key, f"'{label}' is nog leeg: dit staat dan niet op je kaart.", blocking=False))
     # Een kerstkaart zonder datum en locatie is een groet: dan hoort er geen evenement bij.
     with_event = event_expected(content, occasion)
     if with_event:
         day = parse_date(content.get("date"))
         if not day:
-            issues.append(Issue("gegevens", "date", "Zonder datum zien gasten geen datum op de kaart.", blocking=False))
+            if first_publication and not cfg.get("event_optional"):
+                issues.append(Issue("gegevens", "date", "Kies de datum van je evenement voordat je bestelt: zonder datum zien gasten geen datum op de kaart."))
+            else:
+                issues.append(Issue("gegevens", "date", "Zonder datum zien gasten geen datum op de kaart.", blocking=False))
         if not parse_time(content.get("start_time")):
             issues.append(Issue("gegevens", "start_time", "Zonder begintijd zien gasten geen tijd op de kaart.", blocking=False))
         if not str(content.get("venue_name") or "").strip():

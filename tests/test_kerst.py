@@ -144,13 +144,17 @@ class KerstRenderTests(VaylideTestCase):
         issues = publish_issues(content, "kerst", first_publication=True)
         self.assertTrue({"start_time", "venue_name"} <= {i.field for i in issues})
         self.assertEqual({i.field for i in issues if i.blocking} - {"deadline"}, set())    # alleen een tegenstrijdige aanmelddeadline kan blokkeren
-        # Ook bij een uitnodiging voor een andere gelegenheid is niets verplicht; alleen een uitdrukkelijke wenskaart heeft er geen tips voor.
+        # Bij een andere gelegenheid heeft een wenskaart de eerste naam nodig (de rest niet); een uitnodiging daarnaast de datum.
         other = greeting_only(demo_content("liefde-op-papier", "bruiloft"))
+        other["names"] = {}
+        self.assertEqual([i.field for i in publish_issues(other, "bruiloft", first_publication=True) if i.blocking], ["partner_1"])
+        other["names"] = {"partner_1": "Anna"}
         self.assertEqual([i for i in publish_issues(other, "bruiloft", first_publication=True) if i.blocking], [])
         other["soort"] = "uitnodiging"
+        other["date"] = ""
         issues = publish_issues(other, "bruiloft", first_publication=True)
         self.assertTrue({"date", "start_time", "venue_name"} <= {i.field for i in issues})
-        self.assertFalse(any(i.blocking for i in issues))
+        self.assertEqual([i.field for i in issues if i.blocking], ["date"])      # tijd en locatie blijven tips
 
 class KerstStudioTests(VaylideTestCase):
     def test_greeting_card_needs_no_date_venue_or_deadline(self):

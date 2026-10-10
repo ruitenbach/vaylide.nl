@@ -440,7 +440,10 @@ class UitnodigingMakenHubTests(VaylideTestCase):
         anker = '<a href="/digitale-uitnodiging-maken/">digitale uitnodiging maken</a>'
         for pad, canoniek in (("/", "/"), ("/zo-werkt-het/", "/zo-werkt-het/"), ("/ontwerpen/", "/ontwerpen/")):
             html = Client().get(pad).content.decode()
-            self.assertIn(anker, html, pad)
+            if pad == "/ontwerpen/":
+                self.assertIn('<a href="/digitale-uitnodiging-maken/">Lees stap voor stap hoe je een digitale uitnodiging maakt.</a>', html, pad)
+            else:
+                self.assertIn(anker, html, pad)
             self.assertEqual(canonical(html), f"{settings.BASE_URL}{canoniek}", pad)
         self.assertEqual(titel(Client().get("/").content.decode()), "Digitale uitnodigingen die je beleeft · VAYLIDE")
 

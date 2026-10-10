@@ -8,7 +8,7 @@
 {% if existing %}
 <div class="resume-box" data-clarity-mask="True">
   <strong>Verder met je ontwerp?</strong>
-  <ul class="resume-list">{% for inv in existing %}<li><a href="{% url 'studio:resume' inv.uid %}">{{ inv.title|default:"Naamloos ontwerp" }}</a> <span class="muted small">({{ inv.get_occasion_display }}, {{ inv.updated_at|date:"j F" }})</span></li>{% endfor %}</ul>
+  <ul class="resume-list">{% for inv in existing %}<li><a href="{% url 'studio:resume' inv.uid %}">{{ inv.title|default:inv.template_version.template.name }}</a> <span class="muted small">({{ inv.get_occasion_display }}, {{ inv.updated_at|date:"j F" }})</span></li>{% endfor %}</ul>
 </div>
 {% endif %}
 <form method="post" class="form kies" data-once{% if direct and chosen_template %} data-auto-start{% endif %}>

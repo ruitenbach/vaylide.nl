@@ -197,6 +197,8 @@ def _onaangeroerd_concept(request) -> Invitation | None:
         return None
     if not can_access(request, inv) or inv.customer_locked or invitation_is_paid(inv):
         return None
+    if inv.orders.exists():
+        return None     # er is al eens een bestelling of betaling bij gestart: dat concept krijgt nooit stilzwijgend een ander ontwerp
     return inv
 
 
@@ -239,9 +241,9 @@ def start(request):
     wens_start = soort == "wenskaart"
     existing = []
     if request.user.is_authenticated and not request.user.is_staff:
-        existing = list(Invitation.objects.filter(owner=request.user, status=Invitation.Status.DRAFT).order_by("-updated_at")[:3])
+        existing = list(Invitation.objects.select_related("template_version__template").filter(owner=request.user, status=Invitation.Status.DRAFT).order_by("-updated_at")[:3])
     else:
-        existing = list(Invitation.objects.filter(uid__in=session_drafts(request), owner__isnull=True).order_by("-updated_at")[:3])
+        existing = list(Invitation.objects.select_related("template_version__template").filter(uid__in=session_drafts(request), owner__isnull=True).order_by("-updated_at")[:3])
     return render(
         request,
         "studio/start.html",
@@ -868,6 +870,15 @@ def checkout_step(request, inv: Invitation):
                    if c and c in codes), best.package.code if best else "")
     quote = next((q for q in quotes if q.package.code == chosen), best)
     owner_here = request.user.is_authenticated and inv.owner_id == request.user.id
+    version = inv.template_version
+    kleur_key = (content.get("style") or {}).get("palette") or version.default_palette_key
+    kaart = {
+        "template": version.template,
+        "special": is_special(version),
+        "occasion": OCCASION_LABELS.get(inv.occasion, ""),
+        "soort": "Wenskaart" if wens else "Uitnodiging",
+        "kleur": next((p.get("name") for p in version.palettes if p.get("key") == kleur_key), ""),
+    }
     if quote and not wens and quote.package.code != inv.package_code and (owner_here or inv.owner_id is None):
         inv.package_code = quote.package.code  # een upgrade of ander pakket onthouden
         inv.save(update_fields=["package_code"])
@@ -906,7 +917,7 @@ def checkout_step(request, inv: Invitation):
         request,
         "studio/step_bestellen.html",
         _context(request, inv, "bestellen", form=form, quotes=quotes, quote=quote, best=best, optional=optional,
-                 selected_extras=selected_extras, issues=issues, error=error, test_payments=settings.PAYMENT_PROVIDER == "test",
+                 selected_extras=selected_extras, issues=issues, error=error, kaart=kaart, test_payments=settings.PAYMENT_PROVIDER == "test",
                  upgrade=upgrade, downgrade=downgrade, nieuwsbrief_tekst=_newsletter_text(),
                  voorwaarden=_terms_info(), **_consent_texts(), looptijd=_availability_hint({**content, "date": ""} if wens else content, quote), losse_extras=pakket.extras_for(quote.package, quote) if quote and not wens else [],
                  looptijd_uitleg=pakket.looptijd_uitleg(packages, wenskaart_pakket=quote.package if wens and quote else None),
