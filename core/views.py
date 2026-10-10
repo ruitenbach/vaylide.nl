@@ -19,7 +19,7 @@ from invitations.demo import DEFAULT_DEMO_OCCASION
 
 from . import seo
 from .content import (ABOUT_POINTS, FAQ, FEATURE_GROUPS, FEATURES, HERO_CHECKS, HOME_DESIGNS, HOME_FAQ_EXTRA, HOME_FAQ_QUESTIONS,
-                      HOME_FEATURES, HOME_KERST, OCCASION_TILE_NOTES, OCCASION_TILES, STEPS, STEPS_SHORT, TEXT_SAMPLES, TIPS, ZAKELIJK_DELEN, ZAKELIJK_DEMO, ZAKELIJK_FAQ, ZAKELIJK_KOP, ZAKELIJK_MOMENTEN, ZAKELIJK_ONDERDELEN, ZAKELIJK_ONTWERPEN, KERST_BELEVING, KERST_DELEN, VERJAARDAG_BELEVING, VERJAARDAG_DELEN, VERJAARDAG_DEEL_ONTWERP, VERJAARDAG_FAQ, VERJAARDAG_KOP, VERJAARDAG_ONTWERPEN, VERJAARDAG_SOORTEN, KERST_FAMILIE, KERST_FAQ, KERST_KOP, KERST_ONTWERPEN, KERST_ZAKELIJK, TROUW_FAQ, TROUW_KOP,
+                      HOME_FEATURES, HOME_KERST, OCCASION_TILE_NOTES, OCCASION_TILES, STEPS, STEPS_SHORT, TEXT_SAMPLES, TIPS, UM_DELEN_GEBRUIK, UM_FAQ, UM_KOP, UM_MEER, UM_ROUTES, UM_STAPPEN, UM_VOORBEELDEN, UM_WAAROM, ZAKELIJK_DELEN, ZAKELIJK_DEMO, ZAKELIJK_FAQ, ZAKELIJK_KOP, ZAKELIJK_MOMENTEN, ZAKELIJK_ONDERDELEN, ZAKELIJK_ONTWERPEN, KERST_BELEVING, KERST_DELEN, VERJAARDAG_BELEVING, VERJAARDAG_DELEN, VERJAARDAG_DEEL_ONTWERP, VERJAARDAG_FAQ, VERJAARDAG_KOP, VERJAARDAG_ONTWERPEN, VERJAARDAG_SOORTEN, KERST_FAMILIE, KERST_FAQ, KERST_KOP, KERST_ONTWERPEN, KERST_ZAKELIJK, TROUW_FAQ, TROUW_KOP,
                       TROUW_UITGELICHT, TROUW_VOORDELEN, VALUES)
 from .forms import ContactForm
 from .models import ContactMessage, SiteConfig
@@ -232,6 +232,43 @@ def business_invitations(request):
             "faq": faq,
             "config": SiteConfig.get(),
             "jsonld": [seo.breadcrumbs([("Home", "/"), ("Digitale zakelijke uitnodigingen", path)]), seo.faq_page(faq)],
+        },
+    )
+
+
+def make_invitation(request):
+    """SEO-landingspagina /digitale-uitnodiging-maken/: de brede instappagina met routes naar de landingspagina's per gelegenheid."""
+    ontwerpen = {d.slug: d for d in _designs()}
+
+    def kaart(slug, gelegenheid):
+        return _design_cards([ontwerpen[slug]], gelegenheid)[0] if slug in ontwerpen else None
+
+    packages = {p.code: p.price_display for p in Package.objects.filter(is_active=True)}
+    prijzen = dict(essentieel=packages.get("essentieel", ""), compleet=packages.get("compleet", ""), wens=format_euro(wenskaart.PRIJS_CENTS))
+    faq = [(q, a.format(**prijzen)) for q, a in UM_FAQ]
+    kop = [{"label": label, "card": kaart(slug, key)} for key, label, slug in UM_KOP if slug in ontwerpen]
+    routes = [{"label": label, "url": reverse(hub), "card": kaart(slug, key), "tekst": tekst} for key, label, hub, slug, tekst in UM_ROUTES if slug in ontwerpen]
+    alle = {"bruiloft": "Alle trouwontwerpen", "verjaardag": "Alle verjaardagsontwerpen", "kerst": "Alle kerstontwerpen", "zakelijk": "Alle zakelijke ontwerpen"}
+    voorbeelden = [{"label": label, "alle": alle[key], "url": reverse(hub), "cards": [c for c in (kaart(s, key) for s in slugs) if c]} for key, label, hub, slugs in UM_VOORBEELDEN]
+    path = reverse("core:make_invitation")
+    return render(
+        request,
+        "core/uitnodiging_maken.html",
+        {
+            "kop": kop,
+            "routes": routes,
+            "meer": UM_MEER,
+            "demo_slug": "avondgoud" if "avondgoud" in ontwerpen else "",
+            "stappen": UM_STAPPEN,
+            "delen": UM_DELEN_GEBRUIK,
+            "voorbeelden": voorbeelden,
+            "waarom": [(t, x.format(**prijzen)) for t, x in UM_WAAROM],
+            "design_count": len(ontwerpen),
+            "faq": faq,
+            "essentieel_prijs": prijzen["essentieel"],
+            "compleet_prijs": prijzen["compleet"],
+            "config": SiteConfig.get(),
+            "jsonld": [seo.breadcrumbs([("Home", "/"), ("Digitale uitnodiging maken", path)]), seo.faq_page(faq)],
         },
     )
 
@@ -494,6 +531,7 @@ def sitemap_xml(request):
     paths = [
         reverse("core:home"),
         reverse("core:designs"),
+        reverse("core:make_invitation"),
         reverse("core:how"),
         reverse("core:pricing"),
         reverse("core:faq"),

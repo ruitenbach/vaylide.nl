@@ -136,7 +136,7 @@ class SitemapRobotsEnNoindexTests(VaylideTestCase):
         self.assertNotIn("?gelegenheid=kerst", sitemap)
         self.assertNotIn("?gelegenheid=verjaardag", sitemap)
         self.assertNotIn("?gelegenheid=zakelijk", sitemap)
-        for pad in ("/", "/ontwerpen/", "/digitale-trouwkaarten/", "/digitale-kerstkaarten/", "/digitale-verjaardagsuitnodigingen/", "/digitale-zakelijke-uitnodigingen/", "/ontwerpen/?gelegenheid=jubileum", "/ontwerpen/kerstkaart/", "/ontwerpen/kerstbol/", "/ontwerpen/gouden-avond/",
+        for pad in ("/", "/ontwerpen/", "/digitale-uitnodiging-maken/", "/digitale-trouwkaarten/", "/digitale-kerstkaarten/", "/digitale-verjaardagsuitnodigingen/", "/digitale-zakelijke-uitnodigingen/", "/ontwerpen/?gelegenheid=jubileum", "/ontwerpen/kerstkaart/", "/ontwerpen/kerstbol/", "/ontwerpen/gouden-avond/",
                     "/prijzen/", "/zo-werkt-het/"):
             self.assertIn(f"<loc>{settings.BASE_URL}{pad}</loc>", sitemap, pad)
         for pad in ("/voorbeeld/", "/u/", "/maken/", "/account/", "/inloggen/", "/zoeken/", "/voorwaarden/versie/", "/beheer/", "kerstman"):
@@ -400,4 +400,47 @@ class ZakelijkHubTests(VaylideTestCase):
         self.assertEqual(regel("glitter"), ["/digitale-verjaardagsuitnodigingen/", "/digitale-zakelijke-uitnodigingen/"])
         self.assertEqual(regel("avondgoud"), ["/digitale-trouwkaarten/", "/digitale-verjaardagsuitnodigingen/", "/digitale-zakelijke-uitnodigingen/"])
         self.assertEqual(regel("winterlicht"), ["/digitale-kerstkaarten/"])
+
+
+class UitnodigingMakenHubTests(VaylideTestCase):
+    """/digitale-uitnodiging-maken/: de brede instappagina met routes naar de vier landingspagina's."""
+
+    def setUp(self):
+        self.response = Client().get("/digitale-uitnodiging-maken/")
+        self.html = self.response.content.decode()
+
+    def test_pagina_is_indexeerbaar_met_eigen_titel_beschrijving_h1_en_self_canonical(self):
+        self.assertEqual(self.response.status_code, 200)
+        self.assertNotIn("X-Robots-Tag", self.response.headers)
+        self.assertEqual(meta(self.html, "robots"), "")
+        self.assertEqual(titel(self.html), "Digitale uitnodiging maken | Online uitnodiging · VAYLIDE")
+        self.assertEqual(meta(self.html, "description"), "Maak eenvoudig een digitale uitnodiging met een bijzondere opening, RSVP, datum, locatie en persoonlijke details. Deel via WhatsApp, link of QR-code.")
+        self.assertEqual(canonical(self.html), f"{settings.BASE_URL}/digitale-uitnodiging-maken/")
+        self.assertEqual(meta(self.html, "og:url", "property"), canonical(self.html))
+        self.assertEqual(re.findall(r"<h1[^>]*>(.*?)</h1>", self.html, re.S), ["Digitale uitnodiging maken die echt <em>tot leven</em> komt"])
+
+    def test_gestructureerde_gegevens_zijn_geldig_en_de_faq_staat_zichtbaar_op_de_pagina(self):
+        blokken = {b["@type"]: b for b in json_ld(self.html)}
+        self.assertEqual([i["name"] for i in blokken["BreadcrumbList"]["itemListElement"]], ["Home", "Digitale uitnodiging maken"])
+        vragen = blokken["FAQPage"]["mainEntity"]
+        self.assertGreaterEqual(len(vragen), 10)
+        zichtbaar = html_lib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", self.html)))
+        for v in vragen:
+            self.assertIn(v["name"], zichtbaar)
+            self.assertIn(v["acceptedAnswer"]["text"], zichtbaar)
+
+    def test_de_pagina_linkt_naar_de_vier_hubs_collectie_prijzen_uitleg_en_vragen(self):
+        for pad in ("/digitale-trouwkaarten/", "/digitale-verjaardagsuitnodigingen/", "/digitale-kerstkaarten/", "/digitale-zakelijke-uitnodigingen/",
+                    "/ontwerpen/", "/prijzen/", "/zo-werkt-het/", "/veelgestelde-vragen/"):
+            self.assertIn(f'href="{pad}"', self.html, pad)
+
+    def test_sitemap_homepage_uitleg_en_collectie_linken_naar_de_pagina_zonder_hun_canonical_te_wijzigen(self):
+        sitemap = Client().get("/sitemap.xml").content.decode()
+        self.assertIn(f"<loc>{settings.BASE_URL}/digitale-uitnodiging-maken/</loc>", sitemap)
+        anker = '<a href="/digitale-uitnodiging-maken/">digitale uitnodiging maken</a>'
+        for pad, canoniek in (("/", "/"), ("/zo-werkt-het/", "/zo-werkt-het/"), ("/ontwerpen/", "/ontwerpen/")):
+            html = Client().get(pad).content.decode()
+            self.assertIn(anker, html, pad)
+            self.assertEqual(canonical(html), f"{settings.BASE_URL}{canoniek}", pad)
+        self.assertEqual(titel(Client().get("/").content.decode()), "Digitale uitnodigingen die je beleeft · VAYLIDE")
 

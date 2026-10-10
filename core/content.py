@@ -376,3 +376,88 @@ ZAKELIJK_FAQ = [
      "Ja. Je kunt een contactpersoon met telefoonnummer en e-mailadres opnemen, en praktische informatie zoals parkeren, de route of een dresscode. Onderdelen die je niet nodig hebt, zet je uit."),
 ]
 
+
+# SEO-landingspagina /digitale-uitnodiging-maken/ (core/templates/core/uitnodiging_maken.html): de brede instappagina die doorverwijst naar de vier landingspagina's
+# per gelegenheid. Alleen bestaande ontwerpen (ontbrekende worden overgeslagen). De kop toont een ontwerp per gelegenheid.
+UM_KOP = [("bruiloft", "Bruiloft", "strandboog"), ("verjaardag", "Verjaardag", "glitter"), ("kerst", "Kerst", "kerstbol"), ("zakelijk", "Zakelijk", "gala")]
+
+# 'Voor ieder bijzonder moment': (gelegenheid, titel, hub (urlnaam), ontwerp voor het beeld, tekst).
+UM_ROUTES = [
+    ("bruiloft", "Bruiloft", "core:wedding_cards", "balzaal",
+     "Een trouwkaart die opent als echte post, met programma, route en aanmelden voor jullie gasten."),
+    ("verjaardag", "Verjaardag", "core:birthday_invitations", "gouden-jaren",
+     "Van kinderfeest tot 50 jaar: een uitnodiging met datum, locatie en RSVP die bij jouw feest past."),
+    ("kerst", "Kerst", "core:christmas_cards", "golden-noel",
+     "Een warme kerstkaart met beweging en sfeer, voor familie, vrienden of zakelijke relaties."),
+    ("zakelijk", "Zakelijk", "core:business_invitations", "strak",
+     "Voor een opening, bedrijfsfeest of jubileum: overzichtelijk, rustig en met aanmelden."),
+]
+
+UM_MEER = [
+    ("envelop", "Een bijzondere opening", "Gasten tikken en de uitnodiging opent: een envelop met lakzegel, een cadeaulint, gouden deuren of een ringdoosje."),
+    ("kleuren", "Beweging waar het kan", "Veel ontwerpen hebben zachte animaties, zoals sneeuw, goudstof of fonkelende sterren, en kleurvarianten om uit te kiezen."),
+    ("potlood", "Jouw eigen tekst", "Namen, een persoonlijke groet en een boodschap in je eigen woorden."),
+    ("fotos", "Foto's", "Voeg een foto toe en kies zelf welk deel in beeld komt. Met Compleet komt er een galerij van maximaal 12 foto's bij."),
+    ("locatie", "Datum, tijd en locatie", "Met een aftellertje, een knop naar de route en een knop om het in de agenda te zetten."),
+    ("programma", "Programma", "Van ontvangst tot afsluiting op een rustige tijdlijn, plus eventuele praktische informatie."),
+    ("gasten", "RSVP", "Gasten melden zich in de uitnodiging zelf aan, zonder account."),
+]
+
+UM_STAPPEN = [
+    ("Kies een ontwerp", "Bekijk de collectie, filter op gelegenheid en probeer het werkende voorbeeld op je eigen telefoon."),
+    ("Vul je gegevens in", "Alleen de vragen die bij jouw gelegenheid horen: namen, datum, tijd, locatie, programma en je eigen tekst."),
+    ("Pas de stijl aan", "Kies een kleurvariant en, bij ontwerpen met een envelop, de kleur en het zegel. Voeg een foto toe als je wilt."),
+    ("Bekijk het voorbeeld", "Zie direct hoe jouw uitnodiging opent en eruitziet, op telefoon en computer. Pas aan wat je wilt."),
+    ("Bestel en deel", "Je betaalt eenmalig, pas als je tevreden bent. Daarna krijg je een eigen link en QR-code om te delen."),
+]
+
+UM_VOORBEELDEN = [
+    ("bruiloft", "Bruiloft", "core:wedding_cards", ["aurora-nocturne", "liefde-op-papier"]),
+    ("verjaardag", "Verjaardag", "core:birthday_invitations", ["tropisch", "neon"]),
+    ("kerst", "Kerst", "core:christmas_cards", ["winterlicht", "gloria"]),
+    ("zakelijk", "Zakelijk", "core:business_invitations", ["gala", "strak"]),
+]
+
+UM_DELEN_GEBRUIK = [
+    ("chat", "Uitnodiging via WhatsApp", "Plak de link in een gesprek of groep. Gasten tikken erop en de uitnodiging opent in hun browser."),
+    ("link", "Online uitnodiging versturen", "Je eigen link werkt overal: in een e-mail, een sms, een bericht of op een website."),
+    ("qr", "QR-code voor op papier", "Zet de QR-code op een kaartje bij een cadeau, een bord bij de ingang of een save-the-date op papier."),
+]
+
+UM_WAAROM = [
+    ("Geen app nodig", "Gasten openen de link in hun browser. Ze hoeven niets te installeren en geen account aan te maken."),
+    ("Alles op één plek", "Datum, tijd, locatie, route, programma en aanmelden staan in één uitnodiging, in plaats van in losse berichten."),
+    ("Een uitstraling die opvalt", "Een interactieve uitnodiging met een eigen opening en beweging, in plaats van een plaatje in een groepsapp."),
+    ("RSVP zonder najagen", "Reacties komen in Mijn VAYLIDE en je exporteert de gastenlijst naar Excel of Numbers."),
+    ("Delen na je betaling", "Ontwerpen en bekijken is gratis. Pas als je tevreden bent betaal je, en dan krijg je je link en QR-code."),
+    ("Eén keer betalen", "Een vaste prijs per uitnodiging, zonder kosten per gast: Essentieel {essentieel} of Compleet {compleet}."),
+]
+
+UM_FAQ = [
+    ("Hoe maak ik een digitale uitnodiging?",
+     "Je kiest een ontwerp, vult de gegevens van je gelegenheid in, past de stijl aan en bekijkt direct een voorbeeld. Je kunt beginnen zonder account; om je ontwerp te bewaren en te bestellen "
+     "bevestig je je e-mailadres met een code. Na je betaling krijg je een eigen link en een QR-code om te delen."),
+    ("Wat is een digitale uitnodiging?",
+     "Een uitnodiging die je niet per post verstuurt maar als link deelt. Gasten openen hem op hun telefoon of computer en zien de datum, tijd en locatie, met een eigen opening en de mogelijkheid om direct aan te geven of ze komen."),
+    ("Kan ik mijn uitnodiging via WhatsApp versturen?",
+     "Ja. Plak de link in een gesprek of groep. Gasten tikken erop en de uitnodiging opent in hun browser, zonder app. VAYLIDE verstuurt de uitnodiging niet voor je: jij bepaalt wie hem krijgt."),
+    ("Kunnen gasten zich via de uitnodiging aanmelden?",
+     "Ja. Gasten geven met een paar tikken door of ze komen en met hoeveel personen, zonder account. Je kunt een maximum aantal personen per aanmelding instellen. "
+     "Alle reacties staan in Mijn VAYLIDE en de gastenlijst kun je exporteren naar een bestand voor Excel of Numbers."),
+    ("Kan ik foto's toevoegen?",
+     "Ja. Je voegt een foto toe (JPG, PNG of WebP tot 12 MB) en kiest zelf welk deel in beeld komt. Met het pakket Compleet komt er een fotogalerij van maximaal 12 foto's bij."),
+    ("Hebben mijn gasten een app nodig?",
+     "Nee. Gasten openen de link in hun browser. Ze hoeven niets te installeren en geen account aan te maken."),
+    ("Kan ik mijn uitnodiging bekijken voordat ik bestel?",
+     "Ja. Ontwerpen en bekijken is gratis: van elk ontwerp staat een werkend voorbeeld online en in de Studio zie je direct jouw uitnodiging. Je betaalt pas bij het publiceren."),
+    ("Kan ik een QR-code gebruiken?",
+     "Ja. Naast de link krijg je een QR-code, bijvoorbeeld voor op een kaartje, een bord, een scherm of een save-the-date op papier."),
+    ("Voor welke gelegenheden kan ik VAYLIDE gebruiken?",
+     "Voor een bruiloft, verloving, verjaardag, jubileum, babyshower, zakelijk evenement en kerst. Bij kerst kun je ook alleen een kerstgroet versturen, zonder datum en locatie."),
+    ("Wat kost een digitale uitnodiging?",
+     "Je betaalt eenmalig, zonder kosten per gast, inclusief btw: Essentieel kost {essentieel} en Compleet {compleet}. Essentieel staat 6 maanden online en Compleet 12 maanden, vanaf de dag dat je betaling is bevestigd. "
+     "Specials hebben een eigen meerprijs, die je vóór het afrekenen ziet. Alleen een groet, een wenskaart, kost {wens}."),
+    ("Kan ik mijn uitnodiging na het publiceren nog aanpassen?",
+     "Ja. Je wijzigt de gegevens in Mijn VAYLIDE, bekijkt een voorbeeld en publiceert opnieuw. De link en de QR-code blijven hetzelfde."),
+]
+

@@ -1,0 +1,203 @@
+{% extends "base.html" %}{% load static vl %}
+{% block title %}Digitale uitnodiging maken | Online uitnodiging{% endblock %}
+{% block description %}Maak eenvoudig een digitale uitnodiging met een bijzondere opening, RSVP, datum, locatie en persoonlijke details. Deel via WhatsApp, link of QR-code.{% endblock %}
+{% block og_title %}Digitale uitnodiging maken | Online uitnodiging · VAYLIDE{% endblock %}
+{% block og_description %}Maak eenvoudig een digitale uitnodiging met een bijzondere opening, RSVP, datum, locatie en persoonlijke details. Deel via WhatsApp, link of QR-code.{% endblock %}
+{% block body_class %}page-uitnodiging-maken{% endblock %}
+{% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
+{% block content %}
+{# Kop: tekst links en rechts een kaart per gelegenheid, in een trap van overlappende kaarten. #}
+<section class="paginakop um-kop" data-sparkles aria-labelledby="um-titel">
+  {% include "partials/paginakop_wereld.html" %}
+  <div class="container um-kop__inner">
+    <div class="um-kop__tekst">
+      <p class="eyebrow">Digitale uitnodiging maken</p>
+      <h1 id="um-titel">Digitale uitnodiging maken die echt <em>tot leven</em> komt</h1>
+      <p class="lead">Maak in een paar stappen een persoonlijke online uitnodiging met beweging, praktische informatie en RSVP. Kies een ontwerp, pas het aan en deel je uitnodiging eenvoudig via WhatsApp, link of QR-code.</p>
+      <div class="btn-row">
+        <a class="btn btn--primary btn--lg" href="{% url 'studio:start' %}">Maak jouw uitnodiging {% icon "pijl" %}</a>
+        <a class="btn btn--secondary btn--lg" href="{% url 'core:designs' %}">Bekijk alle ontwerpen</a>
+      </div>
+      <ul class="hero__checks"><li>{% icon "vink" %}Voor elke gelegenheid</li><li>{% icon "vink" %}Datum, locatie en RSVP</li><li>{% icon "vink" %}Zonder app voor gasten</li><li>{% icon "vink" %}Eerst bekijken, dan pas betalen</li></ul>
+    </div>
+    <ul class="um-trap">
+      {% for item in kop %}<li class="um-trap__kaart" style="--i:{{ forloop.counter0 }}"><a href="{{ item.card.detail_url }}"><img src="{{ item.card.image }}" alt="Digitale uitnodiging {{ item.card.template.name }} voor {{ item.label|lower }}" width="800" height="1000"{% if forloop.counter0 < 2 %} fetchpriority="high"{% endif %} decoding="async"><span class="um-trap__chip">{{ item.label }}</span></a></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+{# Voor ieder bijzonder moment: vier routes naar de landingspagina's. #}
+<section class="section um-routes" aria-labelledby="routes-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Kies je gelegenheid</p>
+      <h2 id="routes-titel">Voor ieder bijzonder moment</h2>
+      <p>Een online uitnodiging maken begint bij de gelegenheid. Kies waarvoor je uitnodigt en bekijk de ontwerpen en mogelijkheden die daarbij horen.</p>
+    </div>
+    <ul class="um-routes__lijst">
+      {% for route in routes %}
+      <li class="um-route um-route--{{ forloop.counter }}">
+        <a class="um-route__link" href="{{ route.url }}">
+          <span class="um-route__beeld"><img src="{{ route.card.image }}" alt="" width="800" height="1000" loading="lazy" decoding="async"></span>
+          <span class="um-route__tekst">
+            <strong>{{ route.label }}</strong>
+            <span>{{ route.tekst }}</span>
+            <em class="um-route__cta">Meer over {{ route.label|lower }} {% icon "pijl" 16 %}</em>
+          </span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+{# Meer dan een gewone digitale kaart. #}
+<section class="section section--flush" aria-labelledby="meer-titel">
+  <div class="container">
+    <div class="um-meer">
+      <div class="um-meer__tekst">
+        <p class="eyebrow">Interactieve uitnodiging</p>
+        <h2 id="meer-titel">Meer dan een gewone digitale kaart</h2>
+        <p>Een digitale kaart maken kan met elk programma. Een uitnodiging die gasten echt opent, leest en beantwoordt vraagt meer. Daarom heeft elke VAYLIDE-uitnodiging dit allemaal in zich:</p>
+        <ul class="um-meer__lijst">
+          {% for icon_name, title, text in meer %}<li>{% icon icon_name 26 %}<p><strong>{{ title }}</strong><span>{{ text }}</span></p></li>{% endfor %}
+        </ul>
+      </div>
+      {% if demo_slug %}
+      <div class="um-meer__telefoon phone-demo">
+        <div class="phone">
+          <div class="phone__screen" data-lazy-frame="{% url 'invitations:demo' demo_slug %}?gelegenheid=verjaardag&amp;embed=1" data-frame-title="Werkend voorbeeld van een interactieve digitale uitnodiging (fictief feest)">
+            <img class="phone__poster" src="{% design_image demo_slug %}" alt="" width="800" height="1000" loading="lazy" decoding="async">
+            <a class="phone__fallback" href="{% url 'invitations:demo' demo_slug %}?gelegenheid=verjaardag">Open het werkende voorbeeld</a>
+          </div>
+        </div>
+        <p class="demo-caption">Probeer het: tik op het medaillon</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{# Zo werkt een digitale uitnodiging maken. #}
+<section class="section" aria-labelledby="stappen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">In vijf stappen</p>
+      <h2 id="stappen-titel">Zo werkt een digitale uitnodiging maken</h2>
+      <p>Van eerste idee tot een link die je kunt delen. Je ziet steeds hoe jouw uitnodiging eruitziet.</p>
+    </div>
+    <ol class="um-pad">
+      {% for title, text in stappen %}
+      <li class="um-pad__stap">
+        <span class="um-pad__nr" aria-hidden="true">{{ forloop.counter }}</span>
+        <div><h3><span class="visually-hidden">Stap {{ forloop.counter }}: </span>{{ title }}</h3><p>{{ text }}</p></div>
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="stappenrij__voet"><span>Wil je het proces rustig doorlopen?</span><a class="link-arrow" href="{% url 'core:how' %}">Bekijk Zo werkt het</a><a class="link-arrow" href="{% url 'studio:start' %}">Begin direct</a></p>
+  </div>
+</section>
+
+{# RSVP en delen. #}
+<section class="section section--flush um-rsvpdelen" aria-labelledby="rsvp-titel">
+  <div class="container">
+    <div class="um-rsvpdelen__kader">
+      <div class="um-blok um-blok--rsvp">
+        <p class="eyebrow">Weten wie er komt</p>
+        <h2 id="rsvp-titel">RSVP en gastenlijst</h2>
+        <p>Een digitale uitnodiging met RSVP laat gasten in de uitnodiging zelf aangeven of ze komen. Jij houdt overzicht zonder berichten na te jagen.</p>
+        <ul class="checklist">
+          <li>Gasten kiezen: ja, ik kom graag, of helaas, ik kan niet</li>
+          <li>Het aantal personen per aanmelding, met een maximum dat je instelt</li>
+          <li>Alle reacties komen in Mijn VAYLIDE</li>
+          <li>Een export naar Excel of Numbers</li>
+        </ul>
+        <div class="um-mock" role="img" aria-label="Illustratie met fictieve gasten: het overzicht van de aanmeldingen voor de organisator">
+          <p class="um-mock__kop" aria-hidden="true">Aanmeldingen</p>
+          <p class="um-mock__rij" aria-hidden="true"><span>Sanne</span><b>2 personen</b></p>
+          <p class="um-mock__rij" aria-hidden="true"><span>Daan</span><b>1 persoon</b></p>
+          <p class="um-mock__rij um-mock__rij--nee" aria-hidden="true"><span>Lotte</span><b>kan niet</b></p>
+          <p class="um-mock__totaal" aria-hidden="true">3 gasten komen</p>
+        </div>
+        <p class="um-blok__noot">Illustratie met fictieve gasten.</p>
+      </div>
+      <div class="um-blok um-blok--delen">
+        <p class="eyebrow">Zonder app of account</p>
+        <h2 id="delen-titel">Delen via WhatsApp, link en QR-code</h2>
+        <p>Na je betaling krijg je een eigen link en een QR-code. Zo kun je een online uitnodiging versturen via de kanalen die je al gebruikt.</p>
+        <ul class="um-delen__lijst">
+          {% for icon_name, title, text in delen %}<li>{% icon icon_name 26 %}<p><strong>{{ title }}</strong><span>{{ text }}</span></p></li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# Bekijk voorbeelden uit alle gelegenheden. #}
+<section class="section" aria-labelledby="voorbeelden-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Voorbeelden</p>
+      <h2 id="voorbeelden-titel">Bekijk voorbeelden uit alle gelegenheden</h2>
+      <p>{{ design_count }} ontwerpen, elk met een eigen opening en kleurvarianten. Een kleine greep per gelegenheid.</p>
+    </div>
+    <div class="um-voorbeelden">
+      {% for groep in voorbeelden %}
+      <div class="um-groep">
+        <h3>{{ groep.label }}</h3>
+        <div class="um-groep__kaarten">{% for card in groep.cards %}{% include "partials/design_card.html" %}{% endfor %}</div>
+        <a class="link-arrow" href="{{ groep.url }}">{{ groep.alle }}</a>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="um-meerlink"><a class="btn btn--secondary" href="{% url 'core:designs' %}">Bekijk alle {{ design_count }} ontwerpen {% icon "pijl" %}</a></p>
+  </div>
+</section>
+
+{# Waarom VAYLIDE. #}
+<section class="section section--flush" aria-labelledby="waarom-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Concreet</p>
+      <h2 id="waarom-titel">Waarom een uitnodiging maken met VAYLIDE</h2>
+    </div>
+    <ul class="um-waarom">
+      {% for title, text in waarom %}<li class="um-waarom__punt"><span class="um-waarom__nr" aria-hidden="true">{{ forloop.counter }}</span><h3>{{ title }}</h3><p>{{ text }}</p></li>{% endfor %}
+    </ul>
+    <p class="stappenrij__voet"><span>Essentieel {{ essentieel_prijs }} en Compleet {{ compleet_prijs }}, incl. btw en eenmalig.{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</span><a class="link-arrow" href="{% url 'core:pricing' %}">Bekijk de prijzen</a></p>
+  </div>
+</section>
+
+<section class="section home-faq" aria-labelledby="faq-titel">
+  <div class="container container--mid">
+    <div class="sectie-kop">
+      <p class="eyebrow">Goed om te weten</p>
+      <h2 id="faq-titel">Veelgestelde vragen over een digitale uitnodiging maken</h2>
+    </div>
+    <div class="faq-lijst">
+      {% for question, answer in faq %}<details class="faq-item"><summary>{{ question }}</summary><p>{{ answer }}</p></details>{% endfor %}
+    </div>
+    <p class="home-faq__meer"><a class="link-arrow" href="{% url 'core:faq' %}">Alle veelgestelde vragen</a></p>
+  </div>
+</section>
+
+<section class="section section--flush" aria-labelledby="cta-titel">
+  <div class="container">
+    <div class="um-cta">
+      <div class="um-cta__tekst">
+        <p class="eyebrow">Begin vandaag</p>
+        <h2 id="cta-titel">Maak jouw digitale uitnodiging</h2>
+        <p>Kies een ontwerp, vul je gegevens in en zie direct hoe de uitnodiging eruitziet. Je betaalt pas als je tevreden bent en hem wilt delen.</p>
+        <div class="btn-row">
+          <a class="btn btn--donker btn--lg" href="{% url 'studio:start' %}">Maak jouw uitnodiging {% icon "pijl" %}</a>
+          <a class="btn btn--secondary btn--lg" href="{% url 'core:designs' %}">Bekijk alle ontwerpen</a>
+        </div>
+        <p class="um-cta__voet">Voor een <a href="{% url 'core:wedding_cards' %}">bruiloft</a>, <a href="{% url 'core:birthday_invitations' %}">verjaardag</a>, <a href="{% url 'core:christmas_cards' %}">kerst</a> of <a href="{% url 'core:business_invitations' %}">zakelijk evenement</a>.</p>
+      </div>
+      <ul class="um-cta__kaarten" aria-hidden="true">
+        {% for item in kop %}<li style="--i:{{ forloop.counter0 }}"><img src="{{ item.card.image }}" alt="" width="800" height="1000" loading="lazy" decoding="async"></li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

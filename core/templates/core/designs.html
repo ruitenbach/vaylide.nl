@@ -9,6 +9,7 @@
     <p class="eyebrow">Collectie</p>
     <h1>{% if occasion_label %}Ontwerpen voor {{ occasion_label|lower }}{% else %}Onze ontwerpen{% endif %}</h1>
     <p class="lead">Elk ontwerp heeft een eigen opening en kleurvarianten om uit te kiezen.</p>
+    <p class="page-head__noot">Nog niet zeker welk ontwerp? Lees hoe je een <a href="{% url 'core:make_invitation' %}">digitale uitnodiging maken</a> kunt, stap voor stap.</p>
     <nav class="filter-bar" aria-label="Filter op gelegenheid">
       <ul class="chips">
         <li><a class="chip" href="{% url 'core:designs' %}"{% if not occasion and not only_specials %} aria-current="true"{% endif %}>Alle</a></li>

@@ -25,8 +25,8 @@ CLARITY_SCRIPT = ("https://www.clarity.ms", "https://*.clarity.ms")
 CLARITY_VERBINDING = ("https://*.clarity.ms", "https://c.bing.com")
 CLARITY_BEELD = ("https://*.clarity.ms", "https://c.bing.com")
 
-# Waar Clarity mag draaien: homepage, Collectie en ontwerppagina's, Inspiratie, prijzen, de landingspagina's Digitale trouwkaarten, Digitale kerstkaarten, Digitale verjaardagsuitnodigingen en Digitale zakelijke uitnodigingen en de Studio tot en met Bestellen.
-_EXACT = {"/", "/inspiratie/", "/prijzen/", "/digitale-trouwkaarten/", "/digitale-kerstkaarten/", "/digitale-verjaardagsuitnodigingen/", "/digitale-zakelijke-uitnodigingen/"}
+# Waar Clarity mag draaien: homepage, Collectie en ontwerppagina's, Inspiratie, prijzen, de landingspagina's Digitale uitnodiging maken, Digitale trouwkaarten, Digitale kerstkaarten, Digitale verjaardagsuitnodigingen en Digitale zakelijke uitnodigingen en de Studio tot en met Bestellen.
+_EXACT = {"/", "/inspiratie/", "/prijzen/", "/digitale-trouwkaarten/", "/digitale-kerstkaarten/", "/digitale-verjaardagsuitnodigingen/", "/digitale-zakelijke-uitnodigingen/", "/digitale-uitnodiging-maken/"}
 _PREFIX = ("/ontwerpen/", "/maken/")
 # Nooit, ook niet als een pad hierboven past: uitnodigingen van klanten, Mijn VAYLIDE en gastenlijsten, inloggen, beheer, betalen,
 # en de losse voorvertoningen van een kaart (de voorbeelden van ontwerpen en, in de Studio, de kaart in het frame met namen en teksten).
