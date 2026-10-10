@@ -87,7 +87,8 @@ class GelegenheidspaginaSeoTests(VaylideTestCase):
             self.assertGreaterEqual(len(beschrijving), 70, sleutel)
             self.assertLessEqual(len(beschrijving), 160, sleutel)
             # Het bruiloftfilter werkt gewoon, maar zijn canonical is de landingspagina Digitale trouwkaarten.
-            verwacht = f"{settings.BASE_URL}/digitale-trouwkaarten/" if sleutel == "bruiloft" else f"{settings.BASE_URL}/ontwerpen/?gelegenheid={sleutel}"
+            hubs = {"bruiloft": "/digitale-trouwkaarten/", "kerst": "/digitale-kerstkaarten/"}
+            verwacht = f"{settings.BASE_URL}{hubs[sleutel]}" if sleutel in hubs else f"{settings.BASE_URL}/ontwerpen/?gelegenheid={sleutel}"
             self.assertEqual(canonical(html), verwacht, sleutel)
             self.assertEqual(meta(html, "og:url", "property"), canonical(html), sleutel)
             kruimels = [b for b in json_ld(html) if b["@type"] == "BreadcrumbList"][0]
@@ -131,8 +132,9 @@ class OntwerppaginaSeoTests(VaylideTestCase):
 class SitemapRobotsEnNoindexTests(VaylideTestCase):
     def test_sitemap_bevat_publieke_pagina_s_en_gelegenheden_maar_niets_privés(self):
         sitemap = Client().get("/sitemap.xml").content.decode()
-        self.assertNotIn("?gelegenheid=bruiloft", sitemap)          # het bruiloftfilter staat niet in de sitemap: de landingspagina is zijn vervanger
-        for pad in ("/", "/ontwerpen/", "/ontwerpen/?gelegenheid=kerst", "/digitale-trouwkaarten/", "/ontwerpen/kerstkaart/", "/ontwerpen/kerstbol/", "/ontwerpen/gouden-avond/",
+        self.assertNotIn("?gelegenheid=bruiloft", sitemap)          # het bruiloft- en het kerstfilter staan niet in de sitemap: de landingspagina's zijn hun vervanger
+        self.assertNotIn("?gelegenheid=kerst", sitemap)
+        for pad in ("/", "/ontwerpen/", "/digitale-trouwkaarten/", "/digitale-kerstkaarten/", "/ontwerpen/?gelegenheid=verjaardag", "/ontwerpen/kerstkaart/", "/ontwerpen/kerstbol/", "/ontwerpen/gouden-avond/",
                     "/prijzen/", "/zo-werkt-het/"):
             self.assertIn(f"<loc>{settings.BASE_URL}{pad}</loc>", sitemap, pad)
         for pad in ("/voorbeeld/", "/u/", "/maken/", "/account/", "/inloggen/", "/zoeken/", "/voorwaarden/versie/", "/beheer/", "kerstman"):
@@ -204,7 +206,7 @@ class TrouwkaartenHubTests(VaylideTestCase):
         sitemap = Client().get("/sitemap.xml").content.decode()
         self.assertIn(f"<loc>{settings.BASE_URL}/digitale-trouwkaarten/</loc>", sitemap)
         self.assertNotIn("gelegenheid=bruiloft", sitemap)
-        for gelegenheid in ("verloving", "verjaardag", "jubileum", "babyshower", "zakelijk", "kerst"):
+        for gelegenheid in ("verloving", "verjaardag", "jubileum", "babyshower", "zakelijk"):
             self.assertIn(f"gelegenheid={gelegenheid}</loc>", sitemap, gelegenheid)
         filter_pagina = Client().get("/ontwerpen/?gelegenheid=bruiloft")
         self.assertEqual(filter_pagina.status_code, 200)
@@ -217,4 +219,59 @@ class TrouwkaartenHubTests(VaylideTestCase):
         self.assertIn('href="/digitale-trouwkaarten/"', trouw)
         zonder = Client().get("/ontwerpen/kerstbol/").content.decode()          # geen bruiloftontwerp: geen verwijzing
         self.assertNotIn('href="/digitale-trouwkaarten/"', zonder)
+
+
+class KerstkaartenHubTests(VaylideTestCase):
+    """/digitale-kerstkaarten/: de landingspagina voor Kerst, met het kerstfilter als gewone UI."""
+
+    def setUp(self):
+        self.response = Client().get("/digitale-kerstkaarten/")
+        self.html = self.response.content.decode()
+
+    def test_pagina_is_indexeerbaar_met_eigen_titel_beschrijving_h1_en_self_canonical(self):
+        self.assertEqual(self.response.status_code, 200)
+        self.assertNotIn("X-Robots-Tag", self.response.headers)
+        self.assertEqual(meta(self.html, "robots"), "")
+        self.assertEqual(titel(self.html), "Digitale kerstkaart maken | Luxe online kerstkaart · VAYLIDE")
+        beschrijving = "Maak een digitale kerstkaart die echt tot leven komt. Met animatie, een bijzondere opening en eenvoudig delen via WhatsApp, link of QR-code."
+        self.assertEqual(meta(self.html, "description"), beschrijving)
+        self.assertNotIn("muziek", beschrijving.lower())          # muziek zit niet op elke kerstkaart: niet algemeen beloven
+        self.assertEqual(canonical(self.html), f"{settings.BASE_URL}/digitale-kerstkaarten/")
+        self.assertEqual(meta(self.html, "og:url", "property"), canonical(self.html))
+        self.assertEqual(re.findall(r"<h1[^>]*>(.*?)</h1>", self.html, re.S), ["Digitale kerstkaarten die echt <em>tot leven</em> komen"])
+
+    def test_gestructureerde_gegevens_zijn_geldig_en_de_faq_staat_zichtbaar_op_de_pagina(self):
+        blokken = {b["@type"]: b for b in json_ld(self.html)}
+        self.assertEqual([i["name"] for i in blokken["BreadcrumbList"]["itemListElement"]], ["Home", "Digitale kerstkaarten"])
+        self.assertEqual(blokken["BreadcrumbList"]["itemListElement"][1]["item"], f"{settings.BASE_URL}/digitale-kerstkaarten/")
+        vragen = blokken["FAQPage"]["mainEntity"]
+        self.assertGreaterEqual(len(vragen), 8)
+        zichtbaar = html_lib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", self.html)))
+        for v in vragen:
+            self.assertEqual(v["@type"], "Question")
+            self.assertEqual(v["acceptedAnswer"]["@type"], "Answer")
+            self.assertIn(v["name"], zichtbaar)
+            self.assertIn(v["acceptedAnswer"]["text"], zichtbaar)
+
+    def test_de_pagina_linkt_naar_collectie_prijzen_uitleg_vragen_en_kerstontwerpen(self):
+        for pad in ("/ontwerpen/?gelegenheid=kerst", "/prijzen/", "/zo-werkt-het/", "/veelgestelde-vragen/", "/ontwerpen/winterlicht/?gelegenheid=kerst"):
+            self.assertIn(f'href="{pad}"', self.html, pad)
+
+    def test_het_kerstfilter_werkt_gewoon_en_wijst_naar_de_pagina(self):
+        filter_pagina = Client().get("/ontwerpen/?gelegenheid=kerst")
+        self.assertEqual(filter_pagina.status_code, 200)
+        self.assertIn("Ontwerpen voor kerst", filter_pagina.content.decode())
+        self.assertEqual(canonical(filter_pagina.content.decode()), f"{settings.BASE_URL}/digitale-kerstkaarten/")
+        sitemap = Client().get("/sitemap.xml").content.decode()
+        self.assertIn(f"<loc>{settings.BASE_URL}/digitale-kerstkaarten/</loc>", sitemap)
+        self.assertNotIn("gelegenheid=kerst", sitemap)
+        self.assertIn(f"<loc>{settings.BASE_URL}/digitale-trouwkaarten/</loc>", sitemap)      # de andere pagina blijft
+
+    def test_de_homepage_en_kerstontwerpen_linken_naar_de_pagina(self):
+        home = Client().get("/").content.decode()
+        self.assertIn('<a href="/digitale-kerstkaarten/">digitale kerstkaarten</a>', home)
+        kerst = Client().get("/ontwerpen/winterlicht/").content.decode()
+        self.assertIn('href="/digitale-kerstkaarten/"', kerst)
+        zonder = Client().get("/ontwerpen/balzaal/").content.decode()          # geen kerstontwerp: geen verwijzing
+        self.assertNotIn('href="/digitale-kerstkaarten/"', zonder)
 

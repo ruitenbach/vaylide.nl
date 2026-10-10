@@ -70,6 +70,7 @@
       <div class="btn-row">
         <a class="btn btn--goud" href="{% url 'core:designs' %}?gelegenheid=kerst">Bekijk de kerstkaarten {% icon "pijl" %}</a>
       </div>
+      <p class="kerstpodium__meer">Lees meer over onze <a href="{% url 'core:christmas_cards' %}">digitale kerstkaarten</a>, ook voor een zakelijke kerstgroet.</p>
     </div>
     <ul class="kaartenwaaier" data-tilt3d style="--n:{{ kerst_cards|length }}">
       {% for card in kerst_cards %}<li class="zweefkaart" style="--i:{{ forloop.counter0 }}"><a href="{{ card.detail_url }}"><span class="zweefkaart__kaart"><img src="{{ card.image }}" alt="" width="800" height="1000" loading="lazy" decoding="async"><span class="zweefkaart__naam">{{ card.template.name }}</span></span></a></li>{% endfor %}

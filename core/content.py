@@ -206,3 +206,53 @@ TROUW_FAQ = [
      "Nee. Een trouwkaart is alleen bereikbaar via de link en we vragen zoekmachines om hem niet op te nemen. Alleen jij ziet de gastenlijst."),
 ]
 
+
+# SEO-landingspagina /digitale-kerstkaarten/ (core/templates/core/kerstkaarten.html). Warme, lichte kaarten voorop; alleen ontwerpen die er zijn
+# (ontbrekende worden overgeslagen). De openingen en effecten komen uit de manifesten van de ontwerpen.
+KERST_KOP = ["golden-noel", "gloria", "kerstbol", "winterlicht", "middernacht"]
+KERST_ONTWERPEN = ["kerstbol", "golden-noel", "gloria", "winterlicht", "middernacht", "aan-tafel", "kerststad", "kerstkaart"]
+KERST_FAMILIE = "winterlicht"
+KERST_ZAKELIJK = ["middernacht", "gloria"]
+
+KERST_BELEVING = [
+    ("envelop", "Een bijzondere opening",
+     "Je ontvanger tikt en de kaart gaat open: een envelop met lakzegel, engelenvleugels, een glazen kerstbal of een gesloten cadeau met sneeuwbol."),
+    ("kleuren", "Beweging en sfeer",
+     "Sneeuw, goudstof, kaarslicht en fonkelende sterren. De kaart beweegt zacht mee, zonder dat het druk wordt."),
+    ("muziek", "Een geluid dat erbij hoort",
+     "Kerststad heeft een eigen muziekje, een uitnodiging kan eigen muziek krijgen. Het geluid start nooit vanzelf: pas als de ontvanger erop tikt."),
+]
+
+KERST_DELEN = [
+    ("chat", "Via WhatsApp", "Plak de link in een gesprek of groep. Ontvangers openen de kaart in hun browser."),
+    ("link", "Als link", "Na je betaling krijg je een eigen link. Stuur hem per e-mail of sms, of zet hem in een nieuwsbrief of intranetbericht."),
+    ("qr", "Met een QR-code", "Ook een QR-code is inbegrepen: handig op een kaartje bij een cadeau, op een scherm of in een brief."),
+]
+
+KERST_FAQ = [
+    ("Wat is een digitale kerstkaart?",
+     "Een kerstkaart die je niet per post verstuurt maar als link deelt. De ontvanger opent hem op telefoon of computer en ziet jullie kaart met een eigen opening, "
+     "beweging en sfeer, bijvoorbeeld een envelop met lakzegel, engelenvleugels of een glazen kerstbal."),
+    ("Hoe verstuur je een digitale kerstkaart?",
+     "Na je betaling krijg je een eigen link en een QR-code. Die deel je zelf: via WhatsApp, e-mail of sms, of je zet de QR-code op een kaartje of in een brief. "
+     "VAYLIDE verstuurt de kaart dus niet voor je; jij bepaalt wie hem krijgt."),
+    ("Kan ik een kerstkaart via WhatsApp versturen?",
+     "Ja. Plak de link in een gesprek of groep. Ontvangers tikken erop en de kaart opent in hun browser, zonder app."),
+    ("Kan ik mijn eigen tekst en foto's toevoegen?",
+     "Ja. Je vult zelf de afzender en je boodschap in en voegt eventueel een foto toe, en je ziet direct het voorbeeld. "
+     "Bij een kerstuitnodiging met Compleet komt daar een fotogalerij van maximaal 12 foto's bij."),
+    ("Kunnen bedrijven VAYLIDE gebruiken voor een zakelijke kerstgroet?",
+     "Ja. Als afzender vul je een bedrijfsnaam of teamnaam in en je deelt dezelfde link met klanten, medewerkers of relaties. "
+     "Wil je je eigen logo of huisstijl in de kaart, dan kan dat op aanvraag: je krijgt eerst een voorstel met prijs."),
+    ("Hebben ontvangers een app nodig?",
+     "Nee. Ontvangers openen de link in hun browser. Ze hoeven geen app te installeren en geen account aan te maken."),
+    ("Kan ik de kerstkaart eerst bekijken?",
+     "Ja. Ontwerpen en bekijken is gratis: van elk ontwerp staat een werkend voorbeeld online en in de Studio zie je direct jouw kaart. Je betaalt pas bij het publiceren."),
+    ("Wat kost een digitale kerstkaart?",
+     "Een kerstwenskaart, alleen een groet, kost {wens} en {wens_special} in een Special-ontwerp, beide inclusief btw en eenmalig. "
+     "Wil je ook een datum, programma, locatie en aanmelden, bijvoorbeeld voor een kerstdiner of kerstborrel, dan kies je Essentieel ({essentieel}) of Compleet ({compleet})."),
+    ("Kan er muziek bij een digitale kerstkaart?",
+     "Kerststad heeft een eigen muziekje. Bij een kerstuitnodiging kun je eigen muziek toevoegen met Compleet of als extra optie. "
+     "De muziek start nooit vanzelf: pas als de ontvanger erop tikt. Een wenskaart heeft geen muziek."),
+]
+

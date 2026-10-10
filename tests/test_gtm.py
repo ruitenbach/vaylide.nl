@@ -29,7 +29,7 @@ def events(html: str) -> list[dict]:
 
 class ZonderGtmTests(VaylideTestCase):
     def test_zonder_id_niets_van_google(self):
-        for adres in ("/", "/ontwerpen/", "/digitale-trouwkaarten/", "/maken/?gelegenheid=bruiloft", "/privacy/"):
+        for adres in ("/", "/ontwerpen/", "/digitale-trouwkaarten/", "/digitale-kerstkaarten/", "/maken/?gelegenheid=bruiloft", "/privacy/"):
             r = Client().get(adres)
             html = r.content.decode()
             self.assertNotIn("data-gtm", html, adres)

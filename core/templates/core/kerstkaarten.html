@@ -1,0 +1,183 @@
+{% extends "base.html" %}{% load static vl %}
+{% block title %}Digitale kerstkaart maken | Luxe online kerstkaart{% endblock %}
+{% block description %}Maak een digitale kerstkaart die echt tot leven komt. Met animatie, een bijzondere opening en eenvoudig delen via WhatsApp, link of QR-code.{% endblock %}
+{% block og_title %}Digitale kerstkaart maken | Luxe online kerstkaart · VAYLIDE{% endblock %}
+{% block og_description %}Maak een digitale kerstkaart die echt tot leven komt. Met animatie, een bijzondere opening en eenvoudig delen via WhatsApp, link of QR-code.{% endblock %}
+{% block body_class %}page-kerst{% endblock %}
+{% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
+{% block content %}
+{# Kop: warm champagne met kerstlicht, de tekst in het midden en daaronder echte kerstontwerpen uit de collectie. #}
+<section class="paginakop kerst-kop" data-sparkles aria-labelledby="kerst-titel">
+  {% include "partials/paginakop_wereld.html" %}
+  <div class="kerst-lichten" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="container container--mid kerst-kop__tekst">
+    <p class="eyebrow">Digitale kerstkaarten</p>
+    <h1 id="kerst-titel">Digitale kerstkaarten die echt <em>tot leven</em> komen</h1>
+    <p class="lead">Maak van jullie kerstgroet meer dan een afbeelding. Kies een VAYLIDE-kaart met een bijzondere opening, beweging en sfeer en deel hem eenvoudig digitaal met familie, vrienden, klanten of relaties.</p>
+    <div class="btn-row btn-row--center">
+      <a class="btn btn--goud btn--lg" href="#kerstontwerpen">Bekijk de kerstkaarten {% icon "pijl" %}</a>
+      <a class="btn btn--secondary btn--lg" href="{% url 'studio:start' %}?gelegenheid=kerst">Maak jullie kerstkaart</a>
+    </div>
+  </div>
+  <div class="container kerst-kop__kaarten">
+    <ul class="kerst-waaier" style="--n:{{ kop_cards|length }}">
+      {% for card in kop_cards %}<li class="kerst-waaier__kaart" style="--i:{{ forloop.counter0 }}"><a href="{{ card.detail_url }}"><img src="{{ card.image }}" alt="Digitale kerstkaart {{ card.template.name }}" width="800" height="1000"{% if forloop.counter0 < 3 %} fetchpriority="high"{% endif %} decoding="async"><span class="kerst-waaier__naam">{{ card.template.name }}</span></a></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+{# Meer dan een afbeelding: beweging, opening, beleving, met een werkend voorbeeld in een telefoon. #}
+<section class="section kerst-beleving" aria-labelledby="beleving-titel">
+  <div class="container">
+    <div class="kerst-beleving__kader">
+      <div class="kerst-beleving__tekst">
+        <p class="eyebrow">Een bewegende kerstkaart</p>
+        <h2 id="beleving-titel">Meer dan een digitale kerstafbeelding</h2>
+        <p>Een gewone kerstafbeelding kijk je in een tel voorbij. Een geanimeerde kerstkaart van VAYLIDE opent, beweegt en laat je even stilstaan. Je ontvanger tikt, de kaart gaat open en jullie boodschap verschijnt tussen sneeuw, goudstof en kaarslicht.</p>
+        <ul class="kerst-beleving__punten">
+          {% for icon_name, title, text in beleving %}<li>{% icon icon_name 30 %}<p><strong>{{ title }}</strong><span>{{ text }}</span></p></li>{% endfor %}
+        </ul>
+        <a class="link-arrow" href="{% url 'invitations:demo' 'winterlicht' %}?gelegenheid=kerst">Probeer een werkend voorbeeld</a>
+      </div>
+      <div class="phone-demo kerst-beleving__telefoon">
+        <div class="phone">
+          <div class="phone__screen" data-lazy-frame="{% url 'invitations:demo' 'winterlicht' %}?gelegenheid=kerst&amp;embed=1" data-frame-title="Werkend voorbeeld van een digitale kerstkaart (fictieve afzender)">
+            <img class="phone__poster" src="{% design_image 'winterlicht' %}" alt="" width="800" height="1000" loading="lazy" decoding="async">
+            <a class="phone__fallback" href="{% url 'invitations:demo' 'winterlicht' %}?gelegenheid=kerst">Open het werkende voorbeeld</a>
+          </div>
+        </div>
+        <p class="demo-caption">Voorbeeld met een fictieve afzender</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# Familie en vrienden. #}
+<section class="section section--flush" aria-labelledby="familie-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Voor iedereen die je iets wilt wensen</p>
+      <h2 id="familie-titel">Kerstkaarten voor familie én zakelijke relaties</h2>
+      <p>Dezelfde zorg voor sfeer, of je nu je familie wilt verrassen of je klanten wilt bedanken.</p>
+    </div>
+    <div class="kerst-doelgroepen">
+      <article class="kerst-doelgroep">
+        {% if familie_card %}<a class="kerst-doelgroep__beeld" href="{{ familie_card.detail_url }}"><img src="{{ familie_card.image }}" alt="Kerstkaart {{ familie_card.template.name }}" width="800" height="1000" loading="lazy" decoding="async"></a>{% endif %}
+        <div class="kerst-doelgroep__tekst">
+          <h3>Persoonlijk, voor familie en vrienden</h3>
+          <p>Je zet er zelf de afzender en je eigen woorden in: Familie Jansen, of Sanne &amp; Daan, met eventueel de namen van de kinderen eronder. Een foto kan erbij. Wil je ook uitnodigen voor het kerstdiner? Voeg dan datum, programma en locatie toe, zodat gasten zich meteen kunnen aanmelden.</p>
+          <ul class="checklist"><li>Eigen afzender, boodschap en foto</li><li>Als wenskaart of als uitnodiging voor het kerstdiner</li><li>Kleurvarianten per ontwerp</li></ul>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+{# Zakelijk. #}
+<section class="section kerst-zakelijk" aria-labelledby="zakelijk-titel">
+  <div class="container">
+    <div class="kerst-zakelijk__kader">
+      <div class="kerst-zakelijk__tekst">
+        <p class="eyebrow">Zakelijke kerstgroet</p>
+        <h2 id="zakelijk-titel">Een zakelijke digitale kerstkaart met allure</h2>
+        <p>Bedank klanten, medewerkers en relaties met een kerstgroet die opvalt tussen de standaard mailtjes. Je zet de naam van je bedrijf of team als afzender, kiest een ingetogen ontwerp in goud en zwart of ivoor, en deelt één link die iedereen in zijn browser opent.</p>
+        <ul class="checklist">
+          <li>Bedrijfs- of teamnaam als afzender</li>
+          <li>Eén link voor klanten, medewerkers en relaties, zonder app</li>
+          <li>Een kerstborrel of -diner erbij uitnodigen, met aanmelden</li>
+          <li>Eigen logo of huisstijl op aanvraag, eerst met een voorstel en prijs</li>
+        </ul>
+        <div class="btn-row">
+          <a class="btn btn--primary" href="{% url 'studio:start' %}?gelegenheid=kerst">Maak jullie kerstkaart {% icon "pijl" %}</a>
+          <a class="link-arrow" href="{% url 'core:contact' %}?onderwerp=maatwerk">Vraag een voorstel aan</a>
+        </div>
+      </div>
+      <ul class="kerst-zakelijk__kaarten">
+        {% for card in zakelijk_cards %}<li class="kerst-zakelijk__kaart" style="--i:{{ forloop.counter0 }}"><a href="{{ card.detail_url }}"><img src="{{ card.image }}" alt="Kerstkaart {{ card.template.name }}" width="800" height="1000" loading="lazy" decoding="async"><span>{{ card.template.name }}</span></a></li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+{# Delen. #}
+<section class="section section--flush" aria-labelledby="delen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Zonder app of account</p>
+      <h2 id="delen-titel">Eenvoudig digitaal delen</h2>
+      <p>Een kerstkaart digitaal versturen is niet meer dan een link doorsturen. Jij bepaalt wie hem krijgt.</p>
+    </div>
+    <ul class="kerst-delen">
+      {% for icon_name, title, text in delen %}<li class="kerst-delen__item"><span class="kerst-delen__icoon">{% icon icon_name 30 %}</span><h3>{{ title }}</h3><p>{{ text }}</p></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+{# Zo maak je een digitale kerstkaart. #}
+<section class="section" aria-labelledby="stappen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">In vier stappen</p>
+      <h2 id="stappen-titel">Zo maak je een digitale kerstkaart</h2>
+    </div>
+    <ol class="stappenrij">
+      {% for icon_name, title, text in steps %}
+      <li class="stapkaart" style="--i:{{ forloop.counter0 }}">
+        <span class="stapkaart__num" aria-hidden="true">{{ forloop.counter }}</span>
+        <span class="stapkaart__icoon">{% icon icon_name 30 %}</span>
+        <h3><span class="visually-hidden">Stap {{ forloop.counter }}: </span>{{ title }}</h3>
+        <p>{{ text }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="stappenrij__voet"><span><strong>Kerstwenskaart {{ wens_prijs }}</strong> (Special {{ wens_prijs_special }}), kerstuitnodiging vanaf {{ essentieel_prijs }}. Eenmalig en incl. btw.{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</span><a class="link-arrow" href="{% url 'core:pricing' %}">Bekijk de prijzen</a><a class="link-arrow" href="{% url 'core:how' %}">Zo werkt het</a></p>
+  </div>
+</section>
+
+{# De kerstcollectie. #}
+<section class="section section--flush" id="kerstontwerpen" aria-labelledby="ontwerpen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">De kerstcollectie</p>
+      <h2 id="ontwerpen-titel">Kies jullie digitale kerstkaart</h2>
+      <p>{{ kerst_count }} kerstontwerpen, van klassiek goud en engelenvleugels tot een gesloten cadeau met sneeuwbol. Elk met een eigen opening. Probeer ze op je eigen telefoon.</p>
+    </div>
+    <div class="kerst-grid">
+      {% for card in cards %}{% include "partials/design_card.html" %}{% endfor %}
+    </div>
+    <p class="kerst-meer"><a class="btn btn--secondary" href="{% url 'core:designs' %}?gelegenheid=kerst">Bekijk de hele kerstcollectie {% icon "pijl" %}</a></p>
+  </div>
+</section>
+
+<section class="section home-faq" aria-labelledby="faq-titel">
+  <div class="container container--mid">
+    <div class="sectie-kop">
+      <p class="eyebrow">Goed om te weten</p>
+      <h2 id="faq-titel">Veelgestelde vragen over digitale kerstkaarten</h2>
+    </div>
+    <div class="faq-lijst">
+      {% for question, answer in faq %}<details class="faq-item"><summary>{{ question }}</summary><p>{{ answer }}</p></details>{% endfor %}
+    </div>
+    <p class="home-faq__meer"><a class="link-arrow" href="{% url 'core:faq' %}">Alle veelgestelde vragen</a></p>
+  </div>
+</section>
+
+<section class="section section--flush" aria-labelledby="cta-titel">
+  <div class="container">
+    <div class="kerst-cta">
+      <div class="kerst-cta__lichten" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="kerst-cta__tekst">
+        <p class="eyebrow">Deze feestdagen</p>
+        <h2 id="cta-titel">Een kerstgroet die ze niet snel vergeten</h2>
+        <p>Kies een ontwerp, schrijf jullie woorden en zie direct hoe de kaart opent en beweegt. Je betaalt pas als je tevreden bent en de kaart wilt delen.</p>
+        <div class="btn-row">
+          <a class="btn btn--goud btn--lg" href="{% url 'studio:start' %}?gelegenheid=kerst">Maak jullie kerstkaart {% icon "pijl" %}</a>
+          <a class="btn btn--secondary-dark btn--lg" href="{% url 'core:designs' %}?gelegenheid=kerst">Bekijk de kerstkaarten</a>
+        </div>
+        <p class="kerst-cta__voet">Meer vragen? Lees de <a href="{% url 'core:faq' %}">veelgestelde vragen</a> of bekijk <a href="{% url 'core:pricing' %}">de prijzen</a>.</p>
+      </div>
+      <div class="kerst-cta__beeld" aria-hidden="true"><img src="{% design_image 'kerstbol' %}" alt="" width="800" height="1000" loading="lazy" decoding="async"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}

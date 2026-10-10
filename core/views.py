@@ -19,11 +19,16 @@ from invitations.demo import DEFAULT_DEMO_OCCASION
 
 from . import seo
 from .content import (ABOUT_POINTS, FAQ, FEATURE_GROUPS, FEATURES, HERO_CHECKS, HOME_DESIGNS, HOME_FAQ_EXTRA, HOME_FAQ_QUESTIONS,
-                      HOME_FEATURES, HOME_KERST, OCCASION_TILE_NOTES, OCCASION_TILES, STEPS, STEPS_SHORT, TEXT_SAMPLES, TIPS, TROUW_FAQ, TROUW_KOP,
+                      HOME_FEATURES, HOME_KERST, OCCASION_TILE_NOTES, OCCASION_TILES, STEPS, STEPS_SHORT, TEXT_SAMPLES, TIPS, KERST_BELEVING, KERST_DELEN, KERST_FAMILIE, KERST_FAQ, KERST_KOP, KERST_ONTWERPEN, KERST_ZAKELIJK, TROUW_FAQ, TROUW_KOP,
                       TROUW_UITGELICHT, TROUW_VOORDELEN, VALUES)
 from .forms import ContactForm
 from .models import ContactMessage, SiteConfig
 from .utils import form_age_seconds, ip_fingerprint, rate_limit, signed_timestamp
+
+
+# Gelegenheden met een eigen SEO-landingspagina: het filter ?gelegenheid=<sleutel> werkt gewoon in de site, maar zijn canonical is die pagina en
+# hij staat niet in de sitemap (de pagina staat er wel in).
+GELEGENHEID_HUBS = {"bruiloft": "core:wedding_cards", "kerst": "core:christmas_cards"}
 
 
 def _designs():
@@ -107,6 +112,47 @@ def wedding_cards(request):
     )
 
 
+def christmas_cards(request):
+    """SEO-landingspagina /digitale-kerstkaarten/: echte kerstontwerpen uit de collectie, beleving, familie en zakelijk, delen, stappen en vragen."""
+    kerst = [d for d in _designs() if "kerst" in d.occasions]
+    by_slug = {d.slug: d for d in kerst}
+
+    def kies(slugs):
+        return [by_slug[s] for s in slugs if s in by_slug]
+
+    packages = {p.code: p.price_display for p in Package.objects.filter(is_active=True)}
+    antwoorden = dict(wens=format_euro(wenskaart.PRIJS_CENTS), wens_special=format_euro(wenskaart.PRIJS_SPECIAL_CENTS),
+                      essentieel=packages.get("essentieel", ""), compleet=packages.get("compleet", ""))
+    faq = [(q, a.format(**antwoorden)) for q, a in KERST_FAQ]
+    familie = _design_cards(kies([KERST_FAMILIE]), "kerst")
+    path = reverse("core:christmas_cards")
+    return render(
+        request,
+        "core/kerstkaarten.html",
+        {
+            "kop_cards": _design_cards(kies(KERST_KOP), "kerst"),
+            "cards": _design_cards(kies(KERST_ONTWERPEN), "kerst"),
+            "familie_card": familie[0] if familie else None,
+            "zakelijk_cards": _design_cards(kies(KERST_ZAKELIJK), "kerst"),
+            "kerst_count": len(kerst),
+            "beleving": KERST_BELEVING,
+            "delen": KERST_DELEN,
+            "steps": [
+                ("kaarten", "Kies een ontwerp", "Uit onze kerstcollectie, van klassiek goud tot een gesloten cadeau met sneeuwbol."),
+                ("potlood", "Personaliseer", "Afzender, boodschap en eventueel een foto. Bij een uitnodiging ook datum, programma en locatie."),
+                ("oog", "Bekijk het voorbeeld", "Zie direct hoe jouw kaart opent en beweegt, op telefoon en computer."),
+                ("versturen", "Deel de kaart", "Na je betaling een eigen link en QR-code, om te delen via WhatsApp of e-mail."),
+            ],
+            "wens_prijs": antwoorden["wens"],
+            "wens_prijs_special": antwoorden["wens_special"],
+            "essentieel_prijs": antwoorden["essentieel"],
+            "faq": faq,
+            "config": SiteConfig.get(),
+            "jsonld": [seo.breadcrumbs([("Home", "/"), ("Digitale kerstkaarten", path)]), seo.faq_page(faq)],
+        },
+    )
+
+
 def designs(request):
     occasion = request.GET.get("gelegenheid", "")
     if occasion not in OCCASION_LABELS:
@@ -125,8 +171,8 @@ def designs(request):
         list_path = f"{list_path}?gelegenheid={occasion}"
         seo_title, seo_description = seo.OCCASION_SEO[occasion]
         crumbs.append((f"Ontwerpen voor {OCCASION_LABELS[occasion].lower()}", list_path))
-        if occasion == "bruiloft":
-            list_path = reverse("core:wedding_cards")       # de canonical van het bruiloftfilter is de landingspagina Digitale trouwkaarten
+        if occasion in GELEGENHEID_HUBS:
+            list_path = reverse(GELEGENHEID_HUBS[occasion])  # de canonical van dit filter is zijn landingspagina (Digitale trouwkaarten, Digitale kerstkaarten)
     return render(
         request,
         "core/designs.html",
@@ -375,11 +421,10 @@ def sitemap_xml(request):
     ]
     designs_list = _designs()
     # Elke gelegenheid met ontwerpen is een eigen pagina (eigen titel, beschrijving en canonical).
-    # De pagina Digitale trouwkaarten is de landingspagina voor de bruiloft: het filter ?gelegenheid=bruiloft werkt in de site, maar zijn canonical
-    # wijst naar die pagina en hij staat daarom niet in de sitemap.
-    paths.append(reverse("core:wedding_cards"))
+    # De landingspagina's (Digitale trouwkaarten, Digitale kerstkaarten) staan in de sitemap, hun gelegenheidsfilter niet (zie GELEGENHEID_HUBS).
+    paths += [reverse(hub) for hub in GELEGENHEID_HUBS.values()]
     paths += [f"{reverse('core:designs')}?gelegenheid={key}" for key, _label in OCCASION_CHOICES
-              if key != "bruiloft" and any(key in d.occasions for d in designs_list)]
+              if key not in GELEGENHEID_HUBS and any(key in d.occasions for d in designs_list)]
     paths += [reverse("core:design_detail", args=[t.slug]) for t in designs_list]
     urls = "".join(f"<url><loc>{settings.BASE_URL}{p}</loc></url>" for p in paths)
     body = f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>'

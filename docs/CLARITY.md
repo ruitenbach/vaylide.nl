@@ -21,7 +21,7 @@ Stand: 8 oktober 2026, branch `claude/clarity`. Alleen op staging; production (`
 
 ## Waar Clarity draait
 
-`core/analytics.py: clarity_op_pagina` (één plek): homepage, Collectie en ontwerppagina's (`/ontwerpen/…`), Inspiratie, Prijzen, de pagina Digitale trouwkaarten (`/digitale-trouwkaarten/`) en de
+`core/analytics.py: clarity_op_pagina` (één plek): homepage, Collectie en ontwerppagina's (`/ontwerpen/…`), Inspiratie, Prijzen, de pagina's Digitale trouwkaarten (`/digitale-trouwkaarten/`) en Digitale kerstkaarten (`/digitale-kerstkaarten/`) en de
 Studio (`/maken/…`, tot en met Bestellen en de stap Controleer). Nooit: `/u/…` (uitnodigingen), `/account/` (Mijn VAYLIDE en
 gastenlijsten), `/inloggen/`, `/beheer/`, de Django-admin, `/betalen/`, `/bestelling/`, de voorbeelden van ontwerpen (`/voorbeeld/…`)
 en de kaart in het frame van de Studio (`…/voorbeeld/weergave/`, `…/voorbeeld/live/`). De extra CSP-domeinen gelden alleen op de pagina's
