@@ -89,6 +89,39 @@
     s.src = "https://www.clarity.ms/tag/" + encodeURIComponent(id);
     document.head.appendChild(s);
   }
+  // Harde garantie bij intrekken: vanaf de klik vertrekt er geen verzoek meer naar Google, ook geen beacon, fetch, XHR, beeldje of script dat al klaarstond
+  // (Google bundelt en stuurt gebeurtenissen soms met vertraging, en bij het sluiten van de pagina). De Content-Security-Policy van sluitVerkeer is de
+  // eerste muur; dit is de tweede, in de kanalen zelf. De bewaking staat vóór het laden van Google Tag Manager, dus de scripts van Google gebruiken
+  // altijd de bewaakte kanalen. Zonder toestemming wordt er niets aangepast.
+  var GOOGLE_HOST = /(^|\.)(google-analytics\.com|analytics\.google\.com|googletagmanager\.com|doubleclick\.net|googleadservices\.com)$/;
+  function googleAdres(url) {
+    try {
+      var u = new URL(String(url && url.url ? url.url : url), document.baseURI);
+      if (GOOGLE_HOST.test(u.hostname)) return true;
+      return /(^|\.)google\.[a-z.]+$/.test(u.hostname) && /^\/(ccm|pagead|g)\//.test(u.pathname);
+    } catch (e) { return false; }
+  }
+  function sluitGoogle() { window.__vaylideGoogleDicht = true; }
+  function bewaakGoogle() {
+    if (window.__vaylideGoogleBewaakt) return;
+    window.__vaylideGoogleBewaakt = true;
+    var dicht = function () { return window.__vaylideGoogleDicht === true; };
+    var beacon = navigator.sendBeacon;
+    if (beacon) navigator.sendBeacon = function (url) { if (dicht() && googleAdres(url)) return true; return beacon.apply(navigator, arguments); };
+    var haal = window.fetch;
+    if (haal) window.fetch = function (invoer) { if (dicht() && googleAdres(invoer)) return Promise.resolve(new Response(null, { status: 204 })); return haal.apply(window, arguments); };
+    var open = XMLHttpRequest.prototype.open, stuur = XMLHttpRequest.prototype.send;
+    XMLHttpRequest.prototype.open = function (methode, url) { this.__vaylideGoogle = googleAdres(url); return open.apply(this, arguments); };
+    XMLHttpRequest.prototype.send = function () { if (dicht() && this.__vaylideGoogle) return undefined; return stuur.apply(this, arguments); };
+    var bron = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src");
+    if (bron && bron.set) Object.defineProperty(HTMLImageElement.prototype, "src", { configurable: true, enumerable: bron.enumerable, get: bron.get, set: function (v) { if (dicht() && googleAdres(v)) return; bron.set.call(this, v); } });
+    var attribuut = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (naam, waarde) { if (dicht() && /^(src|href)$/i.test(naam) && /^(img|script|link)$/i.test(this.tagName) && googleAdres(waarde)) return; return attribuut.apply(this, arguments); };
+    var voeg = Node.prototype.appendChild, voor = Node.prototype.insertBefore;
+    var googleScript = function (n) { return !!n && n.tagName === "SCRIPT" && !!n.src && googleAdres(n.src); };
+    Node.prototype.appendChild = function (n) { if (dicht() && googleScript(n)) return n; return voeg.apply(this, arguments); };
+    Node.prototype.insertBefore = function (n) { if (dicht() && googleScript(n)) return n; return voor.apply(this, arguments); };
+  }
   function schoneVerwijzer() {
     // De pagina waar de bezoeker vandaan komt: zonder query, en binnen deze site zonder id's (die staan in de paden van de Studio en bestellingen).
     var r = document.referrer || "";
@@ -98,6 +131,7 @@
   function laadGtm() {
     if (!gtmId || !gtmHier || window.__vaylideGtm) return;    // maximaal één keer per pagina
     window.__vaylideGtm = true;
+    bewaakGoogle();                                                            // vóór het laden: de scripts van Google gebruiken dan de bewaakte kanalen
     var dl = window.dataLayer = window.dataLayer || [];
     function gtag() { dl.push(arguments); }
     // Toestemming vóór alles: alleen meten, geen advertenties (Consent Mode v2). Google Tag Manager laadt pas na het klikken op Accepteren.
@@ -136,12 +170,12 @@
       bewaar(nieuw);
       toon(false);
       if (nieuw === "ja") { laadClarity(); laadGtm(); return; }
-      // Weigeren of intrekken
+      // Weigeren of intrekken: als eerste, in dezelfde tik als de klik, alles dicht (daarna pas cookies en de rest)
+      var clarityAan = window.__vaylideClarity && typeof window.clarity === "function", googleAan = !!window.__vaylideGtm;
+      if (clarityAan || googleAan) { sluitGoogle(); sluitVerkeer(); }
       wisClarityCookies();
       wisGoogleCookies();
-      var clarityAan = window.__vaylideClarity && typeof window.clarity === "function", googleAan = !!window.__vaylideGtm;
       if (clarityAan || googleAan) {
-        sluitVerkeer();
         if (clarityAan) stopClarity();
         if (googleAan) stopGtm();
         wisClarityCookies();

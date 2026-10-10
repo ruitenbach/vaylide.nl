@@ -247,6 +247,24 @@ class ToestemmingScriptTests(VaylideTestCase):
         self.assertIn("img-src 'self' data: blob:", JS)
         self.assertIn("/^(_ga|_gid|_gat|_gcl_|_gac_)/", JS)
 
+    def test_intrekken_sluit_ook_de_verzendkanalen_van_google_voor_alles_andere(self):
+        klik = JS[JS.index("// Weigeren of intrekken"):JS.index('document.querySelectorAll("[data-cookie-instellingen]")')]
+        # De eerste handeling na de klik: Google en alle verkeer dicht, vóór cookies, consent update en herladen.
+        self.assertLess(klik.index("sluitGoogle(); sluitVerkeer();"), klik.index("wisClarityCookies();"))
+        self.assertLess(klik.index("sluitGoogle(); sluitVerkeer();"), klik.index("stopGtm();"))
+        # De bewaking staat vóór het laden van Google Tag Manager en dekt beacon, fetch, XHR, beeldjes en scripts.
+        laad = JS[JS.index("function laadGtm()"):JS.index("function toon(")]
+        self.assertLess(laad.index("bewaakGoogle();"), laad.index("document.head.appendChild(s)"))
+        bewaking = JS[JS.index("function bewaakGoogle()"):JS.index("function schoneVerwijzer()")]
+        for kanaal in ("navigator.sendBeacon", "window.fetch", "XMLHttpRequest.prototype.send", 'HTMLImageElement.prototype, "src"', "Element.prototype.setAttribute", "Node.prototype.appendChild", "Node.prototype.insertBefore"):
+            self.assertIn(kanaal, bewaking, kanaal)
+        self.assertGreaterEqual(bewaking.count("dicht() &&"), 7)
+        for host in ("google-analytics", "analytics\\.google\\.com", "googletagmanager"):
+            self.assertIn(host, JS)
+        self.assertIn("window.__vaylideGoogleDicht = true", JS)
+        # Zonder toestemming past het script niets aan: de bewaking staat alleen in laadGtm.
+        self.assertEqual(JS.count("bewaakGoogle();"), 1)
+
     def test_zonder_keuze_of_na_weigeren_wordt_er_niets_geladen(self):
         eind = JS[JS.index("var nu = keuze();"):]
         self.assertIn('if (nu === "ja") { laadClarity(); laadGtm(); }', eind)
