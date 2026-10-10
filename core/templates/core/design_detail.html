@@ -53,11 +53,8 @@
     </div>
   </div>
 </section>
-{% if "bruiloft" in template.occasions %}
-<p class="trouw-verwijzing container">Een trouwkaart zoeken? Lees meer over <a href="{% url 'core:wedding_cards' %}">digitale trouwkaarten</a> van VAYLIDE.</p>
-{% endif %}
-{% if "kerst" in template.occasions %}
-<p class="trouw-verwijzing container">Een kerstkaart zoeken? Lees meer over <a href="{% url 'core:christmas_cards' %}">digitale kerstkaarten</a> van VAYLIDE.</p>
+{% if hub_links %}
+<p class="trouw-verwijzing container">Lees meer over onze {% for tekst, url in hub_links %}<a href="{{ url }}">{{ tekst }}</a>{% if forloop.revcounter == 2 %} en {% elif not forloop.last %}, {% endif %}{% endfor %}.</p>
 {% endif %}
 {% if others %}
 <section class="section section--line" aria-labelledby="andere-titel">

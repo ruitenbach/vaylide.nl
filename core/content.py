@@ -256,3 +256,59 @@ KERST_FAQ = [
      "De muziek start nooit vanzelf: pas als de ontvanger erop tikt. Een wenskaart heeft geen muziek."),
 ]
 
+
+# SEO-landingspagina /digitale-verjaardagsuitnodigingen/ (core/templates/core/verjaardagsuitnodigingen.html). Alleen ontwerpen die er zijn en bij de verjaardag
+# horen (ontbrekende worden overgeslagen). De kop toont vier echte ontwerpen als kaartenmuur; de rest staat in de blokken eronder.
+VERJAARDAG_KOP = ["tropisch", "avondgoud", "glitter", "gouden-jaren"]
+VERJAARDAG_ONTWERPEN = ["glitter", "avondgoud", "tropisch", "gouden-jaren", "lauwerkrans", "neon", "confetti", "ballonfeest"]
+VERJAARDAG_DEEL_ONTWERP = "tropisch"
+
+# 'Voor ieder soort verjaardag': (ontwerp, titel, tekst). De ontwerpen zijn echte voorbeelden uit de collectie; de tekst zegt alleen wat de Studio kan.
+VERJAARDAG_SOORTEN = [
+    ("tropisch", "Volwassen verjaardag", "Een verzorgde uitnodiging voor een feest met vrienden en familie: jouw naam, eventueel je leeftijd, datum, tijd en locatie."),
+    ("neon", "18 of 21 jaar", "Zet de leeftijd groot in beeld, in een ontwerp met vaart en een beetje nachtclub. Een uitnodiging voor 18 jaar die opvalt in de groepsapp."),
+    ("lauwerkrans", "30, 40, 50 of 60 jaar", "Een mijlpaal verdient een eigen uitnodiging. Kies een ontwerp waarin het aantal jaren de hoofdrol krijgt, zoals een gouden getal of een lauwerkrans."),
+    ("ballonfeest", "Kinderfeest", "Vrolijk en licht, met ballonnen. Vul datum, tijd en plek in en laat de ouders aangeven of hun kind komt."),
+    ("avondgoud", "Surprise party", "Een uitnodiging met een geheimzinnige opening: tik op het gouden medaillon. De link staat niet in Google, dus alleen wie hem krijgt kan hem zien."),
+    ("liefde-op-papier", "Borrel of diner", "Rustig en stijlvol, met een lakzegel op de envelop. Zet het programma en de route erbij, zodat gasten precies weten waar en wanneer."),
+]
+
+VERJAARDAG_BELEVING = [
+    ("envelop", "Een interactieve opening", "Je gast tikt en de uitnodiging opent: een envelop met lakzegel, een cadeaulint, een vouwkaart of een medaillon."),
+    ("kleuren", "Beweging en sfeer", "Zachte animaties, kleurvarianten per ontwerp en een stijl die bij jouw feest past."),
+    ("potlood", "Jouw eigen tekst", "Een persoonlijke groet, de naam van de jarige en eventueel de leeftijd. Alles in jouw woorden."),
+    ("fotos", "Foto's", "Voeg een foto toe en kies zelf welk deel in beeld komt. Met Compleet komt er een galerij van maximaal 12 foto's bij."),
+    ("locatie", "Datum, tijd en locatie", "Met een knop naar de route, een aftellertje en een knop om het feest in de agenda te zetten."),
+    ("programma", "Programma", "Van inloop tot taart en muziek, op een rustige tijdlijn. Handig bij een borrel, diner of groot feest."),
+]
+
+VERJAARDAG_DELEN = [
+    ("chat", "Via WhatsApp", "Plak de link in een gesprek of groep. Gasten tikken erop en de uitnodiging opent in hun browser."),
+    ("link", "Als link", "Na je betaling krijg je een eigen link. Stuur hem per e-mail of sms, of zet hem in een bericht of groepsapp."),
+    ("qr", "Met een QR-code", "Ook een QR-code is inbegrepen, bijvoorbeeld voor een kaartje bij een cadeau of een bord bij de ingang."),
+]
+
+VERJAARDAG_FAQ = [
+    ("Wat is een digitale verjaardagsuitnodiging?",
+     "Een uitnodiging die je niet per post verstuurt maar als link deelt. Gasten openen hem op hun telefoon of computer en zien de datum, tijd en locatie van je feest, "
+     "met een eigen opening en de mogelijkheid om direct aan te geven of ze komen."),
+    ("Hoe maak ik een digitale uitnodiging voor een verjaardag?",
+     "Je kiest een ontwerp, vult de naam van de jarige, de datum, tijd en locatie in en bekijkt direct een voorbeeld. Je kunt beginnen zonder account; om je ontwerp te bewaren en te bestellen "
+     "bevestig je je e-mailadres met een code. Na je betaling krijg je een eigen link en een QR-code."),
+    ("Kan ik de uitnodiging via WhatsApp versturen?",
+     "Ja. Plak de link in een gesprek of groep. Gasten tikken erop en de uitnodiging opent in hun browser, zonder app."),
+    ("Kunnen gasten zich aanmelden?",
+     "Ja. Gasten geven met een paar tikken door of ze komen, met hoeveel personen, en je kunt een maximum per aanmelding instellen. Ze hoeven geen account aan te maken. "
+     "Jij ziet alle reacties in Mijn VAYLIDE en kunt de gastenlijst exporteren naar een bestand voor Excel of Numbers."),
+    ("Kan ik foto's toevoegen?",
+     "Ja. Je voegt een foto toe (JPG, PNG of WebP tot 12 MB) en kiest zelf welk deel in beeld komt. Met het pakket Compleet komt er een fotogalerij van maximaal 12 foto's bij."),
+    ("Hebben gasten een app nodig?",
+     "Nee. Gasten openen de link in hun browser. Ze hoeven niets te installeren en geen account aan te maken."),
+    ("Kan ik mijn uitnodiging bekijken voordat ik bestel?",
+     "Ja. Ontwerpen en bekijken is gratis: van elk ontwerp staat een werkend voorbeeld online en in de Studio zie je direct jouw uitnodiging. Je betaalt pas bij het publiceren."),
+    ("Wat kost een digitale verjaardagsuitnodiging?",
+     "Je betaalt eenmalig, zonder kosten per gast: Essentieel kost {essentieel} en Compleet {compleet}. Essentieel staat 6 maanden online en Compleet 12 maanden, vanaf de dag dat je betaling is bevestigd."),
+    ("Moet ik de leeftijd van de jarige noemen?",
+     "Nee. De leeftijd is optioneel. Laat je hem leeg, dan nodigt de uitnodiging gewoon uit voor een feest. Vul je hem in, dan komt hij groot in beeld bij ontwerpen die het aantal jaren uitlichten."),
+]
+

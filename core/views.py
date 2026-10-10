@@ -19,7 +19,7 @@ from invitations.demo import DEFAULT_DEMO_OCCASION
 
 from . import seo
 from .content import (ABOUT_POINTS, FAQ, FEATURE_GROUPS, FEATURES, HERO_CHECKS, HOME_DESIGNS, HOME_FAQ_EXTRA, HOME_FAQ_QUESTIONS,
-                      HOME_FEATURES, HOME_KERST, OCCASION_TILE_NOTES, OCCASION_TILES, STEPS, STEPS_SHORT, TEXT_SAMPLES, TIPS, KERST_BELEVING, KERST_DELEN, KERST_FAMILIE, KERST_FAQ, KERST_KOP, KERST_ONTWERPEN, KERST_ZAKELIJK, TROUW_FAQ, TROUW_KOP,
+                      HOME_FEATURES, HOME_KERST, OCCASION_TILE_NOTES, OCCASION_TILES, STEPS, STEPS_SHORT, TEXT_SAMPLES, TIPS, KERST_BELEVING, KERST_DELEN, VERJAARDAG_BELEVING, VERJAARDAG_DELEN, VERJAARDAG_DEEL_ONTWERP, VERJAARDAG_FAQ, VERJAARDAG_KOP, VERJAARDAG_ONTWERPEN, VERJAARDAG_SOORTEN, KERST_FAMILIE, KERST_FAQ, KERST_KOP, KERST_ONTWERPEN, KERST_ZAKELIJK, TROUW_FAQ, TROUW_KOP,
                       TROUW_UITGELICHT, TROUW_VOORDELEN, VALUES)
 from .forms import ContactForm
 from .models import ContactMessage, SiteConfig
@@ -28,7 +28,9 @@ from .utils import form_age_seconds, ip_fingerprint, rate_limit, signed_timestam
 
 # Gelegenheden met een eigen SEO-landingspagina: het filter ?gelegenheid=<sleutel> werkt gewoon in de site, maar zijn canonical is die pagina en
 # hij staat niet in de sitemap (de pagina staat er wel in).
-GELEGENHEID_HUBS = {"bruiloft": "core:wedding_cards", "kerst": "core:christmas_cards"}
+GELEGENHEID_HUBS = {"bruiloft": "core:wedding_cards", "kerst": "core:christmas_cards", "verjaardag": "core:birthday_invitations"}
+# Op een ontwerppagina: een verwijzing naar de landingspagina('s) van de gelegenheden waar het ontwerp bij hoort: (gelegenheid, tekst van de link).
+HUB_LINKS = (("bruiloft", "digitale trouwkaarten"), ("verjaardag", "digitale verjaardagsuitnodigingen"), ("kerst", "digitale kerstkaarten"))
 
 
 def _designs():
@@ -153,6 +155,49 @@ def christmas_cards(request):
     )
 
 
+def birthday_invitations(request):
+    """SEO-landingspagina /digitale-verjaardagsuitnodigingen/: echte verjaardagsontwerpen uit de collectie, soorten verjaardagen, RSVP, delen, stappen en vragen."""
+    verjaardag = [d for d in _designs() if "verjaardag" in d.occasions]
+    by_slug = {d.slug: d for d in verjaardag}
+
+    def kies(slugs):
+        return [by_slug[s] for s in slugs if s in by_slug]
+
+    packages = {p.code: p.price_display for p in Package.objects.filter(is_active=True)}
+    faq = [(q, a.format(essentieel=packages.get("essentieel", ""), compleet=packages.get("compleet", ""))) for q, a in VERJAARDAG_FAQ]
+    soorten = []
+    for slug, titel, tekst in VERJAARDAG_SOORTEN:
+        kaart = _design_cards(kies([slug]), "verjaardag")
+        if kaart:
+            soorten.append({"titel": titel, "tekst": tekst, "card": kaart[0]})
+    deel = _design_cards(kies([VERJAARDAG_DEEL_ONTWERP]), "verjaardag")
+    path = reverse("core:birthday_invitations")
+    return render(
+        request,
+        "core/verjaardagsuitnodigingen.html",
+        {
+            "kop_cards": _design_cards(kies(VERJAARDAG_KOP), "verjaardag"),
+            "cards": _design_cards(kies(VERJAARDAG_ONTWERPEN), "verjaardag"),
+            "soorten": soorten,
+            "deel_card": deel[0] if deel else None,
+            "verjaardag_count": len(verjaardag),
+            "beleving": VERJAARDAG_BELEVING,
+            "delen": VERJAARDAG_DELEN,
+            "steps": [
+                ("kaarten", "Kies een ontwerp", "Uit onze verjaardagscollectie, van feestelijk en modern tot ingetogen en luxe."),
+                ("potlood", "Personaliseer", "Naam van de jarige, leeftijd, datum, tijd, locatie, een foto en je eigen tekst."),
+                ("oog", "Bekijk het voorbeeld", "Zie direct hoe jouw uitnodiging opent en eruitziet, op telefoon en computer."),
+                ("versturen", "Deel met je gasten", "Na je betaling een eigen link en QR-code, om te delen via WhatsApp of e-mail."),
+            ],
+            "essentieel_prijs": packages.get("essentieel", ""),
+            "compleet_prijs": packages.get("compleet", ""),
+            "faq": faq,
+            "config": SiteConfig.get(),
+            "jsonld": [seo.breadcrumbs([("Home", "/"), ("Digitale verjaardagsuitnodigingen", path)]), seo.faq_page(faq)],
+        },
+    )
+
+
 def designs(request):
     occasion = request.GET.get("gelegenheid", "")
     if occasion not in OCCASION_LABELS:
@@ -235,6 +280,7 @@ def design_detail(request, slug):
             "demo_url": f"{reverse('invitations:demo', args=[slug])}?gelegenheid={occasion}&kleur={kleur}{extra}",
             "start_url": f"{reverse('studio:start')}?ontwerp={slug}&gelegenheid={occasion}&kleur={kleur}{extra}&direct=1",
             "others": _design_cards(collectie_volgorde([t for t in _designs() if t.pk != template.pk and t.supports(occasion)])[:3], occasion),
+            "hub_links": [(tekst, reverse(GELEGENHEID_HUBS[key])) for key, tekst in HUB_LINKS if key in template.occasions],
             "occasion_label": OCCASION_LABELS.get(occasion, ""),
             "effects_text": effect_summary(version.manifest.get("effects")),
             "image_url": seo.absolute(design_image_url(slug)),

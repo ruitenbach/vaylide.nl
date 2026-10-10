@@ -1,0 +1,207 @@
+{% extends "base.html" %}{% load static vl %}
+{% block title %}Digitale verjaardagsuitnodiging maken{% endblock %}
+{% block description %}Maak een digitale verjaardagsuitnodiging die echt tot leven komt. Voeg datum, locatie, RSVP en persoonlijke details toe en deel eenvoudig via WhatsApp.{% endblock %}
+{% block og_title %}Digitale verjaardagsuitnodiging maken · VAYLIDE{% endblock %}
+{% block og_description %}Maak een digitale verjaardagsuitnodiging die echt tot leven komt. Voeg datum, locatie, RSVP en persoonlijke details toe en deel eenvoudig via WhatsApp.{% endblock %}
+{% block body_class %}page-verjaardag{% endblock %}
+{% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
+{% block content %}
+{# Kop: tekst links, rechts een muur van vier echte verjaardagsontwerpen. #}
+<section class="paginakop vj-kop" data-sparkles aria-labelledby="vj-titel">
+  {% include "partials/paginakop_wereld.html" %}
+  <div class="container vj-kop__inner">
+    <div class="vj-kop__tekst">
+      <p class="eyebrow">Digitale verjaardagsuitnodigingen</p>
+      <h1 id="vj-titel">Digitale verjaardagsuitnodigingen die bij <em>jouw feest</em> passen</h1>
+      <p class="lead">Of je nu een kleine borrel, een groot feest of een bijzondere mijlpaal viert: maak een digitale uitnodiging die past bij jouw stijl en deel hem eenvoudig met je gasten.</p>
+      <div class="btn-row">
+        <a class="btn btn--primary btn--lg" href="#verjaardagsontwerpen">Bekijk verjaardagsuitnodigingen {% icon "pijl" %}</a>
+        <a class="btn btn--secondary btn--lg" href="{% url 'studio:start' %}?gelegenheid=verjaardag">Maak jouw uitnodiging</a>
+      </div>
+      <ul class="hero__checks"><li>{% icon "vink" %}Datum, tijd en locatie</li><li>{% icon "vink" %}Aanmelden voor je gasten</li><li>{% icon "vink" %}Delen via WhatsApp</li><li>{% icon "vink" %}Zonder app voor gasten</li></ul>
+    </div>
+    <ul class="vj-muur">
+      {% for card in kop_cards %}<li class="vj-muur__kaart" style="--i:{{ forloop.counter0 }}"><a href="{{ card.detail_url }}"><img src="{{ card.image }}" alt="Digitale verjaardagsuitnodiging {{ card.template.name }}" width="800" height="1000"{% if forloop.counter0 < 2 %} fetchpriority="high"{% endif %} decoding="async"><span class="vj-muur__naam">{{ card.template.name }}</span></a></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+{# Meer dan alleen een uitnodiging, met een werkend voorbeeld. #}
+<section class="section vj-meer" aria-labelledby="meer-titel">
+  <div class="container">
+    <div class="vj-meer__kader">
+      <div class="vj-meer__telefoon phone-demo">
+        <div class="phone">
+          <div class="phone__screen" data-lazy-frame="{% url 'invitations:demo' 'tropisch' %}?gelegenheid=verjaardag&amp;embed=1" data-frame-title="Werkend voorbeeld van een digitale verjaardagsuitnodiging (fictief feest)">
+            <img class="phone__poster" src="{% design_image 'tropisch' %}" alt="" width="800" height="1000" loading="lazy" decoding="async">
+            <a class="phone__fallback" href="{% url 'invitations:demo' 'tropisch' %}?gelegenheid=verjaardag">Open het werkende voorbeeld</a>
+          </div>
+        </div>
+        <p class="demo-caption">Voorbeeld met een fictief feest</p>
+      </div>
+      <div class="vj-meer__tekst">
+        <p class="eyebrow">Probeer het zelf</p>
+        <h2 id="meer-titel">Meer dan alleen een uitnodiging</h2>
+        <p>Een verjaardagsuitnodiging maken hoeft niet te betekenen dat je een plaatje in een groepsapp gooit. Bij VAYLIDE opent jouw uitnodiging, beweegt hij mee en staat alles erin wat gasten willen weten.</p>
+        <ul class="vj-meer__punten">
+          {% for icon_name, title, text in beleving %}<li>{% icon icon_name 30 %}<p><strong>{{ title }}</strong><span>{{ text }}</span></p></li>{% endfor %}
+        </ul>
+        <a class="link-arrow" href="{% url 'invitations:demo' 'tropisch' %}?gelegenheid=verjaardag">Open een werkend voorbeeld</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# Voor ieder soort verjaardag. #}
+<section class="section vj-soorten" aria-labelledby="soorten-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Van klein tot groots</p>
+      <h2 id="soorten-titel">Voor ieder soort verjaardag</h2>
+      <p>Een uitnodiging voor 18 jaar vraagt iets anders dan een uitnodiging voor 50 jaar, en een kinderfeest iets anders dan een borrel. Kies een ontwerp dat bij jouw feest past.</p>
+    </div>
+    <ul class="vj-soorten__lijst">
+      {% for soort in soorten %}
+      <li class="vj-soort">
+        <a class="vj-soort__beeld" href="{{ soort.card.detail_url }}" tabindex="-1" aria-hidden="true"><img src="{{ soort.card.image }}" alt="" width="800" height="1000" loading="lazy" decoding="async"></a>
+        <div class="vj-soort__tekst">
+          <h3>{{ soort.titel }}</h3>
+          <p>{{ soort.tekst }}</p>
+          <a class="link-arrow" href="{{ soort.card.detail_url }}">{{ soort.card.template.name }} bekijken</a>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+{# RSVP en gastenlijst. #}
+<section class="section section--flush vj-rsvp" aria-labelledby="rsvp-titel">
+  <div class="container">
+    <div class="vj-rsvp__kader">
+      <div class="vj-rsvp__tekst">
+        <p class="eyebrow">Weten wie er komt</p>
+        <h2 id="rsvp-titel">Aanmelden en gastenlijst</h2>
+        <p>Geen berichtjes meer najagen. Je gasten geven in de uitnodiging zelf door of ze komen, en jij houdt overzicht in Mijn VAYLIDE.</p>
+        <ul class="checklist">
+          <li>Gasten kiezen: ja, ik kom graag, of helaas, ik kan niet</li>
+          <li>Het aantal personen per aanmelding, met een maximum dat je zelf instelt</li>
+          <li>Geen account nodig; gasten kunnen hun antwoord later zelf wijzigen</li>
+          <li>Alle reacties komen in Mijn VAYLIDE, en je exporteert de lijst naar Excel of Numbers</li>
+        </ul>
+      </div>
+      <div class="vj-rsvp__beeld" role="img" aria-label="Illustratie met fictieve gasten: links het aanmeldformulier van een gast, rechts het overzicht van de aanmeldingen voor de organisator">
+        <div class="vj-mock vj-mock--gast" aria-hidden="true">
+          <p class="vj-mock__kop">Kom je ook?</p>
+          <p class="vj-mock__veld">Naam <b>Sanne</b></p>
+          <p class="vj-mock__keuze vj-mock__keuze--aan">Ja, ik kom graag</p>
+          <p class="vj-mock__keuze">Helaas, ik kan niet</p>
+          <p class="vj-mock__veld">Aantal personen <b>2</b></p>
+          <p class="vj-mock__knop">Versturen</p>
+        </div>
+        <div class="vj-mock vj-mock--lijst" aria-hidden="true">
+          <p class="vj-mock__kop">Aanmeldingen</p>
+          <p class="vj-mock__rij"><span>Sanne</span><b>2 personen</b></p>
+          <p class="vj-mock__rij"><span>Daan</span><b>1 persoon</b></p>
+          <p class="vj-mock__rij"><span>Lotte</span><b>3 personen</b></p>
+          <p class="vj-mock__rij vj-mock__rij--nee"><span>Kees</span><b>kan niet</b></p>
+          <p class="vj-mock__totaal">6 gasten komen</p>
+        </div>
+      </div>
+    </div>
+    <p class="vj-rsvp__noot">Illustratie met fictieve gasten.</p>
+  </div>
+</section>
+
+{# Delen. #}
+<section class="section" aria-labelledby="delen-titel">
+  <div class="container">
+    <div class="vj-delen">
+      <div class="vj-delen__beeld" aria-hidden="true">
+        <p class="vj-chat vj-chat--uit">Lotte wordt 30 en geeft een feest. Kom je ook?</p>
+        <div class="vj-chat vj-chat--uit vj-chat--link">
+          {% if deel_card %}<img src="{{ deel_card.image }}" alt="" width="800" height="1000" loading="lazy" decoding="async">{% endif %}
+          <span><b>Lotte wordt 30</b>Digitale uitnodiging</span>
+        </div>
+        <p class="vj-chat vj-chat--in">Ja, ik kom! Met z'n tweeën.</p>
+      </div>
+      <div class="vj-delen__tekst">
+        <p class="eyebrow">Zonder app of account</p>
+        <h2 id="delen-titel">Eenvoudig delen met je gasten</h2>
+        <p>Een online verjaardagsuitnodiging versturen is niet meer dan een link doorsturen. Jij bepaalt wie hem krijgt.</p>
+        <ul class="vj-delen__lijst">
+          {% for icon_name, title, text in delen %}<li>{% icon icon_name 28 %}<p><strong>{{ title }}</strong><span>{{ text }}</span></p></li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# Zo maak je een digitale verjaardagsuitnodiging. #}
+<section class="section section--flush" aria-labelledby="stappen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">In vier stappen</p>
+      <h2 id="stappen-titel">Zo maak je een digitale verjaardagsuitnodiging</h2>
+    </div>
+    <ol class="vj-tijdlijn">
+      {% for icon_name, title, text in steps %}
+      <li class="vj-tijdlijn__stap">
+        <span class="vj-tijdlijn__bol" aria-hidden="true">{{ forloop.counter }}</span>
+        <h3><span class="visually-hidden">Stap {{ forloop.counter }}: </span>{{ title }}</h3>
+        <p>{{ text }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="stappenrij__voet"><span><strong>Essentieel {{ essentieel_prijs }}</strong>, Compleet {{ compleet_prijs }}. Eenmalig, geen kosten per gast.{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</span><a class="link-arrow" href="{% url 'core:pricing' %}">Bekijk de prijzen</a><a class="link-arrow" href="{% url 'core:how' %}">Zo werkt het</a></p>
+  </div>
+</section>
+
+{# De verjaardagscollectie. #}
+<section class="section" id="verjaardagsontwerpen" aria-labelledby="ontwerpen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">De collectie</p>
+      <h2 id="ontwerpen-titel">Kies jouw verjaardagsuitnodiging</h2>
+      <p>{{ verjaardag_count }} ontwerpen voor een verjaardag, elk met een eigen opening en kleurvarianten. Probeer ze op je eigen telefoon.</p>
+    </div>
+    <div class="vj-grid">
+      {% for card in cards %}{% include "partials/design_card.html" %}{% endfor %}
+    </div>
+    <p class="vj-meerlink"><a class="btn btn--secondary" href="{% url 'core:designs' %}?gelegenheid=verjaardag">Bekijk alle verjaardagsontwerpen {% icon "pijl" %}</a></p>
+  </div>
+</section>
+
+<section class="section section--flush home-faq" aria-labelledby="faq-titel">
+  <div class="container container--mid">
+    <div class="sectie-kop">
+      <p class="eyebrow">Goed om te weten</p>
+      <h2 id="faq-titel">Veelgestelde vragen over digitale verjaardagsuitnodigingen</h2>
+    </div>
+    <div class="faq-lijst">
+      {% for question, answer in faq %}<details class="faq-item"><summary>{{ question }}</summary><p>{{ answer }}</p></details>{% endfor %}
+    </div>
+    <p class="home-faq__meer"><a class="link-arrow" href="{% url 'core:faq' %}">Alle veelgestelde vragen</a></p>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="cta-titel">
+  <div class="container">
+    <div class="vj-cta">
+      <div class="vj-cta__tekst">
+        <p class="eyebrow">Jouw feest</p>
+        <h2 id="cta-titel">Een uitnodiging waar je gasten naar uitkijken</h2>
+        <p>Kies een ontwerp, vul datum, locatie en je eigen tekst in en zie direct hoe de uitnodiging eruitziet. Je betaalt pas als je tevreden bent en hem wilt delen.</p>
+        <div class="btn-row">
+          <a class="btn btn--goud btn--lg" href="{% url 'studio:start' %}?gelegenheid=verjaardag">Maak jouw uitnodiging {% icon "pijl" %}</a>
+          <a class="btn btn--secondary-dark btn--lg" href="{% url 'core:designs' %}?gelegenheid=verjaardag">Bekijk verjaardagsuitnodigingen</a>
+        </div>
+        <p class="vj-cta__voet">Meer vragen? Lees de <a href="{% url 'core:faq' %}">veelgestelde vragen</a> of bekijk <a href="{% url 'core:pricing' %}">de prijzen</a>.</p>
+      </div>
+      <ul class="vj-cta__kaarten" aria-hidden="true">
+        {% for card in kop_cards|slice:":2" %}<li style="--i:{{ forloop.counter0 }}"><img src="{{ card.image }}" alt="" width="800" height="1000" loading="lazy" decoding="async"></li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}
