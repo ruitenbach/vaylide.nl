@@ -87,7 +87,7 @@ class GelegenheidspaginaSeoTests(VaylideTestCase):
             self.assertGreaterEqual(len(beschrijving), 70, sleutel)
             self.assertLessEqual(len(beschrijving), 160, sleutel)
             # Het bruiloftfilter werkt gewoon, maar zijn canonical is de landingspagina Digitale trouwkaarten.
-            hubs = {"bruiloft": "/digitale-trouwkaarten/", "kerst": "/digitale-kerstkaarten/", "verjaardag": "/digitale-verjaardagsuitnodigingen/"}
+            hubs = {"bruiloft": "/digitale-trouwkaarten/", "kerst": "/digitale-kerstkaarten/", "verjaardag": "/digitale-verjaardagsuitnodigingen/", "zakelijk": "/digitale-zakelijke-uitnodigingen/"}
             verwacht = f"{settings.BASE_URL}{hubs[sleutel]}" if sleutel in hubs else f"{settings.BASE_URL}/ontwerpen/?gelegenheid={sleutel}"
             self.assertEqual(canonical(html), verwacht, sleutel)
             self.assertEqual(meta(html, "og:url", "property"), canonical(html), sleutel)
@@ -135,7 +135,8 @@ class SitemapRobotsEnNoindexTests(VaylideTestCase):
         self.assertNotIn("?gelegenheid=bruiloft", sitemap)          # het bruiloft- en het kerstfilter staan niet in de sitemap: de landingspagina's zijn hun vervanger
         self.assertNotIn("?gelegenheid=kerst", sitemap)
         self.assertNotIn("?gelegenheid=verjaardag", sitemap)
-        for pad in ("/", "/ontwerpen/", "/digitale-trouwkaarten/", "/digitale-kerstkaarten/", "/digitale-verjaardagsuitnodigingen/", "/ontwerpen/?gelegenheid=jubileum", "/ontwerpen/kerstkaart/", "/ontwerpen/kerstbol/", "/ontwerpen/gouden-avond/",
+        self.assertNotIn("?gelegenheid=zakelijk", sitemap)
+        for pad in ("/", "/ontwerpen/", "/digitale-trouwkaarten/", "/digitale-kerstkaarten/", "/digitale-verjaardagsuitnodigingen/", "/digitale-zakelijke-uitnodigingen/", "/ontwerpen/?gelegenheid=jubileum", "/ontwerpen/kerstkaart/", "/ontwerpen/kerstbol/", "/ontwerpen/gouden-avond/",
                     "/prijzen/", "/zo-werkt-het/"):
             self.assertIn(f"<loc>{settings.BASE_URL}{pad}</loc>", sitemap, pad)
         for pad in ("/voorbeeld/", "/u/", "/maken/", "/account/", "/inloggen/", "/zoeken/", "/voorwaarden/versie/", "/beheer/", "kerstman"):
@@ -207,7 +208,7 @@ class TrouwkaartenHubTests(VaylideTestCase):
         sitemap = Client().get("/sitemap.xml").content.decode()
         self.assertIn(f"<loc>{settings.BASE_URL}/digitale-trouwkaarten/</loc>", sitemap)
         self.assertNotIn("gelegenheid=bruiloft", sitemap)
-        for gelegenheid in ("verloving", "jubileum", "babyshower", "zakelijk"):
+        for gelegenheid in ("verloving", "jubileum", "babyshower"):
             self.assertIn(f"gelegenheid={gelegenheid}</loc>", sitemap, gelegenheid)
         filter_pagina = Client().get("/ontwerpen/?gelegenheid=bruiloft")
         self.assertEqual(filter_pagina.status_code, 200)
@@ -333,5 +334,70 @@ class VerjaardagHubTests(VaylideTestCase):
     def test_een_ontwerp_voor_meer_gelegenheden_noemt_alle_bijpassende_pagina_s_in_een_regel(self):
         html = Client().get("/ontwerpen/tropisch/").content.decode()          # bruiloft en verjaardag
         regel = re.search(r'<p class="trouw-verwijzing container">(.*?)</p>', html, re.S).group(1)
-        self.assertIn('<a href="/digitale-trouwkaarten/">digitale trouwkaarten</a> en <a href="/digitale-verjaardagsuitnodigingen/">digitale verjaardagsuitnodigingen</a>', regel)
+        self.assertIn('<a href="/digitale-trouwkaarten/">digitale trouwkaarten</a>, <a href="/digitale-verjaardagsuitnodigingen/">digitale verjaardagsuitnodigingen</a> en <a href="/digitale-zakelijke-uitnodigingen/">digitale zakelijke uitnodigingen</a>', regel)
+
+
+class ZakelijkHubTests(VaylideTestCase):
+    """/digitale-zakelijke-uitnodigingen/: de landingspagina voor zakelijke evenementen, met het zakelijke filter als gewone UI."""
+
+    def setUp(self):
+        self.response = Client().get("/digitale-zakelijke-uitnodigingen/")
+        self.html = self.response.content.decode()
+
+    def test_pagina_is_indexeerbaar_met_eigen_titel_beschrijving_h1_en_self_canonical(self):
+        self.assertEqual(self.response.status_code, 200)
+        self.assertNotIn("X-Robots-Tag", self.response.headers)
+        self.assertEqual(meta(self.html, "robots"), "")
+        self.assertEqual(titel(self.html), "Digitale zakelijke uitnodiging maken · VAYLIDE")
+        self.assertEqual(meta(self.html, "description"), "Maak een digitale zakelijke uitnodiging voor een opening, bedrijfsfeest, jubileum of event. Met RSVP, programma, locatie en eenvoudig delen via link of QR-code.")
+        self.assertEqual(canonical(self.html), f"{settings.BASE_URL}/digitale-zakelijke-uitnodigingen/")
+        self.assertEqual(meta(self.html, "og:url", "property"), canonical(self.html))
+        self.assertEqual(re.findall(r"<h1[^>]*>(.*?)</h1>", self.html, re.S), ["Digitale zakelijke uitnodigingen met een <em>professionele</em> uitstraling"])
+
+    def test_gestructureerde_gegevens_zijn_geldig_en_de_faq_staat_zichtbaar_op_de_pagina(self):
+        blokken = {b["@type"]: b for b in json_ld(self.html)}
+        self.assertEqual([i["name"] for i in blokken["BreadcrumbList"]["itemListElement"]], ["Home", "Digitale zakelijke uitnodigingen"])
+        self.assertEqual(blokken["BreadcrumbList"]["itemListElement"][1]["item"], f"{settings.BASE_URL}/digitale-zakelijke-uitnodigingen/")
+        vragen = blokken["FAQPage"]["mainEntity"]
+        self.assertGreaterEqual(len(vragen), 9)
+        zichtbaar = html_lib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", self.html)))
+        for v in vragen:
+            self.assertEqual(v["@type"], "Question")
+            self.assertEqual(v["acceptedAnswer"]["@type"], "Answer")
+            self.assertIn(v["name"], zichtbaar)
+            self.assertIn(v["acceptedAnswer"]["text"], zichtbaar)
+
+    def test_de_pagina_linkt_naar_collectie_prijzen_uitleg_vragen_en_zakelijke_ontwerpen(self):
+        for pad in ("/ontwerpen/?gelegenheid=zakelijk", "/prijzen/", "/zo-werkt-het/", "/veelgestelde-vragen/", "/ontwerpen/gala/?gelegenheid=zakelijk"):
+            self.assertIn(f'href="{pad}"', self.html, pad)
+
+    def test_het_zakelijke_filter_werkt_gewoon_en_wijst_naar_de_pagina(self):
+        filter_pagina = Client().get("/ontwerpen/?gelegenheid=zakelijk")
+        self.assertEqual(filter_pagina.status_code, 200)
+        self.assertIn("Ontwerpen voor zakelijk", filter_pagina.content.decode())
+        self.assertEqual(canonical(filter_pagina.content.decode()), f"{settings.BASE_URL}/digitale-zakelijke-uitnodigingen/")
+        sitemap = Client().get("/sitemap.xml").content.decode()
+        self.assertIn(f"<loc>{settings.BASE_URL}/digitale-zakelijke-uitnodigingen/</loc>", sitemap)
+        self.assertNotIn("gelegenheid=zakelijk", sitemap)
+        for andere in ("/digitale-trouwkaarten/", "/digitale-kerstkaarten/", "/digitale-verjaardagsuitnodigingen/"):
+            self.assertIn(f"<loc>{settings.BASE_URL}{andere}</loc>", sitemap)
+
+    def test_de_homepage_en_zakelijke_ontwerpen_linken_naar_de_pagina(self):
+        home = Client().get("/").content.decode()
+        self.assertIn('<a href="/digitale-zakelijke-uitnodigingen/">digitale zakelijke uitnodigingen</a>', home)
+        gala = Client().get("/ontwerpen/gala/").content.decode()
+        self.assertIn('href="/digitale-zakelijke-uitnodigingen/"', gala)
+        zonder = Client().get("/ontwerpen/winterlicht/").content.decode()          # geen zakelijk ontwerp: geen verwijzing
+        self.assertNotIn('href="/digitale-zakelijke-uitnodigingen/"', zonder)
+
+    def test_de_combinatieregel_noemt_alleen_de_hubs_van_het_ontwerp(self):
+        def regel(slug):
+            html = Client().get(f"/ontwerpen/{slug}/").content.decode()
+            return re.findall(r'href="(/digitale-[a-z-]+/)"', re.search(r'<p class="trouw-verwijzing container">(.*?)</p>', html, re.S).group(1))
+
+        self.assertEqual(regel("strak"), ["/digitale-zakelijke-uitnodigingen/"])                         # zakelijk en jubileum
+        self.assertEqual(regel("gala"), ["/digitale-trouwkaarten/", "/digitale-zakelijke-uitnodigingen/"])      # zakelijk, bruiloft, jubileum
+        self.assertEqual(regel("glitter"), ["/digitale-verjaardagsuitnodigingen/", "/digitale-zakelijke-uitnodigingen/"])
+        self.assertEqual(regel("avondgoud"), ["/digitale-trouwkaarten/", "/digitale-verjaardagsuitnodigingen/", "/digitale-zakelijke-uitnodigingen/"])
+        self.assertEqual(regel("winterlicht"), ["/digitale-kerstkaarten/"])
 

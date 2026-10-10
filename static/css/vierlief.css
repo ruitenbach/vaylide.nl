@@ -1542,3 +1542,156 @@ a[href] img[src^="/static/"] { pointer-events: none; }
   .vj-mock { width: 66%; font-size: .78rem; }
 }
 @media (prefers-reduced-motion: reduce) { .vj-muur__kaart a, .vj-soort { transition: none; } }
+
+/* ---------- SEO-landingspagina Digitale zakelijke uitnodigingen (/digitale-zakelijke-uitnodigingen/) ---------- */
+.page-zakelijk { --zk-groen: #24352B; --zk-groen-2: #3C5445; --zk-steen: #EEE8DC; --zk-koper: #B08A4A; }
+.page-zakelijk .eyebrow { color: var(--zk-groen-2); }
+.zk-kop { text-align: left; padding: clamp(2rem, 5vw, 4rem) 0 clamp(2.5rem, 6vw, 4.5rem);
+  background: radial-gradient(50% 70% at 88% 20%, #F6F0E4, transparent 70%), radial-gradient(45% 60% at 6% 90%, #E5E1D2, transparent 70%), linear-gradient(180deg, #EBE5D8 0%, #EFEADF 60%, var(--ivory) 100%); border-bottom: 1px solid rgba(36, 53, 43, .12); }
+.zk-kop::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .5;
+  background: repeating-linear-gradient(90deg, rgba(36, 53, 43, .05) 0 1px, transparent 1px 7.5rem); }
+.zk-kop__inner { display: grid; grid-template-columns: minmax(0, 1.14fr) minmax(0, .86fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: center; }
+.zk-kop h1 { font-size: clamp(1.8rem, 3.5vw, 2.9rem); margin-bottom: .55em; }
+.zk-kop h1 em { color: var(--zk-groen-2); }
+.zk-kop .lead { margin-left: 0; margin-bottom: 1.8rem; max-width: 35rem; }
+.zk-kop .hero__checks { margin-top: 1.8rem; max-width: 35rem; }
+.zk-kop .hero__checks .icon { color: var(--zk-groen-2); }
+.zk-kop .btn--lg { padding-inline: 1.4rem; font-size: .98rem; }
+.zk-kop .btn--primary { background: var(--zk-groen); }
+.zk-kop .btn--primary:hover { background: #1A261F; }
+.zk-kop .btn--secondary { border-color: rgba(36, 53, 43, .45); }
+.zk-kaarten { list-style: none; margin: 0 auto; padding: 0 0 2rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(.6rem, 1.4vw, 1rem); align-items: start; max-width: 35rem; }
+.zk-kaarten__kaart:nth-child(1) { margin-top: 3rem; }
+.zk-kaarten__kaart:nth-child(2) { margin-top: 0; }
+.zk-kaarten__kaart:nth-child(3) { margin-top: 5.5rem; }
+.zk-kaarten__kaart a { display: block; position: relative; aspect-ratio: 4 / 5.2; border-radius: var(--radius); overflow: hidden; background: var(--paper); text-decoration: none;
+  box-shadow: 0 0 0 1px rgba(36, 53, 43, .18), 0 28px 40px -24px rgba(36, 40, 30, .6); transition: transform .45s cubic-bezier(.2, .8, .2, 1), box-shadow .45s; }
+.zk-kaarten__kaart img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.zk-kaarten__naam { position: absolute; left: .5rem; bottom: .5rem; padding: .18rem .6rem; border-radius: 999px; background: rgba(252, 250, 244, .95); color: var(--ink); font-size: .72rem; font-weight: 600; }
+.zk-kaarten__kaart a:hover, .zk-kaarten__kaart a:focus-visible { transform: translateY(-8px); box-shadow: 0 0 0 1.5px var(--zk-koper), 0 36px 48px -26px rgba(36, 40, 30, .7); }
+
+.zk-momenten__lijst { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid rgba(36, 53, 43, .22); border-left: 1px solid rgba(36, 53, 43, .22); }
+.zk-moment { position: relative; padding: 1.6rem 1.4rem 1.7rem; border-right: 1px solid rgba(36, 53, 43, .22); border-bottom: 1px solid rgba(36, 53, 43, .22); background: var(--paper); transition: background .3s; }
+.zk-moment:hover { background: #F7F3E9; }
+.zk-moment__nr { position: absolute; top: 1.1rem; right: 1.2rem; font-family: var(--font-display); font-size: .95rem; color: var(--zk-koper); letter-spacing: .08em; }
+.zk-moment__icoon { display: grid; place-items: center; width: 3rem; height: 3rem; margin-bottom: 1rem; border-radius: 50%; color: var(--zk-groen); background: var(--zk-steen); }
+.zk-moment__icoon .icon { width: 1.5rem; height: 1.5rem; stroke-width: 1.4; }
+.zk-moment h3 { font-size: 1.2rem; margin-bottom: .4rem; }
+.zk-moment p { font-size: .93rem; color: var(--ink-2); margin: 0; }
+
+.zk-een__kader { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: center; padding: clamp(1.75rem, 5vw, 3.5rem); border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, #EDE7DA, #E4DDCB); box-shadow: 0 0 0 1px rgba(36, 53, 43, .16), 0 36px 60px -44px rgba(36, 40, 30, .55); }
+.zk-een__tekst > p:not(.eyebrow) { color: var(--ink-2); max-width: 36rem; }
+.zk-een__onderdelen { margin: 1.5rem 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 2rem; }
+.zk-een__onderdelen div { padding: .85rem 0; border-top: 1px solid rgba(36, 53, 43, .22); }
+.zk-een__onderdelen dt { font-weight: 600; color: var(--zk-groen); margin-bottom: .15rem; }
+.zk-een__onderdelen dd { margin: 0; font-size: .92rem; color: var(--ink-2); }
+.zk-een .phone { box-shadow: 0 40px 70px -36px rgba(30, 36, 28, .7), inset 0 0 0 1.5px #3A332B; }
+
+.zk-rsvp { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
+.zk-rsvp__beeld { position: relative; min-height: 24rem; padding: 1.5rem; border-radius: var(--radius-xl); background: radial-gradient(70% 70% at 80% 10%, rgba(176, 138, 74, .22), transparent 70%), linear-gradient(135deg, #24352B, #2F4538); box-shadow: 0 40px 70px -46px rgba(20, 30, 22, .8); overflow: hidden; }
+.zk-mock { position: absolute; width: min(14.4rem, 56%); padding: 1.1rem 1.15rem; border-radius: var(--radius); background: var(--paper); color: var(--ink); box-shadow: 0 28px 44px -24px rgba(0, 0, 0, .7); font-size: .84rem; }
+.zk-mock p { margin: 0; }
+.zk-mock__kop { font-family: var(--font-display); font-size: 1.12rem; margin-bottom: .7rem !important; }
+.zk-mock--gast { left: 1.5rem; top: 1.5rem; }
+.zk-mock--lijst { right: 1.5rem; bottom: 1.5rem; width: min(15rem, 58%); }
+.zk-mock__veld { display: flex; justify-content: space-between; gap: .5rem; padding: .45rem .7rem; margin-bottom: .45rem !important; border-radius: 6px; background: var(--ivory-2); color: var(--muted); }
+.zk-mock__veld b { color: var(--ink); font-weight: 600; }
+.zk-mock__keuze { padding: .42rem .7rem; margin-bottom: .4rem !important; border-radius: 6px; border: 1px solid var(--line-strong); }
+.zk-mock__keuze--aan { border-color: var(--zk-groen-2); background: #E7EDE6; font-weight: 600; }
+.zk-mock__knop { margin-top: .7rem !important; padding: .5rem; border-radius: 999px; text-align: center; background: var(--zk-groen); color: #fff; font-weight: 600; }
+.zk-mock__rij { display: flex; justify-content: space-between; gap: .5rem; padding: .45rem 0; border-bottom: 1px solid var(--line); }
+.zk-mock__rij b { font-weight: 500; color: var(--muted); }
+.zk-mock__rij--nee span, .zk-mock__rij--nee b { color: #9A9188; }
+.zk-mock__totaal { margin-top: .75rem !important; font-weight: 700; color: var(--zk-groen-2); }
+.zk-rsvp__tekst > p:not(.eyebrow):not(.zk-rsvp__noot) { color: var(--ink-2); max-width: 34rem; }
+.zk-rsvp .checklist { margin-top: 1.2rem; }
+.zk-rsvp .checklist li::before { border-color: var(--zk-groen-2); }
+.zk-rsvp__noot { margin: 1rem 0 0; font-size: .82rem; color: var(--muted); }
+
+.zk-delen__lijst { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 2px solid var(--zk-groen); }
+.zk-delen__item { padding: 1.6rem 1.5rem 1.4rem 0; }
+.zk-delen__item + .zk-delen__item { padding-left: 1.5rem; border-left: 1px solid rgba(36, 53, 43, .2); }
+.zk-delen__icoon { display: grid; place-items: center; width: 3rem; height: 3rem; margin-bottom: 1rem; border-radius: 50%; color: #fff; background: var(--zk-groen); }
+.zk-delen__icoon .icon { width: 1.5rem; height: 1.5rem; stroke-width: 1.5; }
+.zk-delen__item h3 { margin-bottom: .35rem; }
+.zk-delen__item p { color: var(--ink-2); font-size: .96rem; margin: 0; }
+
+.zk-branding { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 2.4vw, 1.75rem); }
+.zk-branding__kaart { padding: clamp(1.4rem, 3vw, 2rem); border-radius: var(--radius-lg); background: var(--paper); box-shadow: 0 0 0 1px rgba(36, 53, 43, .2), 0 24px 44px -36px rgba(36, 40, 30, .5); }
+.zk-branding__kaart--aanvraag { background: linear-gradient(180deg, #F8F3E7, #F1E9D6); box-shadow: 0 0 0 1.5px var(--zk-koper), 0 24px 44px -36px rgba(120, 90, 30, .5); }
+.zk-branding__kaart h3 { margin-bottom: .9rem; }
+.zk-branding__kaart .checklist { margin-bottom: 1.1rem; }
+.zk-branding__kaart .checklist li::before { border-color: var(--zk-groen-2); }
+.zk-branding__noot { margin: 1.2rem 0 0; text-align: center; font-size: .9rem; color: var(--muted); }
+
+.zk-stappen { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(1rem, 2vw, 1.75rem); }
+.zk-stap { padding-top: 1.1rem; border-top: 2px solid var(--zk-groen); }
+.zk-stap__nr { display: block; font-family: var(--font-display); font-size: 2rem; line-height: 1; color: var(--zk-koper); margin-bottom: .6rem; }
+.zk-stap h3 { font-size: 1.12rem; margin-bottom: .3rem; }
+.zk-stap p { margin: 0; font-size: .92rem; color: var(--ink-2); }
+
+.zk-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(.9rem, 2.4vw, 1.75rem); }
+.zk-grid .design-card__meta { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.zk-meerlink { display: flex; justify-content: center; margin: clamp(1.75rem, 4vw, 2.5rem) 0 0; }
+
+.zk-cta { position: relative; overflow: hidden; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); align-items: center; border-radius: var(--radius-xl); color: #EDE9DD;
+  background: radial-gradient(60% 90% at 90% 20%, rgba(176, 138, 74, .28), transparent 65%), linear-gradient(135deg, #1D2B23 0%, #2A4033 60%, #24352B 100%); box-shadow: 0 40px 70px -46px rgba(14, 24, 17, .85); }
+.zk-cta__tekst { padding: clamp(2rem, 4.5vw, 3.5rem); }
+.zk-cta h2 { color: #F7F2E4; }
+.zk-cta .eyebrow { color: #D8BC84; }
+.zk-cta p { color: #D4D9CC; max-width: 33rem; }
+.zk-cta .btn-row { margin: 1.75rem 0 1.5rem; }
+.zk-cta .btn--secondary-dark { background: transparent; color: #F7F2E4; border-color: rgba(237, 233, 221, .5); }
+.zk-cta .btn--secondary-dark:hover { background: rgba(255, 253, 249, .1); color: #fff; border-color: #D8BC84; }
+.zk-cta__voet { font-size: .92rem; margin: 0; }
+.zk-cta__voet a { color: #F7F2E4; }
+.zk-cta__kaarten { position: relative; list-style: none; margin: 0; padding: 0; align-self: stretch; min-height: 22rem; }
+.zk-cta__kaarten li { position: absolute; width: min(10.5rem, 60%); aspect-ratio: 4 / 5.2; border-radius: var(--radius); overflow: hidden; box-shadow: 0 0 0 1px rgba(237, 233, 221, .5), 0 30px 44px -20px rgba(0, 0, 0, .7); }
+.zk-cta__kaarten li:nth-child(1) { left: 8%; top: 12%; }
+.zk-cta__kaarten li:nth-child(2) { right: 8%; bottom: 10%; }
+.zk-cta__kaarten img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+
+@media (max-width: 1100px) {
+  .zk-momenten__lijst { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .zk-stappen { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 1.8rem; }
+}
+@media (max-width: 860px) {
+  .zk-kop__inner { grid-template-columns: 1fr; }
+  .zk-kaarten { order: -1; max-width: 22rem; padding-bottom: 1.2rem; }
+  .zk-kaarten__kaart:nth-child(1) { margin-top: 1.6rem; }
+  .zk-kaarten__kaart:nth-child(3) { margin-top: 3rem; }
+  .zk-kop { padding-top: 1.5rem; }
+  .zk-een__kader { grid-template-columns: 1fr; }
+  .zk-een__telefoon { order: -1; }
+  .zk-rsvp { grid-template-columns: 1fr; }
+  .zk-rsvp__beeld { order: 2; min-height: 23rem; }
+  .zk-delen__lijst { grid-template-columns: 1fr; border-top: 2px solid var(--zk-groen); }
+  .zk-delen__item, .zk-delen__item + .zk-delen__item { padding: 1.4rem 0; border-left: 0; border-bottom: 1px solid rgba(36, 53, 43, .2); }
+  .zk-branding { grid-template-columns: 1fr; }
+  .zk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .zk-cta { grid-template-columns: 1fr; }
+  .zk-cta__kaarten { order: -1; min-height: 14rem; }
+  .zk-cta__kaarten li { width: 7.5rem; }
+}
+@media (max-width: 640px) {
+  .zk-kaarten__naam { display: none; }
+  .zk-momenten__lijst { grid-template-columns: 1fr; }
+  .zk-een__onderdelen { grid-template-columns: 1fr; }
+  .zk-stappen { grid-template-columns: 1fr; gap: 1.2rem; }
+  .zk-stap { display: grid; grid-template-columns: 3rem minmax(0, 1fr); column-gap: .9rem; }
+  .zk-stap__nr { grid-row: 1 / span 2; margin: 0; }
+  .zk-grid { gap: .75rem; }
+  .zk-grid .design-card__visual { border-radius: var(--radius); margin-bottom: .6rem; }
+  .zk-grid .design-card__name { font-size: .88rem; line-height: 1.3; }
+  .zk-grid .design-card__meta { display: none; }
+  .zk-kop .btn-row .btn, .zk-cta .btn-row .btn { flex: 1 1 100%; }
+  .zk-mock { width: 62%; font-size: .78rem; }
+}
+@media (max-width: 700px) {
+  .zk-rsvp__beeld { display: grid; gap: 1rem; min-height: 0; padding: 1.25rem; }
+  .zk-mock { position: static; width: 100%; font-size: .84rem; }
+  .zk-mock--gast { transform: rotate(-1deg); }
+  .zk-mock--lijst { transform: rotate(1deg); }
+}
+@media (prefers-reduced-motion: reduce) { .zk-kaarten__kaart a, .zk-moment { transition: none; } }

@@ -52,7 +52,7 @@ class PaginaRegelsTests(VaylideTestCase):
             self.assertFalse(clarity_op_pagina(pad), pad)
 
     def test_script_banner_en_csp_alleen_waar_het_mag(self):
-        for adres in ("/", "/ontwerpen/", "/ontwerpen/kerststad/", "/inspiratie/", "/prijzen/", "/digitale-trouwkaarten/", "/digitale-kerstkaarten/", "/digitale-verjaardagsuitnodigingen/", "/maken/?gelegenheid=bruiloft"):
+        for adres in ("/", "/ontwerpen/", "/ontwerpen/kerststad/", "/inspiratie/", "/prijzen/", "/digitale-trouwkaarten/", "/digitale-kerstkaarten/", "/digitale-verjaardagsuitnodigingen/", "/digitale-zakelijke-uitnodigingen/", "/maken/?gelegenheid=bruiloft"):
             r = Client().get(adres)
             html = r.content.decode()
             self.assertEqual(r.status_code, 200, adres)

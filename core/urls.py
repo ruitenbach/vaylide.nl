@@ -11,6 +11,7 @@ urlpatterns = [
     path("digitale-trouwkaarten/", views.wedding_cards, name="wedding_cards"),
     path("digitale-kerstkaarten/", views.christmas_cards, name="christmas_cards"),
     path("digitale-verjaardagsuitnodigingen/", views.birthday_invitations, name="birthday_invitations"),
+    path("digitale-zakelijke-uitnodigingen/", views.business_invitations, name="business_invitations"),
     path("zo-werkt-het/", views.how, name="how"),
     path("prijzen/", views.pricing, name="pricing"),
     path("veelgestelde-vragen/", views.faq, name="faq"),

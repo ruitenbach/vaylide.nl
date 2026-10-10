@@ -1,0 +1,230 @@
+{% extends "base.html" %}{% load static vl %}
+{% block title %}Digitale zakelijke uitnodiging maken{% endblock %}
+{% block description %}Maak een digitale zakelijke uitnodiging voor een opening, bedrijfsfeest, jubileum of event. Met RSVP, programma, locatie en eenvoudig delen via link of QR-code.{% endblock %}
+{% block og_title %}Digitale zakelijke uitnodiging maken · VAYLIDE{% endblock %}
+{% block og_description %}Maak een digitale zakelijke uitnodiging voor een opening, bedrijfsfeest, jubileum of event. Met RSVP, programma, locatie en eenvoudig delen via link of QR-code.{% endblock %}
+{% block body_class %}page-zakelijk{% endblock %}
+{% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
+{% block content %}
+{# Kop: rustig steen en groen, de tekst links en rechts drie echte ontwerpen uit de zakelijke collectie. #}
+<section class="paginakop zk-kop" data-sparkles aria-labelledby="zk-titel">
+  {% include "partials/paginakop_wereld.html" %}
+  <div class="container zk-kop__inner">
+    <div class="zk-kop__tekst">
+      <p class="eyebrow">Digitale zakelijke uitnodigingen</p>
+      <h1 id="zk-titel">Digitale zakelijke uitnodigingen met een <em>professionele</em> uitstraling</h1>
+      <p class="lead">Nodig klanten, medewerkers of relaties uit met een digitale uitnodiging die past bij je organisatie. Voeg praktische informatie toe, laat gasten zich aanmelden en deel eenvoudig via link, WhatsApp of QR-code.</p>
+      <div class="btn-row">
+        <a class="btn btn--primary btn--lg" href="#zakelijke-ontwerpen">Bekijk zakelijke uitnodigingen {% icon "pijl" %}</a>
+        <a class="btn btn--secondary btn--lg" href="{% url 'studio:start' %}?gelegenheid=zakelijk">Maak een zakelijke uitnodiging</a>
+      </div>
+      <ul class="hero__checks"><li>{% icon "vink" %}Programma en locatie</li><li>{% icon "vink" %}RSVP en gastenlijst</li><li>{% icon "vink" %}Link, WhatsApp of QR-code</li><li>{% icon "vink" %}Zonder app voor gasten</li></ul>
+    </div>
+    <ul class="zk-kaarten">
+      {% for card in kop_cards %}<li class="zk-kaarten__kaart" style="--i:{{ forloop.counter0 }}"><a href="{{ card.detail_url }}"><img src="{{ card.image }}" alt="Digitale zakelijke uitnodiging {{ card.template.name }}" width="800" height="1000"{% if forloop.counter0 < 2 %} fetchpriority="high"{% endif %} decoding="async"><span class="zk-kaarten__naam">{{ card.template.name }}</span></a></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+{# Voor ieder zakelijk moment. #}
+<section class="section zk-momenten" aria-labelledby="momenten-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Van opening tot jubileum</p>
+      <h2 id="momenten-titel">Voor ieder zakelijk moment</h2>
+      <p>Een uitnodiging voor een bedrijfsfeest vraagt iets anders dan een uitnodiging voor een opening of een productlancering. Kies het ontwerp dat bij jouw organisatie en jouw gelegenheid past.</p>
+    </div>
+    <ol class="zk-momenten__lijst">
+      {% for icon_name, title, text in momenten %}
+      <li class="zk-moment">
+        <span class="zk-moment__nr" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+        <span class="zk-moment__icoon">{% icon icon_name 28 %}</span>
+        <h3>{{ title }}</h3>
+        <p>{{ text }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+{# Alles overzichtelijk in één uitnodiging, met een werkend zakelijk voorbeeld. #}
+<section class="section section--flush" aria-labelledby="onderdelen-titel">
+  <div class="container">
+    <div class="zk-een__kader">
+      <div class="zk-een__tekst">
+        <p class="eyebrow">Probeer het zelf</p>
+        <h2 id="onderdelen-titel">Alles overzichtelijk in één uitnodiging</h2>
+        <p>Geen bijlage met een pdf en geen losse mail met het adres. Eén link met alles wat je genodigden willen weten, op elk scherm goed leesbaar.</p>
+        <dl class="zk-een__onderdelen">
+          {% for title, text in onderdelen %}<div><dt>{{ title }}</dt><dd>{{ text }}</dd></div>{% endfor %}
+        </dl>
+        {% if demo_slug %}<a class="link-arrow" href="{% url 'invitations:demo' demo_slug %}?gelegenheid=zakelijk">Open een werkend voorbeeld</a>{% endif %}
+      </div>
+      {% if demo_slug %}
+      <div class="zk-een__telefoon phone-demo">
+        <div class="phone">
+          <div class="phone__screen" data-lazy-frame="{% url 'invitations:demo' demo_slug %}?gelegenheid=zakelijk&amp;embed=1" data-frame-title="Werkend voorbeeld van een digitale zakelijke uitnodiging (fictief evenement)">
+            <img class="phone__poster" src="{% design_image demo_slug %}" alt="" width="800" height="1000" loading="lazy" decoding="async">
+            <a class="phone__fallback" href="{% url 'invitations:demo' demo_slug %}?gelegenheid=zakelijk">Open het werkende voorbeeld</a>
+          </div>
+        </div>
+        <p class="demo-caption">Voorbeeld met een fictief evenement</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{# RSVP en gastenlijst. #}
+<section class="section" aria-labelledby="rsvp-titel">
+  <div class="container">
+    <div class="zk-rsvp">
+      <div class="zk-rsvp__beeld" role="img" aria-label="Illustratie met fictieve gasten: links het aanmeldformulier van een gast, rechts het overzicht van de aanmeldingen voor de organisator">
+        <div class="zk-mock zk-mock--gast" aria-hidden="true">
+          <p class="zk-mock__kop">Bent u erbij?</p>
+          <p class="zk-mock__veld">Uw naam <b>J. de Vries</b></p>
+          <p class="zk-mock__keuze zk-mock__keuze--aan">Ja, ik kom graag</p>
+          <p class="zk-mock__keuze">Helaas, ik kan niet</p>
+          <p class="zk-mock__veld">Aantal personen <b>2</b></p>
+          <p class="zk-mock__knop">Versturen</p>
+        </div>
+        <div class="zk-mock zk-mock--lijst" aria-hidden="true">
+          <p class="zk-mock__kop">Aanmeldingen</p>
+          <p class="zk-mock__rij"><span>J. de Vries</span><b>2 personen</b></p>
+          <p class="zk-mock__rij"><span>A. Bakker</span><b>1 persoon</b></p>
+          <p class="zk-mock__rij"><span>S. Jansen</span><b>3 personen</b></p>
+          <p class="zk-mock__rij zk-mock__rij--nee"><span>M. Smit</span><b>kan niet</b></p>
+          <p class="zk-mock__totaal">6 gasten komen</p>
+        </div>
+      </div>
+      <div class="zk-rsvp__tekst">
+        <p class="eyebrow">Weten wie er komt</p>
+        <h2 id="rsvp-titel">Uitnodiging met RSVP en gastenlijst</h2>
+        <p>Een uitnodiging met RSVP voorkomt dat je achter reacties aan moet. Genodigden geven in de uitnodiging zelf door of ze komen, en jij houdt overzicht in Mijn VAYLIDE.</p>
+        <ul class="checklist">
+          <li>Gasten kiezen: ja, ik kom graag, of helaas, ik kan niet</li>
+          <li>Het aantal personen per aanmelding, met een maximum dat je zelf instelt</li>
+          <li>Een uiterste reactiedatum, als je die wilt vragen</li>
+          <li>Geen account nodig; gasten kunnen hun antwoord later zelf wijzigen</li>
+          <li>Alle reacties in Mijn VAYLIDE, met een export naar Excel of Numbers</li>
+        </ul>
+        <p class="zk-rsvp__noot">Illustratie met fictieve gasten.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# Professioneel delen. #}
+<section class="section section--flush zk-delen" aria-labelledby="delen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">Zonder app of account</p>
+      <h2 id="delen-titel">Professioneel delen vanuit je eigen communicatie</h2>
+      <p>Je deelt de uitnodiging via je eigen kanalen. Zo blijft het contact met je relaties bij jou, en bepaal jij wie de uitnodiging krijgt.</p>
+    </div>
+    <ul class="zk-delen__lijst">
+      {% for icon_name, title, text in delen %}<li class="zk-delen__item"><span class="zk-delen__icoon">{% icon icon_name 28 %}</span><h3>{{ title }}</h3><p>{{ text }}</p></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+{# Branding. #}
+<section class="section" aria-labelledby="branding-titel">
+  <div class="container container--mid">
+    <div class="sectie-kop">
+      <p class="eyebrow">Jouw organisatie</p>
+      <h2 id="branding-titel">Bedrijfsnaam, logo en huisstijl</h2>
+      <p>Wat standaard kan, en wat op aanvraag.</p>
+    </div>
+    <div class="zk-branding">
+      <article class="zk-branding__kaart">
+        <h3>Standaard</h3>
+        <ul class="checklist">
+          <li>Je bedrijfsnaam als organisatie op de uitnodiging</li>
+          <li>De naam van het evenement, bijvoorbeeld Jubileumborrel</li>
+          <li>Een ontwerp en kleurvariant uit onze collectie</li>
+          <li>Een contactpersoon met telefoonnummer en e-mailadres</li>
+        </ul>
+      </article>
+      <article class="zk-branding__kaart zk-branding__kaart--aanvraag">
+        <h3>Op aanvraag</h3>
+        <ul class="checklist">
+          <li>Je eigen logo of beeldmerk, ook op het zegel van de envelop</li>
+          <li>Een ontwerp in jullie eigen stijl of huisstijl</li>
+          <li>Eerst een voorstel met prijs; we beginnen pas na jouw akkoord</li>
+        </ul>
+        <a class="link-arrow" href="{% url 'core:contact' %}?onderwerp=maatwerk">Vraag een voorstel aan</a>
+      </article>
+    </div>
+    <p class="zk-branding__noot">Onderaan een uitnodiging staat altijd een kleine vermelding dat hij is gemaakt met VAYLIDE.</p>
+  </div>
+</section>
+
+{# Zo maak je een digitale zakelijke uitnodiging. #}
+<section class="section section--flush" aria-labelledby="stappen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">In vijf stappen</p>
+      <h2 id="stappen-titel">Zo maak je een digitale zakelijke uitnodiging</h2>
+    </div>
+    <ol class="zk-stappen">
+      {% for title, text in steps %}
+      <li class="zk-stap">
+        <span class="zk-stap__nr" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+        <h3><span class="visually-hidden">Stap {{ forloop.counter }}: </span>{{ title }}</h3>
+        <p>{{ text }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="stappenrij__voet"><span><strong>Essentieel {{ essentieel_prijs }}</strong>, Compleet {{ compleet_prijs }}, incl. btw en eenmalig, geen kosten per gast.{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</span><a class="link-arrow" href="{% url 'core:pricing' %}">Bekijk de prijzen</a><a class="link-arrow" href="{% url 'core:how' %}">Zo werkt het</a></p>
+  </div>
+</section>
+
+{# De zakelijke collectie. #}
+<section class="section" id="zakelijke-ontwerpen" aria-labelledby="ontwerpen-titel">
+  <div class="container">
+    <div class="sectie-kop">
+      <p class="eyebrow">De collectie</p>
+      <h2 id="ontwerpen-titel">Kies jouw zakelijke uitnodiging</h2>
+      <p>{{ zakelijk_count }} ontwerpen voor een zakelijk evenement, elk met een eigen opening en kleurvarianten. De voorbeelden tonen voorbeeldteksten; jouw uitnodiging toont jouw eigen gegevens.</p>
+    </div>
+    <div class="zk-grid">
+      {% for card in cards %}{% include "partials/design_card.html" %}{% endfor %}
+    </div>
+    <p class="zk-meerlink"><a class="btn btn--secondary" href="{% url 'core:designs' %}?gelegenheid=zakelijk">Bekijk de hele zakelijke collectie {% icon "pijl" %}</a></p>
+  </div>
+</section>
+
+<section class="section section--flush home-faq" aria-labelledby="faq-titel">
+  <div class="container container--mid">
+    <div class="sectie-kop">
+      <p class="eyebrow">Goed om te weten</p>
+      <h2 id="faq-titel">Veelgestelde vragen over digitale zakelijke uitnodigingen</h2>
+    </div>
+    <div class="faq-lijst">
+      {% for question, answer in faq %}<details class="faq-item"><summary>{{ question }}</summary><p>{{ answer }}</p></details>{% endfor %}
+    </div>
+    <p class="home-faq__meer"><a class="link-arrow" href="{% url 'core:faq' %}">Alle veelgestelde vragen</a></p>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="cta-titel">
+  <div class="container">
+    <div class="zk-cta">
+      <div class="zk-cta__tekst">
+        <p class="eyebrow">Jouw evenement</p>
+        <h2 id="cta-titel">Een uitnodiging die past bij je organisatie</h2>
+        <p>Kies een ontwerp, vul de gegevens van je evenement in en zie direct hoe de uitnodiging eruitziet. Je betaalt pas als je tevreden bent en hem wilt delen.</p>
+        <div class="btn-row">
+          <a class="btn btn--goud btn--lg" href="{% url 'studio:start' %}?gelegenheid=zakelijk">Maak een zakelijke uitnodiging {% icon "pijl" %}</a>
+          <a class="btn btn--secondary-dark btn--lg" href="{% url 'core:designs' %}?gelegenheid=zakelijk">Bekijk zakelijke uitnodigingen</a>
+        </div>
+        <p class="zk-cta__voet">Meer vragen? Lees de <a href="{% url 'core:faq' %}">veelgestelde vragen</a>, bekijk <a href="{% url 'core:pricing' %}">de prijzen</a> of <a href="{% url 'core:contact' %}?onderwerp=maatwerk">vraag een voorstel aan</a>.</p>
+      </div>
+      <ul class="zk-cta__kaarten" aria-hidden="true">
+        {% for card in kop_cards|slice:":2" %}<li style="--i:{{ forloop.counter0 }}"><img src="{{ card.image }}" alt="" width="800" height="1000" loading="lazy" decoding="async"></li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

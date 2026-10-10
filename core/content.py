@@ -312,3 +312,67 @@ VERJAARDAG_FAQ = [
      "Nee. De leeftijd is optioneel. Laat je hem leeg, dan nodigt de uitnodiging gewoon uit voor een feest. Vul je hem in, dan komt hij groot in beeld bij ontwerpen die het aantal jaren uitlichten."),
 ]
 
+
+# SEO-landingspagina /digitale-zakelijke-uitnodigingen/ (core/templates/core/zakelijke_uitnodigingen.html). Alleen ontwerpen die bij de gelegenheid Zakelijk horen
+# (ontbrekende worden overgeslagen). De kaartbeelden tonen voorbeeldteksten; de kop gebruikt de ontwerpen die er zakelijk uitzien.
+ZAKELIJK_KOP = ["gala", "strak", "avondgoud"]
+ZAKELIJK_ONTWERPEN = ["gala", "strak", "avondgoud", "glitter", "neon", "tropisch"]
+ZAKELIJK_DEMO = "strak"
+
+# 'Voor ieder zakelijk moment': (icoon, titel, tekst). Alleen wat de Studio kan: datum, tijd, locatie, programma, contactpersoon, praktische informatie en aanmelden.
+ZAKELIJK_MOMENTEN = [
+    ("programma", "Bedrijfsfeest", "Zomerfeest of jaarfeest: datum, tijd en locatie, en een programma van ontvangst tot afsluiting."),
+    ("locatie", "Opening", "Een nieuwe vestiging, kantoor of winkel: laat relaties weten waar en wanneer, met een knop naar de route."),
+    ("kaarten", "Jubileum", "Tien, vijfentwintig of vijftig jaar bestaan? Zet het aantal jaren (optioneel) in beeld bij ontwerpen die dat uitlichten."),
+    ("gasten", "Netwerkborrel", "Kort en helder, met aanmelden, zodat je weet hoeveel gasten je mag verwachten."),
+    ("hart", "Personeelsfeest", "Nodig je team uit en laat iedereen zich aanmelden. Deel de link via je eigen intranet of groepsapp."),
+    ("wekker", "Kerstborrel", "Een borrel of diner met team of relaties. De kerstcollectie heeft sfeervolle ontwerpen, ook zonder kinderlijk kerstgevoel."),
+    ("oog", "Productlancering", "Ontvangst, presentatie en borrel op een tijdlijn, met praktische informatie voor wie het nieuwe wil zien."),
+    ("agenda", "Zakelijke bijeenkomst", "Klantdag, seminar of relatie-evenement: contactpersoon, programma en praktische informatie op één plek."),
+]
+
+# 'Alles overzichtelijk in één uitnodiging': (titel, tekst).
+ZAKELIJK_ONDERDELEN = [
+    ("Datum en tijd", "Met een aftellertje en een knop om het evenement in de agenda te zetten (Google, Apple en Outlook)."),
+    ("Locatie", "Het adres met een knop naar de kaart, zodat niemand de weg kwijtraakt."),
+    ("Programma", "Van ontvangst tot borrel, op een rustige tijdlijn."),
+    ("Contactpersoon", "Naam, telefoonnummer en e-mailadres van wie vragen kan beantwoorden."),
+    ("Praktische informatie", "Bijvoorbeeld parkeren, openbaar vervoer of een dresscode."),
+    ("Een eigen boodschap", "Een korte tekst van de organisatie, in jullie eigen woorden."),
+]
+
+ZAKELIJK_DELEN = [
+    ("link", "Als link", "Na je betaling krijg je een eigen link. Zet hem in een e-mail, nieuwsbrief, intranetbericht of op je website."),
+    ("chat", "Via WhatsApp", "Plak de link in een gesprek of groep. Ontvangers openen de uitnodiging in hun browser."),
+    ("qr", "Met een QR-code", "Een QR-code is inbegrepen: handig op een kaartje, een scherm, een poster of in een brief."),
+]
+
+ZAKELIJK_FAQ = [
+    ("Wat is een digitale zakelijke uitnodiging?",
+     "Een uitnodiging voor een zakelijk evenement die je als link deelt in plaats van per post. Gasten openen hem op hun telefoon of computer en zien direct de datum, tijd, locatie en het programma, "
+     "en kunnen zich aanmelden."),
+    ("Voor welke zakelijke evenementen kan ik VAYLIDE gebruiken?",
+     "Voor elk evenement waarvoor je gasten wilt uitnodigen: een bedrijfsfeest, een opening, een jubileum, een netwerkborrel, een personeelsfeest, een kerstborrel, een productlancering of een zakelijke bijeenkomst. "
+     "De gelegenheid Zakelijk vraagt om de naam van het evenement en van de organisatie."),
+    ("Kunnen gasten zich via de uitnodiging aanmelden?",
+     "Ja. Gasten geven met een paar tikken door of ze komen en met hoeveel personen, zonder account. Je kunt een uiterste reactiedatum en een maximum aantal personen per aanmelding instellen. "
+     "Alle reacties staan in Mijn VAYLIDE en de gastenlijst kun je exporteren naar een bestand voor Excel of Numbers."),
+    ("Kan ik een zakelijke uitnodiging via WhatsApp of een link versturen?",
+     "Ja. Na je betaling krijg je een eigen link. Die kun je in een e-mail, nieuwsbrief of intranetbericht zetten, of in een WhatsApp-gesprek of -groep plakken. "
+     "VAYLIDE verstuurt de uitnodiging niet voor je: jij bepaalt wie hem krijgt."),
+    ("Kan ik een QR-code gebruiken?",
+     "Ja. Naast de link krijg je een QR-code, bijvoorbeeld voor op een kaartje, een scherm of een poster bij de ingang."),
+    ("Kan ik mijn bedrijfsnaam of logo toevoegen?",
+     "Je bedrijfsnaam staat als organisatie op de uitnodiging. Wil je ook je eigen logo of beeldmerk, ook op het zegel van de envelop, of een ontwerp in jullie huisstijl, dan kan dat op aanvraag: "
+     "je krijgt eerst een voorstel met prijs. Onderaan een uitnodiging staat altijd een kleine vermelding dat hij is gemaakt met VAYLIDE."),
+    ("Hebben gasten een app nodig?",
+     "Nee. Gasten openen de link in hun browser. Ze hoeven niets te installeren en geen account aan te maken."),
+    ("Kan ik de uitnodiging eerst bekijken voordat ik bestel?",
+     "Ja. Ontwerpen en bekijken is gratis: van elk ontwerp staat een werkend voorbeeld online en in de Studio zie je direct jouw uitnodiging. Je betaalt pas bij het publiceren."),
+    ("Wat kost een digitale zakelijke uitnodiging?",
+     "Je betaalt eenmalig, zonder kosten per gast: Essentieel kost {essentieel} en Compleet {compleet}, inclusief btw. Essentieel staat 6 maanden online en Compleet 12 maanden, vanaf de dag dat je betaling is bevestigd. "
+     "Een ontwerp in eigen huisstijl of met je logo is op aanvraag."),
+    ("Kan ik een contactpersoon en praktische informatie toevoegen?",
+     "Ja. Je kunt een contactpersoon met telefoonnummer en e-mailadres opnemen, en praktische informatie zoals parkeren, de route of een dresscode. Onderdelen die je niet nodig hebt, zet je uit."),
+]
+

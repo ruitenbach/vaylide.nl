@@ -19,7 +19,7 @@ from invitations.demo import DEFAULT_DEMO_OCCASION
 
 from . import seo
 from .content import (ABOUT_POINTS, FAQ, FEATURE_GROUPS, FEATURES, HERO_CHECKS, HOME_DESIGNS, HOME_FAQ_EXTRA, HOME_FAQ_QUESTIONS,
-                      HOME_FEATURES, HOME_KERST, OCCASION_TILE_NOTES, OCCASION_TILES, STEPS, STEPS_SHORT, TEXT_SAMPLES, TIPS, KERST_BELEVING, KERST_DELEN, VERJAARDAG_BELEVING, VERJAARDAG_DELEN, VERJAARDAG_DEEL_ONTWERP, VERJAARDAG_FAQ, VERJAARDAG_KOP, VERJAARDAG_ONTWERPEN, VERJAARDAG_SOORTEN, KERST_FAMILIE, KERST_FAQ, KERST_KOP, KERST_ONTWERPEN, KERST_ZAKELIJK, TROUW_FAQ, TROUW_KOP,
+                      HOME_FEATURES, HOME_KERST, OCCASION_TILE_NOTES, OCCASION_TILES, STEPS, STEPS_SHORT, TEXT_SAMPLES, TIPS, ZAKELIJK_DELEN, ZAKELIJK_DEMO, ZAKELIJK_FAQ, ZAKELIJK_KOP, ZAKELIJK_MOMENTEN, ZAKELIJK_ONDERDELEN, ZAKELIJK_ONTWERPEN, KERST_BELEVING, KERST_DELEN, VERJAARDAG_BELEVING, VERJAARDAG_DELEN, VERJAARDAG_DEEL_ONTWERP, VERJAARDAG_FAQ, VERJAARDAG_KOP, VERJAARDAG_ONTWERPEN, VERJAARDAG_SOORTEN, KERST_FAMILIE, KERST_FAQ, KERST_KOP, KERST_ONTWERPEN, KERST_ZAKELIJK, TROUW_FAQ, TROUW_KOP,
                       TROUW_UITGELICHT, TROUW_VOORDELEN, VALUES)
 from .forms import ContactForm
 from .models import ContactMessage, SiteConfig
@@ -28,9 +28,9 @@ from .utils import form_age_seconds, ip_fingerprint, rate_limit, signed_timestam
 
 # Gelegenheden met een eigen SEO-landingspagina: het filter ?gelegenheid=<sleutel> werkt gewoon in de site, maar zijn canonical is die pagina en
 # hij staat niet in de sitemap (de pagina staat er wel in).
-GELEGENHEID_HUBS = {"bruiloft": "core:wedding_cards", "kerst": "core:christmas_cards", "verjaardag": "core:birthday_invitations"}
+GELEGENHEID_HUBS = {"bruiloft": "core:wedding_cards", "kerst": "core:christmas_cards", "verjaardag": "core:birthday_invitations", "zakelijk": "core:business_invitations"}
 # Op een ontwerppagina: een verwijzing naar de landingspagina('s) van de gelegenheden waar het ontwerp bij hoort: (gelegenheid, tekst van de link).
-HUB_LINKS = (("bruiloft", "digitale trouwkaarten"), ("verjaardag", "digitale verjaardagsuitnodigingen"), ("kerst", "digitale kerstkaarten"))
+HUB_LINKS = (("bruiloft", "digitale trouwkaarten"), ("verjaardag", "digitale verjaardagsuitnodigingen"), ("kerst", "digitale kerstkaarten"), ("zakelijk", "digitale zakelijke uitnodigingen"))
 
 
 def _designs():
@@ -194,6 +194,44 @@ def birthday_invitations(request):
             "faq": faq,
             "config": SiteConfig.get(),
             "jsonld": [seo.breadcrumbs([("Home", "/"), ("Digitale verjaardagsuitnodigingen", path)]), seo.faq_page(faq)],
+        },
+    )
+
+
+def business_invitations(request):
+    """SEO-landingspagina /digitale-zakelijke-uitnodigingen/: zakelijke ontwerpen uit de collectie, zakelijke momenten, aanmelden, delen, branding, stappen en vragen."""
+    zakelijk = [d for d in _designs() if "zakelijk" in d.occasions]
+    by_slug = {d.slug: d for d in zakelijk}
+
+    def kies(slugs):
+        return [by_slug[s] for s in slugs if s in by_slug]
+
+    packages = {p.code: p.price_display for p in Package.objects.filter(is_active=True)}
+    faq = [(q, a.format(essentieel=packages.get("essentieel", ""), compleet=packages.get("compleet", ""))) for q, a in ZAKELIJK_FAQ]
+    path = reverse("core:business_invitations")
+    return render(
+        request,
+        "core/zakelijke_uitnodigingen.html",
+        {
+            "kop_cards": _design_cards(kies(ZAKELIJK_KOP), "zakelijk"),
+            "cards": _design_cards(kies(ZAKELIJK_ONTWERPEN), "zakelijk"),
+            "zakelijk_count": len(zakelijk),
+            "demo_slug": ZAKELIJK_DEMO if ZAKELIJK_DEMO in by_slug else "",
+            "momenten": ZAKELIJK_MOMENTEN,
+            "onderdelen": ZAKELIJK_ONDERDELEN,
+            "delen": ZAKELIJK_DELEN,
+            "steps": [
+                ("Kies een ontwerp", "Uit onze zakelijke collectie, van ingetogen tot feestelijk."),
+                ("Vul de gegevens in", "Naam van het evenement, organisatie, datum, tijd, locatie, programma en contactpersoon."),
+                ("Bekijk het voorbeeld", "Zie direct hoe jouw uitnodiging opent en eruitziet, op telefoon en computer."),
+                ("Bestel", "Je betaalt eenmalig, pas als je tevreden bent. Daarna wordt de uitnodiging gepubliceerd."),
+                ("Deel met je genodigden", "Via de link of QR-code, in je eigen e-mail, intranet of WhatsApp."),
+            ],
+            "essentieel_prijs": packages.get("essentieel", ""),
+            "compleet_prijs": packages.get("compleet", ""),
+            "faq": faq,
+            "config": SiteConfig.get(),
+            "jsonld": [seo.breadcrumbs([("Home", "/"), ("Digitale zakelijke uitnodigingen", path)]), seo.faq_page(faq)],
         },
     )
 
