@@ -144,6 +144,30 @@ html:not(.js) .zh-again, .zh-hero:not(.zh-klaar) .zh-again { display: none; }
   .zh-caption { padding-top: 70px; padding-bottom: 14px; } .zh-caption__teken { display: none; } .zh-datum { margin-bottom: 10px; } .zh-names { font-size: 32px; }
 }
 
+/* lange namen: iets kleiner, zodat ze niet over de zwanen en het hart heen vallen (gewone namen blijven zoals ze waren) */
+.zh-caption .zh-names--long { font-size: clamp(34px, 9vw, 56px); }
+.zh-caption .zh-names--xlong { font-size: clamp(22px, 6.2vw, 38px); line-height: 1.08; }
+@media (max-width: 520px) and (max-height: 780px) { .zh-caption .zh-names--long { font-size: clamp(30px, 8.2vw, 40px); } .zh-caption .zh-names--xlong { font-size: clamp(21px, 5.8vw, 30px); } }
+@media (max-height: 620px) { .zh-caption .zh-names--long { font-size: 28px; } .zh-caption .zh-names--xlong { font-size: 21px; } }
+@media (min-aspect-ratio: 2/3) { .zh-caption .zh-names--long { font-size: clamp(26px, 2.5vw, 42px); } .zh-caption .zh-names--xlong { font-size: clamp(20px, 1.9vw, 30px); } }
+/* liggende telefoon: de opening past precies op het scherm, zodat de knop helemaal in beeld en te bedienen is */
+@media (orientation: landscape) and (max-height: 520px) {
+  .zh-hero { min-height: 0; }
+  .zh-open { bottom: max(10px, env(safe-area-inset-bottom)); gap: 4px; padding: 8px 12px 10px; }
+  .zh-open__zegel { width: 18px; height: 18px; }
+  /* het staande venster is hier maar zo'n 300 pixels hoog: namen bovenin (boven de zwanen), datum en knoppen onderin, dus ook lange namen vallen niet over de zwanen */
+  .zh-hero .zh-caption { top: 0; display: grid; grid-template-rows: auto auto 1fr auto auto; align-content: stretch; padding: 8px 10px 8px; }
+  .zh-hero .zh-caption__teken { display: none; }
+  .zh-hero .zh-eyebrow { grid-row: 1; margin: 0 auto 2px; font-size: 8.5px; letter-spacing: .2em; text-indent: .2em; }
+  .zh-hero .zh-caption .zh-names { grid-row: 2; margin: 0 auto; font-size: 22px; line-height: 1.06; }
+  .zh-hero .zh-caption .zh-names--long { font-size: 20px; }
+  .zh-hero .zh-caption .zh-names--xlong { font-size: 17px; }
+  .zh-hero .zh-datum { grid-row: 4; margin: 0 auto 4px; font-size: 9.5px; letter-spacing: .08em; line-height: 1.35; }
+  .zh-hero .zh-caption__knoppen { grid-row: 5; gap: 0 10px; }
+  .zh-hero .zh-view { min-height: 40px; padding: 6px 10px; font-size: 10.5px; letter-spacing: .1em; }
+  .zh-hero .zh-again { min-height: 30px; padding: 4px 6px; font-size: 11px; }
+}
+
 /* breder dan staand (tablet liggend, laptop, desktop): de film als staand venster in het midden, onbijgesneden */
 @media (min-aspect-ratio: 2/3) {
   .zh-hero { background: #1E1913; }

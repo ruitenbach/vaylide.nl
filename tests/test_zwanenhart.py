@@ -208,3 +208,31 @@ class ZwanenhartFilmTests(VaylideTestCase):
         self.assertIn("zh-waas--zwanen", html)
         css = (ONTWERP / "style.css").read_text(encoding="utf-8")
         self.assertIn(":is(.zh-tekst, .zh-klaar, html:not(.js) .zh-hero) .zh-waas--zwanen { opacity: 1; }", css)
+
+
+class ZwanenhartLiggendEnLangeNamenTests(VaylideTestCase):
+    """Twee gerichte fixes: de openingsknop op een liggende telefoon en zeer lange namen die niet over de zwanen heen vallen."""
+
+    def _namen(self, partner_1, partner_2):
+        content = demo_content("zwanenhart", "bruiloft")
+        content["names"] = {"partner_1": partner_1, "partner_2": partner_2}
+        html = _render(content)
+        return re.search(r'<h1 class="([^"]+)" id="zh-namen"', html).group(1)
+
+    def test_de_klasse_van_de_namen_volgt_de_lengte(self):
+        self.assertEqual(self._namen("Sanne", "Daan"), "zh-names zh-names--normal")
+        self.assertEqual(self._namen("Alexandra Maria", "Sebastiaan"), "zh-names zh-names--long")
+        self.assertEqual(self._namen("Zoë d'Artagnan", "Max de Ridder van der Heijden-Smit"), "zh-names zh-names--xlong")
+
+    def test_lange_namen_worden_kleiner_en_gewone_namen_blijven_zoals_ze_waren(self):
+        css = (ONTWERP / "style.css").read_text()
+        self.assertRegex(css, r"\.zh-caption \.zh-names--xlong \{ font-size: clamp\(")
+        self.assertNotRegex(css, r"\.zh-caption \.zh-names--normal")
+
+    def test_liggende_telefoon_past_de_opening_op_het_scherm_en_zet_de_namen_boven_de_zwanen(self):
+        css = (ONTWERP / "style.css").read_text()
+        blok = css[css.index("@media (orientation: landscape) and (max-height: 520px)"):]
+        blok = blok[:blok.index("/* breder dan staand")]
+        self.assertIn(".zh-hero { min-height: 0; }", blok)       # geen vaste minimumhoogte die de knop onder de rand duwt
+        self.assertIn(".zh-open { bottom: max(10px, env(safe-area-inset-bottom))", blok)
+        self.assertIn("grid-template-rows: auto auto 1fr auto auto", blok)   # namen bovenin, datum en knoppen onderin

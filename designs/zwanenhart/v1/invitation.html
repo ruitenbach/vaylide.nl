@@ -42,7 +42,7 @@
       <div class="zh-caption" data-zh-caption>
         <svg class="zh-caption__teken" viewBox="0 0 200 40" aria-hidden="true" focusable="false"><use href="#zh-scheiding"/></svg>
         <p class="zh-eyebrow">{{ v.kicker }}</p>
-        <h1 class="zh-names" id="zh-namen" tabindex="-1">{% if v.is_couple %}<span class="fx-shimmer">{{ v.names.0 }}</span> <span class="zh-names__amp" aria-label="en">&amp;</span> <span class="fx-shimmer">{{ v.names.1 }}</span>{% else %}<span class="fx-shimmer">{{ v.names.0 }}</span>{% endif %}</h1>
+        <h1 class="zh-names zh-names--{{ v.names_size }}" id="zh-namen" tabindex="-1">{% if v.is_couple %}<span class="fx-shimmer">{{ v.names.0 }}</span> <span class="zh-names__amp" aria-label="en">&amp;</span> <span class="fx-shimmer">{{ v.names.1 }}</span>{% else %}<span class="fx-shimmer">{{ v.names.0 }}</span>{% endif %}</h1>
         {% if v.date_display %}<p class="zh-datum">{{ v.date_display|capfirst }}{% if v.time_display %} · {{ v.time_display }}{% endif %}</p>{% endif %}
         <div class="zh-caption__knoppen">
           <button type="button" class="zh-view" data-zh-bekijk>Bekijk de uitnodiging</button>

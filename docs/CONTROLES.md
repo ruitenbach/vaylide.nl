@@ -1195,3 +1195,9 @@ Zie `docs/KERSTFILMKAARTEN.md`. Uitgevoerd:
 - Hele suite: 1027 tests geslaagd (1 overgeslagen), met een bestel- en publicatietest: Special, € 89,95, 12 maanden, geen pakketkeuze of toeslag. `controleer_prijzen` klopt.
 - In Chromium op 390 px (met een VP9-kopie van de film, want H.264 speelt niet af): fasen van de opening, desktop 1366 px, verminderde beweging, geblokkeerde film (eindbeeld na ± 6 s), zonder JavaScript, toetsenbord, 360x640 en 768x1024; studio-voorbeeld, bestelstap, testbetaling, publicatie en gast met extreme namen (tags worden als tekst getoond). `e2e/toegankelijkheid.cjs`: 0 bevindingen (dicht en open).
 - Niet gedaan: echte telefoon, Safari, Firefox, H.264 in een browser, `e2e/effecten.cjs`, het filmpje beluisterd (is stil).
+
+### Zwanenhart: liggende telefoon en lange namen (15 oktober 2026, lokaal, `VIERLIEF_PRICING_V2=1`)
+
+- Chromium (VP9-kopie van de film): de openingsknop ligt helemaal binnen het scherm, is bereikbaar met `elementFromPoint`, een tik start de film en er is geen horizontaal scrollen op 844x390, 667x375, 932x430 en 740x360; staand 390x844 en desktop 1440x900 zijn ongewijzigd.
+- Zeer lange namen (`Zoë d'Artagnan & Émile`, `Max "de Ridder" van der Heijden-Smit`) in het eindbeeld: staand 390x844 en 360x640 en desktop 1440x900 vallen niet over de zwanen; liggend 844x390 en 667x375 staan de namen bovenin boven de zwanen (bekeken op screenshots). De lange namen zijn in de browser met een script in de kop gezet, omdat de voorbeeldpagina vaste namen heeft; de klassen staan ook in een test.
+- Niet gedaan: echte telefoon, Safari, Firefox.

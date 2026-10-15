@@ -32,6 +32,7 @@ Zie `designs/zwanenhart/v1/zwanenhart.js` en de tests in `tests/test_zwanenhart.
 
 ## 11. Wat al afgerond is
 Ontwerp, tests, indeling (Special), collectie (A), sort_order 14, demo-gegevens, bestelroute met € 89,95.
+Twee gerichte fixes (15 oktober 2026, zonder wijziging van film, animatie of vormgeving): (1) op een liggende telefoon (liggend, hoogte tot 520 px) heeft de kop geen vaste minimumhoogte meer, zodat de openingsknop helemaal in beeld en bedienbaar is; (2) de namen krijgen de klasse `zh-names--long` of `zh-names--xlong` (zelfde drempels als de rest van de site) en worden dan kleiner; in het kleine staande venster van een liggende telefoon staan de namen bovenin, boven de zwanen, en datum en knoppen onderin.
 
 ## 12. Wat nog moet gebeuren
 Echte telefoon, Safari, Firefox en H.264 in Chrome/Edge op Windows; `e2e/effecten.cjs` voor dit ontwerp.
