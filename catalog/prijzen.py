@@ -58,6 +58,8 @@ INDELING = {
     # Luxe (Golden Noël heeft de Special-vlag, maar is een elegante enveloppe zonder eigen film of scène en staat kwalitatief naast Winterlicht: Luxe)
     "golden-noel": LUXE, "aan-tafel": LUXE, "avondgoud": LUXE, "eerste-dans": LUXE, "gloria": LUXE, "liefde-op-papier": LUXE,
     "middernacht": LUXE, "puur-moment": LUXE, "voor-altijd": LUXE, "winterlicht": LUXE,
+    # Kerstmarkt, Kerstpaleis, Kerstcoupé en Kerstbal: eigen film en scène, bewust Luxe op besluit van de eigenaar (15 oktober 2026, € 24,95)
+    "kerstmarkt": LUXE, "kerstpaleis": LUXE, "kerstcoupe": LUXE, "kerstbal": LUXE,
     # Basis
     **{slug: BASIS for slug in (
         "ballonfeest", "borrel", "confetti", "congres", "door-de-jaren", "eucalyptus", "gala", "gatsby", "glitter", "gouden-jaren", "ja-woord",

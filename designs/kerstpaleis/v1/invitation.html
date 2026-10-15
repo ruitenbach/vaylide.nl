@@ -1,0 +1,190 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Kerstpaleis v1: het filmpje van de eigenaar als opening (een besneeuwd paleis; de houten deuren gaan open naar gouden licht).
+   Daarna de kaart: rood fluweel in een gouden sierlijst, met de kerstgroet en de naam van de klant eronder.
+   Gemaakt uit de losse voorbeeldkaart van de collega; vaste voorbeeldgegevens zijn vervangen door de gegevens van de klant.
+   Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/cinzel-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/great-vibes-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<script src="{% static 'designs/kerstpaleis/v1/kerstpaleis.js' %}" defer></script>{% endblock %}
+
+{% block cover %}
+<section class="cover kp-cover" data-cover data-duration="4450" data-fx-delay="2300" data-fx-intro="3650" aria-label="Openingsscherm">
+  <div class="kp-film" aria-hidden="true">
+    {# Het filmpje: de deuren gaan open. Zonder geluid en zonder bediening; het eerste beeld is de poster. #}
+    <video class="kp-film__video" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback poster="{% static 'designs/kerstpaleis/v1/img/poster.webp' %}" data-kp-film>
+      <source src="{% static 'designs/kerstpaleis/v1/img/kerstpaleis.webm' %}" type="video/webm">
+      <source src="{% static 'designs/kerstpaleis/v1/img/kerstpaleis.mp4' %}" type="video/mp4">
+    </video>
+    <div class="kp-film__light"></div>
+  </div>
+  <div class="fx-slot" data-fx-slot="cover" aria-hidden="true"></div>
+  <span class="kp-door" data-fx-origin aria-hidden="true"></span>
+  <div class="kp-cover__text">
+    <p class="kp-cover__to">{% if v.occasion == "kerst" %}{% if v.formal %}Een kerstgroet voor u{% else %}Een kerstgroet voor jou{% endif %}{% elif v.formal %}Een uitnodiging voor u{% else %}Een uitnodiging voor jou{% endif %}</p>
+    <a href="#uitnodiging" class="kp-open fx-pulse" data-open>Open de deuren</a>
+    {% if v.show.music %}<button type="button" class="kp-cover__music" data-open data-open-music>Openen met muziek</button>{% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<header class="kp-hero">
+  <div class="kp-card">
+    <div class="fx-slot kp-card__snow" data-fx-slot="hero" aria-hidden="true"></div>
+    <div class="kp-card__frame" aria-hidden="true"></div>
+    <span class="kp-card__fleur kp-card__fleur--l" aria-hidden="true"></span>
+    <span class="kp-card__fleur kp-card__fleur--r" aria-hidden="true"></span>
+    <div class="kp-card__text">
+      <div class="kp-greet">
+        {% if v.occasion == "kerst" and not v.headline_custom %}
+        <h1 class="kp-title fx-names"><span>Fijne</span> <span>kerstdagen</span></h1>
+        <img class="kp-divider fx-intro" style="--fx-d:3" src="{% static 'designs/kerstpaleis/v1/img/scheiding.webp' %}" alt="" width="355" height="43" decoding="async">
+        <p class="kp-wish fx-intro" style="--fx-d:4">en een schitterend nieuwjaar</p>
+        {% else %}
+        <h1 class="kp-title fx-names">{{ v.kicker }}</h1>
+        <img class="kp-divider fx-intro" style="--fx-d:3" src="{% static 'designs/kerstpaleis/v1/img/scheiding.webp' %}" alt="" width="355" height="43" decoding="async">
+        {% endif %}
+      </div>
+      <div class="kp-from fx-intro" style="--fx-d:6">
+        <img class="kp-from__orn" src="{% static 'designs/kerstpaleis/v1/img/sier-boven.webp' %}" alt="" width="204" height="35" decoding="async">
+        {% if v.title != v.occasion_label %}<p class="kp-from__name{% if v.names_size == 'long' or v.names_size == 'xlong' %} kp-from__name--{{ v.names_size }}{% endif %}">{% if v.occasion == "kerst" %}<span class="visually-hidden">van </span>{% endif %}{% if v.is_couple %}{{ v.names.0 }} <span aria-label="en">&amp;</span> {{ v.names.1 }}{% else %}{{ v.names.0 }}{% endif %}</p>{% endif %}
+        {% if v.subnames %}<p class="kp-from__members">{{ v.subnames }}</p>{% endif %}
+        {% if v.occasion != "kerst" and v.tagline %}<p class="kp-from__members">{{ v.tagline }}</p>{% endif %}
+        <img class="kp-from__orn" src="{% static 'designs/kerstpaleis/v1/img/sier-onder.webp' %}" alt="" width="204" height="31" decoding="async">
+      </div>
+    </div>
+    <a class="kp-scroll fx-intro" href="#kp-verder" style="--fx-d:8">Lees verder<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </div>
+</header>
+
+<div class="kp-body" id="kp-verder">
+{% if v.welcome %}
+<section class="kp-sec kp-letter" data-reveal aria-label="{% if v.occasion == 'kerst' %}Kerstgroet{% else %}Welkom{% endif %}">
+  <div class="kp-paper kp-letter__card">
+    {% if v.hero %}<figure class="kp-letter__photo"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 300px, 70vw" %}</div></figure>{% endif %}
+    <div class="kp-letter__text">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.has_event and v.date %}
+<section class="kp-sec kp-date-sec" data-reveal aria-labelledby="kp-date-title">
+  <h2 id="kp-date-title" class="kp-h2">De avond</h2>
+  <div class="kp-date">
+    <p class="kp-date__weekday">{{ v.weekday }}</p>
+    <p class="kp-date__day">{{ v.day }}</p>
+    <p class="kp-date__month">{{ v.month_name }} {{ v.year }}</p>
+    {% if v.time_display or v.venue %}<div class="kp-date__more">
+      {% if v.time_display %}<p class="kp-date__time">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+      {% if v.venue %}<p class="kp-date__venue">{{ v.venue }}</p>{% endif %}
+    </div>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="kp-sec kp-program" data-reveal aria-labelledby="kp-program-title">
+  <h2 id="kp-program-title" class="kp-h2">Programma</h2>
+  <ol class="kp-steps" data-fx-stagger>
+    {% for item in v.program %}
+    <li class="kp-step">
+      {% if item.time %}<p class="kp-step__time">{{ item.time }}</p>{% endif %}
+      <span class="kp-step__node" aria-hidden="true"></span>
+      <div class="kp-step__text">
+        <h3 class="kp-step__title">{{ item.title }}</h3>
+        {% if item.description %}<p class="kp-step__desc">{{ item.description }}</p>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="kp-sec kp-count" data-reveal aria-labelledby="kp-count-title">
+  <h2 id="kp-count-title" class="kp-h2">{% if v.is_past %}Dank je wel{% else %}Aftellen{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="kp-sec kp-place" data-reveal aria-labelledby="kp-place-title">
+  <h2 id="kp-place-title" class="kp-h2">Waar</h2>
+  {% if v.venue %}<p class="kp-place__venue">{{ v.venue }}</p>{% endif %}
+  {% if v.address_lines %}<address class="kp-place__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+  {% if v.date_display %}<p class="kp-place__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="kp-sec kp-dress" data-reveal aria-labelledby="kp-dress-title">
+  <h2 id="kp-dress-title" class="kp-h2">Dresscode</h2>
+  {% if v.dresscode_colors %}<ul class="kp-swatches" aria-label="Kleuren voor de dresscode">
+    {% for c in v.dresscode_colors %}<li class="kp-swatch" style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+  {% for p in v.dresscode_text %}<p class="kp-dress__text">{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="kp-sec kp-story" data-reveal aria-labelledby="kp-story-title">
+  <h2 id="kp-story-title" class="kp-h2">{{ v.story_title }}</h2>
+  <div class="kp-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="kp-sec kp-gallery" data-reveal aria-labelledby="kp-gallery-title">
+  <h2 id="kp-gallery-title" class="kp-h2">Herinneringen</h2>
+  <ul class="kp-photos">
+    {% for photo in v.gallery %}<li class="kp-photo"><figure><div class="ph">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 600px) 250px, 44vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="kp-sec kp-practical" data-reveal aria-labelledby="kp-practical-title">
+  <h2 id="kp-practical-title" class="kp-h2">Goed om te weten</h2>
+  <dl class="kp-practical__list" data-fx-stagger>
+    {% for item in v.practical %}<div class="kp-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="kp-sec kp-rsvp" id="aanmelden" data-reveal aria-labelledby="kp-rsvp-title">
+  <h2 id="kp-rsvp-title" class="kp-h2">{% if v.formal %}Schuift u aan?{% else %}Schuif je aan?{% endif %}</h2>
+  <div class="kp-paper">
+    {% include "invitations/partials/rsvp.html" %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="kp-sec kp-contact" data-reveal aria-labelledby="kp-contact-title">
+  <h2 id="kp-contact-title" class="kp-h2">Vragen?</h2>
+  {% if v.contact.note %}<p class="kp-contact__note">{{ v.contact.note }}</p>{% endif %}
+  <p class="kp-contact__name">{{ v.contact.name }}</p>
+  <p class="kp-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="kp-sec kp-end" data-reveal aria-label="Afsluiting">
+  <div class="kp-paper kp-end__card">
+    {% if v.occasion == "kerst" %}
+    <p class="kp-end__greeting">Fijne kerstdagen</p>
+    <p class="kp-end__text">en een schitterend nieuwjaar</p>
+    {% endif %}
+    {% if v.show.closing %}{% for p in v.closing %}<p class="kp-end__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+    {% if v.title != v.occasion_label %}<p class="kp-end__from">{{ v.names.0 }}</p>{% endif %}
+  </div>
+  {% include "invitations/partials/share_buttons.html" %}
+</section>
+</div>
+{% endblock %}

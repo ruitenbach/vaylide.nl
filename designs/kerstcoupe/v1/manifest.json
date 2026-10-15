@@ -1,0 +1,27 @@
+{
+  "slug": "kerstcoupe",
+  "added_at": "2026-10-15T20:30:00Z",
+  "version": 1,
+  "name": "Kerstcoupé",
+  "tagline": "Fluwelen gordijnen gaan open op een besneeuwd bergdorp",
+  "description": "Een warme treincoupé bij avond, met een lampje, kaarsen en een dampend kopje thee. Na een tik gaan de rode fluwelen gordijnen open en zie je een besneeuwd bergdorp onder de maan. Op het raam verschijnt de kerstgroet, alsof hij met de hand wordt geschreven. Daarna volgen een tafelkaartje met de datum, het programma als dinerkaart en de aanmelding.",
+  "style_notes": "Rood fluweel, mahonie en messing, een nachtblauw winterlandschap en een klassieke cursieve letter",
+  "occasions": ["kerst"],
+  "envelope_mode": "built_in",
+  "sort_order": 43,
+  "opening": "film",
+  "opening_label": "Fluwelen gordijnen die opengaan",
+  "demo_melody": "stille-nacht",
+  "kaartbeeld": "raam",
+  "palettes": [
+    {"key": "fluweel", "name": "Rood fluweel", "swatch": ["#2A0B11", "#7E1A26", "#E2BE72"],
+     "vars": {"--kc-page": "#2A0B11", "--kc-page-2": "#3A1119", "--kc-page-ink": "#FBF1E3", "--kc-page-muted": "#E6D2C1", "--kc-gold": "#E2BE72", "--kc-paper": "#F8EFDF", "--kc-paper-2": "#F0E3CB", "--kc-ink": "#2B1A14", "--kc-muted": "#5E4A3F", "--kc-accent": "#7E1A26", "--kc-accent-ink": "#FFF7EC", "--kc-gold-2": "#7A5A22", "--kc-line": "#D7BE8E", "--kc-wood": "#4A1E12", "--fx-1": "#FFFFFF", "--fx-2": "#E2BE72", "--fx-3": "#F4E8D4", "--fx-4": "#FFF1CF", "--fx-bg": "#2A0B11"}},
+    {"key": "sneeuwnacht", "name": "Sneeuwnacht", "swatch": ["#0C1631", "#8A1D2B", "#E3C47E"],
+     "vars": {"--kc-page": "#0C1631", "--kc-page-2": "#14224A", "--kc-page-ink": "#F5F1E8", "--kc-page-muted": "#CDD5E7", "--kc-gold": "#E3C47E", "--kc-paper": "#F7F1E6", "--kc-paper-2": "#ECE3D2", "--kc-ink": "#1F2233", "--kc-muted": "#4D5164", "--kc-accent": "#8A1D2B", "--kc-accent-ink": "#FFF7EC", "--kc-gold-2": "#765823", "--kc-line": "#D3C29C", "--kc-wood": "#3B2015", "--fx-1": "#FFFFFF", "--fx-2": "#E3C47E", "--fx-3": "#DCE6FA", "--fx-4": "#FFF1CF", "--fx-bg": "#0C1631"}},
+    {"key": "mahonie", "name": "Mahonie & dennengroen", "swatch": ["#23140D", "#1E4A37", "#DDB66A"],
+     "vars": {"--kc-page": "#23140D", "--kc-page-2": "#321D13", "--kc-page-ink": "#FAF0E1", "--kc-page-muted": "#E4D1BA", "--kc-gold": "#DDB66A", "--kc-paper": "#F8EEDC", "--kc-paper-2": "#EFE1C7", "--kc-ink": "#2A1D14", "--kc-muted": "#5B4A3B", "--kc-accent": "#1E4A37", "--kc-accent-ink": "#F6F1E4", "--kc-gold-2": "#775722", "--kc-line": "#D5BD8F", "--kc-wood": "#4B2414", "--fx-1": "#FFFFFF", "--fx-2": "#DDB66A", "--fx-3": "#F4E8D4", "--fx-4": "#FFF1CF", "--fx-bg": "#23140D"}}
+  ],
+  "sections": ["countdown", "story", "gallery", "program", "location", "dresscode", "practical", "rsvp", "contact", "closing", "music"],
+  "effects": {"sfeer": "sneeuw", "knal": "geen", "viering": "sneeuw", "namen": "schrijf", "onthul": "zacht", "extra": ["kenburns"]},
+  "changelog": "Eerste versie: het filmpje van de eigenaar (de gordijnen van de coupé gaan open) als opening, en de kerstgroet die zich op het raam schrijft."
+}

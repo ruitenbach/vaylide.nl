@@ -26,6 +26,10 @@ DEFAULT_DEMO_OCCASION = {
     "balzaal": "bruiloft",
     "gouden-avond": "bruiloft",
     "strandboog": "bruiloft",
+    "kerstmarkt": "kerst",
+    "kerstpaleis": "kerst",
+    "kerstcoupe": "kerst",
+    "kerstbal": "kerst",
 }
 
 DESIGN_IMAGES = {
@@ -70,6 +74,14 @@ DESIGN_IMAGES = {
     "middernacht": ["goud-lichtjes", "zijde-goud", "kaarslicht", "kerst-lichtjes", "stadslicht"],
     "gloria": ["kerst-lichtjes", "sterrenhemel", "kaarslicht", "kerst-boom", "wolken"],
     "aan-tafel": ["kerst-kaarsen", "kaarslicht", "kerst-lichtjes", "kerst-boom", "goud-lichtjes"],
+    # Kerstmarkt: de kop is de kerstmarkt uit het filmpje; deze beelden staan bij de brief en in de galerij.
+    "kerstmarkt": ["kerst-lichtjes", "kerst-boom", "kerst-kaarsen", "kerst-winterbos", "goud-lichtjes"],
+    # Kerstpaleis: de kop is het paleis uit het filmpje; deze beelden staan bij de brief en in de galerij.
+    "kerstpaleis": ["goud-lichtjes", "kerst-lichtjes", "kerst-boom", "kerst-winterbos", "kerst-kaarsen"],
+    # Kerstbal: de kaart hangt aan een gouden draad; deze beelden staan in de galerij.
+    "kerstbal": ["kerst-lichtjes", "kerst-boom", "kerst-kaarsen", "kerst-winterbos", "goud-lichtjes"],
+    # Kerstcoupé: de kop is het raam uit het filmpje; deze beelden staan bij de brief en in de galerij.
+    "kerstcoupe": ["kerst-kaarsen", "kerst-winterbos", "kerst-lichtjes", "kerst-boom", "goud-lichtjes"],
     "voor-altijd": ["rozen", "waterverf-bloesem", "bloemblaadjes", "eucalyptus", "duinen-staand"],
     "eerste-dans": ["waterverf-bloesem", "rozen", "kaarslicht", "bloemblaadjes", "zijde-goud"],
     "balzaal": ["rozen", "waterverf-bloesem", "kaarslicht", "bloemblaadjes", "zijde-goud"],

@@ -1,0 +1,27 @@
+{
+  "slug": "kerstmarkt",
+  "added_at": "2026-10-15T20:30:00Z",
+  "version": 1,
+  "name": "Kerstmarkt",
+  "tagline": "Vanuit het reuzenrad verschijnt een kaart met een ster, die voor je openklapt",
+  "description": "Je kijkt vanuit een reuzenrad over een besneeuwde kerstmarkt bij avond, met lichtjes, kraampjes en een grote kerstboom. Na een tik verschijnt er een kaart met een ster in een gloed van licht. De kaart komt naar je toe, twee deurtjes met een gouden medaillon klappen open, en daarbinnen schrijft de kerstgroet zich met de naam van de afzender. Daarna volgen een kaartje met de datum, het programma als lichtsnoer en de aanmelding, en aan het eind licht de ster nog één keer op boven de kerstmarkt.",
+  "style_notes": "Avondblauw, gondelrood en goud, een crèmekleurige kaart met een gouden rand en een sierlijke handgeschreven letter",
+  "occasions": ["kerst"],
+  "envelope_mode": "built_in",
+  "sort_order": 41,
+  "opening": "film",
+  "opening_label": "Filmopening en een kaart die openklapt",
+  "demo_melody": "stille-nacht",
+  "kaartbeeld": "open",
+  "palettes": [
+    {"key": "avondblauw", "name": "Avondblauw", "swatch": ["#0E1A36", "#8E1C2B", "#E7C77B"],
+     "vars": {"--km-page": "#0E1A36", "--km-page-2": "#172649", "--km-page-ink": "#F6F1E6", "--km-page-muted": "#CDD6EA", "--km-gold": "#E7C77B", "--km-paper": "#FBF6EA", "--km-paper-2": "#F1E7D2", "--km-ink": "#22232F", "--km-muted": "#4C5062", "--km-accent": "#8E1C2B", "--km-accent-ink": "#FFF7EC", "--km-gold-2": "#765623", "--km-line": "#D9C69C", "--km-velvet": "#7A1622", "--fx-1": "#FFFFFF", "--fx-2": "#E7C77B", "--fx-3": "#DCE6FA", "--fx-4": "#FFF1CF", "--fx-bg": "#0E1A36"}},
+    {"key": "gondelrood", "name": "Gondelrood", "swatch": ["#2A0A12", "#861A27", "#E5C179"],
+     "vars": {"--km-page": "#2A0A12", "--km-page-2": "#3B1019", "--km-page-ink": "#FBF0E4", "--km-page-muted": "#EAD3C4", "--km-gold": "#E5C179", "--km-paper": "#FBF4E8", "--km-paper-2": "#F2E5CF", "--km-ink": "#2B1A16", "--km-muted": "#5B473D", "--km-accent": "#861A27", "--km-accent-ink": "#FFF7EC", "--km-gold-2": "#765623", "--km-line": "#DCC49A", "--km-velvet": "#6E1420", "--fx-1": "#FFFFFF", "--fx-2": "#E5C179", "--fx-3": "#F4E8D4", "--fx-4": "#FFF1CF", "--fx-bg": "#2A0A12"}},
+    {"key": "dennengroen", "name": "Dennengroen", "swatch": ["#0D2219", "#1C5239", "#E2C27A"],
+     "vars": {"--km-page": "#0D2219", "--km-page-2": "#153125", "--km-page-ink": "#F4F0E4", "--km-page-muted": "#CDDBCD", "--km-gold": "#E2C27A", "--km-paper": "#FAF5E8", "--km-paper-2": "#EFE6CF", "--km-ink": "#1F2A22", "--km-muted": "#47574B", "--km-accent": "#1C5239", "--km-accent-ink": "#F7F3E6", "--km-gold-2": "#735621", "--km-line": "#D3C49C", "--km-velvet": "#7A1622", "--fx-1": "#FFFFFF", "--fx-2": "#E2C27A", "--fx-3": "#E2EEE4", "--fx-4": "#FFF1CF", "--fx-bg": "#0D2219"}}
+  ],
+  "sections": ["countdown", "story", "gallery", "program", "location", "dresscode", "practical", "rsvp", "contact", "closing", "music"],
+  "effects": {"sfeer": "sneeuw", "knal": "geen", "viering": "sterren", "namen": "schrijf", "onthul": "zacht", "extra": ["kenburns"]},
+  "changelog": "Eerste versie: het filmpje van de eigenaar (de kerstmarkt vanuit het reuzenrad) als opening, de kaart uit het filmpje die naar voren komt en openklapt, en een slot met de ster boven de kerstmarkt."
+}

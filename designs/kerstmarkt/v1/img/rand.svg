@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <!-- Kerstmarkt v1: de gouden rand van de kaart uit het filmpje: een dubbele lijn met een inkeping in elke hoek.
+       Gebruikt als border-image (slice 28): de hoeken blijven gelijk, de randen rekken mee. -->
+  <g fill="none">
+    <path d="M17 10H103V17H110V103H103V110H17V103H10V17H17Z" stroke="#9A7733" stroke-width="4.2"/>
+    <path d="M17 10H103V17H110V103H103V110H17V103H10V17H17Z" stroke="#E8CE8C" stroke-width="2.4"/>
+    <path d="M17 10H103V17H110V103H103V110H17V103H10V17H17Z" stroke="#B08A3E" stroke-width=".7"/>
+  </g>
+</svg>

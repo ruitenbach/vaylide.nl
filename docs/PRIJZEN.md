@@ -29,7 +29,7 @@ Een prijs wordt alleen getoond als er een zichtbaar ontwerp is dat erbij hoort (
 
 ## De indeling per ontwerp
 
-Criteria: **Special** = cinematisch of zeer uitgebreid (eigen film, 3D- of illustratiescène met meerdere lagen en eigen muziek); **Luxe** = eigen ontworpen scène of opening met eigen animaties; **Basis** = standaardopening op de gedeelde atelier-basis. Aantallen: 9 Special, 10 Luxe, 32 Basis. De Special-vlag in de catalogus is niet de indeling: Golden Noël heeft de vlag maar is Luxe (een elegante enveloppe zonder eigen scène; kwaliteitscontrole 15 oktober 2026).
+Criteria: **Special** = cinematisch of zeer uitgebreid (eigen film, 3D- of illustratiescène met meerdere lagen en eigen muziek); **Luxe** = eigen ontworpen scène of opening met eigen animaties; **Basis** = standaardopening op de gedeelde atelier-basis. Aantallen: 9 Special, 14 Luxe, 32 Basis (Luxe inclusief Kerstmarkt, Kerstpaleis, Kerstcoupé en Kerstbal: eigen film, op besluit van de eigenaar van 15 oktober 2026 bewust Luxe, € 24,95). De Special-vlag in de catalogus is niet de indeling: Golden Noël heeft de vlag maar is Luxe (een elegante enveloppe zonder eigen scène; kwaliteitscontrole 15 oktober 2026).
 
 **Nieuw ontwerp?** Voeg bij `INDELING` een regel toe; zonder indeling is het ontwerp niet te bestellen (`tests/test_prijsstructuur.py` bewaakt dat elk ontwerp precies één indeling heeft).
 

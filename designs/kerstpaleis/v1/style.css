@@ -1,0 +1,303 @@
+/* Kerstpaleis v1: de film van een besneeuwd kerstpaleis als opening (de deuren gaan open naar gouden licht),
+   daarna de kaart uit de film: rood fluweel in een gouden sierlijst met dennengroen en hulst.
+   De sierlijst (img/lijst.webp) en de sierlijntjes zijn beelden uit de film, los van de rode achtergrond; het fluweel
+   is CSS, zodat de kaart in elke kleur kan. Maak de beelden opnieuw met tools/kerstpaleis/maak_beelden.py.
+   Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "Great Vibes"; src: url("../../../fonts/great-vibes-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Cinzel"; src: url("../../../fonts/cinzel-latin-wght-normal.woff2") format("woff2"); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../../../fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 300 800; font-display: swap; }
+
+body {
+  --kp-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --kp-script: "Great Vibes", "Snell Roundhand", cursive;
+  --kp-caps: "Cinzel", "Cormorant Garamond", Georgia, serif;
+  --kp-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --kp-w: min(100vw, 560px);
+  /* Gedeelde onderdelen (afteller, knoppen, delen) staan op het fluweel: licht op donker.
+     Op het papier (.kp-paper: brief, aanmelden, slotkaart) weer donker op licht. */
+  --inv-bg: var(--kp-page);
+  --inv-text: var(--kp-cream);
+  --inv-muted: var(--kp-cream-2);
+  --inv-accent: var(--kp-gold);
+  --inv-accent-contrast: var(--kp-dark);
+  --inv-font-body: var(--kp-serif);
+  --inv-font-ui: var(--kp-ui);
+  --inv-focus: var(--kp-gold);
+  --inv-radius: 10px;
+  --inv-surface-2: color-mix(in srgb, var(--kp-cream) 10%, transparent);
+  --inv-btn-border: var(--kp-gold);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--kp-gold) 18%, transparent);
+  --inv-field-bg: var(--kp-paper);
+  --inv-field-text: var(--kp-ink);
+  --inv-field-border: color-mix(in srgb, var(--kp-ink) 30%, transparent);
+  --inv-music-bg: var(--kp-gold);
+  --inv-music-text: var(--kp-dark);
+  --inv-music-border: color-mix(in srgb, var(--kp-gold-2) 40%, transparent);
+  --inv-photo-bg: color-mix(in srgb, var(--kp-cream) 12%, transparent);
+  --inv-error: #9B1C1C;
+  --fx-pulse: var(--kp-gold);
+  --fx-shine: var(--kp-shine);
+  /* Het fluweel achter de tekst iets rustiger dan op de kaart: een waas van de paginakleur over de structuur. */
+  --kp-velvet-bg: linear-gradient(color-mix(in srgb, var(--kp-page) 45%, transparent), color-mix(in srgb, var(--kp-page) 45%, transparent)), url("img/velours.webp") 0 0 / 200px repeat, var(--kp-page);
+  background: var(--kp-velvet-bg);
+  color: var(--kp-cream);
+  font-family: var(--kp-serif);
+  font-size: 1.14rem;
+  font-weight: 500;
+}
+
+/* Papier: donkere tekst op licht, met een dubbele gouden lijn zoals de lijst van de kaart. */
+.kp-paper {
+  --inv-text: var(--kp-ink);
+  --inv-muted: var(--kp-muted);
+  --inv-accent: var(--kp-accent);
+  --inv-accent-contrast: var(--kp-accent-ink);
+  --inv-focus: var(--kp-accent);
+  --inv-btn-border: var(--kp-gold-2);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--kp-gold) 16%, transparent);
+  --inv-surface-2: var(--kp-paper-2);
+  --inv-photo-bg: var(--kp-paper-2);
+  position: relative; padding: 2.2rem 1.5rem; border-radius: 3px;
+  background: var(--kp-paper); color: var(--kp-ink);
+  border: 1px solid color-mix(in srgb, var(--kp-gold-2) 60%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--kp-gold-2) 45%, transparent); outline-offset: -7px;
+  box-shadow: 0 26px 50px -26px rgba(0, 0, 0, .75);
+}
+.kp-paper :focus-visible { outline-color: var(--kp-accent); }
+
+/* ================================================================ openingsscherm: de film */
+.kp-cover { background: #10131F url("img/poster.webp") 50% 50% / cover no-repeat; color: var(--kp-cream); --fx-bg: #1A2238; }
+.kp-film { position: absolute; inset: 0; overflow: hidden; }
+.kp-film__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Onderaan iets donkerder, zodat de tekst en de knop goed leesbaar zijn op de rode loper. */
+.kp-film::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 40%; pointer-events: none;
+  background: linear-gradient(0deg, rgba(14, 6, 8, .9) 0%, rgba(14, 6, 8, .6) 45%, rgba(14, 6, 8, 0) 100%);
+}
+/* Het licht uit de deuropening, vlak voor de kaart verschijnt (geen flits: het licht zwelt rustig aan). */
+.kp-film__light {
+  position: absolute; left: 50%; top: 56%; z-index: 1; width: 130%; aspect-ratio: 1; translate: -50% -50%;
+  border-radius: 50%; opacity: 0; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(closest-side, rgba(255, 234, 176, .9), rgba(255, 208, 128, .42) 42%, rgba(255, 190, 100, 0) 74%);
+}
+.fx-motion.is-opening .kp-film__light { animation: kp-licht 1.6s ease-in 2.3s both; }
+@keyframes kp-licht { from { opacity: 0; scale: .45; } to { opacity: .62; scale: 1.1; } }
+.kp-cover .fx-slot { z-index: 3; }
+.kp-door { position: absolute; left: 50%; top: 56%; width: 2px; height: 2px; }
+.kp-cover__text {
+  position: absolute; left: 50%; bottom: max(1.6rem, 6%); z-index: 7; translate: -50% 0;
+  display: grid; justify-items: center; gap: .85rem; width: min(88%, 360px); text-align: center;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, .7);
+  transition: opacity .45s ease;
+}
+.kp-cover__to { font: 500 clamp(1.75rem, 7.6vw, 2.25rem)/1.1 var(--kp-serif); color: #F6DFA6; }
+.kp-cover__to::first-letter { font-family: var(--kp-script); font-weight: 400; font-size: 1.3em; }
+.kp-open {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: .7rem 1.8rem;
+  border-radius: 999px; border: 1px solid #F7E2AE;
+  background: linear-gradient(180deg, #F4D892 0%, #DDB262 100%); color: #2A0305;
+  font: 600 1rem/1.2 var(--kp-ui); text-decoration: none; text-shadow: none;
+  box-shadow: 0 12px 26px -10px rgba(0, 0, 0, .85);
+}
+.kp-open:hover { filter: brightness(1.06); }
+.kp-open:focus-visible { outline-color: #F7E2AE; }
+.kp-cover__music {
+  min-height: 44px; padding: .3rem .8rem; border: 0; background: none; color: #F8EBD0; cursor: pointer;
+  font: italic 500 1.08rem/1.3 var(--kp-serif); text-decoration: underline; text-underline-offset: 3px;
+}
+.kp-cover__music:focus-visible { outline-color: #F7E2AE; }
+/* Het openen: de knoppen gaan weg, de deuren gaan open (de film), en daarna vervaagt het beeld in de kaart. */
+.is-opening .kp-cover__text { opacity: 0; }
+.is-opening .kp-cover { opacity: 0; transition: opacity .7s ease 3.75s; }
+.is-opening-reduced .kp-cover, .is-opening-reduced .kp-cover__text { transition: opacity .25s ease; }
+
+/* ================================================================ de kaart (kop) */
+.kp-hero {
+  position: relative; container-type: size;
+  height: 100vh; height: calc(100svh - var(--kp-bar, 0px)); min-height: max(560px, calc(var(--kp-w) * 1.36));
+  background: var(--kp-velvet-2);
+}
+.kp-card {
+  position: absolute; inset: 0; overflow: hidden;
+  background:
+    url("img/velours.webp") 0 0 / calc(100cqi * 192 / 720) repeat,
+    radial-gradient(ellipse 82% 58% at 50% 33%, var(--kp-velvet) 0%, color-mix(in srgb, var(--kp-velvet) 58%, var(--kp-velvet-2)) 60%, var(--kp-velvet-2) 100%);
+}
+.kp-card__snow { z-index: 1; --fx-bg: var(--kp-velvet); }
+/* De sierlijst uit de film. De boven- en onderkant houden hun verhouding; alleen de rechte zijlijnen rekken mee
+   met de hoogte van het scherm. Maten in pixels van de film (720 breed): boven 300, zij 44, onder 340. */
+.kp-card__frame {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  border-style: solid; border-color: transparent;
+  border-width: calc(100cqi * 300 / 720) calc(100cqi * 44 / 720) calc(100cqi * 340 / 720);
+  border-image: url("img/lijst.webp") 450 66 510 66 stretch;
+}
+/* Het sierstuk halverwege de zijkant staat los, zodat het niet uitrekt. */
+.kp-card__fleur {
+  position: absolute; top: 50%; z-index: 2; width: calc(100cqi * 44 / 720); aspect-ratio: 132 / 228; translate: 0 -50%;
+  background: url("img/fleur.webp") center / 100% 100% no-repeat;
+}
+.kp-card__fleur--l { left: 0; }
+.kp-card__fleur--r { right: 0; scale: -1 1; }
+.kp-card__text {
+  position: absolute; z-index: 3;
+  left: calc(100cqi * 64 / 720); right: calc(100cqi * 64 / 720);
+  top: calc(100cqi * 290 / 720); bottom: calc(100cqi * 182 / 720 + 3.3rem);
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+/* Geen overgangen in deze tekst: de meting van de lengte klopt dan meteen. */
+.kp-card__text, .kp-card__text * { transition: none !important; }
+.kp-greet { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+/* "Fijne kerstdagen" zoals in de film: een klassieke letter met een sierlijke beginletter, in goud met een schaduw. */
+.kp-title {
+  margin: 0; font: 500 min(17cqi, 8.4cqh)/.98 var(--kp-serif); letter-spacing: .005em; color: var(--kp-gold);
+  filter: drop-shadow(0 .035em .03em rgba(0, 0, 0, .55)); text-wrap: balance;
+}
+.kp-title > span { display: block; }
+.kp-title > span::first-letter { font-family: var(--kp-script); font-weight: 400; font-size: 1.2em; }
+.kp-title--long { font-size: min(11cqi, 6cqh); line-height: 1.05; }
+.kp-title--names > span { display: inline-block; }
+.kp-title--names.kp-title--normal { font-size: min(15cqi, 7.6cqh); }
+.kp-title--names.kp-title--long { font-size: min(12cqi, 6.4cqh); }
+.kp-title--names.kp-title--xlong { font-size: min(9cqi, 5cqh); overflow-wrap: anywhere; }
+.kp-amp { margin: 0 .12em; font-size: .7em; }
+.kp-divider { display: block; width: calc(100cqi * 355 / 720); max-width: 100%; height: auto; margin: min(2.6cqi, 1.6cqh) auto min(1.6cqi, 1cqh); }
+.kp-wish { font: 500 max(15px, min(4.8cqi, 2.6cqh))/1.3 var(--kp-serif); letter-spacing: .01em; color: var(--kp-gold); text-wrap: balance; }
+.kp-kicker { margin-bottom: min(2.4cqi, 1.4cqh); font: 500 max(11px, 3cqi)/1.4 var(--kp-caps); letter-spacing: .22em; text-transform: uppercase; color: var(--kp-gold); text-wrap: balance; }
+/* Waar in de film VAYLIDE staat: de afzender, tussen twee sierlijntjes. */
+.kp-from { display: grid; justify-items: center; gap: min(1.6cqi, 1cqh); margin-top: min(3cqi, 1.6cqh); }
+.kp-from__orn { display: block; width: calc(100cqi * 204 / 720); height: auto; }
+.kp-from__name {
+  max-width: 68cqi; margin-right: -.28em; font: 500 max(13px, 3.9cqi)/1.35 var(--kp-caps); letter-spacing: .28em;
+  text-transform: uppercase; color: var(--kp-gold); text-wrap: balance;
+}
+/* Lange namen: kleiner en minder ruimte tussen de letters; een heel lang woord mag afbreken. */
+.kp-from__name--long { font-size: max(12px, 3.5cqi); letter-spacing: .2em; margin-right: -.2em; }
+.kp-from__name--xlong { font-size: max(12px, 3.1cqi); letter-spacing: .1em; margin-right: -.1em; overflow-wrap: anywhere; }
+.kp-from__members { max-width: 66cqi; font: italic 500 max(14px, 3.9cqi)/1.3 var(--kp-serif); color: var(--kp-cream-2); text-wrap: balance; }
+.kp-scroll {
+  position: absolute; left: 50%; bottom: calc(100cqi * 176 / 720); z-index: 4; translate: -50% 0;
+  display: inline-flex; align-items: center; gap: .3rem; min-height: 44px; padding: .3rem 1.05rem; border-radius: 999px;
+  background: color-mix(in srgb, var(--kp-dark) 62%, transparent); color: var(--kp-cream); text-decoration: none;
+  font: italic 500 1.02rem/1.3 var(--kp-serif); white-space: nowrap;
+}
+
+/* ================================================================ de rest van de kaart, op fluweel */
+.kp-body { position: relative; z-index: 1; color: var(--kp-cream); }
+.kp-sec { padding: clamp(3rem, 9vw, 4.2rem) clamp(1.25rem, 6vw, 2.5rem); text-align: center; }
+.kp-h2 { margin-bottom: 1.6rem; font: 500 clamp(2.1rem, 8.6vw, 2.6rem)/1.1 var(--kp-serif); color: var(--kp-gold); text-wrap: balance; }
+.kp-h2::first-letter { font-family: var(--kp-script); font-weight: 400; font-size: 1.25em; }
+.kp-h2::after {
+  content: ""; display: block; width: 190px; max-width: 62%; aspect-ratio: 355 / 43; margin: .6rem auto 0;
+  background: url("img/scheiding.webp") center / contain no-repeat;
+}
+
+/* De brief op papier */
+.kp-letter__card { max-width: 460px; margin: 0 auto; }
+.kp-letter__photo { max-width: 260px; margin: 0 auto 1.4rem; }
+.kp-letter__photo .ph { aspect-ratio: 4 / 5; border-radius: 2px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--kp-gold-2) 60%, transparent), 0 0 0 5px var(--kp-paper), 0 0 0 6px color-mix(in srgb, var(--kp-gold-2) 40%, transparent); }
+.kp-letter__text { display: grid; gap: .9em; font-size: 1.16rem; line-height: 1.62; }
+.kp-letter__text p:first-child { font-style: italic; font-weight: 600; color: var(--kp-accent); }
+
+/* De datum: een kleine kaart in dezelfde stijl als de grote, fluweel met een dubbele gouden lijn */
+.kp-date {
+  position: relative; display: grid; justify-items: center; gap: .15rem; max-width: 340px; margin: 0 auto; padding: 2rem 1.4rem 1.7rem;
+  background: url("img/velours.webp") 0 0 / 160px repeat, radial-gradient(ellipse 90% 70% at 50% 30%, var(--kp-velvet), var(--kp-velvet-2));
+  border: 1px solid color-mix(in srgb, var(--kp-gold) 80%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--kp-gold) 55%, transparent); outline-offset: -7px;
+  box-shadow: 0 24px 46px -24px rgba(0, 0, 0, .8);
+}
+.kp-date__weekday { font: 500 .8rem/1.3 var(--kp-caps); letter-spacing: .22em; text-transform: uppercase; color: var(--kp-cream-2); }
+.kp-date__day { font: 500 5rem/1 var(--kp-serif); font-variant-numeric: lining-nums; color: var(--kp-gold); }
+.kp-date__month { font: italic 500 1.3rem/1.25 var(--kp-serif); color: var(--kp-cream); }
+.kp-date__more { display: grid; gap: .25rem; width: 100%; margin-top: 1rem; padding-top: .9rem; border-top: 1px solid color-mix(in srgb, var(--kp-gold) 50%, transparent); }
+/* Cijfers in gewone vorm (de 1 in een sierletter lijkt op een I). */
+.kp-date__time { font: 600 1.15rem/1.3 var(--kp-serif); font-variant-numeric: lining-nums; text-wrap: balance; }
+.kp-date__venue { font: 500 1.05rem/1.35 var(--kp-serif); color: var(--kp-cream-2); }
+
+/* Het programma: een gouden lijn met ruitjes */
+.kp-steps { position: relative; display: grid; gap: 1.15rem; max-width: 440px; margin: 0 auto; padding: 0; list-style: none; text-align: left; }
+.kp-step { position: relative; display: grid; grid-template-columns: 3.4rem 1.4rem 1fr; align-items: start; }
+.kp-step::before {
+  content: ""; position: absolute; top: .9rem; bottom: -1.15rem; left: calc(3.4rem + .7rem - .5px);
+  border-left: 1px solid color-mix(in srgb, var(--kp-gold) 55%, transparent);
+}
+.kp-step:last-child::before { display: none; }
+.kp-step__time { grid-column: 1; padding-top: .2rem; text-align: right; font: 600 .95rem/1.2 var(--kp-ui); font-variant-numeric: lining-nums; color: var(--kp-gold); }
+.kp-step__node {
+  grid-column: 2; position: relative; z-index: 1; width: 10px; height: 10px; margin: .4rem auto 0; rotate: 45deg;
+  background: var(--kp-gold); box-shadow: 0 0 0 3px var(--kp-page), 0 0 0 4px color-mix(in srgb, var(--kp-gold) 60%, transparent);
+}
+.kp-step__text { grid-column: 3; padding-left: .4rem; }
+.kp-step__title { font: 600 1.35rem/1.2 var(--kp-serif); color: var(--kp-cream); }
+.kp-step__desc { margin-top: .2rem; font: 500 1.04rem/1.5 var(--kp-serif); color: var(--kp-cream-2); }
+
+/* Aftellen */
+.kp-count .cd__unit { min-width: 4.2rem; padding: .7rem .45rem .55rem; border: 1px solid color-mix(in srgb, var(--kp-gold) 55%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--kp-dark) 30%, transparent); }
+.kp-count .cd__num { font-family: var(--kp-serif); font-weight: 600; color: var(--kp-gold); }
+.kp-count .inv-actions { margin-top: 1.5rem; }
+
+/* Waar */
+.kp-place__venue { font: 600 1.6rem/1.2 var(--kp-serif); color: var(--kp-gold); }
+.kp-place__address { margin-top: .5rem; font: italic 500 1.1rem/1.5 var(--kp-serif); color: var(--kp-cream-2); }
+.kp-place__when { margin: 1rem 0 1.3rem; font: 500 1.08rem/1.5 var(--kp-serif); }
+
+/* Dresscode: kerstballen in de gekozen kleuren */
+.kp-swatches { display: flex; flex-wrap: wrap; justify-content: center; gap: .9rem; margin: 0 0 1.3rem; padding: 0; list-style: none; }
+.kp-swatch {
+  position: relative; width: 46px; height: 46px; margin-top: 8px; border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, color-mix(in srgb, var(--c) 50%, #fff) 0%, var(--c) 48%, color-mix(in srgb, var(--c) 72%, #000) 100%);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--kp-gold) 60%, transparent), 0 8px 14px -8px rgba(0, 0, 0, .6);
+}
+.kp-swatch::before {
+  content: ""; position: absolute; left: 50%; top: -8px; width: 12px; height: 9px; translate: -50% 0; border-radius: 2px 2px 1px 1px;
+  background: linear-gradient(180deg, #F4D892, #B98A3E);
+}
+.kp-dress__text { max-width: 32rem; margin: .4rem auto 0; font: 500 1.1rem/1.55 var(--kp-serif); }
+
+/* Ons jaar, foto's, goed om te weten */
+.kp-story__text { display: grid; gap: .9em; max-width: 36rem; margin: 0 auto; font-size: 1.14rem; line-height: 1.62; }
+.kp-photos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.kp-photo .ph { aspect-ratio: 4 / 5; border-radius: 2px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--kp-gold) 70%, transparent), 0 0 0 4px var(--kp-page), 0 0 0 5px color-mix(in srgb, var(--kp-gold) 45%, transparent); }
+.kp-photo figcaption { margin-top: .5rem; font: italic 500 .98rem/1.3 var(--kp-serif); color: var(--kp-cream-2); }
+.kp-practical__list { display: grid; gap: 1.2rem; max-width: 36rem; margin: 0 auto; text-align: left; }
+.kp-practical__item dt { font: 600 .8rem/1.35 var(--kp-caps); letter-spacing: .16em; text-transform: uppercase; color: var(--kp-gold); }
+.kp-practical__item dd { margin: .25rem 0 0; font: 500 1.1rem/1.55 var(--kp-serif); }
+
+/* Aanmelden, contact */
+.kp-rsvp .kp-paper { max-width: 480px; margin: 0 auto; padding: 1.8rem 1.25rem; text-align: left; }
+.kp-contact__note { max-width: 32rem; margin: 0 auto .8rem; font: 500 1.1rem/1.55 var(--kp-serif); }
+.kp-contact__name { font: 600 1.45rem/1.2 var(--kp-serif); color: var(--kp-gold); }
+.kp-contact__links { margin-top: .4rem; }
+
+/* De slotkaart, met het logo van Vaylide eronder zoals aangeleverd (op licht papier) */
+.kp-end { padding-top: clamp(3.4rem, 10vw, 4.6rem); }
+.kp-end__card { display: grid; justify-items: center; gap: .5rem; max-width: 440px; margin: 0 auto; padding: 2.6rem 1.4rem 2rem; text-align: center; }
+.kp-end__greeting { font: 400 clamp(2.8rem, 12vw, 3.4rem)/1.1 var(--kp-script); color: var(--kp-accent); }
+.kp-end__text { font: 500 1.08rem/1.55 var(--kp-serif); }
+.kp-end__from { margin-top: .2rem; font: 600 .86rem/1.4 var(--kp-caps); letter-spacing: .2em; text-transform: uppercase; color: var(--kp-muted); text-wrap: balance; }
+.kp-end__logo { width: min(230px, 70%); height: auto; margin-top: 1.4rem; }
+.kp-end .inv-share { margin-top: 1.8rem; }
+/* De voet staat op het donkere fluweel, in alle kleurvarianten. */
+.inv-kerstpaleis .inv-colophon { color: rgba(248, 235, 208, .85); }
+.inv-kerstpaleis .inv-colophon a { color: #F8EBD0; }
+
+/* ================================================================ op een computer: de kaart als kolom op een donkere tafel */
+@media (min-width: 600px) {
+  .inv-kerstpaleis body { background: radial-gradient(ellipse 70% 60% at 50% 0%, color-mix(in srgb, var(--kp-page) 55%, var(--kp-table)), var(--kp-table) 72%) fixed var(--kp-table); }
+  .inv-kerstpaleis .inv-main {
+    width: var(--kp-w); margin: 0 auto;
+    background: var(--kp-velvet-bg);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--kp-gold) 35%, transparent), 0 40px 90px -30px rgba(0, 0, 0, .8);
+  }
+  .inv-kerstpaleis .kp-cover { left: 50%; right: auto; width: var(--kp-w); translate: -50% 0; }
+  .inv-kerstpaleis .kp-hero { height: min(calc(100vh - var(--kp-bar, 0px)), calc(var(--kp-w) * 16 / 9)); }
+}
+
+@media (max-width: 380px) {
+  .kp-step { grid-template-columns: 2.9rem 1.2rem 1fr; }
+  .kp-step::before { left: calc(2.9rem + .6rem - .5px); }
+}

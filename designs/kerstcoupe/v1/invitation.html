@@ -1,0 +1,207 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Kerstcoupé v1: het filmpje van de eigenaar als opening (de fluwelen gordijnen van een treincoupé gaan open),
+   daarna de kerstgroet die zich op het raam schrijft, en de kaart in de stijl van een dinerrijtuig.
+   De opening en de kop gebruiken hetzelfde beeldvak (kc-stage), zodat het laatste filmbeeld naadloos overgaat in de kop.
+   Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/eb-garamond-latin-wght-italic.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/jost-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<script src="{% static 'designs/kerstcoupe/v1/kerstcoupe.js' %}" defer></script>{% endblock %}
+
+{% block cover %}
+<section class="cover kc-cover" data-cover data-duration="2700" data-fx-intro="2100" aria-label="Openingsscherm">
+  <div class="kc-backdrop" aria-hidden="true"><img src="{% static 'designs/kerstcoupe/v1/img/dicht-zacht.webp' %}" width="270" height="480" alt=""></div>
+  <div class="kc-stage" aria-hidden="true">
+    <div class="kc-frame">
+      <img class="kc-frame__img" src="{% static 'designs/kerstcoupe/v1/img/dicht.webp' %}" width="720" height="1280" alt="" fetchpriority="high">
+      {# Het filmpje van de gordijnen, zonder geluid en zonder bediening. Het eerste beeld is de poster. #}
+      <video class="kc-film" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback poster="{% static 'designs/kerstcoupe/v1/img/dicht.webp' %}" data-kc-film>
+        <source src="{% static 'designs/kerstcoupe/v1/img/coupe.webm' %}" type="video/webm">
+        <source src="{% static 'designs/kerstcoupe/v1/img/coupe.mp4' %}" type="video/mp4">
+      </video>
+      {# Speelt het filmpje niet (of blijft het hangen), dan vloeit dit beeld (het open raam) eroverheen. #}
+      <img class="kc-frame__open" src="{% static 'designs/kerstcoupe/v1/img/open.webp' %}" width="720" height="1280" alt="" decoding="async">
+      {# Sneeuw achter het glas: pas zichtbaar als de gordijnen opzij gaan, en loopt door in de kop. #}
+      <div class="fx-slot kc-glass" data-fx-slot="cover"></div>
+      <span class="kc-glow kc-glow--lamp"></span>
+      <span class="kc-glow kc-glow--kaars"></span>
+    </div>
+    <span class="kc-stage__shade"></span>
+  </div>
+  {# Een tafelkaartje op de tafel van de coupé. #}
+  <div class="kc-place">
+    <p class="kc-place__kicker">{% if v.occasion == "kerst" %}{% if v.formal %}Een kerstgroet voor u{% else %}Een kerstgroet voor jou{% endif %}{% elif v.formal %}Een uitnodiging voor u{% else %}Een uitnodiging voor jou{% endif %}</p>
+    {% if v.title != v.occasion_label %}<p class="kc-place__from">{% if v.occasion == "kerst" %}van {% endif %}{{ v.title }}</p>{% endif %}
+    <a href="#uitnodiging" class="kc-open fx-pulse" data-open data-fx-origin>Open de gordijnen</a>
+    {% if v.show.music %}<button type="button" class="kc-place__music" data-open data-open-music>Openen met muziek</button>{% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<header class="kc-hero">
+  <div class="kc-backdrop" aria-hidden="true"><img src="{% static 'designs/kerstcoupe/v1/img/open-zacht.webp' %}" width="270" height="480" alt=""></div>
+  <div class="kc-stage">
+    <div class="kc-frame" aria-hidden="true">
+      <img class="kc-frame__img" src="{% static 'designs/kerstcoupe/v1/img/open.webp' %}" width="720" height="1280" alt="">
+      {# Sneeuw valt alleen buiten, achter het glas. #}
+      <div class="fx-slot kc-glass" data-fx-slot="hero"></div>
+      <span class="kc-glow kc-glow--lamp"></span>
+      <span class="kc-glow kc-glow--kaars"></span>
+      <span class="kc-steam"><i></i><i></i><i></i></span>
+    </div>
+    <span class="kc-stage__shade" aria-hidden="true"></span>
+    {# De groet op het raam. De letters liggen op de foto: e2e/coupe.cjs meet het contrast op de echte pixels. #}
+    <div class="kc-hero__text" data-tekst-op-beeld data-kc-fit>
+      <div class="kc-hero__inner">
+        {% if v.occasion == "kerst" and not v.headline_custom %}
+        <p class="kc-greet kc-write">Fijne kerstdagen</p>
+        <p class="kc-wish kc-write">en een schitterend</p>
+        <p class="kc-wish kc-wish--last kc-write">nieuwjaar</p>
+        {% else %}
+        <p class="kc-greet kc-write">{{ v.kicker }}</p>
+        {% endif %}
+        <h1 class="kc-names kc-names--{{ v.names_size }} fx-names">{% if v.is_couple %}{{ v.names.0 }} <span class="kc-names__amp" aria-label="en">&amp;</span> {{ v.names.1 }}{% else %}{{ v.names.0 }}{% endif %}</h1>
+        {% if v.subnames %}<p class="kc-members fx-intro" style="--fx-d:12">{{ v.subnames }}</p>{% endif %}
+        {% if v.occasion != "kerst" %}<p class="kc-tagline fx-intro" style="--fx-d:12">{{ v.tagline }}</p>{% endif %}
+      </div>
+    </div>
+    <a class="kc-scroll fx-intro" href="#kc-verder" style="--fx-d:14" data-tekst-op-beeld>Lees verder<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </div>
+</header>
+
+<div class="kc-body" id="kc-verder">
+{% if v.welcome %}
+<section class="kc-sec kc-letter" data-reveal aria-label="{% if v.occasion == 'kerst' %}Kerstgroet{% else %}Welkom{% endif %}">
+  <div class="kc-card">
+    {% if v.hero %}<figure class="kc-window kc-letter__photo"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 640px) 480px, 84vw" %}</div></figure>{% endif %}
+    <div class="kc-letter__text">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.has_event and v.date %}
+{# Het tafelkaartje: de datum, de tijd en de plek. #}
+<section class="kc-sec kc-reserved" data-reveal aria-labelledby="kc-reserved-title">
+  <div class="kc-placecard">
+    <p class="kc-placecard__crest" aria-hidden="true">{{ v.monogram }}</p>
+    <h2 id="kc-reserved-title" class="kc-placecard__title">Gereserveerd <span>{% if v.formal %}voor u{% else %}voor jou{% endif %}</span></h2>
+    <p class="kc-placecard__date"><span class="kc-placecard__weekday">{{ v.weekday }}</span><span class="kc-placecard__day">{{ v.day }}</span><span class="kc-placecard__month">{{ v.month_name }} {{ v.year }}</span></p>
+    {% if v.time_display %}<p class="kc-placecard__time">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+    {% if v.venue %}<p class="kc-placecard__venue">{{ v.venue }}</p>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+{# Het programma als dinerkaart: titel, stippellijn en tijd. #}
+<section class="kc-sec kc-program" data-reveal aria-labelledby="kc-program-title">
+  <div class="kc-card kc-menu">
+    <p class="kc-menu__kicker" aria-hidden="true">Dinerkaart</p>
+    <h2 id="kc-program-title" class="kc-h2 kc-h2--paper">Het programma</h2>
+    <ol class="kc-menu__list" data-fx-stagger>
+      {% for item in v.program %}
+      <li class="kc-menu__item">
+        <p class="kc-menu__line"><span class="kc-menu__title">{{ item.title }}</span>{% if item.time %}<span class="kc-menu__dots" aria-hidden="true"></span><span class="kc-menu__time">{{ item.time }}</span>{% endif %}</p>
+        {% if item.description %}<p class="kc-menu__desc">{{ item.description }}</p>{% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="kc-sec kc-count" data-reveal aria-labelledby="kc-count-title">
+  <h2 id="kc-count-title" class="kc-h2">{% if v.countdown_label == "kerst" %}Aftellen naar kerst{% elif v.is_past %}Dank je wel{% else %}Nog even en we schuiven aan{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="kc-sec kc-place-sec" data-reveal aria-labelledby="kc-place-title">
+  <div class="kc-card kc-dest">
+    <h2 id="kc-place-title" class="kc-h2 kc-h2--paper">Bestemming</h2>
+    {% if v.venue %}<p class="kc-dest__venue">{{ v.venue }}</p>{% endif %}
+    {% if v.address_lines %}<address class="kc-dest__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+    {% if v.date_display %}<p class="kc-dest__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>{% endif %}
+    {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="kc-sec kc-dress" data-reveal aria-labelledby="kc-dress-title">
+  <h2 id="kc-dress-title" class="kc-h2">Dresscode</h2>
+  {% if v.dresscode_colors %}<ul class="kc-swatches" aria-label="Kleuren voor de dresscode" data-fx-stagger>
+    {% for c in v.dresscode_colors %}<li class="kc-swatch" style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+  {% for p in v.dresscode_text %}<p class="kc-dress__text">{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="kc-sec kc-story" data-reveal aria-labelledby="kc-story-title">
+  <div class="kc-card">
+    <h2 id="kc-story-title" class="kc-h2 kc-h2--paper">{{ v.story_title }}</h2>
+    <div class="kc-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="kc-sec kc-gallery" data-reveal aria-labelledby="kc-gallery-title">
+  <h2 id="kc-gallery-title" class="kc-h2">Uitzicht onderweg</h2>
+  <ul class="kc-photos" data-fx-stagger>
+    {% for photo in v.gallery %}<li><figure class="kc-window"><div class="ph">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 640px) 260px, 42vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="kc-sec kc-practical" data-reveal aria-labelledby="kc-practical-title">
+  <h2 id="kc-practical-title" class="kc-h2">Goed om te weten</h2>
+  <dl class="kc-practical__list" data-fx-stagger>
+    {% for item in v.practical %}<div class="kc-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="kc-sec kc-rsvp" id="aanmelden" data-reveal aria-labelledby="kc-rsvp-title">
+  <h2 id="kc-rsvp-title" class="kc-h2">{% if v.formal %}Reserveert u een plaats?{% else %}Reserveer je plaats{% endif %}</h2>
+  <div class="kc-card">
+    {% include "invitations/partials/rsvp.html" %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="kc-sec kc-contact" data-reveal aria-labelledby="kc-contact-title">
+  <h2 id="kc-contact-title" class="kc-h2">Vragen?</h2>
+  {% if v.contact.note %}<p class="kc-contact__note">{{ v.contact.note }}</p>{% endif %}
+  <p class="kc-contact__name">{{ v.contact.name }}</p>
+  <p class="kc-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+{# Het slot: terug aan tafel, bij de kaarsen en het dampende kopje thee. #}
+<section class="kc-sec kc-end" data-reveal aria-label="Afsluiting">
+  {% if v.occasion == "kerst" %}
+  <p class="kc-end__greet">Fijne kerstdagen</p>
+  <p class="kc-end__wish">en een schitterend nieuwjaar</p>
+  <p class="kc-end__from">{{ v.names.0 }}</p>
+  {% endif %}
+  {% if v.show.closing %}{% for p in v.closing %}<p class="kc-end__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  <div class="kc-table" aria-hidden="true">
+    <img src="{% static 'designs/kerstcoupe/v1/img/tafel.webp' %}" width="720" height="420" alt="" loading="lazy" decoding="async">
+    <span class="kc-steam"><i></i><i></i><i></i></span>
+  </div>
+  {% include "invitations/partials/share_buttons.html" %}
+</section>
+</div>
+{% endblock %}

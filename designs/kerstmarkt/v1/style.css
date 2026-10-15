@@ -1,0 +1,518 @@
+/* Kerstmarkt v1: vanuit een reuzenrad over een kerstmarkt bij avond. De opening is het filmpje van de eigenaar
+   (een lichtstreep wordt een kaart met een ster). De kop is het laatste beeld daarvan: de echte kaart ligt precies op de
+   kaart uit het filmpje, komt naar voren en klapt open, en binnenin schrijft de groet zich.
+   Daaronder de kaart: crèmekleurig papier met de gouden rand uit het filmpje, een lichtsnoer en kerstballen.
+   Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Pinyon Script"; src: url("../../../fonts/pinyon-script-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "Marcellus"; src: url("../../../fonts/marcellus-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Jost"; src: url("../../../fonts/jost-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+
+html.inv-kerstmarkt { color-scheme: dark; background: #0B1328; }
+body {
+  --km-script: "Pinyon Script", "Snell Roundhand", "Segoe Script", cursive;
+  --km-serif: "Cormorant Garamond", Garamond, Georgia, "Times New Roman", serif;
+  --km-caps: "Marcellus", "Cormorant Garamond", Georgia, serif;
+  --km-ui: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* De gouden rand uit het filmpje, met een inkeping in elke hoek (img/rand.svg). */
+  --km-rand: url("img/rand.svg");
+  /* Gedeelde onderdelen (knoppen, afteller, muziek) op de donkere pagina; op het papier zie .km-paper. */
+  --inv-bg: var(--km-page);
+  --inv-text: var(--km-page-ink);
+  --inv-muted: var(--km-page-muted);
+  --inv-accent: var(--km-gold);
+  --inv-accent-contrast: var(--km-page);
+  --inv-font-body: var(--km-serif);
+  --inv-font-ui: var(--km-ui);
+  --inv-focus: var(--km-gold);
+  --inv-radius: 10px;
+  --inv-radius-field: 8px;
+  --inv-btn-border: color-mix(in srgb, var(--km-gold) 75%, transparent);
+  --inv-btn-text: var(--km-page-ink);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--km-gold) 14%, transparent);
+  --inv-surface-2: var(--km-page-2);
+  --inv-music-bg: var(--km-paper);
+  --inv-music-text: var(--km-ink);
+  --inv-music-border: color-mix(in srgb, var(--km-gold-2) 45%, transparent);
+  --inv-photo-bg: var(--km-page-2);
+  --inv-error: #FFB4A8;
+  --fx-pulse: var(--km-accent);
+  --fx-shine: var(--km-gold);
+  background-color: var(--km-page);
+  /* Het licht van de kraampjes, laag aan de horizon. */
+  background-image:
+    radial-gradient(70rem 34rem at 50% 108%, color-mix(in srgb, var(--km-gold) 12%, transparent), transparent 70%),
+    radial-gradient(50rem 30rem at -10% 20%, color-mix(in srgb, var(--km-gold) 6%, transparent), transparent 70%);
+  background-attachment: fixed;
+  color: var(--km-page-ink);
+  font-family: var(--km-serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+/* ================================================================ het beeldvak (opening en kop)
+   Het vak heeft de verhouding van het filmpje (9:16) en is op een telefoon zo breed als het scherm.
+   .km-frame vult het vak zoals object-fit: cover, zodat alles wat op het beeld ligt (de kaart, de ster, het licht)
+   in procenten van het beeld op zijn plek blijft. */
+.km-backdrop { position: absolute; inset: 0; overflow: hidden; background: #0B1328; }
+.km-backdrop img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); filter: brightness(.5) saturate(1.1); }
+.km-backdrop::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 55%, var(--km-page) 100%), radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(0, 0, 0, .45));
+}
+.km-stage {
+  position: absolute; top: 0; left: 50%; height: 100%; aspect-ratio: 9 / 16; max-width: 100%; translate: -50% 0;
+  overflow: hidden; container-type: size; box-shadow: 0 0 70px rgba(0, 0, 0, .65);
+}
+.km-frame { position: absolute; left: 50%; top: 50%; width: max(100cqw, 56.25cqh); height: max(100cqh, 177.78cqw); translate: -50% -50%; }
+.km-frame > img, .km-frame > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Onderaan loopt het beeld over in de kleur van de pagina. */
+.km-stage__shade { position: absolute; left: 0; right: 0; bottom: 0; height: 8%; pointer-events: none; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--km-page) 85%, transparent)); }
+
+/* De ster uit het filmpje (_ster.html): crème met een gouden rand, op een gouden stokje. */
+.km-star__svg { display: block; width: 100%; height: auto; overflow: visible; }
+.km-star__shape { fill: #FBF6EA; stroke: #B8913F; stroke-width: 2.6; stroke-linejoin: round; }
+.km-star__stick { fill: none; stroke: #B8913F; stroke-width: 2.6; }
+.km-star__glow { position: absolute; left: 50%; top: 46%; width: 190%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; pointer-events: none; background: radial-gradient(closest-side, rgba(255, 236, 186, .62), rgba(255, 214, 140, .2) 52%, transparent); }
+
+/* ================================================================ openingsscherm: het reuzenrad */
+/* Alleen met JavaScript (zie invite-base.css): zonder script staat de kop met de geopende kaart er meteen. */
+.js .km-cover { display: block; background: #0B1328; }
+/* Dezelfde hoogte als de kop (100svh: het scherm met de adresbalk zichtbaar), zodat het laatste filmbeeld
+   ook op een telefoon met een in- en uitschuivende adresbalk precies op de kop past. */
+.km-cover > .km-backdrop, .km-cover > .km-stage { top: var(--km-bar, 0px); height: calc(100vh - var(--km-bar, 0px)); height: max(calc(100svh - var(--km-bar, 0px)), 600px); }
+.km-frame__end, .km-film { opacity: 0; }
+.km-cover--film .km-film { opacity: 1; }
+/* Zonder (geladen) filmpje, of zonder kerstmarkt.js: een lichtstreep groeit uit tot een gloed, en daarin verschijnt
+   de kaart (het eindbeeld vloeit over het eerste beeld). Speelt het filmpje (km-cover--speelt), dan doet het dat zelf. */
+.km-flare {
+  position: absolute; left: 58.5%; top: 47.8%; width: 46%; height: 50%; translate: -50% -50%; border-radius: 50%;
+  pointer-events: none; opacity: 0; transform: scale(.06, .5);
+  background: radial-gradient(closest-side, rgba(255, 250, 232, .95), rgba(255, 226, 160, .6) 45%, rgba(255, 200, 120, .18) 75%, transparent);
+}
+.is-opening .km-cover:not(.km-cover--speelt) .km-flare { animation: km-flare 2.6s cubic-bezier(.4, 0, .3, 1) .4s both; }
+.is-opening .km-cover:not(.km-cover--speelt) .km-frame__end { animation: km-in 1.3s ease 1.5s both; }
+/* Hapert het filmpje pas laat, dan vloeit het eindbeeld snel over (zonder lichtstreep). */
+.is-opening .km-cover.km-cover--snel .km-frame__end { animation: km-in .5s ease both; }
+.is-opening .km-cover.km-cover--snel .km-flare { animation: none; }
+@keyframes km-flare {
+  0% { opacity: 0; transform: scale(.04, .45); }
+  25% { opacity: .95; transform: scale(.12, .9); }
+  55% { opacity: .9; transform: scale(1, 1); }
+  100% { opacity: 0; transform: scale(1.15, 1.05); }
+}
+@keyframes km-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* Het kaartje voor het reuzenrad. */
+.km-ticket {
+  position: absolute; z-index: 3; left: 50%; bottom: calc(max(1rem, env(safe-area-inset-bottom)) + 4.2rem); translate: -50% 0;
+  display: grid; justify-items: center; gap: .45rem; width: min(21rem, calc(100% - 2.5rem)); padding: 2.1rem 1.1rem 1.6rem;
+  background: radial-gradient(130% 90% at 50% 0%, #FFFDF6, var(--km-paper) 60%, var(--km-paper-2)) border-box;
+  color: var(--km-ink); text-align: center; border-radius: 4px;
+  border: 22px solid transparent; border-image: var(--km-rand) 28 / 22px stretch;
+  box-shadow: 0 1.4rem 2.6rem -.4rem rgba(0, 0, 0, .7);
+  transition: opacity .55s ease, translate .7s cubic-bezier(.5, 0, .7, .2);
+}
+/* Een kleine ster boven op het kaartje (zonder stokje). */
+.km-ticket__star { position: absolute; left: 50%; top: -22px; width: 3.4rem; translate: -50% -58%; filter: drop-shadow(0 0 .7rem rgba(255, 226, 160, .75)); }
+.km-ticket__star .km-star__stick { display: none; }
+.km-ticket__kicker { font-family: var(--km-caps); font-size: .78rem; letter-spacing: .16em; text-transform: uppercase; color: var(--km-gold-2); text-wrap: balance; }
+.km-ticket__from { font-style: italic; font-weight: 500; font-size: clamp(1.5rem, 6.4vw, 1.8rem); line-height: 1.2; text-wrap: balance; overflow-wrap: anywhere; }
+.km-open {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 48px; margin-top: .45rem; padding: .7rem 1.6rem;
+  border-radius: 999px; background: var(--km-accent); color: var(--km-accent-ink); text-decoration: none; cursor: pointer;
+  font-family: var(--km-ui); font-size: 1rem; font-weight: 600; letter-spacing: .03em;
+  box-shadow: 0 .5rem 1.2rem -.4rem color-mix(in srgb, var(--km-accent) 70%, #000);
+}
+.km-open:hover { filter: brightness(1.1); }
+.km-open:focus-visible, .km-ticket__music:focus-visible { outline: 3px solid var(--km-gold-2); outline-offset: 4px; }
+.km-ticket__music {
+  min-height: 44px; padding: .4rem 1rem; border: 0; background: none; cursor: pointer; color: var(--km-ink);
+  font-family: var(--km-ui); font-size: .92rem; font-weight: 600; text-decoration: underline; text-underline-offset: 4px;
+}
+/* Een laag scherm: een compacter kaartje, zodat de kerstmarkt in beeld blijft. */
+@media (max-height: 700px) {
+  .km-ticket { gap: .3rem; padding-top: 1.7rem; padding-bottom: 1.1rem; bottom: calc(max(.8rem, env(safe-area-inset-bottom)) + 3.6rem); }
+  .km-ticket__from { font-size: 1.45rem; }
+  .km-open { margin-top: .25rem; }
+}
+/* Heel smal (zoals het telefoonvoorbeeld op de website): een kleiner kaartje, zodat de kerstmarkt in beeld blijft. */
+@media (max-width: 340px) {
+  .km-ticket { gap: .3rem; width: calc(100% - 1.6rem); padding: 1.5rem .7rem .8rem; border-width: 18px; border-image-width: 18px; bottom: calc(max(.6rem, env(safe-area-inset-bottom)) + 3.4rem); }
+  .km-ticket__star { top: -18px; width: 2.8rem; }
+  .km-ticket__kicker { font-size: .68rem; letter-spacing: .14em; }
+  .km-ticket__from { font-size: 1.3rem; }
+  .km-open { min-height: 44px; margin-top: .25rem; padding: .55rem 1.1rem; font-size: .9rem; white-space: nowrap; }
+  .km-ticket__music { font-size: .85rem; }
+}
+
+.is-opening .km-ticket { opacity: 0; translate: -50% 1.4rem; pointer-events: none; }
+/* Sneeuw valt over de kerstmarkt zodra het filmpje begint. */
+.km-cover .km-snow { opacity: .55; transition: opacity 1.2s ease; }
+.is-opening .km-cover .km-snow { opacity: 1; }
+/* Aan het eind van het filmpje vervaagt het openingsscherm; daaronder staat precies hetzelfde beeld in de kop. */
+.is-opening .km-cover { animation: km-out .45s ease var(--km-out, 4.55s) forwards; }
+@keyframes km-out { to { opacity: 0; } }
+.is-opening-reduced .km-cover { animation: none; opacity: 0; transition: opacity .2s; }
+
+/* ================================================================ kop: de kaart die openklapt */
+.km-hero { position: relative; height: calc(100vh - var(--km-bar, 0px)); height: max(calc(100svh - var(--km-bar, 0px)), 600px); overflow: hidden; background: #0B1328; }
+/* De kerstmarkt wordt iets donkerder, zodat de kaart naar voren komt. */
+.km-shade { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 70% 55% at 50% 48%, rgba(8, 12, 30, .22), rgba(8, 12, 30, .58)); }
+/* Warm licht achter de kaart (het licht uit het filmpje). */
+.km-halo {
+  position: absolute; left: 50%; top: 49%; width: 118%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 228, 168, .5), rgba(255, 204, 128, .16) 55%, transparent); opacity: .65;
+}
+.fx-motion .km-halo { animation: km-breathe 7s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes km-breathe { 50% { opacity: .85; } }
+
+/* De kaart: 3 bij 5, zoals in het filmpje. Een eigen container, zodat alles op de kaart meeschaalt (cqi). */
+.km-card {
+  position: absolute; z-index: 1; left: 20%; top: 22.2%; width: 60%; aspect-ratio: 3 / 5;
+  container-type: inline-size; transform-origin: 0 0;
+}
+/* Schaduw onder de kaart (losse laag, zodat hij goedkoop kan verschijnen). */
+.km-card::before { content: ""; position: absolute; inset: 3% -2% -3%; border-radius: 4cqi; background: rgba(4, 6, 18, .55); filter: blur(5cqi); }
+.km-card__inside {
+  position: absolute; inset: 0; overflow: hidden; border-radius: .8cqi;
+  background: radial-gradient(130% 80% at 50% 8%, #FFFDF7, var(--km-paper) 55%, var(--km-paper-2));
+  box-shadow: inset 0 0 0 .3cqi rgba(150, 118, 60, .25);
+}
+.km-card__inside::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  border: 15.5cqi solid transparent; border-image: var(--km-rand) 28 / 15.5cqi stretch;
+}
+.km-card__text {
+  position: absolute; inset: 15cqi 11cqi; display: flex; align-items: center; justify-content: center;
+  text-align: center; color: var(--km-ink);
+}
+.km-card__inner { width: 100%; font-size: calc(1cqi * var(--km-fit, 1)); }
+body { --km-orn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 16'%3E%3Cpath d='M0 8h52M88 8h52' stroke='%23000' stroke-width='1.3'/%3E%3Cpath d='M70 0l2.6 5.2L78 6l-4 3.9.9 5.6L70 12.9l-4.9 2.6.9-5.6L62 6l5.4-.8z'/%3E%3Ccircle cx='57' cy='8' r='1.7'/%3E%3Ccircle cx='83' cy='8' r='1.7'/%3E%3C/svg%3E"); }
+.km-orn, .km-divider { display: block; margin-inline: auto; background: var(--km-gold-2); -webkit-mask: var(--km-orn) center / contain no-repeat; mask: var(--km-orn) center / contain no-repeat; }
+.km-orn { width: 36em; height: 4.4em; margin-bottom: 5.5em; }
+.km-divider { width: 28em; height: 3.4em; margin: 6em auto 5.5em; }
+.km-greet { font-family: var(--km-script); font-weight: 400; font-size: 17.5em; line-height: 1.06; color: var(--km-accent); text-wrap: balance; overflow-wrap: anywhere; }
+.km-greet .km-write { display: block; }
+.km-greet--own { font-size: 14em; line-height: 1.12; }
+.km-greet--own .km-write { display: inline; }
+.km-wish { margin-top: .4em; font-style: italic; font-weight: 500; font-size: 8.4em; line-height: 1.22; text-wrap: balance; }
+.km-names {
+  padding-left: .16em; font-family: var(--km-caps); font-weight: 400; font-size: 7.2em; line-height: 1.4;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--km-ink); text-wrap: balance; overflow-wrap: anywhere;
+}
+.km-names--long { font-size: 6.6em; letter-spacing: .12em; }
+.km-names--xlong { font-size: 5.8em; letter-spacing: .08em; }
+.km-names__amp { font-family: var(--km-serif); font-style: italic; font-size: 1.25em; letter-spacing: 0; text-transform: none; color: var(--km-accent); }
+.km-members, .km-tagline { margin-top: .35em; font-style: italic; font-size: 7.4em; line-height: 1.3; color: var(--km-muted); text-wrap: balance; }
+.km-when { margin-top: .5em; font-family: var(--km-caps); font-size: 5.8em; letter-spacing: .12em; text-transform: uppercase; color: var(--km-gold-2); }
+/* Licht dat uit de kaart komt als hij opengaat (alleen tijdens het openen zichtbaar). */
+.km-card__light { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(ellipse 70% 60% at 50% 46%, rgba(255, 246, 214, .95), rgba(255, 232, 170, .45) 55%, transparent 85%); }
+
+/* De ster op de kaart. Hij staat op een stokje midden boven de kaart; het stokje komt net onder de bovenrand. */
+.km-star { position: absolute; left: 50%; bottom: 100%; width: 63.6%; margin-bottom: -2.4%; transform-origin: 50% 96.1%; transform: translateX(-50%) scale(.72); }
+.km-star .km-star__glow { opacity: .8; }
+.fx-motion.fx-done .km-hero .km-star__glow { animation: km-twinkle 5.5s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes km-twinkle { 0%, 100% { opacity: .7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+
+/* De deurtjes (alleen in beweging): elk de helft van de voorkant, met het medaillon in het midden. */
+.km-doors { display: none; position: absolute; inset: 0; }
+.km-door { position: absolute; top: 0; bottom: 0; width: 50%; overflow: hidden; backface-visibility: hidden; }
+.km-door--l { left: 0; transform-origin: 0 50%; --km-swing: -116deg; }
+.km-door--r { right: 0; transform-origin: 100% 50%; --km-swing: 116deg; }
+.km-door__face {
+  position: absolute; top: 0; bottom: 0; width: 200%; border-radius: .8cqi;
+  background: radial-gradient(130% 80% at 50% 8%, #FFFDF7, var(--km-paper) 55%, var(--km-paper-2));
+}
+.km-door--l .km-door__face { left: 0; }
+.km-door--r .km-door__face { right: 0; }
+.km-door__face::before { content: ""; position: absolute; inset: 0; border: 15.5cqi solid transparent; border-image: var(--km-rand) 28 / 15.5cqi stretch; }
+/* Het medaillon: half op elk deurtje. */
+.km-door__face::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 29cqi; aspect-ratio: 1; translate: -50% -50%;
+  background: url("img/medaille.svg") center / contain no-repeat; filter: drop-shadow(0 .6cqi 1.2cqi rgba(90, 60, 20, .35));
+}
+/* De naad tussen de deurtjes, en de schaduw op een deurtje als het opendraait. */
+.km-door::before { content: ""; position: absolute; z-index: 1; top: 0; bottom: 0; width: .35cqi; background: rgba(120, 88, 36, .5); }
+.km-door--l::before { right: 0; }
+.km-door--r::before { left: 0; }
+.km-door::after { content: ""; position: absolute; z-index: 1; inset: 0; opacity: 0; background: linear-gradient(90deg, rgba(70, 45, 15, .4), transparent); }
+.km-door--l::after { background: linear-gradient(270deg, rgba(70, 45, 15, .4), transparent); }
+
+/* Sterrenstof: komt achter de ster vandaan als de kaart opengaat (achter de kaart, nooit over de tekst). */
+.km-dust { position: absolute; left: 50%; top: 14.6%; width: 0; height: 0; pointer-events: none; }
+.km-dust i, .km-end__dust i {
+  position: absolute; left: -.8rem; top: -.8rem; width: 1.6rem; height: 1.6rem; opacity: 0;
+  background: radial-gradient(closest-side, #FFF8E2, rgba(255, 226, 150, .9) 35%, transparent 70%);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+}
+.km-dust i:nth-child(1) { --a: -90deg; --d: 7.5rem; --s: 1.3; }
+.km-dust i:nth-child(2) { --a: -60deg; --d: 6rem; --s: .8; }
+.km-dust i:nth-child(3) { --a: -30deg; --d: 8.5rem; --s: 1.1; }
+.km-dust i:nth-child(4) { --a: -5deg; --d: 7rem; --s: .9; }
+.km-dust i:nth-child(5) { --a: 20deg; --d: 8rem; --s: 1.2; }
+.km-dust i:nth-child(6) { --a: 40deg; --d: 6.5rem; --s: .7; }
+.km-dust i:nth-child(7) { --a: 140deg; --d: 6.5rem; --s: .8; }
+.km-dust i:nth-child(8) { --a: 160deg; --d: 8rem; --s: 1.2; }
+.km-dust i:nth-child(9) { --a: 185deg; --d: 7rem; --s: .9; }
+.km-dust i:nth-child(10) { --a: 210deg; --d: 8.5rem; --s: 1.1; }
+.km-dust i:nth-child(11) { --a: 240deg; --d: 6rem; --s: .8; }
+.km-dust i:nth-child(12) { --a: 270deg; --d: 4.5rem; --s: 1; }
+@keyframes km-dust {
+  0% { opacity: 0; transform: rotate(var(--a)) translateX(.6rem) scale(.2); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateX(var(--d)) scale(var(--s)) rotate(calc(-1 * var(--a))); }
+}
+
+.km-scroll {
+  position: absolute; z-index: 2; left: 50%; bottom: max(3.2%, 1rem); translate: -50% 0;
+  display: inline-flex; flex-direction: column; align-items: center; gap: .1rem; min-height: 44px; padding: .45rem 1.1rem .3rem;
+  border-radius: 999px; background: var(--km-page); box-shadow: 0 0 0 1px color-mix(in srgb, var(--km-gold) 55%, transparent);
+  color: var(--km-page-ink); text-decoration: none;
+  font-family: var(--km-ui); font-size: .78rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+}
+.fx-motion .km-scroll svg { animation: km-nudge 2.6s ease-in-out 4s infinite; animation-play-state: var(--fx-play, running); }
+@keyframes km-nudge { 50% { transform: translateY(4px); } }
+
+/* ---------------------------------------------------------------- de kaartopening (alleen in beweging)
+   Zolang het openingsscherm er staat, ligt de kaart dicht op de plek van de kaart in het filmpje (--km-van, door
+   kerstmarkt.js berekend uit de vier hoeken; zonder script een benadering). Na het filmpje (fx-start):
+   0,5 s  de kaart komt naar voren, de ster wordt kleiner en de kerstmarkt iets donkerder;
+   1,25 s het medaillon en de naad verschijnen;
+   1,85 s de deurtjes klappen open, er komt licht uit de kaart en sterrenstof achter de ster vandaan;
+   2,3 s  de groet schrijft zich, daarna de afzender. Alles is klaar binnen 4,2 seconden (fx-done). */
+.fx-motion:is(.has-cover, .is-opening) .km-card { transform: var(--km-van, translate(37.3%, 17.9%) scale(.559)); }
+.fx-motion:is(.has-cover, .is-opening) .km-star { transform: translateX(-40.9%) scale(1); }
+.fx-motion:is(.has-cover, .is-opening) .km-shade, .fx-motion:is(.has-cover, .is-opening) .km-card::before { opacity: 0; }
+.fx-motion:is(.has-cover, .is-opening, .fx-start:not(.fx-done)) .km-doors { display: block; }
+.fx-motion:is(.has-cover, .is-opening) .km-door__face::after,
+.fx-motion:is(.has-cover, .is-opening) .km-door::before { opacity: 0; }
+.fx-motion:is(.has-cover, .is-opening) :is(.km-write, .km-orn, .km-divider, .km-members, .km-tagline, .km-when) { opacity: 0; }
+.fx-motion:is(.has-cover, .is-opening) .km-star__glow { opacity: 0; }
+
+.fx-motion.fx-start:not(.fx-done) .km-card { animation: km-forward 1.15s cubic-bezier(.45, 0, .25, 1) .5s both; }
+.fx-motion.fx-start:not(.fx-done) .km-star { animation: km-star-forward 1.15s cubic-bezier(.45, 0, .25, 1) .5s both; }
+.fx-motion.fx-start:not(.fx-done) .km-card::before { animation: km-fade-in 1s ease .8s both; }
+.fx-motion.fx-start:not(.fx-done) .km-shade { animation: km-fade-in 1.1s ease .5s both; }
+.fx-motion.fx-start:not(.fx-done) .km-halo { animation: km-bloom 2s ease 1.8s both; }
+.fx-motion.fx-start:not(.fx-done) .km-door__face::after, .fx-motion.fx-start:not(.fx-done) .km-door::before { animation: km-medal .55s cubic-bezier(.3, 1.3, .5, 1) 1.25s both; }
+.fx-motion.fx-start:not(.fx-done) .km-door { animation: km-door 1.1s cubic-bezier(.55, .05, .35, 1) 1.85s both; }
+.fx-motion.fx-start:not(.fx-done) .km-door::after { animation: km-door-shade 1.1s ease-in 1.85s both; }
+.fx-motion.fx-start:not(.fx-done) .km-card__light { animation: km-light 1.5s ease 1.85s both; }
+.fx-motion.fx-start:not(.fx-done) .km-hero .km-star__glow { animation: km-swell 1.6s ease 1.9s both; }
+.fx-motion.fx-start:not(.fx-done) .km-dust i { animation: km-dust 1.7s cubic-bezier(.2, .6, .3, 1) calc(2s + var(--i, 0) * 40ms) both; }
+.km-dust i:nth-child(even) { --i: 2; }
+.km-dust i:nth-child(3n) { --i: 4; }
+
+@keyframes km-forward { from { transform: var(--km-van, translate(37.3%, 17.9%) scale(.559)); } to { transform: none; } }
+@keyframes km-star-forward { from { transform: translateX(-40.9%) scale(1); } to { transform: translateX(-50%) scale(.72); } }
+@keyframes km-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes km-medal { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+@keyframes km-door {
+  0% { transform: perspective(150cqi) rotateY(0); opacity: 1; }
+  45% { opacity: 1; }
+  100% { transform: perspective(150cqi) rotateY(var(--km-swing)); opacity: 0; }
+}
+@keyframes km-door-shade { to { opacity: 1; } }
+@keyframes km-light { 0% { opacity: 0; } 30% { opacity: .9; } 100% { opacity: 0; } }
+@keyframes km-bloom { 0% { opacity: .65; } 30% { opacity: 1; } 100% { opacity: .65; } }
+/* De ster licht één keer zacht op (geen flits). */
+@keyframes km-swell { 0% { opacity: 0; transform: scale(.7); } 40% { opacity: 1; transform: scale(1.25); } 100% { opacity: .8; transform: none; } }
+
+/* Het schrijven: de regels verschijnen na elkaar, alsof ze met de hand op de kaart worden geschreven. */
+.fx-motion.fx-namen-schrijf.fx-start:not(.fx-done) .km-write {
+  -webkit-mask-image: linear-gradient(90deg, #000 44%, transparent 56%); mask-image: linear-gradient(90deg, #000 44%, transparent 56%);
+  -webkit-mask-size: 260% 100%; mask-size: 260% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  animation: fx-names-schrijf var(--km-dur, .9s) cubic-bezier(.45, .05, .35, 1) var(--km-at, 2.3s) both;
+}
+.km-write { --km-at: 2.3s; --km-dur: .7s; }
+.km-write--2 { --km-at: 2.75s; --km-dur: .85s; }
+.km-write--3 { --km-at: 3.3s; --km-dur: .7s; }
+.km-greet--own .km-write { --km-dur: 1.4s; }
+.fx-motion.fx-start:not(.fx-done) :is(.km-orn, .km-divider) { animation: km-fade-in .8s ease 2.2s both; }
+.fx-motion.fx-start:not(.fx-done) .km-names.fx-names {
+  -webkit-mask-image: none; mask-image: none; animation: km-letters 1s var(--fx-ease) 3.05s both;
+}
+@keyframes km-letters { from { opacity: 0; letter-spacing: .42em; } }
+.fx-motion.fx-start:not(.fx-done) :is(.km-members, .km-tagline, .km-when) { animation: fx-rise .7s var(--fx-ease) 3.4s both; }
+
+/* ================================================================ de kaart */
+body { --km-snoer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 26'%3E%3Cpath d='M2 4Q47 18 90 6Q133 -2 178 10' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3Cg%3E%3Cellipse cx='22' cy='15' rx='3.2' ry='4.4'/%3E%3Cellipse cx='54' cy='16.5' rx='3.2' ry='4.4'/%3E%3Cellipse cx='90' cy='12' rx='3.6' ry='5'/%3E%3Cellipse cx='126' cy='8.5' rx='3.2' ry='4.4'/%3E%3Cellipse cx='158' cy='12' rx='3.2' ry='4.4'/%3E%3C/g%3E%3C/svg%3E"); }
+.km-body { display: grid; gap: clamp(2.8rem, 9vw, 4rem); max-width: 38rem; margin: 0 auto; padding: clamp(2.6rem, 9vw, 4.2rem) 1.1rem 1rem; }
+.km-sec { text-align: center; }
+.km-h2 { font-family: var(--km-script); font-weight: 400; font-size: clamp(2.5rem, 10vw, 3.1rem); line-height: 1.15; color: var(--km-gold); margin-bottom: 1.3rem; text-wrap: balance; }
+/* Een lichtsnoer onder elke kop. */
+.km-h2::after {
+  content: ""; display: block; width: 10rem; height: 1.45rem; margin: .4rem auto 0; background: currentColor;
+  -webkit-mask: var(--km-snoer) center / contain no-repeat; mask: var(--km-snoer) center / contain no-repeat;
+}
+.km-h2--paper { color: var(--km-accent); }
+
+/* Crèmekleurig papier met de gouden rand uit het filmpje. */
+.km-paper, .km-pass {
+  --inv-text: var(--km-ink);
+  --inv-muted: var(--km-muted);
+  --inv-accent: var(--km-accent);
+  --inv-accent-contrast: var(--km-accent-ink);
+  --inv-focus: var(--km-gold-2);
+  --inv-btn-border: var(--km-gold-2);
+  --inv-btn-text: var(--km-ink);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--km-gold) 18%, transparent);
+  --inv-surface-2: var(--km-paper-2);
+  --inv-field-bg: #FFFDF8;
+  --inv-field-text: var(--km-ink);
+  --inv-field-border: color-mix(in srgb, var(--km-ink) 32%, transparent);
+  --inv-photo-bg: var(--km-paper-2);
+  --inv-error: #9B1C1C;
+  /* Lichte formuliervelden en keuzerondjes op het papier (de pagina zelf is donker). */
+  color-scheme: light;
+  position: relative; color: var(--km-ink); border-radius: 4px;
+  background: radial-gradient(130% 90% at 50% 0%, #FFFDF6, var(--km-paper) 60%, var(--km-paper-2)) border-box;
+  border: 22px solid transparent; border-image: var(--km-rand) 28 / 22px stretch;
+  box-shadow: 0 1.5rem 3rem -1.2rem rgba(0, 0, 0, .65);
+}
+.km-paper { padding: clamp(.9rem, 4vw, 1.7rem) clamp(.6rem, 3.5vw, 1.5rem); }
+.km-paper .inv-link { color: var(--km-accent); }
+
+/* Foto's in een raampje van de gondel: goud, met rood fluweel eronder. */
+.km-window { position: relative; margin: 0; padding: 7px 7px 16px; border-radius: 999px 999px 14px 14px; background: linear-gradient(180deg, #E7C77B, #B8913F 40%, #8A6526); box-shadow: 0 1rem 2rem -1rem rgba(0, 0, 0, .7); }
+.km-window::after { content: ""; position: absolute; left: 7px; right: 7px; bottom: 5px; height: 7px; border-radius: 0 0 9px 9px; background: var(--km-velvet); }
+.km-window .ph { border-radius: 999px 999px 8px 8px; aspect-ratio: 4 / 5; }
+
+.km-letter__photo { width: min(17rem, 82%); margin: .4rem auto 1.4rem; }
+.km-letter__photo .ph { aspect-ratio: 4 / 5; }
+.km-letter__text { text-align: left; font-style: italic; font-size: 1.28rem; line-height: 1.58; }
+.km-letter__text p + p, .km-story__text p + p { margin-top: .9rem; }
+
+/* Een kaartje voor het reuzenrad: de datum, met een perforatie en twee halve gaatjes. */
+.km-pass {
+  max-width: 22rem; margin: 0 auto; padding: 1.4rem 1rem 1.2rem;
+  /* De halve gaatjes staan op de hoogte van de stippellijn (--km-cut, gemeten door kerstmarkt.js). */
+  -webkit-mask: radial-gradient(circle at 0 var(--km-cut, 64%), transparent .9rem, #000 .95rem) left / 51% 100% no-repeat, radial-gradient(circle at 100% var(--km-cut, 64%), transparent .9rem, #000 .95rem) right / 51% 100% no-repeat;
+  mask: radial-gradient(circle at 0 var(--km-cut, 64%), transparent .9rem, #000 .95rem) left / 51% 100% no-repeat, radial-gradient(circle at 100% var(--km-cut, 64%), transparent .9rem, #000 .95rem) right / 51% 100% no-repeat;
+}
+.km-pass__title { font-family: var(--km-caps); font-weight: 400; font-size: .86rem; letter-spacing: .3em; text-transform: uppercase; color: var(--km-gold-2); }
+.km-pass__title::after { content: ""; display: block; width: 7rem; height: .9rem; margin: .5rem auto 0; background: var(--km-gold-2); -webkit-mask: var(--km-orn) center / contain no-repeat; mask: var(--km-orn) center / contain no-repeat; }
+.km-pass__date { display: grid; justify-items: center; margin: .9rem 0 1.1rem; }
+.km-pass__weekday { font-family: var(--km-caps); font-size: .84rem; letter-spacing: .26em; text-transform: uppercase; color: var(--km-muted); }
+.km-pass__day { font-weight: 600; font-size: 4.6rem; line-height: 1; color: var(--km-accent); }
+.km-pass__month { font-style: italic; font-size: 1.4rem; }
+.km-pass__more { padding-top: 1rem; border-top: 2px dashed color-mix(in srgb, var(--km-gold-2) 50%, transparent); }
+.km-pass__time { font-family: var(--km-ui); font-size: 1rem; font-weight: 500; }
+.km-pass__venue { margin-top: .2rem; font-style: italic; font-size: 1.28rem; }
+
+/* Het programma als lichtsnoer: een gouden draad met een lampje bij elk onderdeel. */
+.km-lights { position: relative; display: grid; gap: 1.5rem; max-width: 26rem; margin: 0 auto; padding-left: 2.6rem; text-align: left; }
+.km-lights::before { content: ""; position: absolute; left: .82rem; top: .6rem; bottom: .8rem; width: 2px; border-radius: 2px; background: linear-gradient(180deg, color-mix(in srgb, var(--km-gold) 80%, transparent), color-mix(in srgb, var(--km-gold) 35%, transparent)); }
+.km-lights__item { position: relative; }
+.km-lights__bulb { position: absolute; left: -2.3rem; top: .3rem; width: 1.15rem; height: 1.45rem; border-radius: 50% 50% 46% 46% / 40% 40% 60% 60%; background: radial-gradient(circle at 42% 38%, #FFF8E0, var(--km-gold) 55%, color-mix(in srgb, var(--km-gold) 70%, #6b4a14)); box-shadow: 0 0 .9rem .15rem color-mix(in srgb, var(--km-gold) 55%, transparent); }
+.km-lights__bulb::before { content: ""; position: absolute; left: 50%; top: -.38rem; width: .55rem; height: .45rem; translate: -50% 0; border-radius: 2px 2px 1px 1px; background: #8A6526; }
+.fx-motion .km-lights__item:nth-child(odd) .km-lights__bulb { animation: km-bulb 4.8s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .km-lights__item:nth-child(even) .km-lights__bulb { animation: km-bulb 4.8s ease-in-out -2.4s infinite; animation-play-state: var(--fx-play, running); }
+@keyframes km-bulb { 50% { box-shadow: 0 0 1.3rem .35rem color-mix(in srgb, var(--km-gold) 70%, transparent); } }
+.km-lights__time { font-family: var(--km-ui); font-size: .95rem; font-weight: 600; letter-spacing: .08em; color: var(--km-gold); font-variant-numeric: lining-nums tabular-nums; }
+.km-lights__title { font-size: 1.36rem; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+.km-lights__desc { margin-top: .1rem; font-style: italic; font-size: 1.16rem; line-height: 1.45; color: var(--km-page-muted); }
+
+/* Afteller: gouden ringen. */
+.km-count .cd { gap: clamp(.7rem, 3vw, 1.1rem); margin-bottom: 1.6rem; }
+.km-count .cd__unit {
+  justify-content: center; width: clamp(3.7rem, 17.5vw, 5rem); min-width: 0; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--km-page-2), var(--km-page)); box-shadow: 0 0 0 1px var(--km-gold), 0 0 0 4px var(--km-page), 0 0 0 5px color-mix(in srgb, var(--km-gold) 45%, transparent);
+}
+.km-count .cd__num { font-family: var(--km-serif); font-weight: 600; font-size: clamp(1.6rem, 7.5vw, 2.1rem); color: var(--km-page-ink); }
+.km-count .cd__label { color: var(--km-page-muted); font-size: .68rem; letter-spacing: .14em; }
+.km-count .cd-today, .km-count .cd-past { color: var(--km-page-muted); font-size: 1.3rem; margin-bottom: 1rem; }
+
+.km-dest { display: grid; justify-items: center; gap: .55rem; }
+.km-dest .km-h2 { margin-bottom: .5rem; }
+.km-dest__venue { font-size: 1.5rem; font-weight: 600; line-height: 1.25; }
+.km-dest__address { font-style: normal; font-size: 1.22rem; }
+.km-dest__when { font-style: italic; color: var(--km-muted); margin-bottom: .6rem; }
+
+/* De dresscode als kerstballen aan een draadje. */
+.km-baubles { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.1rem; margin-bottom: 1.3rem; padding-top: 1.2rem; }
+.km-bauble {
+  position: relative; width: 3.2rem; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, color-mix(in srgb, var(--c) 55%, #fff), var(--c) 50%, color-mix(in srgb, var(--c) 62%, #000));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--km-gold) 60%, transparent), 0 .6rem 1rem -.4rem rgba(0, 0, 0, .6);
+}
+.km-bauble::before { content: ""; position: absolute; left: 50%; top: -.5rem; width: .8rem; height: .55rem; translate: -50% 0; border-radius: 2px; background: linear-gradient(90deg, #8A6526, #E7C77B, #8A6526); }
+.km-bauble::after { content: ""; position: absolute; left: 50%; bottom: calc(100% + .5rem); width: 1px; height: .8rem; background: color-mix(in srgb, var(--km-gold) 70%, transparent); }
+.km-dress__text { font-size: 1.24rem; }
+
+.km-story__text { text-align: left; font-size: 1.24rem; line-height: 1.6; }
+.km-story__text p:first-child::first-letter { float: left; margin: .02em .12em 0 0; font-family: var(--km-script); font-size: 3.6em; line-height: .9; color: var(--km-accent); }
+
+.km-photos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem .9rem; }
+.km-photos figcaption { padding: .55rem .2rem .2rem; font-style: italic; font-size: 1rem; color: var(--km-page-ink); }
+
+.km-practical__list { display: grid; gap: 1.3rem; }
+.km-practical__item dt { font-family: var(--km-caps); font-size: .84rem; letter-spacing: .22em; text-transform: uppercase; color: var(--km-gold); margin-bottom: .2rem; }
+.km-practical__item dd { margin: 0; font-size: 1.2rem; }
+
+.km-rsvp .km-paper { text-align: left; }
+.km-rsvp .rsvp__deadline { color: var(--km-gold-2); font-weight: 600; }
+
+.km-contact__note { font-size: 1.22rem; }
+.km-contact__name { margin-top: .4rem; font-family: var(--km-script); font-size: 2rem; color: var(--km-gold); }
+.km-contact__links { font-family: var(--km-ui); font-size: 1rem; overflow-wrap: anywhere; }
+.km-contact .inv-link { color: var(--km-page-ink); }
+
+/* ================================================================ het slot: de ster boven de kerstmarkt */
+.km-end { padding-top: .5rem; }
+.km-end__sky { position: relative; z-index: 1; display: grid; justify-items: center; }
+.km-end__star { position: relative; width: 6.2rem; margin-bottom: 1.4rem; }
+.km-end__star .km-star__stick { display: none; }
+.km-end__star .km-star__svg { position: relative; z-index: 1; }
+.km-end__star .km-star__glow { top: 50%; width: 260%; opacity: .75; }
+.km-end__dust { position: absolute; left: 50%; top: 48%; width: 0; height: 0; }
+.km-end__dust i:nth-child(1) { --a: -90deg; --d: 4.4rem; --s: 1.1; }
+.km-end__dust i:nth-child(2) { --a: -45deg; --d: 4rem; --s: .8; }
+.km-end__dust i:nth-child(3) { --a: 0deg; --d: 5rem; --s: 1; }
+.km-end__dust i:nth-child(4) { --a: 35deg; --d: 3.6rem; --s: .7; }
+.km-end__dust i:nth-child(5) { --a: 145deg; --d: 3.6rem; --s: .7; }
+.km-end__dust i:nth-child(6) { --a: 180deg; --d: 5rem; --s: 1; }
+.km-end__dust i:nth-child(7) { --a: 225deg; --d: 4rem; --s: .8; }
+.km-end__dust i:nth-child(8) { --a: 250deg; --d: 4.6rem; --s: .9; }
+/* Komt het slot in beeld, dan gaat de ster één keer zacht stralen en vliegt er wat sterrenstof weg (geen flits). */
+.fx-motion .km-end.is-visible .km-end__star .km-star__glow { animation: km-swell 1.8s ease .3s both, km-twinkle 5.5s ease-in-out 2.1s infinite; animation-play-state: running, var(--fx-play, running); }
+.fx-motion .km-end.is-visible .km-end__dust i { animation: km-dust 1.8s cubic-bezier(.2, .6, .3, 1) calc(.5s + var(--i, 0) * 60ms) both; }
+.km-end__dust i:nth-child(even) { --i: 2; }
+.km-end__greet { font-family: var(--km-script); font-size: clamp(2.9rem, 12.5vw, 3.6rem); line-height: 1.1; color: var(--km-gold); }
+.km-end__wish { font-style: italic; font-size: clamp(1.45rem, 6.2vw, 1.75rem); }
+.km-end__from { margin-top: 1rem; padding-left: .3em; font-family: var(--km-caps); font-size: 1rem; letter-spacing: .3em; text-transform: uppercase; color: var(--km-page-ink); overflow-wrap: anywhere; }
+.km-end__text { margin-top: 1.2rem; font-style: italic; font-size: 1.24rem; color: var(--km-page-muted); text-wrap: balance; }
+/* De kerstmarkt uit het eerste beeld van het filmpje, met lichtjes in de kerstboom die zacht twinkelen. */
+.km-market { position: relative; margin: -1.2rem -1.1rem 1.4rem; }
+.km-market img { width: 100%; height: auto; -webkit-mask-image: linear-gradient(180deg, transparent, #000 30%, #000 72%, transparent); mask-image: linear-gradient(180deg, transparent, #000 30%, #000 72%, transparent); }
+.km-market__lights { position: absolute; inset: 0; pointer-events: none; }
+.km-market__lights i { position: absolute; left: var(--x); top: var(--y); width: 1.4rem; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; opacity: 0; background: radial-gradient(closest-side, rgba(255, 244, 205, .95), rgba(255, 214, 130, .45) 40%, transparent); }
+.km-market__lights i:nth-child(1) { --x: 85.7%; --y: 27%; }
+.km-market__lights i:nth-child(2) { --x: 83%; --y: 34%; }
+.km-market__lights i:nth-child(3) { --x: 88.5%; --y: 36%; }
+.km-market__lights i:nth-child(4) { --x: 81%; --y: 43%; }
+.km-market__lights i:nth-child(5) { --x: 86%; --y: 46%; }
+.km-market__lights i:nth-child(6) { --x: 91%; --y: 47%; }
+.km-market__lights i:nth-child(7) { --x: 79%; --y: 53%; }
+.km-market__lights i:nth-child(8) { --x: 84%; --y: 56%; }
+.km-market__lights i:nth-child(9) { --x: 89.5%; --y: 57%; }
+.km-market__lights i:nth-child(10) { --x: 93%; --y: 60%; }
+.km-market__lights i:nth-child(11) { --x: 30%; --y: 80%; }
+.km-market__lights i:nth-child(12) { --x: 55%; --y: 77%; }
+.fx-motion .km-market__lights i { animation: km-light-twinkle 4.2s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.km-market__lights i:nth-child(3n + 1) { animation-delay: -1.4s; }
+.km-market__lights i:nth-child(3n + 2) { animation-delay: -2.8s; }
+.km-market__lights i:nth-child(4n) { animation-duration: 5.6s; }
+@keyframes km-light-twinkle { 0%, 100% { opacity: 0; } 45%, 55% { opacity: .85; } }
+@media (min-width: 640px) { .km-market { margin-inline: 0; } }
+.km-again { margin-top: 1.2rem; }
+
+.inv-colophon { color: var(--km-page-muted); }
+.inv-colophon a { color: var(--km-page-ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .km-ticket { transition: none; }
+}

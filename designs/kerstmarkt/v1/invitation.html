@@ -1,0 +1,223 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Kerstmarkt v1: het filmpje van de eigenaar als opening (vanuit een reuzenrad over een kerstmarkt; een lichtstreep wordt
+   een kaart met een ster). Daarna neemt de echte kaart het over: hij ligt precies op de kaart uit het filmpje, komt naar
+   voren en klapt open (twee deurtjes met een gouden medaillon), en binnenin schrijft de groet zich met de naam van de klant.
+   De opening en de kop gebruiken hetzelfde beeldvak (km-stage), zodat het laatste filmbeeld naadloos overgaat in de kop.
+   Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/pinyon-script-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/marcellus-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-italic.woff2' %}" as="font" type="font/woff2" crossorigin>
+<script src="{% static 'designs/kerstmarkt/v1/kerstmarkt.js' %}" defer></script>{% endblock %}
+
+{% block cover %}
+<section class="cover km-cover" data-cover data-duration="5050" data-fx-intro="4550" aria-label="Openingsscherm">
+  <div class="km-backdrop" aria-hidden="true"><img src="{% static 'designs/kerstmarkt/v1/img/begin-zacht.webp' %}" width="270" height="480" alt=""></div>
+  <div class="km-stage" aria-hidden="true">
+    <div class="km-frame">
+      <img class="km-frame__img" src="{% static 'designs/kerstmarkt/v1/img/begin.webp' %}" width="720" height="1280" alt="" fetchpriority="high">
+      {# Het filmpje: vanuit het reuzenrad over de kerstmarkt, tot de kaart met de ster er staat. Zonder geluid en zonder bediening. #}
+      <video class="km-film" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback poster="{% static 'designs/kerstmarkt/v1/img/begin.webp' %}" data-km-film>
+        <source src="{% static 'designs/kerstmarkt/v1/img/markt.webm' %}" type="video/webm">
+        <source src="{% static 'designs/kerstmarkt/v1/img/markt.mp4' %}" type="video/mp4">
+      </video>
+      {# Speelt het filmpje niet (of blijft het hangen), dan verschijnt de kaart in een gloed: dit beeld vloeit eroverheen. #}
+      <img class="km-frame__end" src="{% static 'designs/kerstmarkt/v1/img/kaart.webp' %}" width="720" height="1280" alt="" decoding="async">
+      <span class="km-flare"></span>
+      <div class="fx-slot km-snow" data-fx-slot="cover"></div>
+    </div>
+  </div>
+  {# Een kaartje voor het reuzenrad. #}
+  <div class="km-ticket">
+    <span class="km-ticket__star" aria-hidden="true">{% include "kerstmarkt/v1/_ster.html" %}</span>
+    <p class="km-ticket__kicker">{% if v.occasion == "kerst" %}{% if v.formal %}Een kerstgroet voor u{% else %}Een kerstgroet voor jou{% endif %}{% elif v.formal %}Een uitnodiging voor u{% else %}Een uitnodiging voor jou{% endif %}</p>
+    {% if v.title != v.occasion_label %}<p class="km-ticket__from">{% if v.occasion == "kerst" %}van {% endif %}{{ v.title }}</p>{% endif %}
+    <a href="#uitnodiging" class="km-open fx-pulse" data-open data-fx-origin>{% if v.occasion == "kerst" %}Open de kerstkaart{% else %}Open de uitnodiging{% endif %}</a>
+    {% if v.show.music %}<button type="button" class="km-ticket__music" data-open data-open-music>Openen met muziek</button>{% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<header class="km-hero">
+  <div class="km-backdrop" aria-hidden="true"><img src="{% static 'designs/kerstmarkt/v1/img/kaart-zacht.webp' %}" width="270" height="480" alt=""></div>
+  <div class="km-stage">
+    <div class="km-frame" data-km-frame>
+      <img class="km-frame__img" src="{% static 'designs/kerstmarkt/v1/img/kaart.webp' %}" width="720" height="1280" alt="" aria-hidden="true">
+      <span class="km-shade" aria-hidden="true"></span>
+      <div class="fx-slot km-snow" data-fx-slot="hero" aria-hidden="true"></div>
+      {# Warm licht achter de kaart, en sterrenstof dat achter de ster vandaan komt als de kaart opengaat (achter de tekst). #}
+      <span class="km-halo" aria-hidden="true"></span>
+      <span class="km-dust" aria-hidden="true">{% for i in "123456789012" %}<i></i>{% endfor %}</span>
+      {# De kaart. Hij begint precies op de plek van de kaart in het filmpje (kerstmarkt.js rekent die uit). #}
+      <div class="km-card" data-km-card>
+        <span class="km-star" aria-hidden="true"><span class="km-star__glow"></span>{% include "kerstmarkt/v1/_ster.html" %}</span>
+        <div class="km-card__inside">
+          <div class="km-card__text" data-km-fit>
+            <div class="km-card__inner">
+              <span class="km-orn" aria-hidden="true"></span>
+              {% if v.occasion == "kerst" and not v.headline_custom %}
+              <p class="km-greet"><span class="km-write">Fijne</span> <span class="km-write km-write--2">kerstdagen</span></p>
+              <p class="km-wish"><span class="km-write km-write--3">en een gelukkig nieuwjaar</span></p>
+              {% else %}
+              <p class="km-greet km-greet--own"><span class="km-write">{{ v.kicker }}</span></p>
+              {% endif %}
+              <span class="km-divider" aria-hidden="true"></span>
+              <h1 class="km-names km-names--{{ v.names_size }} fx-names">{% if v.is_couple %}{{ v.names.0 }} <span class="km-names__amp" aria-label="en">&amp;</span> {{ v.names.1 }}{% else %}{{ v.names.0 }}{% endif %}</h1>
+              {% if v.subnames %}<p class="km-members">{{ v.subnames }}</p>{% endif %}
+              {% if v.occasion != "kerst" %}<p class="km-tagline">{{ v.tagline }}</p>{% if v.date_display %}<p class="km-when">{{ v.date_display|capfirst }}</p>{% endif %}{% endif %}
+            </div>
+          </div>
+          <span class="km-card__light" aria-hidden="true"></span>
+        </div>
+        {# Twee deurtjes met een gouden medaillon; ze klappen open als de kaart vooraan staat. Alleen in beweging. #}
+        <div class="km-doors" aria-hidden="true">
+          <span class="km-door km-door--l"><span class="km-door__face"></span></span>
+          <span class="km-door km-door--r"><span class="km-door__face"></span></span>
+        </div>
+      </div>
+    </div>
+    <span class="km-stage__shade" aria-hidden="true"></span>
+    <a class="km-scroll fx-intro" href="#km-verder" style="--fx-d:18">Lees verder<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </div>
+</header>
+
+<div class="km-body" id="km-verder">
+{% if v.welcome %}
+<section class="km-sec km-letter" data-reveal aria-label="{% if v.occasion == 'kerst' %}Kerstgroet{% else %}Welkom{% endif %}">
+  <div class="km-paper">
+    {% if v.hero %}<figure class="km-window km-letter__photo"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 640px) 420px, 76vw" %}</div></figure>{% endif %}
+    <div class="km-letter__text">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.has_event and v.date %}
+{# Een kaartje voor het reuzenrad: de datum, de tijd en de plek. #}
+<section class="km-sec km-ticket-sec" data-reveal aria-labelledby="km-date-title">
+  <div class="km-pass">
+    <h2 id="km-date-title" class="km-pass__title">{% if v.formal %}Uw kaartje{% else %}Jouw kaartje{% endif %}</h2>
+    <p class="km-pass__date"><span class="km-pass__weekday">{{ v.weekday }}</span><span class="km-pass__day">{{ v.day }}</span><span class="km-pass__month">{{ v.month_name }} {{ v.year }}</span></p>
+    {% if v.time_display or v.venue %}<div class="km-pass__more">
+      {% if v.time_display %}<p class="km-pass__time">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+      {% if v.venue %}<p class="km-pass__venue">{{ v.venue }}</p>{% endif %}
+    </div>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+{# Het programma als lichtsnoer: elk onderdeel een lampje. #}
+<section class="km-sec km-program" data-reveal aria-labelledby="km-program-title">
+  <h2 id="km-program-title" class="km-h2">Het programma</h2>
+  <ol class="km-lights" data-fx-stagger>
+    {% for item in v.program %}
+    <li class="km-lights__item">
+      <span class="km-lights__bulb" aria-hidden="true"></span>
+      {% if item.time %}<p class="km-lights__time">{{ item.time }}</p>{% endif %}
+      <p class="km-lights__title">{{ item.title }}</p>
+      {% if item.description %}<p class="km-lights__desc">{{ item.description }}</p>{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="km-sec km-count" data-reveal aria-labelledby="km-count-title">
+  <h2 id="km-count-title" class="km-h2">{% if v.countdown_label == "kerst" %}Aftellen naar kerst{% elif v.is_past %}Dank je wel{% else %}Nog even en het is zover{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="km-sec km-place" data-reveal aria-labelledby="km-place-title">
+  <div class="km-paper km-dest">
+    <h2 id="km-place-title" class="km-h2 km-h2--paper">{% if v.formal %}Hier vindt u ons{% else %}Hier vind je ons{% endif %}</h2>
+    {% if v.venue %}<p class="km-dest__venue">{{ v.venue }}</p>{% endif %}
+    {% if v.address_lines %}<address class="km-dest__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+    {% if v.date_display %}<p class="km-dest__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>{% endif %}
+    {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="km-sec km-dress" data-reveal aria-labelledby="km-dress-title">
+  <h2 id="km-dress-title" class="km-h2">Dresscode</h2>
+  {% if v.dresscode_colors %}<ul class="km-baubles" aria-label="Kleuren voor de dresscode" data-fx-stagger>
+    {% for c in v.dresscode_colors %}<li class="km-bauble" style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+  {% for p in v.dresscode_text %}<p class="km-dress__text">{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="km-sec km-story" data-reveal aria-labelledby="km-story-title">
+  <div class="km-paper">
+    <h2 id="km-story-title" class="km-h2 km-h2--paper">{{ v.story_title }}</h2>
+    <div class="km-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="km-sec km-gallery" data-reveal aria-labelledby="km-gallery-title">
+  <h2 id="km-gallery-title" class="km-h2">{% if v.occasion == "kerst" %}Ons jaar in beeld{% else %}Foto's{% endif %}</h2>
+  <ul class="km-photos" data-fx-stagger>
+    {% for photo in v.gallery %}<li><figure class="km-window"><div class="ph">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 640px) 260px, 42vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="km-sec km-practical" data-reveal aria-labelledby="km-practical-title">
+  <h2 id="km-practical-title" class="km-h2">Goed om te weten</h2>
+  <dl class="km-practical__list" data-fx-stagger>
+    {% for item in v.practical %}<div class="km-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="km-sec km-rsvp" id="aanmelden" data-reveal aria-labelledby="km-rsvp-title">
+  <h2 id="km-rsvp-title" class="km-h2">{% if v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+  <div class="km-paper">
+    {% include "invitations/partials/rsvp.html" %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="km-sec km-contact" data-reveal aria-labelledby="km-contact-title">
+  <h2 id="km-contact-title" class="km-h2">Vragen?</h2>
+  {% if v.contact.note %}<p class="km-contact__note">{{ v.contact.note }}</p>{% endif %}
+  <p class="km-contact__name">{{ v.contact.name }}</p>
+  <p class="km-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+{# Het slot: de ster licht nog één keer op boven de kerstmarkt uit het filmpje. #}
+<section class="km-sec km-end" data-reveal aria-label="Afsluiting">
+  <div class="km-end__sky">
+    <span class="km-end__star" aria-hidden="true"><span class="km-star__glow"></span>{% include "kerstmarkt/v1/_ster.html" %}<span class="km-end__dust">{% for i in "12345678" %}<i></i>{% endfor %}</span></span>
+    {% if v.occasion == "kerst" %}
+    <p class="km-end__greet">Fijne kerstdagen</p>
+    <p class="km-end__wish">en een gelukkig nieuwjaar</p>
+    <p class="km-end__from">{{ v.names.0 }}</p>
+    {% endif %}
+    {% if v.show.closing %}{% for p in v.closing %}<p class="km-end__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  </div>
+  <div class="km-market" aria-hidden="true">
+    <img src="{% static 'designs/kerstmarkt/v1/img/slot.webp' %}" width="720" height="900" alt="" loading="lazy" decoding="async">
+    <span class="km-market__lights">{% for i in "1234567890ab" %}<i></i>{% endfor %}</span>
+  </div>
+  {% include "invitations/partials/share_buttons.html" %}
+  {% if v.opening_enabled %}<p class="km-again" data-km-again hidden><button type="button" class="inv-btn">Bekijk de opening nog een keer</button></p>{% endif %}
+</section>
+</div>
+{% endblock %}

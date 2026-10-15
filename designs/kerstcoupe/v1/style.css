@@ -1,0 +1,339 @@
+/* Kerstcoupé v1: een treincoupé bij avond. De opening is het filmpje van de eigenaar (de gordijnen gaan open),
+   de kop is het laatste beeld daarvan, met de kerstgroet die zich op het raam schrijft.
+   Daaronder de kaart in de stijl van een dinerrijtuig: crèmekleurige kaartjes met messing randen.
+   Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "EB Garamond"; src: url("../../../fonts/eb-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 400 800; font-display: swap; }
+@font-face { font-family: "EB Garamond"; src: url("../../../fonts/eb-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 400 800; font-style: italic; font-display: swap; }
+@font-face { font-family: "Jost"; src: url("../../../fonts/jost-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+
+html.inv-kerstcoupe { color-scheme: dark; background: #140906; }
+body {
+  --kc-serif: "EB Garamond", Garamond, Georgia, "Times New Roman", serif;
+  --kc-ui: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Gedeelde onderdelen (knoppen, afteller, muziek) op de donkere pagina; in de kaartjes zie .kc-card. */
+  --inv-bg: var(--kc-page);
+  --inv-text: var(--kc-page-ink);
+  --inv-muted: var(--kc-page-muted);
+  --inv-accent: var(--kc-gold);
+  --inv-accent-contrast: var(--kc-page);
+  --inv-font-body: var(--kc-serif);
+  --inv-font-ui: var(--kc-ui);
+  --inv-focus: var(--kc-gold);
+  --inv-radius: 10px;
+  --inv-radius-field: 8px;
+  --inv-btn-border: color-mix(in srgb, var(--kc-gold) 75%, transparent);
+  --inv-btn-text: var(--kc-page-ink);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--kc-gold) 14%, transparent);
+  --inv-surface-2: var(--kc-page-2);
+  --inv-music-bg: var(--kc-paper);
+  --inv-music-text: var(--kc-ink);
+  --inv-music-border: color-mix(in srgb, var(--kc-gold-2) 45%, transparent);
+  --inv-photo-bg: var(--kc-page-2);
+  --inv-error: #FFB4A8;
+  --fx-pulse: var(--kc-accent);
+  background-color: var(--kc-page);
+  /* Warm lamplicht links en rechts, zoals in de coupé. */
+  background-image:
+    radial-gradient(60rem 40rem at -10% 30%, color-mix(in srgb, var(--kc-gold) 9%, transparent), transparent 70%),
+    radial-gradient(50rem 36rem at 110% 75%, color-mix(in srgb, var(--kc-gold) 7%, transparent), transparent 70%);
+  background-attachment: fixed;
+  color: var(--kc-page-ink);
+  font-family: var(--kc-serif);
+  font-size: 1.12rem;
+}
+
+/* ================================================================ het beeldvak (opening en kop)
+   Het vak heeft de verhouding van het filmpje (9:16) en is op een telefoon zo breed als het scherm.
+   .kc-frame vult het vak zoals object-fit: cover, zodat alles wat op het beeld ligt (sneeuw, stoom,
+   lichtjes) in procenten van het beeld op zijn plek blijft. */
+.kc-backdrop { position: absolute; inset: 0; overflow: hidden; background: #140906; }
+.kc-backdrop img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); filter: brightness(.5) saturate(1.1); }
+.kc-backdrop::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 55%, var(--kc-page) 100%), radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(0, 0, 0, .45));
+}
+.kc-stage {
+  position: absolute; top: 0; left: 50%; height: 100%; aspect-ratio: 9 / 16; max-width: 100%; translate: -50% 0;
+  overflow: hidden; container-type: size; box-shadow: 0 0 70px rgba(0, 0, 0, .65);
+}
+.kc-frame { position: absolute; left: 50%; top: 50%; width: max(100cqw, 56.25cqh); height: max(100cqh, 177.78cqw); translate: -50% -50%; }
+.kc-frame > img, .kc-frame > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Onderaan loopt het beeld over in de kleur van de pagina. */
+.kc-stage__shade { position: absolute; left: 0; right: 0; bottom: 0; height: 7%; pointer-events: none; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--kc-page) 85%, transparent)); }
+
+/* Licht van het lampje en de kaarsen; in beweging flakkert het zacht (geen flitsen). */
+.kc-glow { position: absolute; border-radius: 50%; pointer-events: none; mix-blend-mode: screen; opacity: .5; }
+.kc-glow--lamp { left: -7%; top: 48%; width: 26%; height: 18%; background: radial-gradient(closest-side, rgba(255, 214, 150, .5), transparent); }
+.kc-glow--kaars { left: 79%; top: 63%; width: 24%; height: 14%; background: radial-gradient(closest-side, rgba(255, 196, 120, .5), transparent); }
+.fx-motion .kc-glow--lamp { animation: kc-breathe 6.5s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .kc-glow--kaars { animation: kc-flicker 3.4s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kc-breathe { 50% { opacity: .62; } }
+@keyframes kc-flicker { 0%, 100% { opacity: .45; } 28% { opacity: .62; } 44% { opacity: .52; } 71% { opacity: .66; } }
+
+/* Stoom boven het kopje thee (alleen in beweging; het beeld heeft zelf al een wolkje). */
+.kc-steam { position: absolute; left: 74.3%; top: 64.5%; width: 5.2%; height: 12%; pointer-events: none; }
+.kc-steam i {
+  position: absolute; left: 50%; bottom: 0; width: 70%; height: 42%; border-radius: 50%; opacity: 0;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, .3), transparent);
+}
+.fx-motion .kc-steam i { animation: kc-steam 4.4s ease-in infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .kc-steam i:nth-child(2) { animation-delay: -1.5s; }
+.fx-motion .kc-steam i:nth-child(3) { animation-delay: -2.9s; }
+@keyframes kc-steam {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(.6); }
+  25% { opacity: .85; }
+  100% { opacity: 0; transform: translate(-25%, -160%) scale(1.5, 1.9); }
+}
+
+/* ================================================================ openingsscherm: de gordijnen */
+/* Alleen met JavaScript (zie invite-base.css): zonder script staat de kop met de groet er meteen. */
+.js .kc-cover { display: block; background: #140906; }
+/* Dezelfde hoogte als de kop (100svh: het scherm met de adresbalk zichtbaar), zodat het laatste filmbeeld
+   ook op een telefoon met een in- en uitschuivende adresbalk precies op de kop past. */
+.kc-cover > .kc-backdrop, .kc-cover > .kc-stage { top: var(--kc-bar, 0px); height: calc(100vh - var(--kc-bar, 0px)); height: max(calc(100svh - var(--kc-bar, 0px)), 600px); }
+.kc-frame__open, .kc-film { opacity: 0; }
+.kc-cover--film .kc-film { opacity: 1; }
+/* Zonder (geladen) filmpje, of zonder kerstcoupe.js: de gordijnen gaan open met een overvloeier.
+   Speelt het filmpje (kc-cover--speelt), dan doet het filmpje dat zelf. */
+.is-opening .kc-cover:not(.kc-cover--speelt) .kc-frame__open { animation: kc-in 1.6s ease .35s both; }
+/* De sneeuw achter het glas verschijnt als het raam vrij is: met het filmpje na 2,6 s, met de overvloeier eerder. */
+.kc-cover .kc-glass { opacity: 0; }
+.is-opening .kc-cover .kc-glass { opacity: 1; transition: opacity 1.2s ease .8s; }
+.is-opening .kc-cover.kc-cover--speelt .kc-glass { transition: opacity 1s ease 2.6s; }
+@keyframes kc-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* Het tafelkaartje. */
+.kc-place {
+  position: absolute; z-index: 3; left: 50%; bottom: calc(max(1rem, env(safe-area-inset-bottom)) + 4.4rem); translate: -50% 0;
+  display: grid; justify-items: center; gap: .5rem; width: min(21rem, calc(100% - 2.5rem)); padding: 1.6rem 1.4rem 1.5rem;
+  background: radial-gradient(130% 90% at 50% 0%, color-mix(in srgb, #fff 45%, var(--kc-paper)), var(--kc-paper) 60%, var(--kc-paper-2));
+  color: var(--kc-ink); text-align: center; border-radius: 6px;
+  box-shadow: 0 1.4rem 2.6rem -.4rem rgba(0, 0, 0, .7), inset 0 0 0 1px var(--kc-line), inset 0 0 0 6px var(--kc-paper), inset 0 0 0 7px color-mix(in srgb, var(--kc-gold-2) 45%, transparent);
+  transition: opacity .55s ease, translate .7s cubic-bezier(.5, 0, .7, .2);
+}
+.kc-place::before {
+  content: ""; width: 7.5rem; height: 10px; margin-bottom: .1rem; background: var(--kc-gold-2);
+  -webkit-mask: var(--kc-ornament) center / contain no-repeat; mask: var(--kc-ornament) center / contain no-repeat;
+}
+.kc-place__kicker { font-family: var(--kc-ui); font-size: .76rem; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; color: var(--kc-gold-2); }
+.kc-place__from { font-style: italic; font-size: clamp(1.45rem, 6.4vw, 1.75rem); line-height: 1.2; text-wrap: balance; overflow-wrap: anywhere; }
+.kc-open {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 48px; margin-top: .5rem; padding: .7rem 1.6rem;
+  border-radius: 999px; background: var(--kc-accent); color: var(--kc-accent-ink); text-decoration: none; cursor: pointer;
+  font-family: var(--kc-ui); font-size: 1rem; font-weight: 600; letter-spacing: .03em;
+  box-shadow: 0 .5rem 1.2rem -.4rem color-mix(in srgb, var(--kc-accent) 70%, #000);
+}
+.kc-open:hover { filter: brightness(1.1); }
+.kc-open:focus-visible, .kc-place__music:focus-visible { outline: 3px solid var(--kc-gold-2); outline-offset: 4px; }
+.kc-place__music {
+  min-height: 44px; padding: .4rem 1rem; border: 0; background: none; cursor: pointer; color: var(--kc-ink);
+  font-family: var(--kc-ui); font-size: .92rem; font-weight: 600; text-decoration: underline; text-underline-offset: 4px;
+}
+
+/* Heel smal (zoals het telefoonvoorbeeld op de website): een kleiner kaartje, zodat de gordijnen in beeld blijven. */
+@media (max-width: 340px) {
+  .kc-place { gap: .35rem; width: calc(100% - 1.6rem); padding: 1.15rem .9rem 1rem; bottom: calc(max(.6rem, env(safe-area-inset-bottom)) + 3.6rem); }
+  .kc-place::before { width: 6rem; }
+  .kc-place__kicker { font-size: .66rem; letter-spacing: .16em; }
+  .kc-place__from { font-size: 1.28rem; }
+  .kc-open { min-height: 44px; margin-top: .3rem; padding: .55rem 1.1rem; font-size: .9rem; white-space: nowrap; }
+  .kc-place__music { font-size: .85rem; }
+}
+
+.is-opening .kc-place { opacity: 0; translate: -50% 1.4rem; pointer-events: none; }
+/* Na het filmpje vervaagt het openingsscherm; daaronder staat precies hetzelfde beeld in de kop. */
+.is-opening .kc-cover { animation: kc-out .45s ease var(--kc-out, 2.2s) forwards; }
+@keyframes kc-out { to { opacity: 0; } }
+.is-opening-reduced .kc-cover { animation: none; opacity: 0; transition: opacity .2s; }
+
+/* ================================================================ kop: de groet op het raam */
+.kc-hero { position: relative; height: calc(100vh - var(--kc-bar, 0px)); height: max(calc(100svh - var(--kc-bar, 0px)), 600px); overflow: hidden; background: #140906; }
+/* Sneeuw valt alleen buiten: het vlak volgt het glas van het raam. */
+.kc-glass { inset: 13.2% 7.7% 33.1% 8.7%; border-radius: 7% / 4%; }
+.kc-hero__text {
+  position: absolute; z-index: 2; left: 50%; top: 21%; height: 41%; translate: -50% 0;
+  width: min(44cqh, calc(100cqw - 2.2rem)); display: flex; align-items: center; justify-content: center;
+  text-align: center; color: #FFFFFF;
+}
+.kc-hero__inner { position: relative; isolation: isolate; font-size: calc(1cqh * var(--kc-fit, 1)); width: 100%; }
+/* Een zachte nachtblauwe waas achter de letters, zodat ze ook voor de lichtjes van het dorp en de rijp op het glas
+   goed leesbaar zijn: een vlak dat even groot is als de tekst, met een brede vage rand (e2e/coupe.cjs meet het). */
+.kc-hero__inner::before {
+  content: ""; position: absolute; z-index: -1; inset: -.9em -1.6em; border-radius: 3em; pointer-events: none;
+  background: rgba(7, 12, 30, .56); filter: blur(1.6em);
+}
+.kc-hero__text, .kc-hero__text * { transition: none !important; }
+.kc-greet, .kc-wish, .kc-names, .kc-members, .kc-tagline { text-shadow: 0 .04em .45em rgba(0, 0, 0, .65); }
+.kc-greet { width: fit-content; max-width: 100%; margin-inline: auto; font-style: italic; font-weight: 500; font-size: 4.9em; line-height: 1.12; text-wrap: balance; overflow-wrap: anywhere; }
+.kc-wish { width: fit-content; max-width: 100%; margin-inline: auto; font-style: italic; font-size: 3.3em; line-height: 1.22; }
+.kc-wish--last { font-size: 4.1em; font-weight: 500; line-height: 1.1; }
+.kc-names {
+  margin-top: 1.4em; padding-left: .34em; font-family: var(--kc-ui); font-weight: 500; font-size: 2.35em; line-height: 1.45;
+  letter-spacing: .34em; text-transform: uppercase; text-wrap: balance; overflow-wrap: anywhere;
+}
+.kc-names--long { font-size: 2.1em; letter-spacing: .26em; }
+.kc-names--xlong { font-size: 1.9em; letter-spacing: .18em; }
+.kc-names__amp { font-family: var(--kc-serif); font-style: italic; font-size: 1.3em; letter-spacing: 0; text-transform: none; }
+.kc-members, .kc-tagline { margin-top: .5em; font-style: italic; font-size: 2.6em; line-height: 1.3; color: #F8F1E4; text-wrap: balance; }
+.kc-scroll {
+  position: absolute; z-index: 2; left: 50%; bottom: max(3.2%, 1rem); translate: -50% 0;
+  display: inline-flex; flex-direction: column; align-items: center; gap: .1rem; min-height: 44px; padding: .45rem 1.1rem .3rem;
+  border-radius: 999px; background: rgba(16, 7, 4, .55); color: #F8F1E4; text-decoration: none;
+  font-family: var(--kc-ui); font-size: .78rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+}
+.fx-motion .kc-scroll svg { animation: kc-nudge 2.6s ease-in-out 4s infinite; animation-play-state: var(--fx-play, running); }
+@keyframes kc-nudge { 50% { transform: translateY(4px); } }
+
+/* Het schrijven: de regels verschijnen na elkaar, alsof ze met de hand op het raam worden geschreven.
+   Daarna de afzender in kapitalen (zoals onder de groet in het filmpje). Alles klaar binnen 4,2 seconden (fx-done). */
+.fx-motion:is(.has-cover, .is-opening) .kc-write { opacity: 0; }
+.fx-motion.fx-namen-schrijf.fx-start:not(.fx-done) .kc-write {
+  -webkit-mask-image: linear-gradient(90deg, #000 44%, transparent 56%); mask-image: linear-gradient(90deg, #000 44%, transparent 56%);
+  -webkit-mask-size: 260% 100%; mask-size: 260% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  animation: fx-names-schrijf var(--kc-dur, 1.4s) cubic-bezier(.45, .05, .35, 1) var(--kc-at, .15s) both;
+}
+.kc-greet { --kc-at: .15s; --kc-dur: 1.5s; }
+.kc-wish { --kc-at: 1.45s; --kc-dur: 1.05s; }
+.kc-wish--last { --kc-at: 2.3s; --kc-dur: .85s; }
+.fx-motion.fx-namen-schrijf.fx-start:not(.fx-done) .kc-names.fx-names {
+  -webkit-mask-image: none; mask-image: none; animation: kc-letters 1s var(--fx-ease) 3s both;
+}
+@keyframes kc-letters { from { opacity: 0; letter-spacing: .6em; } }
+.fx-motion.fx-start:not(.fx-done) :is(.kc-members, .kc-tagline).fx-intro { animation: fx-rise .8s var(--fx-ease) 3.35s both; }
+
+/* ================================================================ de kaart */
+body { --kc-ornament: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 12'%3E%3Cpath d='M0 6h56M84 6h56' stroke='%23000' stroke-width='1.2'/%3E%3Cpath d='M70 0l2.4 3.6L76 6l-3.6 2.4L70 12l-2.4-3.6L64 6l3.6-2.4z'/%3E%3Ccircle cx='60' cy='6' r='1.6'/%3E%3Ccircle cx='80' cy='6' r='1.6'/%3E%3C/svg%3E"); }
+.kc-body { display: grid; gap: clamp(2.8rem, 9vw, 4rem); max-width: 38rem; margin: 0 auto; padding: clamp(2.6rem, 9vw, 4.2rem) 1.1rem 1rem; }
+.kc-sec { text-align: center; }
+.kc-h2 { font-style: italic; font-weight: 500; font-size: clamp(1.95rem, 7.4vw, 2.45rem); line-height: 1.15; color: var(--kc-gold); margin-bottom: 1.3rem; text-wrap: balance; }
+.kc-h2::after {
+  content: ""; display: block; width: 8.75rem; height: 10px; margin: .65rem auto 0; background: currentColor;
+  -webkit-mask: var(--kc-ornament) center / contain no-repeat; mask: var(--kc-ornament) center / contain no-repeat;
+}
+.kc-h2--paper { color: var(--kc-accent); }
+
+/* Crèmekleurige kaartjes met een messing rand. */
+.kc-card, .kc-placecard {
+  --inv-text: var(--kc-ink);
+  --inv-muted: var(--kc-muted);
+  --inv-accent: var(--kc-accent);
+  --inv-accent-contrast: var(--kc-accent-ink);
+  --inv-focus: var(--kc-gold-2);
+  --inv-btn-border: var(--kc-gold-2);
+  --inv-btn-text: var(--kc-ink);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--kc-gold) 18%, transparent);
+  --inv-surface-2: var(--kc-paper-2);
+  --inv-field-bg: #FFFDF8;
+  --inv-field-text: var(--kc-ink);
+  --inv-field-border: color-mix(in srgb, var(--kc-ink) 32%, transparent);
+  --inv-photo-bg: var(--kc-paper-2);
+  --inv-error: #9B1C1C;
+  /* Lichte formuliervelden en keuzerondjes op het papier (de pagina zelf is donker). */
+  color-scheme: light;
+  position: relative; color: var(--kc-ink); border-radius: 10px;
+  background: radial-gradient(130% 90% at 50% 0%, color-mix(in srgb, #fff 45%, var(--kc-paper)), var(--kc-paper) 60%, var(--kc-paper-2));
+  box-shadow: 0 1.5rem 3rem -1.2rem rgba(0, 0, 0, .65), inset 0 0 0 1px var(--kc-line), inset 0 0 0 6px var(--kc-paper), inset 0 0 0 7px color-mix(in srgb, var(--kc-gold-2) 40%, transparent);
+}
+.kc-card { padding: clamp(1.7rem, 6vw, 2.5rem) clamp(1.3rem, 5.5vw, 2.3rem); }
+.kc-card .inv-link { color: var(--kc-accent); }
+
+/* Foto's in een raam van de coupé: mahonie met een messing randje. */
+.kc-window { position: relative; margin: 0; padding: 8px; border-radius: 20px; background: linear-gradient(155deg, color-mix(in srgb, var(--kc-wood) 70%, #fff 12%), var(--kc-wood) 45%, color-mix(in srgb, var(--kc-wood) 70%, #000)); box-shadow: 0 1rem 2rem -1rem rgba(0, 0, 0, .7); }
+.kc-window .ph { border-radius: 13px; aspect-ratio: 4 / 5; }
+.kc-window::after { content: ""; position: absolute; inset: 8px; border-radius: 13px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--kc-gold) 70%, transparent), inset 0 0 24px rgba(0, 0, 0, .25); pointer-events: none; }
+
+.kc-letter__photo { margin-bottom: 1.5rem; }
+.kc-letter__photo .ph { aspect-ratio: 4 / 3; }
+.kc-letter__text { text-align: left; font-style: italic; font-size: 1.24rem; line-height: 1.62; }
+.kc-letter__text p + p, .kc-story__text p + p { margin-top: .9rem; }
+
+/* Het tafelkaartje met de datum. */
+.kc-placecard { max-width: 23rem; margin: 1.6rem auto 0; padding: 2.6rem 1.5rem 1.8rem; border-radius: 4px 4px 8px 8px; }
+.kc-placecard::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 16px; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, color-mix(in srgb, var(--kc-paper-2) 70%, #8a6a40 18%), transparent); pointer-events: none; }
+.kc-placecard__crest {
+  position: absolute; left: 50%; top: 0; translate: -50% -50%; display: grid; place-items: center; width: 3.4rem; height: 3.4rem; border-radius: 50%;
+  background: var(--kc-paper); color: var(--kc-accent); font-style: italic; font-weight: 600; font-size: 1.15rem;
+  box-shadow: 0 0 0 1px var(--kc-line), 0 0 0 5px var(--kc-paper), 0 0 0 6px color-mix(in srgb, var(--kc-gold-2) 50%, transparent);
+}
+.kc-placecard__title { display: grid; gap: .1rem; font-family: var(--kc-ui); font-size: .82rem; font-weight: 600; letter-spacing: .3em; text-transform: uppercase; color: var(--kc-gold-2); }
+.kc-placecard__title span { font-family: var(--kc-serif); font-style: italic; font-weight: 500; font-size: 1.75rem; letter-spacing: 0; text-transform: none; color: var(--kc-ink); }
+.kc-placecard__date { display: grid; justify-items: center; margin: 1.1rem 0 .9rem; padding: 1rem 0 .9rem; border-block: 1px dashed color-mix(in srgb, var(--kc-gold-2) 55%, transparent); }
+.kc-placecard__weekday { font-family: var(--kc-ui); font-size: .8rem; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; color: var(--kc-muted); }
+.kc-placecard__day { font-size: 4.4rem; font-weight: 500; line-height: 1; color: var(--kc-accent); }
+.kc-placecard__month { font-size: 1.35rem; }
+.kc-placecard__time { font-family: var(--kc-ui); font-size: 1rem; font-weight: 500; }
+.kc-placecard__venue { margin-top: .25rem; font-style: italic; font-size: 1.25rem; }
+
+/* Het programma als dinerkaart. */
+.kc-menu { padding-top: clamp(2rem, 7vw, 2.6rem); }
+.kc-menu__kicker { font-family: var(--kc-ui); font-size: .76rem; font-weight: 600; letter-spacing: .34em; text-transform: uppercase; color: var(--kc-gold-2); margin-bottom: .35rem; }
+.kc-menu__list { display: grid; gap: 1.15rem; margin-top: 1.4rem; text-align: left; }
+.kc-menu__line { display: flex; align-items: baseline; gap: .55rem; font-size: 1.24rem; font-weight: 600; line-height: 1.3; }
+.kc-menu__title { flex: 0 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.kc-menu__dots { flex: 1 1 1.4rem; min-width: 1.4rem; border-bottom: 2px dotted color-mix(in srgb, var(--kc-gold-2) 60%, transparent); translate: 0 -.3em; }
+.kc-menu__time { flex: none; font-family: var(--kc-ui); font-size: 1.02rem; font-weight: 600; color: var(--kc-accent); font-variant-numeric: lining-nums tabular-nums; }
+.kc-menu__desc { margin-top: .15rem; font-style: italic; font-size: 1.1rem; line-height: 1.45; color: var(--kc-muted); }
+
+/* Afteller: messing ringen. */
+.kc-count .cd { gap: clamp(.7rem, 3vw, 1.1rem); margin-bottom: 1.6rem; }
+.kc-count .cd__unit {
+  justify-content: center; width: clamp(3.7rem, 17.5vw, 5rem); min-width: 0; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--kc-page-2), var(--kc-page)); box-shadow: 0 0 0 1px var(--kc-gold), 0 0 0 4px var(--kc-page), 0 0 0 5px color-mix(in srgb, var(--kc-gold) 45%, transparent);
+}
+.kc-count .cd__num { font-family: var(--kc-serif); font-weight: 500; font-size: clamp(1.6rem, 7.5vw, 2.1rem); color: var(--kc-page-ink); }
+.kc-count .cd__label { color: var(--kc-page-muted); font-size: .68rem; letter-spacing: .14em; }
+.kc-count .cd-today, .kc-count .cd-past { color: var(--kc-page-muted); font-size: 1.3rem; margin-bottom: 1rem; }
+
+.kc-dest { display: grid; justify-items: center; gap: .55rem; }
+.kc-dest .kc-h2 { margin-bottom: .6rem; }
+.kc-dest__venue { font-size: 1.5rem; font-weight: 600; line-height: 1.25; }
+.kc-dest__address { font-style: normal; font-size: 1.18rem; }
+.kc-dest__when { font-style: italic; color: var(--kc-muted); margin-bottom: .6rem; }
+
+.kc-swatches { display: flex; flex-wrap: wrap; justify-content: center; gap: .95rem; margin-bottom: 1.3rem; }
+.kc-swatch {
+  width: 3.2rem; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--c) 62%, #fff), var(--c) 52%, color-mix(in srgb, var(--c) 65%, #000));
+  box-shadow: 0 0 0 2px var(--kc-page), 0 0 0 3px var(--kc-gold), 0 .6rem 1rem -.4rem rgba(0, 0, 0, .6);
+}
+.kc-dress__text { font-size: 1.2rem; }
+
+.kc-story__text { text-align: left; font-size: 1.2rem; line-height: 1.6; }
+.kc-story__text p:first-child::first-letter { float: left; margin: .06em .1em 0 0; font-style: italic; font-weight: 600; font-size: 3.3em; line-height: .85; color: var(--kc-accent); }
+
+.kc-photos { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; }
+.kc-photos figcaption { padding: .5rem .2rem .2rem; font-style: italic; font-size: 1rem; color: var(--kc-page-ink); }
+
+.kc-practical__list { display: grid; gap: 1.3rem; }
+.kc-practical__item dt { font-family: var(--kc-ui); font-size: .78rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--kc-gold); margin-bottom: .2rem; }
+.kc-practical__item dd { margin: 0; font-size: 1.16rem; }
+
+.kc-rsvp .kc-card { text-align: left; }
+.kc-rsvp .rsvp__deadline { color: var(--kc-gold-2); font-weight: 600; }
+
+.kc-contact__note { font-size: 1.18rem; }
+.kc-contact__name { margin-top: .4rem; font-style: italic; font-size: 1.4rem; color: var(--kc-gold); }
+.kc-contact__links { font-family: var(--kc-ui); font-size: 1rem; overflow-wrap: anywhere; }
+.kc-contact .inv-link { color: var(--kc-page-ink); }
+
+/* Het slot: de groet nog een keer, en de tafel met de kaarsen en het kopje thee. */
+.kc-end { padding-top: .5rem; }
+.kc-end__greet { font-style: italic; font-weight: 500; font-size: clamp(2.3rem, 10vw, 3rem); line-height: 1.1; }
+.kc-end__wish { font-style: italic; font-size: clamp(1.4rem, 6vw, 1.7rem); }
+.kc-end__from { margin-top: 1rem; padding-left: .34em; font-family: var(--kc-ui); font-size: .92rem; font-weight: 500; letter-spacing: .34em; text-transform: uppercase; color: var(--kc-gold); overflow-wrap: anywhere; }
+.kc-end__text { margin-top: 1.2rem; font-style: italic; font-size: 1.2rem; color: var(--kc-page-muted); text-wrap: balance; }
+.kc-table { position: relative; margin: 1.2rem -1.1rem 1.6rem; }
+.kc-table img { width: 100%; height: auto; -webkit-mask-image: radial-gradient(ellipse 72% 72% at 50% 46%, #000 52%, transparent 100%); mask-image: radial-gradient(ellipse 72% 72% at 50% 46%, #000 52%, transparent 100%); }
+.kc-table .kc-steam { left: 74.4%; top: 4%; width: 5.4%; height: 25%; }
+@media (min-width: 640px) { .kc-table { margin-inline: 0; } }
+
+.inv-colophon { color: var(--kc-page-muted); }
+.inv-colophon a { color: var(--kc-page-ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .kc-place { transition: none; }
+}
+
+/* ================================================================ effecten (effects.js en effects.css) */
+body { --fx-shine: var(--kc-gold); }

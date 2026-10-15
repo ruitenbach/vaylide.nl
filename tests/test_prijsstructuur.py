@@ -71,7 +71,7 @@ class IndelingEnTabel(VaylideTestCase):
         slugs = set(Template.objects.values_list("slug", flat=True))
         self.assertEqual(set(prijzen.INDELING), slugs, "elk ontwerp in de catalogus heeft precies één indeling (en niets anders)")
         tellers = {t: sum(1 for i in prijzen.INDELING.values() if i == t) for t in prijzen.TIERS}
-        self.assertEqual(tellers, {BASIS: 32, LUXE: 10, SPECIAL: 9})
+        self.assertEqual(tellers, {BASIS: 32, LUXE: 14, SPECIAL: 9})
 
     def test_elke_special_vlag_is_een_special_of_bewust_luxe(self):
         vlag = {t.slug for t in Template.objects.filter(special=True)}
@@ -200,6 +200,25 @@ class BestellenEnBetalen(NieuwePrijzen):
             self.assertEqual((order.ends_at.year * 12 + order.ends_at.month) - (order.paid_at.year * 12 + order.paid_at.month), maanden)
             inv.refresh_from_db()
             self.assertEqual(sorted(inv.features), sorted(set(prijzen.ALLE_FUNCTIES) | ({"special"} if indeling == SPECIAL else set())))
+
+    def test_de_nieuwe_kerstkaarten_met_film_zijn_luxe_en_te_bestellen_en_te_publiceren(self):
+        # Kerstmarkt, Kerstpaleis, Kerstcoupé en Kerstbal: Luxe, € 24,95, 12 maanden, via dezelfde ene bron; geen toeslag of pakketkeuze.
+        for i, slug in enumerate(("kerstmarkt", "kerstpaleis", "kerstcoupe", "kerstbal")):
+            klant = self.make_customer(f"film{i}@example.com")
+            inv = vul(self.make_invitation(owner=klant, template=slug, occasion="kerst"), klant)
+            c = Client()
+            c.force_login(klant)
+            html = c.get(reverse("studio:step", args=[inv.uid, "bestellen"])).content.decode()
+            self.assertIn("€ 24,95", html, slug)
+            self.assertIn("12 maanden online", html, slug)
+            for tekst in ("Upgrade", "Extra opties", "Essentieel", "Compleet"):
+                self.assertNotIn(tekst, html, f"{slug}: {tekst}")
+            payment = self.pay(inv, klant)
+            order = Order.objects.get(invitation=inv)
+            self.assertEqual((order.total_cents, payment.amount_cents, order.package_code, order.availability_months), (2495, 2495, LUXE, 12), slug)
+            inv.refresh_from_db()
+            self.assertTrue(inv.is_published, slug)
+            self.assertEqual(c.get(reverse("orders:status", args=[order.uid])).status_code, 200, slug)
 
     def test_wenskaart_krijgt_de_prijs_uit_dezelfde_tabel(self):
         owner = self.make_customer()

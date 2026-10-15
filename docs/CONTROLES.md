@@ -1172,3 +1172,12 @@ Ringdoosje dat opengaat op een filmscène, rand tot rand (zie `docs/STRANDBOOG.m
 - Gericht gedraaid (geen volledige suite): `tests.test_strandboog`, `test_collectie`, `test_effects`, `test_specials`, `test_gouden_avond`, `test_atelier`: 82 tests geslaagd.
 - Lokaal in Chrome (H.264): `e2e/strandboog_functies.cjs` 22 van 22 en `e2e/toegankelijkheid.cjs ... strandboog` 0 bevindingen, vóór het samenbrengen met de collectie. Op staging is alleen gericht gecontroleerd (zie de oplevering).
 - Niet gecontroleerd: Safari op een iPhone, Firefox, een oud Android-toestel, schermlezers.
+
+## Kerstmarkt, Kerstpaleis, Kerstcoupé en Kerstbal (15 oktober 2026, lokaal)
+
+Zie `docs/KERSTFILMKAARTEN.md`. Uitgevoerd:
+
+- Hele suite `manage.py test tests`: 1001 tests geslaagd (1 overgeslagen). Met `VIERLIEF_PRICING_V2=1` ook de prijstests, en `controleer_prijzen`: getoond bedrag = offerte, één regel per kaart.
+- Bestelstap, betaling (testmodus) en publicatie voor alle vier: € 24,95, Luxe, 12 maanden, geen pakketkeuze of toeslag (`test_prijsstructuur`).
+- Lokaal in Chromium op 360, 390, 768 en 1366 px: voorbeeldpagina laadt zonder fouten, geen horizontaal scrollen, de film speelt na de tik (WebM), de opening wordt klaar, en na scrollen zijn alle onderdelen zichtbaar. Beelden bekeken op 390 en 1366 px.
+- Niet gedaan: Safari op een iPhone, Firefox, een echte Android-telefoon, `e2e/toegankelijkheid.cjs` en `e2e/effecten.cjs` voor deze vier, de kleurvarianten in de browser (alleen de contrastcontrole in de tests), en de hele klantreis in de browser met uploaden van eigen foto's.

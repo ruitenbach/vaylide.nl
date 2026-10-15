@@ -25,6 +25,7 @@ B = (
     "lauwerkrans", "zilveren-feest", "gouden-jaren", "robijn",
     "confetti", "glitter", "neon", "tropisch", "ballonfeest", "regenboog", "maanlicht",
     "gala", "strak",
+    "kerstmarkt", "kerstpaleis", "kerstcoupe", "kerstbal",                               # kerst, met eigen film (Luxe)
 )
 C = (
     "kerstman", "sneeuwpop",                                            # cartoon-uitstraling, past niet bij het premium-niveau
