@@ -1181,3 +1181,11 @@ Zie `docs/KERSTFILMKAARTEN.md`. Uitgevoerd:
 - Bestelstap, betaling (testmodus) en publicatie voor alle vier: € 24,95, Luxe, 12 maanden, geen pakketkeuze of toeslag (`test_prijsstructuur`).
 - Lokaal in Chromium op 360, 390, 768 en 1366 px: voorbeeldpagina laadt zonder fouten, geen horizontaal scrollen, de film speelt na de tik (WebM), de opening wordt klaar, en na scrollen zijn alle onderdelen zichtbaar. Beelden bekeken op 390 en 1366 px.
 - Niet gedaan: Safari op een iPhone, Firefox, een echte Android-telefoon, `e2e/toegankelijkheid.cjs` en `e2e/effecten.cjs` voor deze vier, de kleurvarianten in de browser (alleen de contrastcontrole in de tests), en de hele klantreis in de browser met uploaden van eigen foto's.
+
+### Kerstbal v2 (15 oktober 2026, lokaal, voor- en na-meting)
+
+- Gemeten met Chromium op 390x844 (dekking van omslag, kaart en kaartvlak per beeld en gemiddelde helderheid per schermafbeelding): laagste helderheid in de overgang v1 ± 16, v2 ± 27; de kaart is vanaf ± 3,6 s zichtbaar onder het wegvervagende omslag. Zelfde meting met geblokkeerde video: zelfde verloop.
+- Verminderde beweging (opent na ± 0,4 s), geblokkeerde video, zonder JavaScript, 360x640, 768x1024 en liggend 844x390: gelijk aan v1, geen fouten.
+- Hele suite: 1005 tests geslaagd (1 overgeslagen).
+- Niet gedaan: Safari op een iPhone, Firefox, een echte telefoon, `e2e/toegankelijkheid.cjs` en `e2e/effecten.cjs` opnieuw voor v2.
+- Kerstbal v2, rustigere kaart (lokaal): timing gemeten per beeld (kaart, omslag, kaartvlak) op 390 px; verminderde beweging (opent na ± 0,4 s), geblokkeerde video (opent na ± 6,0 s), zonder JavaScript, 360x640, 768x1024 en liggend: geen fouten. Hele suite 1005 geslaagd. Niet gedaan: axe/effecten opnieuw, echte telefoon, Safari, Firefox.

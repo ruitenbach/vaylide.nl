@@ -19,3 +19,9 @@ Vier nieuwe kerstkaarten met een eigen film als opening, overgenomen van een col
 ## Rechten
 
 De films lijken met AI gemaakt. De zips zeggen dat het eigen materiaal is; de eigenaar bevestigt dat.
+
+## Kerstbal v2 (15 oktober 2026): vloeiende overgang
+
+In v1 bleef de kaart onzichtbaar tot het einde van de opening (4,1 s): de animatie `kb-sheet-in` had alleen een beginstand (`from`), dus de eindstand was de dekking 0 uit `.fx-motion:is(.has-cover, .is-opening) .kb-sheet`. Tussen ± 3,5 en 4,1 s bleef er een bijna leeg donker scherm over (laagste gemiddelde helderheid ± 16). In `designs/kerstbal/v2/style.css` staat daarom één regel anders: `kb-sheet-in` heeft een eindstand (`to { opacity: 1; transform: none; }`), zodat de kaart onder het wegvervagende omslag opkomt. Film, beelden, HTML (op de paden na), script, kleuren en alle andere timing zijn gelijk aan v1. Een test (`KerstbalV2Tests`) bewaakt dat. Welke versie nieuwe klanten krijgen kiest de eigenaar in Beheer (v1 blijft staan).
+
+Opvolging (15 oktober 2026): de kaart sprong er te snel uit. In v2 komt de kaart nu in 2,9 s uit de bal (was 1,5 s) en in 1,2 s naar je toe (was 0,6 s), met zachtere versnelling; de opening duurt daardoor 5,9 s (`data-duration`, `data-fx-intro`) en het omslag vervaagt vanaf 5,2 s. Alleen timing in CSS en die twee attributen; de film is niet aangeraakt. Top van de schaalsnelheid: uit de bal ± 2,4 naar ± 0,85 per seconde, naar je toe ± 2,0 naar ± 0,7.

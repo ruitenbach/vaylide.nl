@@ -114,3 +114,46 @@ class KerstbalDesignTests(VaylideTestCase):
     def test_other_occasions_keep_working(self):
         _, html = self.render(occasion="bruiloft")
         self.assertNotIn("Warme kerstgroeten", html)
+
+
+class KerstbalV2Tests(VaylideTestCase):
+    """v2: dezelfde film en vormgeving; alleen de timing aan het einde van de opening is bijgesteld (geen donker, leeg moment)."""
+    V1 = settings.BASE_DIR / "designs" / "kerstbal" / "v1"
+    V2 = settings.BASE_DIR / "designs" / "kerstbal" / "v2"
+
+    def test_film_and_images_are_the_same_as_v1(self):
+        for name in ("kerstbal.mp4", "kerstbal.webm", "poster.webp"):
+            self.assertEqual((self.V1 / "img" / name).read_bytes(), (self.V2 / "img" / name).read_bytes(), name)
+
+    def test_manifest_is_version_two_with_the_same_design(self):
+        m1 = json.loads((self.V1 / "manifest.json").read_text(encoding="utf-8"))
+        m2 = json.loads((self.V2 / "manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(m2["version"], 2)
+        for key in m1:
+            if key not in ("version", "changelog"):
+                self.assertEqual(m1[key], m2[key], key)
+
+    def test_v2_only_changes_the_timing_of_the_opening(self):
+        new = (self.V2 / "style.css").read_text(encoding="utf-8")
+        old = (self.V1 / "style.css").read_text(encoding="utf-8")
+        self.assertIn("kb-card-in 2.9s", new)
+        self.assertIn("kb-card-fly 1.2s", new)
+        self.assertIn("kb-cover-out .6s ease 5.2s", new)
+        self.assertTrue(any("@keyframes kb-sheet-in" in line and "to { opacity: 1" in line for line in new.splitlines()))
+        # de rest van de vormgeving is gelijk aan v1: zonder de bijgestelde regels blijft er niets over dat verschilt
+        drop = ("Kerstbal v", "De kaart komt uit de bal", "animation: kb-card-in", "kb-cover-out", "kb-sheet-in", "/* v2:")
+        keep = lambda text: [line for line in text.splitlines() if not any(d in line for d in drop)]
+        self.assertEqual(keep(old), keep(new))
+
+    def test_v2_points_only_to_its_own_files_and_renders(self):
+        html = (self.V2 / "invitation.html").read_text(encoding="utf-8")
+        self.assertNotIn("kerstbal/v1/", html)
+        self.assertIn("kerstbal/v2/img/kerstbal.webm", html)
+        v1_html = (self.V1 / "invitation.html").read_text(encoding="utf-8").replace("v1", "v2")
+        self.assertEqual(v1_html.replace('data-duration="4100"', 'data-duration="5900"').replace('data-fx-intro="3500"', 'data-fx-intro="5200"'), html)
+        template = Template.objects.get(slug="kerstbal")
+        version = template.versions.get(number=2)
+        v = build_view(occasion="kerst", content=demo_content("kerstbal", "kerst"), overrides={}, template_version=version,
+                       options=RenderOptions(mode="demo", music_synth=True))
+        out = render_to_string("kerstbal/v2/invitation.html", {"v": v, "rsvp_form": {}})
+        self.assertIn("kb-sheet", out)

@@ -1,0 +1,65 @@
+{
+  "slug": "kerstbal",
+  "added_at": "2026-10-15T20:30:00Z",
+  "version": 2,
+  "name": "Kerstbal",
+  "tagline": "Tik op een rood-gouden kerstbal: de bal gaat open en de kaart komt eruit",
+  "description": "Je ziet een rood-gouden kerstbal. Na een tik gaat de bal open en komt de kaart eruit naar voren. Daarna hangt de kaart aan een gouden draad, tussen de sneeuw, met de kerstgroet en de naam van de afzender, het programma, de datum en aanmelden voor het kerstdiner.",
+  "style_notes": "Kerstrood, goud en ivoor, met een gouden draad en kerstballen als sierstuk",
+  "occasions": [
+    "kerst"
+  ],
+  "envelope_mode": "built_in",
+  "sort_order": 44,
+  "opening": "film",
+  "opening_label": "Filmopening: de kerstbal gaat open",
+  "demo_melody": "stille-nacht",
+  "palettes": [
+    {
+      "key": "kerstrood",
+      "name": "Kerstrood",
+      "swatch": [
+        "#5C0F1C",
+        "#E8C77E",
+        "#E8C77E"
+      ],
+      "vars": {
+        "--kb-card": "#5C0F1C",
+        "--kb-card-2": "#4C0B16",
+        "--kb-ink": "#FBF1E6",
+        "--kb-muted": "#EBCFC4",
+        "--kb-gold": "#E8C77E",
+        "--kb-line": "#D9B46A",
+        "--kb-name": "#F6E3B4",
+        "--kb-btn": "#E8C77E",
+        "--kb-btn-ink": "#3A0A10",
+        "--kb-field": "#4A0A15"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "sneeuw",
+    "knal": "vonken",
+    "viering": "sterren",
+    "namen": "schrijf",
+    "onthul": "omhoog",
+    "extra": [
+      "kenburns",
+      "tik"
+    ]
+  },
+  "changelog": "Tweede versie: dezelfde film en vormgeving; alleen de timing aan het einde van de opening is aangepast, zodat de film vloeiend in de uitnodiging overgaat (geen donker, leeg moment meer)."
+}
