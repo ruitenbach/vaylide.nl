@@ -26,6 +26,7 @@ DEFAULT_DEMO_OCCASION = {
     "balzaal": "bruiloft",
     "gouden-avond": "bruiloft",
     "strandboog": "bruiloft",
+    "zwanenhart": "bruiloft",
     "kerstmarkt": "kerst",
     "kerstpaleis": "kerst",
     "kerstcoupe": "kerst",
@@ -87,6 +88,7 @@ DESIGN_IMAGES = {
     "balzaal": ["rozen", "waterverf-bloesem", "kaarslicht", "bloemblaadjes", "zijde-goud"],
     "gouden-avond": ["rozen", "waterverf-bloesem", "kaarslicht", "bloemblaadjes", "zijde-goud"],
     "strandboog": ["zee-horizon", "rozen", "bloemblaadjes", "duinen-ochtend", "waterverf-bloesem"],
+    "zwanenhart": ["waterverf-bloesem", "rozen", "kaarslicht", "bloemblaadjes", "zijde-goud"],
 }
 IMAGE_SIZES = {
     "waterverf-bloesem": (1200, 1500),

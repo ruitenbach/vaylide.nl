@@ -1,0 +1,77 @@
+{
+  "slug": "zwanenhart",
+  "added_at": "2026-10-15T20:30:00Z",
+  "version": 1,
+  "name": "Zwanenhart",
+  "tagline": "Een envelop met een gouden zegel opent, en twee zwanen vormen samen een hart",
+  "description": "Je ziet eerst een ivoren envelop met reliëfbloemen en een gouden lakzegel. Tik om hem te openen: het zegel gaat gloeien, de envelop opent zich en uit het licht verschijnen twee witte zwanen op een meer met bloesem in het avondlicht. Ze buigen naar elkaar toe tot hun snavelpunten elkaar net raken en hun halzen een hart vormen, en dan staan jullie namen en de datum in beeld. Daaronder loopt de uitnodiging door in ivoor, bloesem en champagnegoud, met aftellen, programma, locatie en aanmelden. De opening is over te slaan en rustig bij minder beweging. De film is een gegenereerde scène zonder personen.",
+  "style_notes": "Ivoren envelop met gouden lakzegel, twee witte zwanen die een hart vormen, bloesem en water in avondlicht; ivoor en champagnegoud; romantisch en tijdloos",
+  "occasions": [
+    "bruiloft",
+    "verloving",
+    "jubileum"
+  ],
+  "sort_order": 14,
+  "special": true,
+  "opening": "zwanenhart",
+  "envelope_mode": "built_in",
+  "opening_label": "Een envelop die opent naar twee zwanen in de vorm van een hart, een filmische opening",
+  "demo_melody": "canon",
+  "kaartbeeld": "open",
+  "palettes": [
+    {
+      "key": "ivoor",
+      "name": "Ivoor en champagnegoud",
+      "swatch": [
+        "#FCF8F0",
+        "#E2CB9C",
+        "#2A2219"
+      ],
+      "vars": {
+        "--zh-page": "#EAE1D2",
+        "--zh-bg": "#FCF8F0",
+        "--zh-bg-2": "#F4ECDD",
+        "--zh-ink": "#2B241B",
+        "--zh-muted": "#5C5043",
+        "--zh-accent": "#6B4E22",
+        "--zh-accent-ink": "#FFFFFF",
+        "--zh-gold": "#BE9A5C",
+        "--zh-gold-2": "#69501F",
+        "--zh-line": "#E6DAC4",
+        "--zh-schaduw": "#251E16",
+        "--zh-schaduw-2": "#2E261C",
+        "--fx-1": "#C9973E",
+        "--fx-2": "#E8C77F",
+        "--fx-3": "#A87A2E",
+        "--fx-4": "#FFF4D6",
+        "--fx-bg": "#FCF8F0"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "glitter",
+    "knal": "vonken",
+    "viering": "blaadjes",
+    "namen": "folie",
+    "onthul": "zacht",
+    "extra": [
+      "tik"
+    ],
+    "samenvatting": "Een filmische opening: na een tik gloeit het gouden zegel, opent de envelop en vormen twee witte zwanen samen een hart; dan verschijnen jullie namen met een gouden glans en vonken, en fonkelt goud op het water en door de hele uitnodiging.",
+    "kaartlabel": "filmische opening"
+  },
+  "changelog": "Eerste versie: de aangeleverde envelopvideo en zwanenvideo samengevoegd tot één film (envelop opent, het licht gaat over in de zwanen, de film stopt als de snavels elkaar raken), als opening na een tik; daarna de namen met gouden glans en vonken, fonkelend licht op het water en een uitnodiging in ivoor, bloesem en champagnegoud; overslaan en een stilstaand eindbeeld als terugval."
+}

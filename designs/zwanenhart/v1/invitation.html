@@ -1,0 +1,242 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Zwanenhart v1: een ivoren envelop met een gouden lakzegel; na een tik gloeit het zegel, opent de envelop en gaat het licht over in twee witte zwanen die samen een hart vormen
+   (de twee aangeleverde films, samengevoegd met een overvloeier), daarna de namen en de datum.
+   Opening, kop en namen zijn één scène (.zh-hero) in het eigen script (zwanenhart.js): geen openingsscherm van invite.js, want het eerste beeld van de film is de poster en het laatste beeld blijft de kop.
+   Namen, datum en alle onderdelen daaronder komen uit de gedeelde onderdelen (aftellen, programma, locatie, aanmelden). Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" as="image" href="{% static 'designs/zwanenhart/v1/media/poster.jpg' %}">
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-italic.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cinzel-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<script src="{% static 'designs/zwanenhart/v1/zwanenhart.js' %}" defer></script>{% endblock %}
+
+{% block content %}
+<header class="zh-hero{% if not v.opening_enabled %} zh-klaar{% endif %}" id="zh-hero" data-zh{% if v.opening_enabled %} data-zh-opening{% endif %} aria-label="Een envelop met een gouden zegel en twee zwanen die samen een hart vormen">
+  <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
+    <symbol id="zh-zegel" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke-width="1.3" d="M24 3.5C28 3 30.5 5.6 33.6 6.3C37.2 7.1 40.6 8.6 41.9 12.4C43.1 15.7 44.9 18.6 44.4 22.4C44 26 45.4 29.6 43.2 33C41.3 36 39.6 39.2 36 40.8C32.6 42.3 29.6 44.6 25.6 44.4C21.6 44.3 18.2 44.9 14.8 42.8C11.7 40.9 8.2 39.6 6.4 36C4.7 32.8 3.2 29.6 3.6 25.6C3.9 21.8 3.2 18.4 5.1 15C7 11.7 9.3 8.7 12.9 6.9C16.4 5.2 20 3.9 24 3.5Z"/>
+      <circle cx="24" cy="24" r="15.2" stroke-width=".9" opacity=".7"/>
+      <path stroke-width="1.15" d="M24 34.5V15"/><path stroke-width="1.05" d="M24 18.6C21.4 17.8 20 15.6 20.4 13.2C23 13.6 24.4 15.8 24 18.6ZM24 18.6C26.6 17.8 28 15.6 27.6 13.2C25 13.6 23.6 15.8 24 18.6Z"/>
+      <path stroke-width="1.05" d="M24 24.4C20.8 24 18.6 21.6 18.6 18.6C21.8 19.1 23.9 21.4 24 24.4ZM24 24.4C27.2 24 29.4 21.6 29.4 18.6C26.2 19.1 24.1 21.4 24 24.4Z"/>
+      <path stroke-width="1.05" d="M24 30.2C20.5 30 17.8 27.6 17.6 24.4C21.1 24.7 23.6 27 24 30.2ZM24 30.2C27.5 30 30.2 27.6 30.4 24.4C26.9 24.7 24.4 27 24 30.2Z"/></g></symbol>
+    <symbol id="zh-scheiding" viewBox="0 0 200 40"><g fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 20H80M120 20H192"/><path d="M62 20C68 16 74 16 80 20C74 24 68 24 62 20Z" opacity=".7"/><path d="M138 20C132 16 126 16 120 20C126 24 132 24 138 20Z" opacity=".7"/>
+      <path d="M100 30C93 25 88.5 21 88.5 16.4C88.5 13.2 90.9 11 93.8 11C96.4 11 98.5 12.6 100 15C101.5 12.6 103.6 11 106.2 11C109.1 11 111.5 13.2 111.5 16.4C111.5 21 107 25 100 30Z"/></g>
+      <circle cx="100" cy="3.5" r="1.4" fill="currentColor"/><circle cx="100" cy="36.5" r="1.4" fill="currentColor"/></symbol>
+  </defs></svg>
+
+  <img class="zh-waas zh-waas--envelop" src="{% static 'designs/zwanenhart/v1/media/waas-envelop.webp' %}" alt="" width="360" height="640" decoding="async">
+  <img class="zh-waas zh-waas--zwanen" src="{% static 'designs/zwanenhart/v1/media/waas-zwanen.webp' %}" alt="" width="360" height="640" decoding="async">
+  <p class="zh-heading">Er ligt iets voor je klaar.</p>
+  <div class="zh-raam">
+    <div class="zh-scene">
+      <video id="zh-video" muted playsinline preload="metadata" poster="{% static 'designs/zwanenhart/v1/media/poster.jpg' %}" width="720" height="1280" aria-label="Een ivoren envelop met een gouden zegel opent zich; uit het licht verschijnen twee witte zwanen op een meer met bloesem, die naar elkaar toe buigen tot hun snavels elkaar raken en hun halzen een hart vormen (gegenereerde scène zonder personen)" data-zh-video>
+        <source src="{% static 'designs/zwanenhart/v1/media/zwanenhart.mp4' %}" type="video/mp4">
+      </video>
+      <img class="zh-eind" src="{% static 'designs/zwanenhart/v1/media/poster-eind.jpg' %}" alt="" width="720" height="1280" decoding="async">
+      <div class="zh-beeld" aria-hidden="true">
+        <div class="zh-gloed"></div>
+        <div class="zh-zon"></div>
+        <div class="zh-fonkel zh-fonkel--envelop"><i style="--x:50%;--y:46%;--s:40;--d:3.4s;--dl:-1.1s"></i><i style="--x:44%;--y:50%;--s:26;--d:2.9s;--dl:-2.2s"></i><i style="--x:56%;--y:51%;--s:30;--d:3.8s;--dl:-.4s"></i><i style="--x:30%;--y:36%;--s:24;--d:4.2s;--dl:-2.8s"></i><i style="--x:70%;--y:36%;--s:28;--d:3.6s;--dl:-1.6s"></i><i style="--x:14%;--y:21%;--s:22;--d:4.6s;--dl:-3.4s"></i><i style="--x:86%;--y:22%;--s:26;--d:4s;--dl:-.9s"></i><i style="--x:33%;--y:68%;--s:24;--d:3.9s;--dl:-2.5s"></i><i style="--x:67%;--y:68%;--s:26;--d:4.4s;--dl:-1.3s"></i><i style="--x:18%;--y:83%;--s:22;--d:4.8s;--dl:-3.9s"></i><i style="--x:82%;--y:82%;--s:24;--d:3.7s;--dl:-2s"></i></div>
+        <div class="zh-fonkel zh-fonkel--meer"><i style="--x:51.5%;--y:49.5%;--s:30;--d:4.2s;--dl:-1.4s"></i><i style="--x:43%;--y:46.5%;--s:22;--d:3.3s;--dl:-2.6s"></i><i style="--x:60%;--y:47.5%;--s:24;--d:3.9s;--dl:-.6s"></i><i style="--x:96%;--y:40%;--s:42;--d:3.1s;--dl:-1.9s"></i><i style="--x:92%;--y:46%;--s:30;--d:3.7s;--dl:-.8s"></i><i style="--x:97%;--y:53%;--s:36;--d:2.9s;--dl:-2.3s"></i><i style="--x:89%;--y:58%;--s:26;--d:4.1s;--dl:-3.1s"></i><i style="--x:95%;--y:65%;--s:34;--d:3.4s;--dl:-1.2s"></i><i style="--x:84%;--y:7%;--s:38;--d:4.6s;--dl:-2.9s"></i><i style="--x:93%;--y:13%;--s:26;--d:3.8s;--dl:-.3s"></i><i style="--x:22%;--y:18%;--s:24;--d:4.3s;--dl:-1.7s"></i><i style="--x:38%;--y:24%;--s:22;--d:3.6s;--dl:-3.3s"></i><i style="--x:9%;--y:30%;--s:26;--d:4.9s;--dl:-2.1s"></i><i style="--x:70%;--y:31%;--s:22;--d:3.5s;--dl:-.9s"></i><i style="--x:12%;--y:59%;--s:24;--d:4s;--dl:-2.7s"></i><i style="--x:80%;--y:62%;--s:28;--d:3.2s;--dl:-1.5s"></i></div>
+      </div>
+      <div class="fx-slot zh-fx" data-fx-slot="hero" aria-hidden="true"></div>
+      <div class="zh-caption" data-zh-caption>
+        <svg class="zh-caption__teken" viewBox="0 0 200 40" aria-hidden="true" focusable="false"><use href="#zh-scheiding"/></svg>
+        <p class="zh-eyebrow">{{ v.kicker }}</p>
+        <h1 class="zh-names" id="zh-namen" tabindex="-1">{% if v.is_couple %}<span class="fx-shimmer">{{ v.names.0 }}</span> <span class="zh-names__amp" aria-label="en">&amp;</span> <span class="fx-shimmer">{{ v.names.1 }}</span>{% else %}<span class="fx-shimmer">{{ v.names.0 }}</span>{% endif %}</h1>
+        {% if v.date_display %}<p class="zh-datum">{{ v.date_display|capfirst }}{% if v.time_display %} · {{ v.time_display }}{% endif %}</p>{% endif %}
+        <div class="zh-caption__knoppen">
+          <button type="button" class="zh-view" data-zh-bekijk>Bekijk de uitnodiging</button>
+          <button type="button" class="zh-again" data-zh-again>Speel de opening opnieuw</button>
+        </div>
+      </div>
+    </div>
+    {% if v.opening_enabled %}<button type="button" class="zh-open" data-zh-open data-fx-origin aria-label="Tik om de envelop te openen en speel de opening af">
+      <svg class="zh-open__zegel" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#zh-zegel"/></svg>
+      <span class="zh-open__tekst">Tik om de envelop te openen</span>
+    </button>{% endif %}
+  </div>
+  <button type="button" class="zh-skip" data-zh-skip data-open>Opening overslaan</button>
+  <p class="zh-status" role="status" aria-live="polite" data-zh-status></p>
+</header>
+
+<div class="zh-body" id="zh-verder">
+{% if v.tagline %}
+<section class="zh-sec zh-schaduw zh-foto-sec zh-intro" aria-label="Welkom">
+  <img class="zh-bg" src="{% static 'designs/zwanenhart/v1/media/bloesem.webp' %}" alt="" width="720" height="500" loading="lazy" decoding="async">
+  <div class="fx-slot zh-fx" data-fx-slot="band" aria-hidden="true"></div>
+  <div class="zh-in" data-reveal>
+    <svg class="zh-scheiding" viewBox="0 0 200 40" aria-hidden="true" focusable="false"><use href="#zh-scheiding"/></svg>
+    <p class="zh-intro__tagline">{{ v.tagline }}</p>
+    <svg class="zh-scheiding" viewBox="0 0 200 40" aria-hidden="true" focusable="false"><use href="#zh-scheiding"/></svg>
+  </div>
+</section>
+{% endif %}
+
+{% if v.has_event and v.date %}
+<section class="zh-sec zh-steen zh-date" aria-labelledby="zh-date-title">
+  <div class="zh-in" data-reveal>
+    <p class="zh-label">Save the date</p>
+    <h2 id="zh-date-title" class="zh-h2">De dag</h2>
+    <p class="visually-hidden">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>
+    <div class="zh-venster" aria-hidden="true">
+      <div class="zh-venster__glas">
+        <img src="{% static 'designs/zwanenhart/v1/media/zwanen.webp' %}" alt="" width="720" height="360" loading="lazy" decoding="async">
+        <div class="zh-datum-groot">
+          <span class="zh-weekdag">{{ v.weekday }}</span>
+          <strong class="zh-dag">{{ v.day }}</strong>
+          <span class="zh-maand">{{ v.month_name }}</span>
+          <span class="zh-jaar">{{ v.year }}</span>
+        </div>
+      </div>
+    </div>
+    {% if v.time_display %}<p class="zh-date__tijd">{{ v.time_display }}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.welcome or v.hero %}
+<section class="zh-sec zh-ivoor zh-letter" aria-label="Welkom">
+  <div class="zh-in" data-reveal>
+    {% if v.hero %}<figure class="zh-boogfoto zh-letter__photo"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 600px) 360px, 72vw" %}</div></figure>{% endif %}
+    {% if v.welcome %}<div class="zh-letter__text">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.story %}
+<section class="zh-sec zh-steen zh-story" aria-labelledby="zh-story-title">
+  <div class="zh-in" data-reveal>
+    <svg class="zh-zegeltje" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#zh-zegel"/></svg>
+    <h2 id="zh-story-title" class="zh-h2">{{ v.story_title }}</h2>
+    <div class="zh-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="zh-sec zh-schaduw zh-foto-sec zh-program" aria-labelledby="zh-program-title">
+  <img class="zh-bg" src="{% static 'designs/zwanenhart/v1/media/water.webp' %}" alt="" width="720" height="460" loading="lazy" decoding="async">
+  <div class="fx-slot zh-fx" data-fx-slot="band" aria-hidden="true"></div>
+  <div class="zh-in zh-in--breed" data-reveal>
+    <p class="zh-label">Zo verloopt de dag</p>
+    <h2 id="zh-program-title" class="zh-h2">Het programma</h2>
+    <ol class="zh-tijdlijn" data-fx-stagger>
+      {% for item in v.program %}
+      <li class="zh-tl">
+        <span class="zh-tl__punt" aria-hidden="true"></span>
+        <div class="zh-tl__tekst">
+          {% if item.time %}<p class="zh-tl__tijd">{{ item.time }}</p>{% endif %}
+          <h3 class="zh-tl__titel">{{ item.title }}</h3>
+          {% if item.description %}<p class="zh-tl__desc">{{ item.description }}</p>{% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="zh-sec zh-kaarslicht zh-count" aria-labelledby="zh-count-title">
+  <div class="fx-slot zh-fx" data-fx-slot="band" aria-hidden="true"></div>
+  <div class="zh-lichtjes" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="zh-in" data-reveal>
+    <svg class="zh-scheiding" viewBox="0 0 200 40" aria-hidden="true" focusable="false"><use href="#zh-scheiding"/></svg>
+    <h2 id="zh-count-title" class="zh-h2">{% if v.is_past %}Dank je wel{% else %}Nog even en het is zover{% endif %}</h2>
+    {% include "invitations/partials/countdown.html" %}
+    {% include "invitations/partials/calendar_buttons.html" %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="zh-sec zh-schaduw zh-foto-sec zh-place" aria-labelledby="zh-place-title">
+  <img class="zh-bg" src="{% static 'designs/zwanenhart/v1/media/zwanen.webp' %}" alt="" width="720" height="360" loading="lazy" decoding="async">
+  <div class="fx-slot zh-fx" data-fx-slot="band" aria-hidden="true"></div>
+  <div class="zh-in" data-reveal>
+    <p class="zh-label">Waar</p>
+    <h2 id="zh-place-title" class="zh-h2">Locatie</h2>
+    {% if v.venue %}<p class="zh-place__venue">{{ v.venue }}</p>{% endif %}
+    {% if v.address_lines %}<address class="zh-place__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+    {% if v.date_display %}<p class="zh-place__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+    {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Plan je route</a>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="zh-sec zh-ivoor zh-dress" aria-labelledby="zh-dress-title">
+  <div class="zh-in" data-reveal>
+    <h2 id="zh-dress-title" class="zh-h2">Dresscode</h2>
+    {% if v.dresscode_colors %}<ul class="zh-kleuren" aria-label="Kleuren voor de dresscode">
+      {% for c in v.dresscode_colors %}<li class="zh-kleur" style="--c:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+    </ul>{% endif %}
+    {% for p in v.dresscode_text %}<p class="zh-dress__text">{{ p|linebreaksbr }}</p>{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="zh-sec zh-steen zh-gallery" aria-labelledby="zh-gallery-title">
+  <div class="zh-in zh-in--breed" data-reveal>
+    <h2 id="zh-gallery-title" class="zh-h2">Momenten</h2>
+    <ul class="zh-photos">
+      {% for photo in v.gallery %}<li><figure class="zh-boogfoto"><div class="ph fx-kb">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 900px) 240px, 42vw" %}</div>{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="zh-sec zh-ivoor zh-practical" aria-labelledby="zh-practical-title">
+  <div class="zh-in" data-reveal>
+    <h2 id="zh-practical-title" class="zh-h2">Goed om te weten</h2>
+    <dl class="zh-practical__list" data-fx-stagger>
+      {% for item in v.practical %}<div class="zh-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+    </dl>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="zh-sec zh-schaduw zh-foto-sec zh-rsvp" id="aanmelden" aria-labelledby="zh-rsvp-title">
+  <img class="zh-bg" src="{% static 'designs/zwanenhart/v1/media/bloesem.webp' %}" alt="" width="720" height="500" loading="lazy" decoding="async">
+  <div class="fx-slot zh-fx" data-fx-slot="band" aria-hidden="true"></div>
+  <div class="zh-in" data-reveal>
+    <p class="zh-label">Aanmelden</p>
+    <h2 id="zh-rsvp-title" class="zh-h2">{% if v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+    <div class="zh-card">
+      <svg class="zh-card__zegel" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#zh-zegel"/></svg>
+      {% include "invitations/partials/rsvp.html" %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="zh-sec zh-ivoor zh-contact" aria-labelledby="zh-contact-title">
+  <div class="zh-in" data-reveal>
+    <h2 id="zh-contact-title" class="zh-h2">Vragen?</h2>
+    {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+    <p class="zh-contact__name">{{ v.contact.name }}</p>
+    <p class="zh-contact__links">
+      {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+      {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+      {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+    </p>
+  </div>
+</section>
+{% endif %}
+
+<section class="zh-sec zh-schaduw zh-foto-sec zh-closing" aria-label="Afsluiting">
+  <img class="zh-bg" src="{% static 'designs/zwanenhart/v1/media/water.webp' %}" alt="" width="720" height="460" loading="lazy" decoding="async">
+  <div class="fx-slot zh-fx" data-fx-slot="band" aria-hidden="true"></div>
+  <div class="zh-in" data-reveal>
+    <svg class="zh-zegeltje" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#zh-zegel"/></svg>
+    <p class="zh-closing__wish">Wij kijken ernaar uit</p>
+    {% if v.show.closing %}{% for p in v.closing %}<p class="zh-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+    {% include "invitations/partials/share_buttons.html" %}
+  </div>
+</section>
+</div>
+{% endblock %}

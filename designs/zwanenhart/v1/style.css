@@ -1,0 +1,400 @@
+/* Zwanenhart v1: een ivoren envelop met een gouden lakzegel opent; uit het licht verschijnen twee witte zwanen die samen een hart vormen (de twee aangeleverde films,
+   samengevoegd met een overvloeier). Daarna de namen en de datum. De uitnodiging loopt door in dezelfde wereld: ivoor en het reliëfpapier van de envelop, donkere
+   banden met beelden uit dezelfde film (bloesem, de zwanen, het water in avondlicht) en champagnegoud. Opening, kop en namen: één scène (.zh-hero) die zwanenhart.js
+   timet. Opbouw gelijk aan Witte Roos v1. Wijzig een uitgebrachte versie niet: maak een v2. */
+
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "EB Garamond"; src: url("../../../fonts/eb-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 400 800; font-display: swap; }
+@font-face { font-family: "EB Garamond"; src: url("../../../fonts/eb-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 400 800; font-style: italic; font-display: swap; }
+@font-face { font-family: "Cinzel"; src: url("../../../fonts/cinzel-latin-wght-normal.woff2") format("woff2"); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../../../fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 300 800; font-display: swap; }
+
+body {
+  --zh-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --zh-tekst: "EB Garamond", Georgia, "Times New Roman", serif;
+  --zh-kap: "Cinzel", "Trajan Pro", Georgia, serif;
+  --zh-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --zh-boog: inset(0 round 999px 999px 4px 4px);
+  --inv-bg: var(--zh-bg);
+  --inv-text: var(--zh-ink);
+  --inv-muted: var(--zh-muted);
+  --inv-accent: var(--zh-accent);
+  --inv-accent-contrast: var(--zh-accent-ink);
+  --inv-font-body: var(--zh-tekst);
+  --inv-font-ui: var(--zh-ui);
+  --inv-focus: var(--zh-accent);
+  --inv-radius: 4px;
+  --inv-surface-2: color-mix(in srgb, var(--zh-bg-2) 70%, var(--zh-line));
+  --inv-btn-border: color-mix(in srgb, var(--zh-accent) 55%, transparent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--zh-accent) 9%, transparent);
+  --inv-field-bg: #FFFFFF;
+  --inv-field-text: var(--zh-ink);
+  --inv-field-border: color-mix(in srgb, var(--zh-ink) 26%, transparent);
+  --inv-music-bg: linear-gradient(180deg, #FFFDF8, #EFE4CF);
+  --inv-music-text: #2C251E;
+  --inv-music-border: rgba(110, 82, 38, .35);
+  --inv-photo-bg: var(--zh-bg-2);
+  --fx-pulse: var(--zh-gold);
+  background: var(--zh-bg);
+  color: var(--zh-ink);
+  font-family: var(--zh-tekst);
+  font-size: 1.12rem;
+}
+
+/* ================================================================ de opening: envelop, licht en zwanen (opening en kop in één scène) */
+/* Op een telefoon (staand) vult de film het hele scherm, rand tot rand. Op een breder scherm staat de film onbijgesneden als een hoog, staand venster in het
+   midden, met daaromheen dezelfde scène wazig en gedempt: zo blijven het zegel en de zwanen altijd volledig in beeld. Zie docs/ZWANENHART.md. */
+.zh-hero {
+  --zh-h: 100vh; --zh-h: 100svh;
+  position: relative; isolation: isolate; overflow: hidden; width: 100%; height: var(--zh-h); min-height: 460px; color: #FFFAF0;
+  background: #2A2218; font-family: var(--zh-tekst);
+}
+html:not(.inv-embed) body:has(.inv-banner) .zh-hero { --zh-h: calc(100svh - var(--inv-banner-h, 3.9rem)); }
+html.zh-bezig, html.zh-bezig body { overflow: hidden; overscroll-behavior: none; }
+/* op het eerste beeld staat de kop in donkere inkt op de ivoren envelop: ook de achtergrond eronder is dan ivoor (tot de poster er is) */
+.zh-hero.zh-gate, .zh-gate .zh-scene { background: #EFE6D6; }
+.zh-waas { display: none; }
+.zh-waas--zwanen { opacity: 0; transition: opacity 1.6s ease-out; }
+:is(.zh-tekst, .zh-klaar, html:not(.js) .zh-hero) .zh-waas--zwanen { opacity: 1; }
+.zh-raam { position: absolute; inset: 0; z-index: 1; }
+.zh-scene { position: absolute; inset: 0; overflow: hidden; background: #3A3128; container-type: size; }   /* tot de poster er is; donker zodat de tekst ook zonder beeld leesbaar is */
+.zh-scene video, .zh-eind { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; }
+.zh-eind { z-index: 1; opacity: 0; transition: opacity .6s; }
+/* leesbaarheid: alleen een zachte schaduw bovenin en onder de namen; het beeld zelf blijft onaangeroerd */
+.zh-hero::before { content: ""; position: absolute; inset: 0 0 auto; z-index: 3; height: min(22vh, 11rem); pointer-events: none;
+  background: linear-gradient(to bottom, rgba(252, 246, 234, .55), rgba(252, 246, 234, 0)); transition: opacity .8s; }
+:is(.zh-klaar, .zh-speelt, .zh-laadt, html:not(.js) .zh-hero)::before { opacity: 0; }
+.zh-heading { position: absolute; top: max(24px, calc(env(safe-area-inset-top) + 14px)); left: 0; right: 0; z-index: 6; margin: 0; padding: 0 64px; text-align: center;
+  font: italic 500 clamp(19px, 2.1vw, 25px)/1.2 var(--zh-display); color: #4A3920; text-shadow: 0 1px 12px rgba(255, 250, 238, .8); transition: opacity .8s; }
+
+.zh-caption { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; padding: 120px 20px max(76px, calc(env(safe-area-inset-bottom) + 68px));   /* onderaan ruimte voor de vaste knoppen Beweging en Muziek */ text-align: center; color: #FFFAF0;
+  background: linear-gradient(to bottom, rgba(28, 22, 16, 0), rgba(28, 22, 16, .5) 34%, rgba(28, 22, 16, .64) 62%, rgba(28, 22, 16, .76));
+  opacity: 0; visibility: hidden; transform: translateY(14px); transition: none; }   /* verbergen gaat direct: anders schemeren de namen bij het laden even over de envelop */
+html.zh-bezig .zh-caption { will-change: opacity, transform; }
+.zh-caption__teken { display: block; width: 8.5rem; height: auto; margin: 0 auto 10px; color: #F0DDB3; filter: drop-shadow(0 1px 6px rgba(0, 0, 0, .45)); }
+.zh-eyebrow { max-width: 36rem; margin: 0 auto 10px; font: 500 11px/1.3 var(--zh-kap); letter-spacing: .3em; text-indent: .3em; text-transform: uppercase; color: #F2E4C6; text-shadow: 0 1px 10px rgba(0, 0, 0, .55); }
+.zh-names { max-width: 36rem; margin: 0 auto 10px; font: italic 500 clamp(40px, 10.5vw, 72px)/1.04 var(--zh-display); overflow-wrap: anywhere; text-wrap: balance; color: #FFFBF2; text-shadow: 0 2px 24px rgba(10, 6, 2, .6); }
+.zh-names__amp { display: inline-block; margin: 0 .08em; font-weight: 400; color: #EBD7AE; }
+.zh-datum { max-width: 36rem; margin: 0 auto 20px; font: 500 12.5px/1.5 var(--zh-kap); letter-spacing: .16em; color: #FBF1DC; text-shadow: 0 1px 12px rgba(0, 0, 0, .6); }
+.zh-caption__knoppen { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 14px; }
+.zh-view { min-height: 44px; padding: 10px 24px; border: 1px solid rgba(235, 215, 174, .9); border-radius: 2px; background: rgba(255, 250, 240, .14); color: #FFF8EA;
+  font: 600 12px var(--zh-ui); letter-spacing: .14em; text-transform: uppercase; cursor: pointer; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+.zh-view:hover { background: rgba(255, 250, 240, .26); }
+.zh-again { min-height: 44px; padding: 10px 6px; border: 0; background: none; color: #F6EBD3; font: 500 12.5px var(--zh-ui); letter-spacing: .04em; cursor: pointer;
+  text-decoration: underline; text-decoration-color: rgba(246, 235, 211, .5); text-underline-offset: 4px; text-shadow: 0 1px 8px rgba(0, 0, 0, .5); }
+.zh-again:hover { text-decoration-color: currentColor; }
+html:not(.js) .zh-again, .zh-hero:not(.zh-klaar) .zh-again { display: none; }
+
+/* openen: een ivoren kaartje met een gouden rand onder het zegel, zoals briefpapier */
+.zh-open { position: absolute; left: 50%; bottom: max(10%, calc(env(safe-area-inset-bottom) + 56px)); z-index: 7; display: none; flex-direction: column; align-items: center; gap: 8px; width: min(19rem, 86%); min-height: 44px; padding: 14px 18px 16px; translate: -50% 0; text-align: center;
+  border: 1px solid rgba(160, 124, 62, .85); border-radius: 2px; background: rgba(255, 252, 245, .78); color: #3A2C17; cursor: pointer; backdrop-filter: blur(8px) saturate(1.05); -webkit-backdrop-filter: blur(8px) saturate(1.05);
+  box-shadow: 0 14px 34px -16px rgba(90, 64, 24, .55), inset 0 0 0 4px rgba(255, 252, 245, .9), inset 0 0 0 5px rgba(190, 154, 92, .55); font: 600 11.5px var(--zh-kap); letter-spacing: .24em; text-indent: .24em; text-transform: uppercase;
+  transition: background .3s, border-color .3s; }
+.zh-open__zegel { width: 26px; height: 26px; color: #8C6A30; }
+.zh-open:hover { background: rgba(255, 252, 245, .94); border-color: #8C6A30; }
+.zh-gate .zh-open { display: flex; }
+.fx-motion .zh-gate .zh-open { animation: zh-adem 3.6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes zh-adem { 0%, 100% { box-shadow: 0 14px 34px -16px rgba(90, 64, 24, .55), inset 0 0 0 4px rgba(255, 252, 245, .9), inset 0 0 0 5px rgba(190, 154, 92, .55), 0 0 0 0 rgba(201, 151, 62, .35); } 50% { box-shadow: 0 14px 34px -16px rgba(90, 64, 24, .55), inset 0 0 0 4px rgba(255, 252, 245, .9), inset 0 0 0 5px rgba(190, 154, 92, .55), 0 0 0 10px rgba(201, 151, 62, 0); } }
+/* de film laadt nog na de tik: een rustige lijn onder de knopplek, geen draaiend wiel */
+.zh-laadt .zh-raam::after { content: ""; position: absolute; left: 50%; bottom: max(13%, calc(env(safe-area-inset-bottom) + 70px)); z-index: 7; width: 72px; height: 1px; translate: -50% 0;
+  background: linear-gradient(90deg, transparent, #8C6A30, transparent); opacity: .85; }
+.fx-motion .zh-laadt .zh-raam::after { animation: zh-laad 1.4s ease-in-out infinite; }
+@keyframes zh-laad { 0%, 100% { opacity: .25; transform: scaleX(.5); } 50% { opacity: .95; transform: scaleX(1); } }
+
+/* opening overslaan: rustig, rechtsboven */
+.zh-skip { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 20; min-height: 44px; padding: 8px 16px; border: 1px solid rgba(255, 246, 225, .55); border-radius: 2px;
+  background: rgba(36, 28, 20, .34); color: #FFFAF0; font: 600 12px var(--zh-ui); letter-spacing: .08em; cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); text-shadow: 0 1px 8px rgba(0, 0, 0, .4); transition: opacity .5s; }
+.zh-skip:hover { background: rgba(36, 28, 20, .52); }
+.zh-gate .zh-skip { background: rgba(255, 252, 245, .62); color: #3A2C17; border-color: rgba(160, 124, 62, .6); text-shadow: none; }
+.zh-gate .zh-skip:hover { background: rgba(255, 252, 245, .86); }
+.zh-hero:not(.zh-gate):not(.zh-speelt):not(.zh-laadt) .zh-skip, html:not(.js) .zh-skip { opacity: 0; pointer-events: none; visibility: hidden; }
+.zh-status { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* eindbeeld met namen: geen opening ingesteld, geen JavaScript, minder beweging, al gezien of de film kon niet spelen */
+:is(.zh-klaar, html:not(.js) .zh-hero) .zh-eind { opacity: 1; transition: none; }
+:is(.zh-speelt, .zh-laadt) .zh-eind { opacity: 0; transition: none; }
+:is(.zh-klaar, .zh-tekst, html:not(.js) .zh-hero) .zh-caption { opacity: 1; visibility: visible; transform: none; transition: opacity 1.4s ease-out, transform 1.4s ease-out, visibility 0s; }
+:is(.zh-klaar, html:not(.js) .zh-hero) .zh-caption { transition: none; }
+:is(.zh-klaar, .zh-speelt, .zh-laadt, html:not(.js) .zh-hero) .zh-heading { opacity: 0; }
+:is(.zh-klaar, html:not(.js) .zh-hero) .zh-open { display: none; }
+
+/* overgang naar de uitnodiging: de onderrand loopt zacht over in de eerste band */
+.zh-hero::after { content: ""; position: absolute; inset: auto 0 0; z-index: 5; height: clamp(1.5rem, 5vh, 3rem); pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--zh-uit, var(--zh-schaduw))); opacity: 0; transition: opacity 1.4s; }
+.zh-hero:has(+ .zh-body > .zh-steen:first-child) { --zh-uit: var(--zh-bg-2); }
+.zh-hero:has(+ .zh-body > .zh-ivoor:first-child) { --zh-uit: var(--zh-bg); }
+:is(.zh-klaar, .zh-tekst, html:not(.js) .zh-hero)::after { opacity: 1; }
+
+@media (max-width: 520px) {
+  .zh-heading { text-align: left; padding: 0 0 0 20px; font-size: 17px; white-space: nowrap; }
+  .zh-caption__teken { width: 6.5rem; margin-bottom: 4px; }
+  .zh-names { font-size: clamp(38px, 10vw, 60px); margin-bottom: 6px; }
+  .zh-datum { margin-bottom: 14px; }
+  .zh-open { letter-spacing: .18em; text-indent: .18em; }
+  .zh-skip { padding: 8px 12px; }
+}
+/* lage telefoons: de namen iets compacter, zodat de zwanen en het hart vrij blijven */
+@media (max-width: 520px) and (max-height: 780px) {
+  .zh-caption { padding-top: 84px; padding-bottom: max(70px, calc(env(safe-area-inset-bottom) + 62px)); } .zh-caption__teken { display: none; }
+  .zh-names { font-size: clamp(34px, 9.4vw, 46px); } .zh-eyebrow { margin-bottom: 6px; } .zh-datum { margin-bottom: 10px; font-size: 11.5px; }
+}
+@media (max-height: 620px) {
+  .zh-heading { display: none; }
+  .zh-caption { padding-top: 70px; padding-bottom: 14px; } .zh-caption__teken { display: none; } .zh-datum { margin-bottom: 10px; } .zh-names { font-size: 32px; }
+}
+
+/* breder dan staand (tablet liggend, laptop, desktop): de film als staand venster in het midden, onbijgesneden */
+@media (min-aspect-ratio: 2/3) {
+  .zh-hero { background: #1E1913; }
+  .zh-waas { position: absolute; top: -4%; left: -4%; z-index: 0; display: block; width: 108%; max-width: none; height: 108%; object-fit: cover; filter: brightness(.62) saturate(.92) sepia(.1); }
+  .zh-hero > .zh-heading { z-index: 6; }
+  .zh-raam { --zh-rand: clamp(14px, 3.2vh, 34px);
+    inset: var(--zh-rand) auto var(--zh-rand) 50%; width: calc((var(--zh-h) - 2 * var(--zh-rand)) * 9 / 16); max-width: calc(100% - 28px); translate: -50% 0;
+    box-shadow: 0 0 0 1px rgba(235, 215, 174, .7), 0 0 0 7px rgba(30, 24, 18, .35), 0 0 0 8px rgba(235, 215, 174, .32), 0 40px 90px -30px rgba(0, 0, 0, .85); }
+  .zh-scene video, .zh-eind { object-fit: cover; object-position: 50% 50%; }
+  .zh-hero::before, :is(.zh-klaar, .zh-speelt, .zh-laadt, html:not(.js) .zh-hero)::before { inset: 0; z-index: 1; height: auto; opacity: 1; background: radial-gradient(60% 85% at 50% 50%, rgba(30, 24, 18, .1), rgba(30, 24, 18, .62)); }
+  .zh-heading { top: max(18px, calc(var(--zh-rand, 24px) + 22px)); padding: 0 12px; font-size: clamp(16px, 1.5vw, 21px); }
+  .zh-caption { padding: 96px 16px 22px; }
+  .zh-caption__teken { width: 6.5rem; margin-bottom: 2px; }
+  .zh-names { font-size: clamp(32px, 3vw, 50px); margin-bottom: 6px; }
+  .zh-datum { margin-bottom: 14px; font-size: 11.5px; }
+  .zh-caption__knoppen { gap: 4px 14px; }
+  .zh-hero::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zh-hero *, .zh-hero *::before, .zh-hero *::after { transition: none !important; animation: none !important; }
+}
+
+/* ================================================================ de uitnodiging: ivoor, het papier van de envelop, avondlicht en het water */
+.zh-body { position: relative; z-index: 1; overflow-x: clip; }
+.zh-sec { position: relative; isolation: isolate; overflow: hidden; padding: clamp(4.4rem, 15vw, 8.5rem) 1.25rem; text-align: center; }
+.zh-in { position: relative; z-index: 2; width: min(100%, 40rem); margin-inline: auto; }
+.zh-in--breed { width: min(100%, 62rem); }
+.zh-ivoor { background: var(--zh-bg); }
+.zh-steen { background: var(--zh-bg-2); }
+/* het papier van de envelop: het reliëf met bloemen, heel zacht, als textuur */
+.zh-steen::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: .26; mix-blend-mode: multiply;
+  background: url("media/papier.webp") center top / 640px auto repeat; }
+.zh-schaduw { --zh-t: #FBF3E3; --zh-t2: #E6DACA; --zh-tg: #E9D3A6; background: var(--zh-schaduw); color: var(--zh-t); }
+.zh-kaarslicht { background: radial-gradient(120% 90% at 50% 0%, #FFFBF1 0%, #F7ECD6 55%, #EEDFC2 100%); color: #2C251E; }
+
+.zh-label { margin: 0 0 .9rem; font: 500 .74rem/1.4 var(--zh-kap); letter-spacing: .32em; text-indent: .32em; text-transform: uppercase; color: var(--zh-gold-2); }
+.zh-schaduw .zh-label { color: var(--zh-tg); }
+.zh-h2 { margin: 0 0 1.6rem; font: italic 500 clamp(2.6rem, 11vw, 4.4rem)/1.05 var(--zh-display); color: var(--zh-accent); text-wrap: balance; }
+.zh-schaduw .zh-h2 { color: #F3E4C3; text-shadow: 0 2px 24px rgba(0, 0, 0, .5); }
+.zh-scheiding { display: block; width: 10rem; height: auto; margin: 1.2rem auto; color: var(--zh-gold); }
+.zh-schaduw .zh-scheiding { color: var(--zh-tg); }
+.zh-zegeltje { display: block; width: 2.6rem; height: 2.6rem; margin: 0 auto 1.3rem; color: var(--zh-gold); }
+.zh-schaduw .zh-zegeltje { color: var(--zh-tg); }
+
+.zh-bg { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: cover; opacity: .55; filter: saturate(.8); }
+.zh-foto-sec::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, var(--zh-schaduw) 0%, rgba(34, 28, 22, .78) 24%, rgba(34, 28, 22, .84) 76%, var(--zh-schaduw) 100%); }
+
+.zh-intro { padding-block: clamp(5.5rem, 18vw, 10rem); }
+.zh-intro__tagline { margin: 0 auto; max-width: 30rem; font: italic 500 clamp(1.8rem, 7.4vw, 2.7rem)/1.32 var(--zh-display); color: var(--zh-t); text-wrap: balance; text-shadow: 0 2px 22px rgba(0, 0, 0, .55); }
+
+/* de datum: een rond boogvenster met de zwanen uit de film en een gouden lijn */
+.zh-venster { position: relative; width: min(68vw, 17rem); aspect-ratio: 5 / 7; margin: 0 auto; padding: 7px; clip-path: var(--zh-boog);
+  background: linear-gradient(160deg, #D9C39A, #8C6B36 48%, #D9C39A); filter: drop-shadow(0 26px 34px rgba(70, 50, 20, .35)); }
+.zh-venster__glas { position: relative; width: 100%; height: 100%; clip-path: var(--zh-boog); background: var(--zh-schaduw); color: #FFFAF0; overflow: hidden; }
+.zh-venster__glas img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
+.zh-venster__glas::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(34, 28, 22, .1) 10%, rgba(34, 28, 22, .55) 45%, rgba(34, 28, 22, .9)); }
+.zh-datum-groot { position: absolute; left: 0; right: 0; bottom: 1.4rem; z-index: 2; display: grid; justify-items: center; line-height: .95; }
+.zh-weekdag, .zh-jaar { font: 500 .74rem var(--zh-kap); letter-spacing: .38em; text-indent: .38em; text-transform: uppercase; color: #F2E2BE; }
+.zh-dag { font: 400 clamp(5.6rem, 26vw, 8.6rem)/.9 var(--zh-display); color: #FFFBF2; text-shadow: 0 6px 22px rgba(0, 0, 0, .5); }
+.zh-maand { margin: -.1rem 0 .35rem; font: italic 500 clamp(1.9rem, 8vw, 2.6rem)/1.1 var(--zh-display); }
+.zh-date__tijd { margin: 1.7rem 0 0; font: italic 500 1.45rem var(--zh-display); color: var(--zh-muted); }
+
+/* foto's in een ronde boog met een dunne gouden rand */
+.zh-boogfoto { position: relative; margin: 0; padding: 6px; clip-path: var(--zh-boog); background: linear-gradient(160deg, #E4D2AE, #A8854C 50%, #E4D2AE); }
+.zh-boogfoto .ph { aspect-ratio: 5 / 7; clip-path: var(--zh-boog); overflow: hidden; }
+.zh-letter__photo { width: min(72vw, 21rem); margin: 0 auto 2.6rem; filter: drop-shadow(0 30px 36px rgba(70, 50, 20, .3)); }
+.zh-letter__text { max-width: 28rem; margin: 0 auto; line-height: 1.72; font-size: 1.2rem; }
+.zh-letter__text p { margin: 0 0 1rem; }
+.zh-letter__text p:first-child { font: italic 500 clamp(1.9rem, 8vw, 2.6rem)/1.2 var(--zh-display); color: var(--zh-accent); }
+
+.zh-story__text { max-width: 30rem; margin: 0 auto; line-height: 1.75; font-size: 1.2rem; }
+.zh-story__text p { margin: 0 0 1.1rem; }
+.zh-story__text p:first-child { font: italic 500 clamp(1.5rem, 6vw, 1.9rem)/1.5 var(--zh-display); color: var(--zh-accent); }
+
+/* programma: een gouden lijn met kleine ruitjes */
+.zh-tijdlijn { position: relative; list-style: none; margin: 2.4rem auto 0; padding: 0; max-width: 28rem; display: grid; gap: 2.6rem; text-align: left; }
+.zh-tijdlijn::before { content: ""; position: absolute; left: 1.35rem; top: .4rem; bottom: .4rem; width: 1px; background: linear-gradient(transparent, var(--zh-tg) 8%, var(--zh-tg) 92%, transparent); }
+.zh-tl { position: relative; display: grid; grid-template-columns: 2.7rem 1fr; gap: 1.1rem; align-items: start; }
+.zh-tl__punt { position: relative; width: .7rem; height: .7rem; margin: 1.15rem 1rem; rotate: 45deg; background: var(--zh-schaduw); border: 1px solid var(--zh-tg); box-shadow: 0 0 0 5px var(--zh-schaduw), 0 0 14px 4px rgba(233, 211, 166, .25); }
+.zh-tl__tijd { margin: 0; font: 400 clamp(2.4rem, 11vw, 3.5rem)/1 var(--zh-display); letter-spacing: .02em; color: var(--zh-tg); }
+.zh-tl__titel { margin: .3rem 0 0; font: italic 600 clamp(1.45rem, 6vw, 1.85rem)/1.2 var(--zh-display); color: var(--zh-t); }
+.zh-tl__desc { margin: .3rem 0 0; color: var(--zh-t2); line-height: 1.5; }
+@media (min-width: 860px) {
+  .zh-tijdlijn { max-width: 52rem; gap: 3.2rem; }
+  .zh-tijdlijn::before { left: 50%; translate: -50% 0; }
+  .zh-tl { grid-template-columns: 1fr 3rem 1fr; gap: 0; }
+  .zh-tl__punt { grid-column: 2; grid-row: 1; justify-self: center; margin: 1.3rem 0; }
+  .zh-tl__tekst { grid-row: 1; }
+  .zh-tl:nth-child(odd) .zh-tl__tekst { grid-column: 1; text-align: right; padding-right: 2.2rem; }
+  .zh-tl:nth-child(even) .zh-tl__tekst { grid-column: 3; padding-left: 2.2rem; }
+}
+
+/* aftellen: zacht avondlicht met ronde medaillons */
+.zh-count .zh-h2 { color: #5E441C; }
+.zh-count .cd { flex-wrap: nowrap; gap: clamp(.45rem, 2.4vw, 1.8rem); margin: 2rem 0 1.6rem; }
+.zh-count .cd__unit { width: clamp(3.9rem, 19.4vw, 7.4rem); min-width: 0; aspect-ratio: 1; justify-content: center; border-radius: 50%;
+  background: radial-gradient(circle at 50% 32%, #FFFEFA, #F8EEDB 78%); box-shadow: 0 0 0 3px #FFFBF2, 0 0 0 4px #B9975B, 0 0 0 7px rgba(255, 251, 242, .7), 0 0 0 7.5px rgba(185, 151, 91, .5), 0 18px 30px -16px rgba(90, 60, 15, .45); }
+.zh-count .cd__num { font: 400 clamp(1.9rem, 8.2vw, 3.3rem)/1 var(--zh-display); color: #2C251E; }
+.zh-count .cd__label { margin-top: .2rem; font: 500 .56rem var(--zh-kap); letter-spacing: .2em; color: #5E441C; }
+.zh-count .inv-actions { margin-top: 1.4rem; }
+.zh-kaarslicht .inv-btn { border-color: #6E5226; color: #2C251E; background: rgba(255, 253, 247, .55); }
+
+/* locatie en knoppen op de donkere banden */
+.zh-place__venue { margin: 0; font: italic 600 clamp(1.9rem, 8vw, 2.8rem)/1.2 var(--zh-display); color: #F3E4C3; text-shadow: 0 2px 20px rgba(0, 0, 0, .5); }
+.zh-place__address { margin: .7rem 0 0; font-style: normal; line-height: 1.6; color: var(--zh-t); }
+.zh-place__when { margin: 1.2rem 0 1.8rem; color: var(--zh-t2); }
+.zh-schaduw .inv-btn { color: var(--zh-t); border-color: rgba(233, 211, 166, .6); background: rgba(255, 248, 232, .07); }
+.zh-schaduw .inv-btn--primary { background: linear-gradient(180deg, #F8E9C8, #D9BB82); color: #23190A; border-color: #8C6B36; box-shadow: 0 10px 30px -12px rgba(233, 200, 140, .4); }
+.zh-schaduw .inv-link { color: var(--zh-tg); }
+.zh-schaduw .tz-note { color: var(--zh-t2); }
+
+/* dresscode, momenten, goed om te weten */
+.zh-kleuren { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem; margin: 0 0 1.5rem; padding: 0; }
+.zh-kleur { width: 3.6rem; height: 3.6rem; border-radius: 50%; background: radial-gradient(circle at 35% 28%, color-mix(in srgb, var(--c) 50%, #fff), var(--c) 62%);
+  box-shadow: 0 0 0 3px var(--zh-bg), 0 0 0 4px var(--zh-gold), 0 14px 22px -10px rgba(60, 40, 10, .4); }
+.zh-dress__text { max-width: 26rem; margin: 0 auto .6rem; font-size: 1.18rem; }
+.zh-photos { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; max-width: 40rem; margin: 2rem auto 0; padding: 0; }
+.zh-photos li:nth-child(even) { margin-top: 2.4rem; }
+.zh-photos .zh-boogfoto { filter: drop-shadow(0 22px 26px rgba(70, 50, 20, .28)); }
+.zh-photos figcaption { padding: .55rem .4rem .2rem; font: italic 500 1rem var(--zh-display); color: var(--zh-muted); background: var(--zh-bg-2); }
+.zh-practical__list { display: grid; gap: 1.5rem; max-width: 28rem; margin: 2rem auto 0; }
+.zh-practical__item { padding-top: 1.1rem; border-top: 1px solid var(--zh-gold); }
+.zh-practical__item dt { font: 500 .74rem var(--zh-kap); letter-spacing: .24em; text-transform: uppercase; color: var(--zh-gold-2); }
+.zh-practical__item dd { margin: .4rem 0 0; font-size: 1.14rem; }
+
+/* aanmelden: een ivoren kaart op de donkere band, met een dubbele gouden lijn */
+.zh-card { position: relative; max-width: 30rem; margin: 2.2rem auto 0; padding: 3rem clamp(1.3rem, 6vw, 2.4rem) 2.4rem; text-align: left; color: var(--zh-ink); background: linear-gradient(180deg, #FFFEFA, #F8F1E4);
+  border-radius: 2px; box-shadow: inset 0 0 0 7px #FFFEFA, inset 0 0 0 8px rgba(185, 151, 91, .85), inset 0 0 0 11px #FFFEFA, inset 0 0 0 11.5px rgba(185, 151, 91, .45), 0 40px 80px -28px rgba(0, 0, 0, .75); }
+.zh-card__zegel { position: absolute; top: -1.5rem; left: 50%; width: 3rem; height: 3rem; translate: -50% 0; padding: .25rem; border-radius: 50%; color: #FFF6DE; background: radial-gradient(circle at 38% 32%, #E7C98A, #B08443 62%, #8A642C); box-shadow: 0 6px 16px -6px rgba(60, 40, 10, .6); }
+.zh-card .rsvp__deadline { font-style: italic; font-size: 1.1rem; }
+.zh-card a { color: var(--zh-accent); }
+.zh-contact__name { margin: .5rem 0 .3rem; font: italic 500 clamp(2rem, 8vw, 2.7rem) var(--zh-display); color: var(--zh-accent); }
+
+/* afsluiting */
+.zh-closing { padding-block: clamp(6rem, 20vw, 11rem); }
+.zh-closing__wish { margin: .3rem 0 0; font: italic 500 clamp(3rem, 13vw, 5.4rem)/1.04 var(--zh-display); color: #F3E4C3; text-shadow: 0 4px 22px rgba(0, 0, 0, .5); }
+.zh-closing__text { max-width: 26rem; margin: 1rem auto 0; font-size: 1.22rem; color: var(--zh-t); }
+.zh-closing .inv-share { margin-top: 2.2rem; }
+.zh-closing .inv-share__status { color: var(--zh-t2); }
+.inv-zwanenhart .music__toggle, .inv-zwanenhart .fx-toggle { box-shadow: 0 8px 22px -6px rgba(40, 25, 10, .4), inset 0 1px 0 rgba(255, 255, 255, .6); }
+
+/* breed scherm */
+@media (min-width: 900px) {
+  .zh-sec { padding-block: clamp(6rem, 10vw, 9.5rem); }
+  .zh-in { width: min(100%, 46rem); }
+  .zh-in--breed { width: min(100%, 70rem); }
+  .zh-h2 { font-size: clamp(3.6rem, 5vw, 5.2rem); }
+  .zh-intro__tagline { max-width: 46rem; font-size: clamp(2.4rem, 3.4vw, 3.4rem); }
+  .zh-venster { width: 19rem; }
+  .zh-dag { font-size: clamp(8rem, 10vw, 10rem); }
+  .zh-letter .zh-in { display: grid; grid-template-columns: auto 1fr; gap: clamp(3rem, 6vw, 6rem); align-items: center; width: min(100%, 62rem); text-align: left; }
+  .zh-letter__photo { margin: 0; }
+  .zh-letter__text { max-width: none; font-size: 1.3rem; }
+  .zh-story__text { max-width: 36rem; font-size: 1.3rem; }
+  .zh-tl__tijd { font-size: 4rem; }
+  .zh-count .cd { gap: 2.2rem; }
+  .zh-count .cd__unit { width: 9.2rem; }
+  .zh-count .cd__num { font-size: 4rem; }
+  .zh-count .cd__label { font-size: .7rem; }
+  .zh-place__venue { font-size: clamp(2.8rem, 4vw, 3.8rem); }
+  .zh-kleur { width: 4.6rem; height: 4.6rem; }
+  .zh-photos { grid-template-columns: repeat(4, 1fr); max-width: 66rem; gap: 1.8rem; }
+  .zh-photos li:nth-child(even) { margin-top: 3.2rem; }
+  .zh-closing .zh-in { width: min(100%, 64rem); }
+  .zh-closing__wish { font-size: clamp(5rem, 7.4vw, 7.8rem); }
+  .zh-card { max-width: 34rem; }
+}
+@media (min-width: 600px) {
+  body { background: var(--zh-page); }
+}
+@media print {
+  .zh-hero { height: auto; min-height: 0; } .zh-skip, .zh-open, .zh-again { display: none; }
+}
+
+/* ================================================================ leven in de kaart: goudstof, zegelgloed, avondzon en glans
+   Alles is decoratief (aria-hidden) en beweegt alleen onder .fx-motion: niet bij 'minder beweging' of als de gast op 'Beweging' tikte.
+   Doorlopende animaties volgen --fx-play; geen flitsen. De film zelf blijft ongewijzigd: de lagen liggen erboven. */
+.zh-sec > .zh-fx { --fx-z: 2; }                                    /* boven de foto en de schaduw, onder de tekst */
+/* goud dat opvalt: op de lichte kerk en de ivoren banden verzadigd goud, in de donkere banden licht goud (effects.js leest --fx-* per laag) */
+.zh-scene > .zh-fx { --fx-bg: #E9DFCF; --fx-1: #C08A2E; --fx-2: #E2B865; --fx-3: #9E6F22; }
+.zh-schaduw > .zh-fx { --fx-bg: #221C16; --fx-1: #EBC77C; --fx-2: #F7E2AA; --fx-3: #D8AE5E; --fx-4: #FFF6DE; --fx-page-opacity: 1; }
+.zh-scene > .zh-fx { --fx-z: 3; transition: opacity 1.2s ease-out; }
+.zh-hero:is(.zh-laadt, .zh-speelt):not(.zh-tekst) .zh-fx { opacity: 0; transition: opacity .4s; }   /* tijdens de film alleen de film */
+
+/* de beeldlaag: valt precies over de film (zelfde verhouding en uitsnede als object-fit: cover), zodat fonkelingen op het zegel en het water blijven liggen */
+.zh-beeld { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+@supports (width: 1cqw) {
+  .zh-beeld { inset: auto; left: 50%; top: 45%; width: max(100cqw, 100cqh * 9 / 16); height: max(100cqh, 100cqw * 16 / 9); translate: -50% -45%; }
+}
+/* het zegel gloeit zacht op het eerste beeld (in de film gaat het zegel daarna echt gloeien) */
+.zh-gloed { position: absolute; left: 50%; top: 52.5%; width: 34%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; opacity: 0; mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(255, 226, 150, .55) 0%, rgba(255, 214, 130, .22) 34%, rgba(255, 214, 130, 0) 66%); transition: opacity 1s ease-out; }
+.fx-motion .zh-gate .zh-gloed { opacity: 1; animation: zh-zegel 3.6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes zh-zegel { 0%, 100% { opacity: .45; transform: scale(.9); } 50% { opacity: 1; transform: scale(1.06); } }
+/* avondzon: een warme gloed rechtsboven, waar de zon door de bomen schijnt (alleen op het laatste beeld) */
+.zh-zon { position: absolute; right: -18%; top: 10%; width: 80%; aspect-ratio: 1; border-radius: 50%; opacity: 0; mix-blend-mode: soft-light;
+  background: radial-gradient(circle, rgba(255, 228, 170, .9) 0%, rgba(255, 214, 140, .35) 35%, rgba(255, 214, 140, 0) 68%); transition: opacity 1.6s ease-out; }
+.fx-motion :is(.zh-tekst, .zh-klaar) .zh-zon { opacity: 1; animation: zh-zon 9s ease-in-out infinite alternate; animation-play-state: var(--fx-play, running); }
+@keyframes zh-zon { from { transform: scale(.94); opacity: .7; } to { transform: scale(1.08); opacity: 1; } }
+
+/* de namen: een gouden glans glijdt af en toe over de letters (effects.css, 'folie') */
+.zh-names { --fx-shine: #F6E1A9; }
+.fx-motion.fx-namen-folie .zh-names .fx-shimmer { text-shadow: none; filter: drop-shadow(0 2px 14px rgba(10, 6, 2, .6)); }
+.fx-motion :is(.zh-tekst, .zh-klaar) .zh-names__amp { animation: zh-amp 4.8s ease-in-out 1.5s infinite; animation-play-state: var(--fx-play, running); }
+@keyframes zh-amp { 0%, 100% { text-shadow: 0 2px 24px rgba(10, 6, 2, .6); } 50% { text-shadow: 0 2px 24px rgba(10, 6, 2, .6), 0 0 18px rgba(246, 225, 169, .75); } }
+
+/* gouden scheidingen en roosjes gloeien zacht na */
+.fx-motion :is(.zh-scheiding, .zh-zegeltje, .zh-caption__teken) { animation: zh-gloei 5.5s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .zh-sec:nth-of-type(2n) :is(.zh-scheiding, .zh-zegeltje) { animation-delay: -2.2s; }
+@keyframes zh-gloei { 0%, 100% { filter: drop-shadow(0 0 0 rgba(233, 211, 166, 0)); } 50% { filter: drop-shadow(0 0 7px rgba(233, 211, 166, .85)); } }
+
+/* foto's in de donkere banden bewegen heel langzaam */
+.fx-motion .zh-foto-sec .zh-bg { animation: zh-drijf 26s ease-in-out infinite alternate; animation-play-state: var(--fx-play, running); }
+@keyframes zh-drijf { from { transform: scale(1.02) translate3d(-1%, 0, 0); } to { transform: scale(1.1) translate3d(1.2%, -1.5%, 0); } }
+
+/* avondlicht: drie zachte lichtjes die ademen achter het aftellen */
+.zh-lichtjes { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.zh-lichtjes span { position: absolute; top: -12%; width: 46%; aspect-ratio: 1; border-radius: 50%; translate: -50% 0;
+  background: radial-gradient(circle, rgba(255, 220, 160, .5) 0%, rgba(255, 220, 160, .16) 38%, rgba(255, 220, 160, 0) 68%); }
+.zh-lichtjes span:nth-child(1) { left: 14%; } .zh-lichtjes span:nth-child(2) { left: 50%; top: -20%; width: 60%; } .zh-lichtjes span:nth-child(3) { left: 86%; }
+.fx-motion .zh-lichtjes span { animation: zh-licht 5.2s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .zh-lichtjes span:nth-child(2) { animation-duration: 6.4s; animation-delay: -1.8s; }
+.fx-motion .zh-lichtjes span:nth-child(3) { animation-duration: 5.8s; animation-delay: -3.1s; }
+@keyframes zh-licht { 0%, 100% { opacity: .7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.07); } }
+
+/* de rozetten van het aftellen: een lichtje loopt rond over de gouden rand */
+.zh-count .cd__unit { position: relative; }
+.zh-count .cd__unit::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; pointer-events: none; opacity: 0;
+  background: conic-gradient(from 0deg, rgba(255, 238, 190, 0) 0deg, rgba(255, 238, 190, 0) 300deg, rgba(255, 246, 214, .95) 340deg, rgba(255, 238, 190, 0) 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); }
+.fx-motion .zh-count .cd__unit::after { opacity: 1; animation: zh-rond 6s linear infinite; animation-play-state: var(--fx-play, running); }
+.fx-motion .zh-count .cd__unit:nth-child(2)::after { animation-delay: -1.5s; } .fx-motion .zh-count .cd__unit:nth-child(3)::after { animation-delay: -3s; } .fx-motion .zh-count .cd__unit:nth-child(4)::after { animation-delay: -4.5s; }
+@keyframes zh-rond { to { transform: rotate(1turn); } }
+
+/* het aanmeldkaartje: af en toe een lichtstreep over de gouden lijn bovenaan */
+.zh-card::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 244, 210, 0) 35%, #F6E1A9 50%, rgba(255, 244, 210, 0) 65%, transparent) no-repeat; background-size: 60% 100%; }
+.fx-motion .zh-card::after { opacity: 1; animation: zh-veeg 7s ease-in-out 1s infinite; animation-play-state: var(--fx-play, running); }
+@keyframes zh-veeg { 0%, 60% { background-position: -80% 0; } 100% { background-position: 180% 0; } }
+
+/* fonkelingen: op het eerste beeld op het zegel en de gouden randen van de envelop, op het laatste beeld op het water, het hart en de bloesem */
+.zh-fonkel { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transition: opacity 1s ease-out; }
+.fx-motion .zh-gate .zh-fonkel--envelop, .fx-motion :is(.zh-tekst, .zh-klaar) .zh-fonkel--meer { opacity: 1; }
+.zh-fonkel i { position: absolute; left: var(--x); top: var(--y); width: calc(var(--s) * 1px); aspect-ratio: 1; translate: -50% -50%; opacity: 0;
+  background:
+    radial-gradient(circle, #FFFFFF 0 7%, rgba(255, 240, 200, .95) 13%, rgba(255, 222, 150, .35) 26%, rgba(255, 222, 150, 0) 46%),
+    linear-gradient(90deg, transparent 46.5%, rgba(255, 248, 226, .95) 50%, transparent 53.5%),
+    linear-gradient(0deg, transparent 46.5%, rgba(255, 248, 226, .95) 50%, transparent 53.5%);
+  -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 68%); mask-image: radial-gradient(circle, #000 18%, transparent 68%);
+  filter: drop-shadow(0 0 4px rgba(255, 214, 140, .8)); }
+.fx-motion .zh-fonkel i { animation: zh-fonkel var(--d, 3.6s) ease-in-out var(--dl, 0s) infinite; animation-play-state: var(--fx-play, running); }
+@keyframes zh-fonkel { 0%, 100% { opacity: 0; transform: scale(.25) rotate(0deg); } 45% { opacity: 1; transform: scale(1) rotate(30deg); } 70% { opacity: .15; transform: scale(.5) rotate(45deg); } }
+.zh-hero:is(.zh-laadt, .zh-speelt):not(.zh-tekst) .zh-fonkel { transition: opacity .4s; }

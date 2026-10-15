@@ -71,7 +71,7 @@ class IndelingEnTabel(VaylideTestCase):
         slugs = set(Template.objects.values_list("slug", flat=True))
         self.assertEqual(set(prijzen.INDELING), slugs, "elk ontwerp in de catalogus heeft precies één indeling (en niets anders)")
         tellers = {t: sum(1 for i in prijzen.INDELING.values() if i == t) for t in prijzen.TIERS}
-        self.assertEqual(tellers, {BASIS: 32, LUXE: 14, SPECIAL: 9})
+        self.assertEqual(tellers, {BASIS: 32, LUXE: 14, SPECIAL: 10})
 
     def test_elke_special_vlag_is_een_special_of_bewust_luxe(self):
         vlag = {t.slug for t in Template.objects.filter(special=True)}
@@ -219,6 +219,31 @@ class BestellenEnBetalen(NieuwePrijzen):
             inv.refresh_from_db()
             self.assertTrue(inv.is_published, slug)
             self.assertEqual(c.get(reverse("orders:status", args=[order.uid])).status_code, 200, slug)
+
+    def test_zwanenhart_is_special_en_kost_voor_een_trouwkaart_89_95(self):
+        # Zwanenhart: Special, trouwkaart € 89,95 (bestaand bedrag in de tabel), 12 maanden; geen toeslag of pakketkeuze.
+        klant = self.make_customer("zwanenhart@example.com")
+        inv = vul(self.make_invitation(owner=klant, template="zwanenhart", occasion="bruiloft"), klant)
+        c = Client()
+        c.force_login(klant)
+        html = c.get(reverse("studio:step", args=[inv.uid, "bestellen"])).content.decode()
+        self.assertIn("€ 89,95", html)
+        self.assertIn("12 maanden online", html)
+        for tekst in ("Upgrade", "Extra opties", "Essentieel", "Compleet"):
+            self.assertNotIn(tekst, html, tekst)
+        payment = self.pay(inv, klant)
+        order = Order.objects.get(invitation=inv)
+        self.assertEqual((order.total_cents, payment.amount_cents, order.package_code, order.availability_months), (8995, 8995, SPECIAL, 12))
+        inv.refresh_from_db()
+        self.assertTrue(inv.is_published)
+        self.assertEqual(prijzen.INDELING["zwanenhart"], SPECIAL)
+
+    def test_zwanenhart_houdt_de_bestaande_special_prijzen_per_gelegenheid(self):
+        # Bruiloft € 89,95, verloving en jubileum € 69,00, allemaal Special en 12 maanden; geen nieuw prijspunt in de tabel.
+        verwacht = {"bruiloft": 8995, "verloving": 6900, "jubileum": 6900}
+        for gelegenheid, cents in verwacht.items():
+            info = prijzen.prijs_info(ontwerp("zwanenhart"), gelegenheid)
+            self.assertEqual((info["tier"], info["cents"], info["maanden"]), (SPECIAL, cents, 12), gelegenheid)
 
     def test_wenskaart_krijgt_de_prijs_uit_dezelfde_tabel(self):
         owner = self.make_customer()

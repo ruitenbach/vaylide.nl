@@ -1189,3 +1189,9 @@ Zie `docs/KERSTFILMKAARTEN.md`. Uitgevoerd:
 - Hele suite: 1005 tests geslaagd (1 overgeslagen).
 - Niet gedaan: Safari op een iPhone, Firefox, een echte telefoon, `e2e/toegankelijkheid.cjs` en `e2e/effecten.cjs` opnieuw voor v2.
 - Kerstbal v2, rustigere kaart (lokaal): timing gemeten per beeld (kaart, omslag, kaartvlak) op 390 px; verminderde beweging (opent na ± 0,4 s), geblokkeerde video (opent na ± 6,0 s), zonder JavaScript, 360x640, 768x1024 en liggend: geen fouten. Hele suite 1005 geslaagd. Niet gedaan: axe/effecten opnieuw, echte telefoon, Safari, Firefox.
+
+### Zwanenhart (15 oktober 2026, lokaal, `VIERLIEF_PRICING_V2=1`)
+
+- Hele suite: 1027 tests geslaagd (1 overgeslagen), met een bestel- en publicatietest: Special, € 89,95, 12 maanden, geen pakketkeuze of toeslag. `controleer_prijzen` klopt.
+- In Chromium op 390 px (met een VP9-kopie van de film, want H.264 speelt niet af): fasen van de opening, desktop 1366 px, verminderde beweging, geblokkeerde film (eindbeeld na ± 6 s), zonder JavaScript, toetsenbord, 360x640 en 768x1024; studio-voorbeeld, bestelstap, testbetaling, publicatie en gast met extreme namen (tags worden als tekst getoond). `e2e/toegankelijkheid.cjs`: 0 bevindingen (dicht en open).
+- Niet gedaan: echte telefoon, Safari, Firefox, H.264 in een browser, `e2e/effecten.cjs`, het filmpje beluisterd (is stil).

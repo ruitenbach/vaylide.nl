@@ -54,7 +54,7 @@ GELEGENHEID_RIJ = {
 INDELING = {
     # Special
     "aurora-nocturne": SPECIAL, "balzaal": SPECIAL, "gouden-avond": SPECIAL, "kerstbol": SPECIAL, "kerstkaart": SPECIAL, "kerststad": SPECIAL,
-    "midnight-emeraude": SPECIAL, "rose-royale": SPECIAL, "strandboog": SPECIAL,
+    "midnight-emeraude": SPECIAL, "rose-royale": SPECIAL, "strandboog": SPECIAL, "zwanenhart": SPECIAL,
     # Luxe (Golden Noël heeft de Special-vlag, maar is een elegante enveloppe zonder eigen film of scène en staat kwalitatief naast Winterlicht: Luxe)
     "golden-noel": LUXE, "aan-tafel": LUXE, "avondgoud": LUXE, "eerste-dans": LUXE, "gloria": LUXE, "liefde-op-papier": LUXE,
     "middernacht": LUXE, "puur-moment": LUXE, "voor-altijd": LUXE, "winterlicht": LUXE,
