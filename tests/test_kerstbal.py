@@ -37,7 +37,7 @@ class KerstbalDesignTests(VaylideTestCase):
             content["headline"] = headline
         v = build_view(occasion=occasion, content=content, overrides={}, template_version=template.current_version,
                        options=RenderOptions(mode="demo", now=now, music_synth=True))
-        return v, render_to_string("kerstbal/v1/invitation.html", {"v": v, "rsvp_form": {}})
+        return v, render_to_string(template.current_version.template_path, {"v": v, "rsvp_form": {}})
 
     def test_manifest_palette_effects_and_readable_colours(self):
         data = self.manifest()
@@ -65,7 +65,7 @@ class KerstbalDesignTests(VaylideTestCase):
         html = response.content.decode()
         for fragment in (
             'class="cover kb-cover" data-cover', 'class="kb-ball fx-pulse" data-open', "Tik op de kerstbal", "Warme kerstgroeten",
-            "designs/kerstbal/v1/img/kerstbal.webm", "designs/kerstbal/v1/img/kerstbal.mp4", "Familie Van Dijk",
+            "designs/kerstbal/v2/img/kerstbal.webm", "designs/kerstbal/v2/img/kerstbal.mp4", "Familie Van Dijk",
             "Sanne, Daan, Lotte en Siem", "Programma", "Locatie", "Ben jij erbij?", "data-rsvp", 'data-music-synth="stille-nacht"',
             "Digitale kerstkaart gemaakt met",
         ):
@@ -74,7 +74,7 @@ class KerstbalDesignTests(VaylideTestCase):
         self.assertIn(f"<script>{BOOT_SCRIPT}</script>", html)
         self.assertNotIn("<style", html)
         self.assertNotIn("kaart.invalid", html)
-        self.assertLess(html.index("designs/kerstbal/v1/kerstbal.js"), html.index("invitations/invite.js"))
+        self.assertLess(html.index("designs/kerstbal/v2/kerstbal.js"), html.index("invitations/invite.js"))
 
     def test_film_is_silent_decorative_and_starts_only_after_a_tap(self):
         html = read("invitation.html")
@@ -157,3 +157,19 @@ class KerstbalV2Tests(VaylideTestCase):
                        options=RenderOptions(mode="demo", music_synth=True))
         out = render_to_string("kerstbal/v2/invitation.html", {"v": v, "rsvp_form": {}})
         self.assertIn("kb-sheet", out)
+
+    def test_v2_is_the_chosen_version_for_new_customers_and_v1_is_kept(self):
+        from catalog.seed import sync_designs
+        template = Template.objects.get(slug="kerstbal")
+        self.assertEqual(template.current_version.number, 2)
+        self.assertEqual(sorted(template.versions.values_list("number", flat=True)), [1, 2])
+        self.assertEqual(template.versions.get(number=1).template_path, "kerstbal/v1/invitation.html")
+        html = Client().get("/voorbeeld/kerstbal/").content.decode()
+        self.assertIn("designs/kerstbal/v2/", html)
+        self.assertNotIn("designs/kerstbal/v1/", html)
+        # een keuze van de beheerder blijft staan bij een nieuwe sync
+        template.current_version = template.versions.get(number=1)
+        template.save(update_fields=["current_version"])
+        sync_designs()
+        template.refresh_from_db()
+        self.assertEqual(template.current_version.number, 1)

@@ -149,6 +149,7 @@ def sync_designs(update_existing_manifest: bool = False) -> list[str]:
     from .models import Template, TemplateVersion
 
     messages = []
+    nieuw = set()    # ontwerpen die in deze ronde zijn aangemaakt
     for path, data in design_manifests():
         slug = data["slug"]
         number = int(data["version"])
@@ -167,6 +168,7 @@ def sync_designs(update_existing_manifest: bool = False) -> list[str]:
             },
         )
         if created:
+            nieuw.add(slug)
             messages.append(f"Ontwerp aangemaakt: {template.name}")
         version, v_created = TemplateVersion.objects.get_or_create(
             template=template,
@@ -190,7 +192,9 @@ def sync_designs(update_existing_manifest: bool = False) -> list[str]:
             version.renderer = renderer
             version.save(update_fields=["manifest", "renderer"])
             messages.append(f"Manifest bijgewerkt (ontwikkelmodus): {template.name} v{number}")
-        if template.current_version_id is None:
+        # Een nieuw ontwerp dat meteen met meer versies binnenkomt (bijvoorbeeld Kerstbal v1 en v2) krijgt de nieuwste als gekozen versie voor nieuwe klanten.
+        # Bij een bestaand ontwerp verandert dit niets: daar kiest de beheerder de versie (Beheer, Ontwerpen).
+        if template.current_version_id is None or (slug in nieuw and number > template.current_version.number):
             template.current_version = version
             template.save(update_fields=["current_version"])
     return messages
