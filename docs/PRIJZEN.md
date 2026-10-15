@@ -49,4 +49,10 @@ Terugdraaien: zet `VIERLIEF_PRICING_V2` uit (of verwijder de variabele) en laat 
 
 ## Wat bewust niet is aangepast
 
-De algemene voorwaarden (artikel 6: Essentieel 6 en Compleet 12 maanden) en de privacyverklaring noemen de oude pakketten en duren nog; de aangepaste tekst (12 maanden voor alle kaarten, met overgangsregel voor bestaande bestellingen) ligt ter goedkeuring bij de eigenaar en wordt pas daarna als nieuwe versie van de voorwaarden doorgevoerd (`core/voorwaarden.py`). Een handmatige correctieronde bij Special wordt niet beloofd. Geen nieuwe gelegenheden of ontwerpen. Beheer → Prijzen toont bij een actieve schakelaar alleen de nieuwe structuur (lezen); de oude pakketten daar gelden dan niet voor nieuwe bestellingen.
+De algemene voorwaarden (artikel 6: Essentieel 6 en Compleet 12 maanden) en de privacyverklaring noemen de oude pakketten en duren nog; de aangepaste volledige teksten (12 maanden voor alle kaarten, met overgangsregel voor bestaande bestellingen) staan als concept in `docs/concept-juridisch/` (door de eigenaar als concept goedgekeurd op 15 oktober 2026, nog niet juridisch beoordeeld) en worden pas na de livegangbeslissing als nieuwe versie van de voorwaarden doorgevoerd (`core/voorwaarden.py`). Daar staat ook welke bedrijfsgegevens de eigenaar nog moet bevestigen. Een handmatige correctieronde bij Special wordt niet beloofd. Geen nieuwe gelegenheden of ontwerpen. Beheer → Prijzen toont bij een actieve schakelaar alleen de nieuwe structuur (lezen); de oude pakketten daar gelden dan niet voor nieuwe bestellingen.
+
+## Bestaande bestellingen en concepten
+
+- Een bestelling legt bij het starten van de betaling vast: pakket, prijs, maanden online, het moment van akkoord en de versie van de voorwaarden (`terms_version`, ook bij maatwerk). Een latere wijziging van prijzen, schakelaar of voorwaarden raakt die bestelling niet; de einddatum staat vast in `ends_at`.
+- Een concept zonder bestelling valt na het aanzetten van de schakelaar onder de nieuwe prijzen en voorwaarden, ook als het ooit met Essentieel of Compleet is begonnen.
+- De editor toont alleen voor kaarten die nieuw of in de nieuwe structuur besteld zijn "Inbegrepen" (`studio.pakket.nieuwe_prijsstructuur`); een kaart uit de oude structuur houdt de teksten van zijn eigen pakket. Tests: `tests/test_prijsstructuur.py`, klasse `BestaandeBestellingen`.

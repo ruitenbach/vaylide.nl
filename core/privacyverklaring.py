@@ -184,7 +184,7 @@ def suppliers() -> list[dict]:
             "gegevens": "Gebruiksgegevens van je bezoek: je IP-adres (dat Google Analytics tijdens de verwerking gebruikt om onder meer globale locatiegegevens af te leiden; voor gebruikers in de EU/EER registreert of bewaart Google Analytics het afzonderlijke IP-adres niet), welke pagina's je bekijkt "
                         "(met het adres zonder de codes van je ontwerp of bestelling), hoe diep je scrolt, op welke uitgaande links je klikt, "
                         "je apparaat, browser en globale locatie, de pagina waar je vandaan komt en een willekeurig bezoekers-id in een cookie. "
-                        "Bij vijf stappen van het samenstellen en bestellen sturen we ook het gekozen ontwerp, de gelegenheid, het pakket en "
+                        "Bij vijf stappen van het samenstellen en bestellen sturen we ook het gekozen ontwerp, de gelegenheid, het gekozen pakket of de gekozen indeling en "
                         "het bedrag mee. Namen, e-mailadressen, telefoonnummers, adressen, teksten van je kaart en gegevens van gasten gaan "
                         "nooit mee.",
             "rol": "Verwerker (volgens de gegevensverwerkingsvoorwaarden van Google Analytics)",

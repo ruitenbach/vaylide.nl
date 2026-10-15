@@ -67,6 +67,21 @@ class WishFlowTests(VaylideTestCase):
         req.refresh_from_db()
         self.assertEqual(req.status, CustomRequest.Status.DONE)
 
+    def test_een_maatwerkbestelling_legt_de_geldende_voorwaardenversie_vast(self):
+        """Artikel 16: voor je bestelling geldt de versie die gold bij het akkoord. Dat geldt ook voor maatwerk, en een latere nieuwe versie raakt de bestelling niet."""
+        from unittest import mock
+
+        from core.voorwaarden import CURRENT
+
+        req = self.create()
+        self.staff.post(f"/beheer/wensen/{req.uid}/", {"actie": "voorstel", "text": "We maken een tweetalige versie.", "price": "35.00"})
+        self.assertEqual(self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord"}).status_code, 302)
+        order = Order.objects.get(kind=Order.Kind.CUSTOM)
+        self.assertEqual(order.terms_version, CURRENT)
+        with mock.patch("orders.services.TERMS_VERSION", "2099-01-01"):
+            order.refresh_from_db()
+            self.assertEqual(order.terms_version, CURRENT, "een nieuwere versie verandert de vastgelegde versie van een bestaande bestelling niet")
+
     def test_free_proposal_starts_after_agreement(self):
         req = self.create()
         self.staff.post(f"/beheer/wensen/{req.uid}/", {"actie": "voorstel", "text": "Dat kan kosteloos.", "price": ""})

@@ -187,3 +187,15 @@ class RetentionCleanupTests(VaylideTestCase):
         self.assertGreaterEqual(report["verwijderde_cachewaarden"], 1)
         self.assertTrue(Session.objects.filter(session_key="nieuw" * 6).exists())
         self.assertEqual(cache.get("rl:test-geldig"), 1)
+
+
+class AnalyticsTekstTests(VaylideTestCase):
+    @override_settings(GTM_ID="GTM-TEST123")
+    def test_de_analyticstekst_noemt_geen_pakket_dat_in_de_nieuwe_structuur_niet_bestaat(self):
+        """De gebeurtenissen sturen de code van het pakket of de indeling mee; de tekst noemt allebei, ongeacht de prijsschakelaar."""
+        tekst = [r for r in pv.suppliers() if "Google Analytics" in r["dienst"]][0]["gegevens"]
+        self.assertIn("het gekozen pakket of de gekozen indeling", tekst)
+        for flag in (False, True):
+            with override_settings(PRICING_V2=flag):
+                html = Client().get("/privacy/").content.decode()
+                self.assertIn("het gekozen pakket of de gekozen indeling", html)

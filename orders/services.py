@@ -137,6 +137,7 @@ def create_custom_order(custom_request, *, user) -> Order:
         custom_request=custom_request,
         total_cents=custom_request.proposal_price_cents or 0,
         terms_accepted_at=timezone.now(),
+        terms_version=TERMS_VERSION,    # de versie die gold op het moment van akkoord; artikel 16 van de voorwaarden
         test_mode=settings.TEST_MODE,
     )
     OrderLine.objects.create(
