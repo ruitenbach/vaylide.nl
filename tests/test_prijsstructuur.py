@@ -295,6 +295,88 @@ class BestaandeBestellingen(VaylideTestCase):
         self.assertEqual(Order.objects.get(invitation=nieuw).total_cents, 5995)
 
 
+    def test_de_editor_belooft_een_oude_klant_geen_onderdelen_die_niet_in_zijn_bestelling_zitten(self):
+        """Een kaart die in de oude structuur is besteld (Essentieel) houdt zijn eigen voorwaarden: ook met de nieuwe prijzen aan staat er in de editor
+        niet 'Inbegrepen' bij onderdelen die hij niet kocht. Een nieuwe of nog niet bestelde kaart ziet wel 'Inbegrepen'."""
+        owner = self.make_customer()
+        oud = self.make_invitation(owner=owner, template="liefde-op-papier", occasion="bruiloft")
+        with override_settings(PRICING_V2=False):
+            self.pay(oud, owner, package="essentieel")
+        nieuw = self.make_invitation(owner=owner, template="liefde-op-papier", occasion="bruiloft")
+        c = Client()
+        c.force_login(owner)
+        with V2:
+            tekst_oud = c.get(reverse("studio:step", args=[oud.uid, "fotos"])).content.decode()
+            tekst_nieuw = c.get(reverse("studio:step", args=[nieuw.uid, "fotos"])).content.decode()
+        self.assertNotIn("Inbegrepen", tekst_oud)
+        self.assertNotIn("Dit zit in de prijs van je kaart", tekst_oud)
+        self.assertIn("Inbegrepen", tekst_nieuw)
+
+
+    def _editorteksten(self, client, inv):
+        """Wat de editor over de onderdelen belooft: de labels en de uitleg bij eigen muziek, per stap."""
+        teksten = {}
+        for stap in ("fotos", "aanmelden", "stijl"):
+            html = client.get(reverse("studio:step", args=[inv.uid, stap])).content.decode()
+            teksten[stap] = (re.findall(r'<span class="badge">([^<]*)</span>', html), re.findall(r'class="info__tekst"[^>]*>([^<]*)<', html))
+        return teksten
+
+    def _oude_bestelling_blijft_gelijk(self, inv, owner, code):
+        order = Order.objects.get(invitation=inv)
+        inv.refresh_from_db()
+        voor = (order.total_cents, order.package_code, order.package_name, order.availability_months, sorted(order.features), order.ends_at,
+                sorted(inv.features or []), [(l.code, l.unit_price_cents, l.total_cents) for l in order.lines.all()])
+        c = Client()
+        c.force_login(owner)
+        editor_voor = self._editorteksten(c, inv)
+        with V2:
+            order.refresh_from_db()
+            inv.refresh_from_db()
+            na = (order.total_cents, order.package_code, order.package_name, order.availability_months, sorted(order.features), order.ends_at,
+                  sorted(inv.features or []), [(l.code, l.unit_price_cents, l.total_cents) for l in order.lines.all()])
+            editor_na = self._editorteksten(c, inv)
+        self.assertEqual(voor, na, "functies, rechten, prijs en looptijd van de bestelling zijn niet veranderd")
+        self.assertEqual(order.package_code, code)
+        self.assertEqual(editor_voor, editor_na, "de editor zegt met de nieuwe prijzen aan hetzelfde als daarvoor")
+        for stap, (labels, uitleg) in editor_na.items():
+            self.assertNotIn("Inbegrepen", labels, stap)
+            self.assertFalse(any("zit in de prijs van je kaart" in u for u in uitleg), stap)
+        return voor, editor_na
+
+    def test_een_bestaande_compleet_bestelling_behoudt_functies_rechten_en_looptijd(self):
+        owner = self.make_customer()
+        inv = self.make_invitation(owner=owner, template="liefde-op-papier", occasion="bruiloft")
+        with override_settings(PRICING_V2=False):
+            self.pay(inv, owner, package="compleet")
+        inv.package_code = "compleet"
+        inv.save(update_fields=["package_code"])
+        voor, editor = self._oude_bestelling_blijft_gelijk(inv, owner, "compleet")
+        self.assertTrue(any(labels for labels, _ in editor.values()), "de editor toont labels (de controle is niet leeg)")
+        self.assertEqual(voor[3], 12, "Compleet blijft 12 maanden online")
+        self.assertTrue({"gallery", "music", "story", "extra_questions"} <= set(voor[4]), "de functies van Compleet blijven bestaan")
+        c = Client()
+        c.force_login(owner)
+        with V2:
+            self.assertIn("In Compleet", c.get(reverse("studio:step", args=[inv.uid, "fotos"])).content.decode())
+
+    def test_een_bestaande_wenskaart_behoudt_functies_rechten_en_looptijd(self):
+        from invitations.services import save_draft
+
+        owner = self.make_customer()
+        inv = create_draft(occasion="bruiloft", template=ontwerp("liefde-op-papier"), owner=owner, soort="wenskaart")
+        content = dict(inv.draft_content)
+        content["welcome_text"] = "Gefeliciteerd!"
+        content["names"] = {"partner_1": "Anna", "partner_2": "Bram"}
+        inv = save_draft(inv, expected_rev=None, content=content, user=owner)
+        with override_settings(PRICING_V2=False):
+            self.pay(inv, owner)
+        order = Order.objects.get(invitation=inv)
+        self.assertFalse(order.package_code.startswith(("basis", "luxe", "special")), "dit is een wenskaart uit de oude structuur")
+        voor, _ = self._oude_bestelling_blijft_gelijk(inv, owner, order.package_code)
+        self.assertEqual(voor[3], 6, "een oude wenskaart blijft 6 maanden online")
+        self.assertFalse({"gallery", "music", "story", "extra_questions"} & set(voor[4]), "een wenskaart kreeg geen extra functies")
+
+
 class Pagina(NieuwePrijzen):
     def test_ontwerppagina_toont_indeling_en_prijs_per_gelegenheid(self):
         c = Client()

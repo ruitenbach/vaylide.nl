@@ -176,10 +176,11 @@ def _context(request, inv: Invitation, step: str, **extra) -> dict:
     }
     if step in ("fotos", "stijl", "aanmelden"):
         gekozen = pakket.chosen_package(inv)
-        ctx["feature_badges"] = pakket.feature_badges(gekozen)
+        nieuw = pakket.nieuwe_prijsstructuur(inv)
+        ctx["feature_badges"] = pakket.feature_badges(gekozen, nieuw)
         if step == "fotos":
             track = (inv.template_version.manifest or {}).get("music")
-            ctx["muziek_uitleg"] = pakket.muziek_uitleg(gekozen, ontwerp_muziek=isinstance(track, dict) and bool(track.get("src")))
+            ctx["muziek_uitleg"] = pakket.muziek_uitleg(gekozen, ontwerp_muziek=isinstance(track, dict) and bool(track.get("src")), nieuw=nieuw)
     if step in ("gegevens", "stijl"):
         ctx["eigen_opening"] = _eigen_opening(inv)
     if step == "gegevens":

@@ -25,11 +25,21 @@ def chosen_package(invitation, packages: list[Package] | None = None) -> Package
     return next((p for p in packages if p.code == invitation.package_code), None)
 
 
-def feature_badges(package: Package | None) -> dict[str, str]:
+def nieuwe_prijsstructuur(invitation) -> bool:
+    """Geldt voor deze kaart de nieuwe prijsstructuur? Alleen als de schakelaar aan staat én de kaart nog niet is besteld of is besteld in de nieuwe
+    structuur. Een bestelling uit de oude structuur (Essentieel, Compleet) houdt zijn eigen voorwaarden: daar tonen de teksten wat die klant kocht."""
+    if not prijzen.actief():
+        return False
+    bestelling = invitation.orders.filter(kind="invitation", status="paid").order_by("-paid_at", "-pk").first()
+    return bestelling is None or bestelling.package_code.split("-")[0] in prijzen.TIERS
+
+
+def feature_badges(package: Package | None, nieuw: bool | None = None) -> dict[str, str]:
     """Het label bij verhaal, galerij, muziek en extra vragen in de editor."""
+    nieuw = prijzen.actief() if nieuw is None else nieuw
     badges = {}
     for feature in FEATURE_STEPS:
-        if prijzen.actief():
+        if nieuw:
             badges[feature] = "Inbegrepen"     # nieuwe prijsstructuur: alles wat je kunt personaliseren zit in de prijs van het ontwerp
         elif package is None:
             badges[feature] = "Compleet of extra optie"
@@ -57,9 +67,10 @@ def looptijd_uitleg(packages: list[Package], wenskaart_pakket: Package | None = 
     return f"Met {eerste.name} blijft je kaart {eerste.availability_months} maanden online. {overige}, {vanaf}."
 
 
-def muziek_uitleg(package: Package | None, ontwerp_muziek: bool) -> str:
+def muziek_uitleg(package: Package | None, ontwerp_muziek: bool, nieuw: bool | None = None) -> str:
     """De uitleg bij eigen muziek, met de prijs uit Beheer (dezelfde AddOn als op de rekening). Leeg als eigen muziek niet kan."""
-    if prijzen.actief():
+    nieuw = prijzen.actief() if nieuw is None else nieuw
+    if nieuw:
         prijs = "Dit zit in de prijs van je kaart, zonder extra kosten."
     elif package is not None and "music" in (package.features or []):
         prijs = f"In {package.name} zit dit erbij, zonder extra kosten."
