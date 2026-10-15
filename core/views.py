@@ -10,7 +10,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from catalog.assets import design_image_url
-from catalog import wenskaart
+from types import SimpleNamespace
+
+from catalog import prijzen, wenskaart
 from catalog.models import AddOn, Package, Template, format_euro
 from catalog.specials import is_special, special_prijszin
 from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, collectie_volgorde, occasion_config
@@ -77,7 +79,7 @@ def home(request):
             "tiles": OCCASION_TILES,
             "steps": STEPS_SHORT,
             "features": HOME_FEATURES,
-            "from_price": cheapest.price_display if cheapest else "",
+            "from_price": format_euro(prijzen.vanaf_cents()) if prijzen.actief() else (cheapest.price_display if cheapest else ""),
             "config": SiteConfig.get(),
             "jsonld": [seo.organization(), seo.website()],
         },
@@ -92,8 +94,11 @@ def wedding_cards(request):
     featured = [by_slug[s] for s in TROUW_UITGELICHT if s in by_slug]
     packages = list(Package.objects.filter(is_active=True))
     prices = {p.code: p.price_display for p in packages}
-    faq = [(q, a.format(essentieel=prices.get("essentieel", ""), compleet=prices.get("compleet", ""), special_zin=special_prijszin())) for q, a in TROUW_FAQ]
-    cheapest = min(packages, key=lambda p: p.price_cents) if packages else None
+    faq = [(q, a.format(essentieel=prices.get("essentieel", ""), compleet=prices.get("compleet", ""), special_zin=special_prijszin(), **{k: v for k, v in prijzen.tekst_kwargs("bruiloft").items() if prijzen.actief() and k not in ("essentieel", "compleet", "special_zin")})) for q, a in TROUW_FAQ]
+    if prijzen.actief():   # de prijskaarten tonen de indelingen waarvoor een trouwontwerp bestaat, met het vaste bedrag van een trouwuitnodiging
+        packages = [SimpleNamespace(name=prijzen.TIER_NAAM[i], price_display=format_euro(c), description=prijzen.BESCHRIJVING[i], availability_months=prijzen.MAANDEN_ONLINE[i], is_featured=i == prijzen.LUXE)
+                    for i, c in prijzen.beschikbaar("bruiloft")]
+    cheapest = min(packages, key=lambda p: p.price_cents) if packages and not prijzen.actief() else None
     path = reverse("core:wedding_cards")
     return render(
         request,
@@ -107,7 +112,7 @@ def wedding_cards(request):
             "steps": STEPS_SHORT,
             "packages": packages,
             "faq": faq,
-            "from_price": cheapest.price_display if cheapest else "",
+            "from_price": (packages[0].price_display if packages else "") if prijzen.actief() else (cheapest.price_display if cheapest else ""),
             "config": SiteConfig.get(),
             "jsonld": [seo.breadcrumbs([("Home", "/"), ("Digitale trouwkaarten", path)]), seo.faq_page(faq)],
         },
@@ -125,6 +130,8 @@ def christmas_cards(request):
     packages = {p.code: p.price_display for p in Package.objects.filter(is_active=True)}
     antwoorden = dict(wens=format_euro(wenskaart.PRIJS_CENTS), wens_special=format_euro(wenskaart.PRIJS_SPECIAL_CENTS),
                       essentieel=packages.get("essentieel", ""), compleet=packages.get("compleet", ""))
+    if prijzen.actief():
+        antwoorden = {**antwoorden, **prijzen.tekst_kwargs("kerst")}
     faq = [(q, a.format(**antwoorden)) for q, a in KERST_FAQ]
     familie = _design_cards(kies([KERST_FAMILIE]), "kerst")
     path = reverse("core:christmas_cards")
@@ -146,6 +153,7 @@ def christmas_cards(request):
                 ("versturen", "Deel de kaart", "Na je betaling een eigen link en QR-code, om te delen via WhatsApp of e-mail."),
             ],
             "wens_prijs": antwoorden["wens"],
+            "prijsvoet": prijzen.zin("kerst") if prijzen.actief() else "",
             "wens_prijs_special": antwoorden["wens_special"],
             "essentieel_prijs": antwoorden["essentieel"],
             "faq": faq,
@@ -164,7 +172,7 @@ def birthday_invitations(request):
         return [by_slug[s] for s in slugs if s in by_slug]
 
     packages = {p.code: p.price_display for p in Package.objects.filter(is_active=True)}
-    faq = [(q, a.format(essentieel=packages.get("essentieel", ""), compleet=packages.get("compleet", ""))) for q, a in VERJAARDAG_FAQ]
+    faq = [(q, a.format(**({"essentieel": packages.get("essentieel", ""), "compleet": packages.get("compleet", "")} if not prijzen.actief() else prijzen.tekst_kwargs("verjaardag")))) for q, a in VERJAARDAG_FAQ]
     soorten = []
     for slug, titel, tekst in VERJAARDAG_SOORTEN:
         kaart = _design_cards(kies([slug]), "verjaardag")
@@ -191,6 +199,7 @@ def birthday_invitations(request):
             ],
             "essentieel_prijs": packages.get("essentieel", ""),
             "compleet_prijs": packages.get("compleet", ""),
+            "prijsvoet": prijzen.zin("verjaardag") if prijzen.actief() else "",
             "faq": faq,
             "config": SiteConfig.get(),
             "jsonld": [seo.breadcrumbs([("Home", "/"), ("Digitale verjaardagsuitnodigingen", path)]), seo.faq_page(faq)],
@@ -207,7 +216,7 @@ def business_invitations(request):
         return [by_slug[s] for s in slugs if s in by_slug]
 
     packages = {p.code: p.price_display for p in Package.objects.filter(is_active=True)}
-    faq = [(q, a.format(essentieel=packages.get("essentieel", ""), compleet=packages.get("compleet", ""))) for q, a in ZAKELIJK_FAQ]
+    faq = [(q, a.format(**({"essentieel": packages.get("essentieel", ""), "compleet": packages.get("compleet", "")} if not prijzen.actief() else prijzen.tekst_kwargs("zakelijk")))) for q, a in ZAKELIJK_FAQ]
     path = reverse("core:business_invitations")
     return render(
         request,
@@ -229,6 +238,7 @@ def business_invitations(request):
             ],
             "essentieel_prijs": packages.get("essentieel", ""),
             "compleet_prijs": packages.get("compleet", ""),
+            "prijsvoet": prijzen.zin("zakelijk") if prijzen.actief() else "",
             "faq": faq,
             "config": SiteConfig.get(),
             "jsonld": [seo.breadcrumbs([("Home", "/"), ("Digitale zakelijke uitnodigingen", path)]), seo.faq_page(faq)],
@@ -244,8 +254,12 @@ def make_invitation(request):
         return _design_cards([ontwerpen[slug]], gelegenheid)[0] if slug in ontwerpen else None
 
     packages = {p.code: p.price_display for p in Package.objects.filter(is_active=True)}
-    prijzen = dict(essentieel=packages.get("essentieel", ""), compleet=packages.get("compleet", ""), wens=format_euro(wenskaart.PRIJS_CENTS), special_zin=special_prijszin())
-    faq = [(q, a.format(**prijzen)) for q, a in UM_FAQ]
+    prijzen_mod = prijzen
+    prijzen_actief_um = prijzen_mod.actief()
+    prijzen_kw = dict(essentieel=packages.get("essentieel", ""), compleet=packages.get("compleet", ""), wens=format_euro(wenskaart.PRIJS_CENTS), special_zin=special_prijszin())
+    if prijzen_actief_um:
+        prijzen_kw = {**prijzen_kw, **prijzen_mod.tekst_kwargs("")}
+    faq = [(q, a.format(**prijzen_kw)) for q, a in UM_FAQ]
     kop = [{"label": label, "card": kaart(slug, key)} for key, label, slug in UM_KOP if slug in ontwerpen]
     routes = [{"label": label, "url": reverse(hub), "card": kaart(slug, key), "tekst": tekst} for key, label, hub, slug, tekst in UM_ROUTES if slug in ontwerpen]
     alle = {"bruiloft": "Alle trouwontwerpen", "verjaardag": "Alle verjaardagsontwerpen", "kerst": "Alle kerstontwerpen", "zakelijk": "Alle zakelijke ontwerpen"}
@@ -262,11 +276,12 @@ def make_invitation(request):
             "stappen": UM_STAPPEN,
             "delen": UM_DELEN_GEBRUIK,
             "voorbeelden": voorbeelden,
-            "waarom": [(t, x.format(**prijzen)) for t, x in UM_WAAROM],
+            "waarom": [(t, x.format(**prijzen_kw)) for t, x in UM_WAAROM],
+            "prijsvoet": ("Basis vanaf {vanaf}, Luxe vanaf {vanaf_luxe}, Special vanaf {vanaf_special}, incl. btw en eenmalig.".format(**prijzen_kw)) if prijzen_actief_um else "",
             "design_count": len(ontwerpen),
             "faq": faq,
-            "essentieel_prijs": prijzen["essentieel"],
-            "compleet_prijs": prijzen["compleet"],
+            "essentieel_prijs": prijzen_kw["essentieel"],
+            "compleet_prijs": prijzen_kw["compleet"],
             "config": SiteConfig.get(),
             "jsonld": [seo.breadcrumbs([("Home", "/"), ("Digitale uitnodiging maken", path)]), seo.faq_page(faq)],
         },
@@ -333,6 +348,8 @@ def design_detail(request, slug):
         for key, label in (("uitnodiging", "Uitnodiging"), ("wenskaart", "Wenskaart"))
     ]
     wenskaart_prijs = format_euro(wenskaart.prijs_cents(template))
+    prijs_u, prijs_w = prijzen.prijs_info(template, occasion, ""), prijzen.prijs_info(template, occasion, "wenskaart")
+    prijs_nu = prijs_w if soort == "wenskaart" else prijs_u
     extra = f"&soort={soort}" if soort else ""
     palettes = [
         {**p, "url": f"?gelegenheid={occasion}&kleur={p.get('key')}{extra}", "current": p.get("key") == kleur}
@@ -351,6 +368,10 @@ def design_detail(request, slug):
             "soorten": soorten,
             "wenskaart_prijs": wenskaart_prijs,
             "wenskaart_special": is_special(template),
+            "prijs_v2": prijzen.actief(),
+            "prijs_nu": prijs_nu if prijzen.actief() else None,
+            "prijs_uitnodiging": prijs_u["label"] if prijs_u else "",
+            "prijs_wenskaart": prijs_w["label"] if prijs_w else "",
             "occasion_choices": [(k, OCCASION_LABELS[k]) for k in template.occasions if k in OCCASION_LABELS],
             "demo_url": f"{reverse('invitations:demo', args=[slug])}?gelegenheid={occasion}&kleur={kleur}{extra}",
             "start_url": f"{reverse('studio:start')}?ontwerp={slug}&gelegenheid={occasion}&kleur={kleur}{extra}&direct=1",
@@ -383,6 +404,9 @@ def pricing(request):
             "wenskaart_prijs": format_euro(wenskaart.PRIJS_CENTS),
             "wenskaart_prijs_special": format_euro(wenskaart.PRIJS_SPECIAL_CENTS),
             "wenskaart_punten": wenskaart.HIGHLIGHTS,
+            "prijs_v2": prijzen.actief(),
+            "tabel": prijzen.overzicht_tabel() if prijzen.actief() else [],
+            "tiers": [{"tier": t, "naam": prijzen.TIER_NAAM[t], "beschrijving": prijzen.BESCHRIJVING[t], "punten": prijzen.highlights(t)[1:]} for t in prijzen.TIERS] if prijzen.actief() else [],
         },
     )
 

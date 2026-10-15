@@ -16,7 +16,7 @@ from django.db import IntegrityError, transaction
 from django.urls import reverse
 from django.utils import timezone
 
-from catalog import wenskaart
+from catalog import prijzen, wenskaart
 from catalog.models import Package
 from core.voorwaarden import CURRENT as TERMS_VERSION, DELIVERY_CONSENT, SERVICE_CONSENT
 from invitations.content import publish_issues
@@ -78,7 +78,11 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
         blocking = [i for i in publish_issues(invitation.draft_content, invitation.occasion, first_publication=True) if i.blocking]
         if blocking:
             raise CheckoutError("Je uitnodiging is nog niet compleet: " + " ".join(i.message for i in blocking))
-        if wenskaart.is_wenskaart(invitation.draft_content):
+        if prijzen.actief():
+            # Nieuwe prijsstructuur: één prijs uit het ontwerp en de gelegenheid; een meegestuurd pakket of extra optie telt niet.
+            quote = build_quote(invitation.draft_content, None, None, template_version=invitation.template_version, occasion=invitation.occasion)
+            package = quote.package
+        elif wenskaart.is_wenskaart(invitation.draft_content):
             # Een wenskaart heeft één vaste prijs; een meegestuurd pakket of extra optie telt niet.
             quote = build_wenskaart_quote(invitation.draft_content, invitation.template_version)
             package = quote.package

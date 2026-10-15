@@ -38,7 +38,7 @@
     {% endif %}
   {% else %}
     <div class="step-actions step-actions--bar step-actions--cta">
-      <a class="btn btn--primary btn--lg step-actions__next{% if blocking %} is-disabled{% endif %}" href="{% url 'studio:step' inv.uid 'bestellen' %}"{% if blocking %} aria-disabled="true"{% endif %}>{% if wenskaart_vast %}Bestellen &middot; {{ wenskaart_prijs }} incl. btw{% else %}Verder naar bestellen{% endif %} &rarr;</a>
+      <a class="btn btn--primary btn--lg step-actions__next{% if blocking %} is-disabled{% endif %}" href="{% url 'studio:step' inv.uid 'bestellen' %}"{% if blocking %} aria-disabled="true"{% endif %}>{% if bestel_prijs %}Bestellen &middot; {{ bestel_prijs }} incl. btw{% elif wenskaart_vast %}Bestellen &middot; {{ wenskaart_prijs }} incl. btw{% else %}Verder naar bestellen{% endif %} &rarr;</a>
       {% if blocking %}<p class="small muted step-actions__noot">Pas eerst de punten hierboven aan.</p>{% endif %}
     </div>
   {% endif %}

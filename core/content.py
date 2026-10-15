@@ -461,3 +461,70 @@ UM_FAQ = [
      "Ja. Je wijzigt de gegevens in Mijn VAYLIDE, bekijkt een voorbeeld en publiceert opnieuw. De link en de QR-code blijven hetzelfde."),
 ]
 
+
+
+# ---------------------------------------------------------------- nieuwe prijsstructuur (settings.PRICING_V2)
+# Staat de nieuwe structuur aan, dan vervangen deze zinnen de teksten over Essentieel, Compleet en extra opties (die bestaan dan niet meer). De zinnen
+# met {prijszin}, {vanaf}, {vanaf_luxe} en {vanaf_special} worden in de views ingevuld uit catalog.prijzen: elk bedrag op de site komt uit die ene bron.
+# Uit: niets verandert. De juridische pagina's (voorwaarden, privacyverklaring) staan hier bewust buiten; die worden niet aangepast zonder besluit.
+def _v2_vervangingen() -> dict:
+    from catalog.prijzen import looptijd_zin
+
+    duur = duur_luxe = looptijd_zin("Een kaart")
+    return {
+        'Ja, met het pakket Compleet of als extra optie. De muziek start pas als een gast er zelf op tikt. Gebruik alleen muziek waarvoor je toestemming hebt.':
+            'Ja, bij elke kaart kun je eigen muziek toevoegen. De muziek start pas als een gast er zelf op tikt. Gebruik alleen muziek waarvoor je toestemming hebt.',
+        'Essentieel 6 maanden en Compleet 12 maanden, gerekend vanaf de aankoopdatum: de dag waarop je betaling is bevestigd. Later publiceren of je evenement verplaatsen verschuift die einddatum niet. De einddatum staat in je bestelbevestiging en bij je uitnodiging in Mijn VAYLIDE. Er is geen automatische verlenging; langer online is als extra optie mogelijk.':
+            duur + ', gerekend vanaf de aankoopdatum: de dag waarop je betaling is bevestigd. Later publiceren of je evenement verplaatsen verschuift die einddatum niet. De einddatum staat in je bestelbevestiging en bij je uitnodiging in Mijn VAYLIDE. Er is geen automatische verlenging.',
+        'Aanwezig en met hoeveel personen. Extra vragen uit een vaste lijst met Compleet of als extra optie.': 'Aanwezig en met hoeveel personen. Extra vragen uit een vaste lijst.',
+        "Ja. Je vult zelf de afzender en je boodschap in en voegt eventueel een foto toe, en je ziet direct het voorbeeld. Bij een kerstuitnodiging met Compleet komt daar een fotogalerij van maximaal 12 foto's bij.":
+            "Ja. Je vult zelf de afzender en je boodschap in en voegt eventueel een foto toe, en je ziet direct het voorbeeld. Bij een kerstuitnodiging kun je ook een fotogalerij van maximaal 12 foto's toevoegen.",
+        'Een kerstwenskaart, alleen een groet, kost {wens} en {wens_special} in een Special-ontwerp, beide inclusief btw en eenmalig. Wil je ook een datum, programma, locatie en aanmelden, bijvoorbeeld voor een kerstdiner of kerstborrel, dan kies je Essentieel ({essentieel}) of Compleet ({compleet}).':
+            '{prijszin} Een kerstkaart kan alleen een groet zijn, maar ook een uitnodiging met datum, programma, locatie en aanmelden, bijvoorbeeld voor een kerstdiner of kerstborrel; de prijs is dan hetzelfde.',
+        'Kerststad heeft een eigen muziekje. Bij een kerstuitnodiging kun je eigen muziek toevoegen met Compleet of als extra optie. De muziek start nooit vanzelf: pas als de ontvanger erop tikt. Een wenskaart heeft geen muziek.':
+            'Kerststad heeft een eigen muziekje. Bij een kerstuitnodiging kun je ook eigen muziek toevoegen. De muziek start nooit vanzelf: pas als de ontvanger erop tikt. Een wenskaart heeft geen muziek.',
+        "Tekst, foto's, datum en extra opties.": "Tekst, foto's, datum, programma en meer.",
+        'Kies uit vaste vragen, bijvoorbeeld over vervoer of overnachten. Met Compleet of als extra optie.': 'Kies uit vaste vragen, bijvoorbeeld over vervoer of overnachten.',
+        'Je betaalt eenmalig, zonder kosten per gast. Essentieel kost {essentieel} en Compleet {compleet}. {special_zin} Ontwerpen en bekijken is gratis; je betaalt pas bij het publiceren.':
+            '{prijszin} Je betaalt zonder kosten per gast. Ontwerpen en bekijken is gratis; je betaalt pas bij het publiceren.',
+        'Essentieel 6 maanden en Compleet 12 maanden, gerekend vanaf de aankoopdatum: de dag waarop je betaling is bevestigd. Langer online is als extra optie mogelijk; er is geen automatische verlenging.':
+            duur + ', gerekend vanaf de aankoopdatum: de dag waarop je betaling is bevestigd. Er is geen automatische verlenging.',
+        "Ja, met het pakket Compleet of als extra optie: een fotogalerij met maximaal 12 foto's en eigen muziek. De muziek start pas als een gast er zelf op tikt.":
+            "Ja, bij elke trouwkaart: een fotogalerij met maximaal 12 foto's en eigen muziek. De muziek start pas als een gast er zelf op tikt.",
+        "Ja. Je voegt een foto toe (JPG, PNG of WebP tot 12 MB) en kiest zelf welk deel in beeld komt. Met het pakket Compleet komt er een fotogalerij van maximaal 12 foto's bij.":
+            "Ja. Je voegt een foto toe (JPG, PNG of WebP tot 12 MB) en kiest zelf welk deel in beeld komt. Daarnaast kun je een fotogalerij van maximaal 12 foto's toevoegen.",
+        'Je betaalt eenmalig, zonder kosten per gast, inclusief btw: Essentieel kost {essentieel} en Compleet {compleet}. Essentieel staat 6 maanden online en Compleet 12 maanden, vanaf de dag dat je betaling is bevestigd. {special_zin} Alleen een groet, een wenskaart, kost {wens}.':
+            'Je betaalt eenmalig, zonder kosten per gast, inclusief btw. De prijs hangt af van het ontwerp en de gelegenheid en staat bij elk ontwerp: een Basis-kaart kost vanaf {vanaf}, een Luxe-kaart vanaf {vanaf_luxe} en een Special vanaf {vanaf_special}. ' + duur + ', vanaf de dag dat je betaling is bevestigd. Een wenskaart, alleen een groet, valt in dezelfde indelingen.',
+        "Voeg een foto toe en kies zelf welk deel in beeld komt. Met Compleet komt er een galerij van maximaal 12 foto's bij.":
+            "Voeg een foto toe en kies zelf welk deel in beeld komt. Daarnaast kun je een galerij van maximaal 12 foto's toevoegen.",
+        'Een vaste prijs per uitnodiging, zonder kosten per gast: Essentieel {essentieel} of Compleet {compleet}.':
+            'Een vaste prijs per kaart, zonder kosten per gast, zichtbaar bij elk ontwerp: Basis vanaf {vanaf}, Luxe vanaf {vanaf_luxe}, Special vanaf {vanaf_special}.',
+        'Je betaalt eenmalig, zonder kosten per gast: Essentieel kost {essentieel} en Compleet {compleet}. Essentieel staat 6 maanden online en Compleet 12 maanden, vanaf de dag dat je betaling is bevestigd.':
+            '{prijszin} Je betaalt zonder kosten per gast. ' + duur_luxe + ', vanaf de dag dat je betaling is bevestigd.',
+        'Je betaalt eenmalig, zonder kosten per gast: Essentieel kost {essentieel} en Compleet {compleet}, inclusief btw. Essentieel staat 6 maanden online en Compleet 12 maanden, vanaf de dag dat je betaling is bevestigd. Een ontwerp in eigen huisstijl of met je logo is op aanvraag.':
+            '{prijszin} Je betaalt zonder kosten per gast. ' + duur_luxe + ', vanaf de dag dat je betaling is bevestigd. Een ontwerp in eigen huisstijl of met je logo is op aanvraag.',
+    }
+
+
+def _v2_toepassen() -> None:
+    vervangingen = _v2_vervangingen()
+
+    def kaart(obj):
+        if isinstance(obj, str):
+            return vervangingen.get(obj, obj)
+        if isinstance(obj, list):
+            return [kaart(x) for x in obj]
+        if isinstance(obj, tuple):
+            return tuple(kaart(x) for x in obj)
+        if isinstance(obj, dict):
+            return {k: kaart(v) for k, v in obj.items()}
+        return obj
+
+    for naam in [n for n, w in list(globals().items()) if n.isupper() and isinstance(w, (list, tuple, dict))]:
+        globals()[naam] = kaart(globals()[naam])
+
+
+from django.conf import settings as _settings  # noqa: E402
+
+if getattr(_settings, "PRICING_V2", False):
+    _v2_toepassen()

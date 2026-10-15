@@ -153,7 +153,7 @@
       </li>
       {% endfor %}
     </ol>
-    <p class="stappenrij__voet"><span><strong>Essentieel {{ essentieel_prijs }}</strong>, Compleet {{ compleet_prijs }}. Eenmalig, geen kosten per gast.{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</span><a class="link-arrow" href="{% url 'core:pricing' %}">Bekijk de prijzen</a><a class="link-arrow" href="{% url 'core:how' %}">Zo werkt het</a></p>
+    <p class="stappenrij__voet">{% if prijsvoet %}<span>{{ prijsvoet }}{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</span>{% else %}<span><strong>Essentieel {{ essentieel_prijs }}</strong>, Compleet {{ compleet_prijs }}. Eenmalig, geen kosten per gast.{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</span>{% endif %}<a class="link-arrow" href="{% url 'core:pricing' %}">Bekijk de prijzen</a><a class="link-arrow" href="{% url 'core:how' %}">Zo werkt het</a></p>
   </div>
 </section>
 

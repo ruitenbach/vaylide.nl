@@ -16,6 +16,11 @@ def format_euro(cents: int | None) -> str:
         return "—"
     euros, rest = divmod(int(cents), 100)
     whole = f"{euros:,}".replace(",", ".")
+    from django.conf import settings
+
+    # In de nieuwe prijsstructuur altijd twee decimalen (€ 69,00); anders zoals voorheen (hele euro's zonder ,00).
+    if getattr(settings, "PRICING_V2", False):
+        return f"€ {whole},{rest:02d}"
     return f"€ {whole},{rest:02d}" if rest else f"€ {whole}"
 
 

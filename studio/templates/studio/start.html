@@ -29,10 +29,10 @@
     </div>
     <div class="chip-rij chip-rij--soort" role="group" aria-label="Soort kaart">
       <a class="chip-link{% if not wenskaart %} is-current{% endif %}" href="?soort=uitnodiging&amp;gelegenheid={{ occasion }}{% if kleur %}&amp;kleur={{ kleur }}{% endif %}"{% if not wenskaart %} aria-current="true"{% endif %}>Uitnodiging</a>
-      <a class="chip-link{% if wenskaart %} is-current{% endif %}" href="?soort=wenskaart&amp;gelegenheid={{ occasion }}{% if kleur %}&amp;kleur={{ kleur }}{% endif %}"{% if wenskaart %} aria-current="true"{% endif %}>Wenskaart &middot; {{ wenskaart_prijs }}</a>
+      <a class="chip-link{% if wenskaart %} is-current{% endif %}" href="?soort=wenskaart&amp;gelegenheid={{ occasion }}{% if kleur %}&amp;kleur={{ kleur }}{% endif %}"{% if wenskaart %} aria-current="true"{% endif %}>Wenskaart{% if not prijs_v2 %} &middot; {{ wenskaart_prijs }}{% endif %}</a>
     </div>
   </div>
-  {% if wenskaart %}<p class="kies__prijs small">Wenskaart {{ wenskaart_prijs }} &middot; Special {{ wenskaart_prijs_special }} (incl. btw), zonder pakket.</p>{% endif %}
+  {% if wenskaart and not prijs_v2 %}<p class="kies__prijs small">Wenskaart {{ wenskaart_prijs }} &middot; Special {{ wenskaart_prijs_special }} (incl. btw), zonder pakket.</p>{% endif %}
   {% if form.template.errors %}<p class="field__error" role="alert">{{ form.template.errors.0 }}</p>{% endif %}
 
   {% if chosen_template %}
@@ -41,6 +41,7 @@
     <div class="kaart-gekozen__tekst">
       <p class="kaart-gekozen__label"><span aria-hidden="true">&#10003;</span> Gekozen ontwerp</p>
       <strong>{{ chosen_template.name }}</strong>
+      {% if prijzen_ontwerp %}<span class="kaart-gekozen__prijs">{{ prijzen_ontwerp|get_item:chosen_template.slug }} <span class="small muted">incl. btw, eenmalig</span></span>{% endif %}
       <a class="small" href="{% url 'invitations:demo' chosen_template.slug %}?gelegenheid={{ occasion }}" target="_blank" rel="noopener">Bekijk voorbeeld<span class="visually-hidden"> (opent in nieuw venster)</span></a>
     </div>
     <button type="submit" name="template" value="{{ chosen_template.slug }}" class="btn btn--primary btn--lg kaart-gekozen__cta">Verder met personaliseren &rarr;</button>

@@ -4,6 +4,7 @@ Prijzen komen altijd uit Beheer (Package en AddOn); hier wordt niets vastgelegd.
 """
 from __future__ import annotations
 
+from catalog import prijzen
 from catalog.features import feature_label
 from catalog.models import AddOn, Package, format_euro
 
@@ -28,7 +29,9 @@ def feature_badges(package: Package | None) -> dict[str, str]:
     """Het label bij verhaal, galerij, muziek en extra vragen in de editor."""
     badges = {}
     for feature in FEATURE_STEPS:
-        if package is None:
+        if prijzen.actief():
+            badges[feature] = "Inbegrepen"     # nieuwe prijsstructuur: alles wat je kunt personaliseren zit in de prijs van het ontwerp
+        elif package is None:
             badges[feature] = "Compleet of extra optie"
         elif feature in (package.features or []):
             badges[feature] = f"In {package.name}"
@@ -41,6 +44,8 @@ def feature_badges(package: Package | None) -> dict[str, str]:
 def looptijd_uitleg(packages: list[Package], wenskaart_pakket: Package | None = None) -> str:
     """De uitleg bij 'Hoe lang blijft mijn kaart online?', uit dezelfde pakketten als de bestelling (Beheer)."""
     vanaf = "gerekend vanaf de bevestigde betaling"
+    if prijzen.actief():
+        return f"{prijzen.looptijd_zin('Je kaart')}, {vanaf}. Je ziet de einddatum van jouw kaart hieronder in het overzicht."
     if wenskaart_pakket is not None:
         return f"Je wenskaart blijft {wenskaart_pakket.availability_months} maanden online, {vanaf}."
     if not packages:
@@ -54,7 +59,9 @@ def looptijd_uitleg(packages: list[Package], wenskaart_pakket: Package | None = 
 
 def muziek_uitleg(package: Package | None, ontwerp_muziek: bool) -> str:
     """De uitleg bij eigen muziek, met de prijs uit Beheer (dezelfde AddOn als op de rekening). Leeg als eigen muziek niet kan."""
-    if package is not None and "music" in (package.features or []):
+    if prijzen.actief():
+        prijs = "Dit zit in de prijs van je kaart, zonder extra kosten."
+    elif package is not None and "music" in (package.features or []):
         prijs = f"In {package.name} zit dit erbij, zonder extra kosten."
     else:
         addon = AddOn.objects.filter(is_active=True, feature="music").order_by("price_cents").first()
@@ -72,7 +79,7 @@ def soort_uitleg(wenskaart_prijs: str | None) -> str:
     net als bij de keuze zelf."""
     tekst = ("Kies Uitnodiging als je gasten wilt uitnodigen voor een moment met datum, locatie en eventueel aanmelden. "
              "Kies Wenskaart als je alleen een persoonlijke kaart wilt versturen, zonder datum, locatie of aanmeldingen")
-    tekst += f", voor een vaste prijs van {wenskaart_prijs}." if wenskaart_prijs else "."
+    tekst += f", voor een vaste prijs van {wenskaart_prijs}." if (wenskaart_prijs and not prijzen.actief()) else "."
     return tekst + " Je ziet daarna alleen de stappen die bij je keuze horen. Na het bestellen ligt je keuze vast."
 
 

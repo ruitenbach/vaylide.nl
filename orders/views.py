@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
 
-from catalog import wenskaart
+from catalog import prijzen, wenskaart
 from core import analytics
 from catalog.occasions import doc_kind
 from processing.models import OutboundEmail
@@ -93,7 +93,7 @@ def status(request, uid):
     order.refresh_from_db()
     state = _state(order)
     kind = doc_kind(order.invitation.occasion) if order.invitation else "uitnodiging"
-    greeting = bool(order.invitation) and order.package_code in (wenskaart.CODE, wenskaart.CODE_SPECIAL)
+    greeting = bool(order.invitation) and (order.package_code in (wenskaart.CODE, wenskaart.CODE_SPECIAL) or prijzen.is_wenskaart_code(order.package_code))
     if greeting and order.invitation.occasion != "kerst":
         kind = "wenskaart"
     payment = order.latest_payment

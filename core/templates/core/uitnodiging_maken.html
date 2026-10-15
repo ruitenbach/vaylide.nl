@@ -164,7 +164,7 @@
     <ul class="um-waarom">
       {% for title, text in waarom %}<li class="um-waarom__punt"><span class="um-waarom__nr" aria-hidden="true">{{ forloop.counter }}</span><h3>{{ title }}</h3><p>{{ text }}</p></li>{% endfor %}
     </ul>
-    <p class="stappenrij__voet"><span>Essentieel {{ essentieel_prijs }} en Compleet {{ compleet_prijs }}, incl. btw en eenmalig.{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</span><a class="link-arrow" href="{% url 'core:pricing' %}">Bekijk de prijzen</a></p>
+    <p class="stappenrij__voet">{% if prijsvoet %}<span>{{ prijsvoet }}{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</span>{% else %}<span>Essentieel {{ essentieel_prijs }} en Compleet {{ compleet_prijs }}, incl. btw en eenmalig.{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</span>{% endif %}<a class="link-arrow" href="{% url 'core:pricing' %}">Bekijk de prijzen</a></p>
   </div>
 </section>
 

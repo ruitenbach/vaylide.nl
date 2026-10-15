@@ -3,6 +3,12 @@
 {% block content %}
 <div class="app-head"><div><p class="eyebrow">Beheer</p><h1>Pakketten en opties</h1></div><div class="btn-row"><a class="btn btn--secondary btn--sm" href="{% url 'beheer:package_new' %}">Nieuw pakket</a><a class="btn btn--secondary btn--sm" href="{% url 'beheer:addon_new' %}">Nieuwe optie</a></div></div>
 {% if config.prices_provisional %}<p class="notice notice--warning"><strong>Prijzen staan als 'voorlopig'</strong>Op de website staat nu 'Voorlopige prijzen'. Zet dit uit bij Instellingen zodra de prijzen definitief zijn.</p>{% endif %}
+{% if nieuw %}<section class="panel" aria-labelledby="nieuw-prijzen"><h2 id="nieuw-prijzen">Actieve prijsstructuur: Basis, Luxe en Special</h2>
+<p class="notice notice--warning"><strong>De pakketten en opties hieronder worden voor nieuwe bestellingen niet gebruikt.</strong> Elk ontwerp heeft één vaste indeling en per gelegenheid één prijs (catalog/prijzen.py). Bestaande bestellingen behouden hun bedrag. Wijzigen kan alleen in de code; terugschakelen naar de oude structuur: zet VIERLIEF_PRICING_V2 uit.</p>
+<div class="data-table-wrap"><table class="data-table"><thead><tr><th>Soort kaart</th><th class="num">Basis</th><th class="num">Luxe</th><th class="num">Special</th></tr></thead><tbody>
+{% for r in nieuw.rijen %}<tr><td>{{ r.label }}</td>{% for c in r.prijzen %}<td class="num">{{ c }}</td>{% endfor %}</tr>{% endfor %}
+</tbody></table></div>
+<ul class="small">{% for t in nieuw.tiers %}<li><strong>{{ t.naam }}</strong> ({{ t.maanden }} maanden online): {{ t.ontwerpen|join:", " }}</li>{% endfor %}</ul></section>{% endif %}
 <p class="notice">Prijzen zijn inclusief btw. Wijzigingen gelden direct voor nieuwe bestellingen; bestaande bestellingen behouden hun bedrag.</p>
 <section class="panel">
   <h2>Pakketten</h2>

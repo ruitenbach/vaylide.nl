@@ -468,8 +468,15 @@ def template_edit(request, pk):
 
 @staff_required
 def pricing(request):
+    from catalog import prijzen
+
+    nieuw = None
+    if prijzen.actief():     # nieuwe prijsstructuur: alleen lezen; de bedragen en de indeling staan in catalog/prijzen.py
+        telling = {t: sorted(slug for slug, i in prijzen.INDELING.items() if i == t) for t in prijzen.TIERS}
+        nieuw = {"rijen": [{"label": prijzen.CATEGORIE_LABEL[r], "prijzen": [prijzen.format_euro(c) for c in cs]} for r, cs in prijzen.PRIJZEN.items()],
+                 "tiers": [{"naam": prijzen.TIER_NAAM[t], "maanden": prijzen.MAANDEN_ONLINE[t], "ontwerpen": telling[t]} for t in prijzen.TIERS]}
     return render(request, "beheer/pricing.html", {"packages": Package.objects.all(), "addons": AddOn.objects.all(),
-                                                   "config": SiteConfig.get()})
+                                                   "config": SiteConfig.get(), "nieuw": nieuw})
 
 
 @staff_required

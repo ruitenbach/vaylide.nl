@@ -25,8 +25,11 @@ def special_addon(template):
 def special_prijszin() -> str:
     """Eén zin over wat een special extra kost, passend bij wat er in Beheer → Prijzen is ingesteld (nooit een verzonnen prijs).
     Alle teksten op de site die iets over de prijs van specials zeggen, gebruiken deze zin, zodat tekst en berekende prijs overeenkomen."""
+    from . import prijzen
     from .models import AddOn, Template
 
+    if prijzen.actief():
+        return ""    # elk ontwerp heeft één vaste prijs (catalog/prijzen.py); er is geen aparte meerprijs voor specials
     slugs = list(Template.objects.filter(special=True, is_active=True).values_list("slug", flat=True))
     if not slugs:
         return ""

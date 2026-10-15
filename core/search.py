@@ -4,6 +4,8 @@ Zoekt alleen in vaste teksten en actieve ontwerpen; nooit in klantgegevens of ui
 """
 from __future__ import annotations
 
+from django.conf import settings
+
 import unicodedata
 
 from django.urls import reverse
@@ -25,7 +27,7 @@ def _normalize(text: str) -> str:
 def _pages():
     return [
         ("Zo werkt het", reverse("core:how"), "Van ontwerp kiezen tot aanmeldingen beheren, stap voor stap.", "stappen uitleg openingsanimatie afteller programma route agenda delen muziek privé"),
-        ("Prijzen", reverse("core:pricing"), "Pakketten en extra opties. Eenmalig betalen, geen kosten per gast.", "kosten pakket essentieel compleet opties betalen ideal"),
+        ("Prijzen", reverse("core:pricing"), *(("Prijs per ontwerp: Basis, Luxe of Special. Eenmalig betalen, geen kosten per gast.", "kosten prijs basis luxe special betalen ideal") if getattr(settings, "PRICING_V2", False) else ("Pakketten en extra opties. Eenmalig betalen, geen kosten per gast.", "kosten pakket essentieel compleet opties betalen ideal"))),
         ("Collectie", reverse("core:designs"), "Alle ontwerpen, met een werkend voorbeeld.", "ontwerpen designs voorbeeld"),
         ("Inspiratie", reverse("core:inspiration"), "Voorbeeldteksten en tips voor je uitnodiging.", "tekst tips ideeën dresscode aanmelddatum"),
         ("Over ons", reverse("core:about"), "Waar VAYLIDE voor staat.", "vaylide wie privacy"),

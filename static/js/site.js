@@ -123,6 +123,10 @@
       });
       var hint = document.querySelector(".segmented__hint");
       if (hint) hint.textContent = soortTekst[soort] || "";
+      document.querySelectorAll("[data-prijs]").forEach(function (el) {
+        var tekst = el.getAttribute("data-prijs-" + soort), doel = el.querySelector("[data-prijs-tekst]");
+        if (tekst && doel) doel.textContent = tekst;
+      });
       if (window.history && history.replaceState) history.replaceState(null, "", zetParam(window.location.href, "soort", soort));
     });
   });

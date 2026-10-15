@@ -16,13 +16,14 @@
       <p class="breadcrumbs"><a href="{% url 'core:designs' %}">Collectie</a> / {{ template.name }}</p>
       <h1>{{ template.name }}</h1>
       <p class="lead">{{ template.description }}</p>
+      {% if prijs_nu %}<p class="detail-prijs" data-prijs data-prijs-uitnodiging="{{ prijs_uitnodiging }}" data-prijs-wenskaart="{{ prijs_wenskaart }}"><strong class="detail-prijs__bedrag" data-prijs-tekst>{{ prijs_nu.label }}</strong> <span class="small muted">incl. btw, eenmalig &middot; {{ prijs_nu.maanden }} maanden online</span></p>{% endif %}
       <dl class="meta-list">
         <div><dt>Opening</dt><dd>{{ version.manifest.opening_label }}</dd></div>
         {% if effects_text %}<div><dt>Effecten</dt><dd>{{ effects_text }} Gasten kunnen de beweging met één tik stilzetten.</dd></div>{% endif %}
         <div><dt>Geschikt voor</dt><dd>{{ template.occasion_labels|join:", "|lower }}</dd></div>
         {% if soorten %}<div><dt>Soort kaart</dt><dd>
           <ul class="segmented" aria-label="Toon het voorbeeld als uitnodiging of als wenskaart">{% for s in soorten %}<li><a class="segmented__item" href="{{ s.url }}" data-soort-link data-soort="{{ s.key }}"{% if s.current %} aria-current="true"{% endif %}>{{ s.label }}</a></li>{% endfor %}</ul>
-          <p class="segmented__hint">{% if soort == "wenskaart" %}Alleen een persoonlijke groet, zonder datum, locatie of aanmelden. {{ wenskaart_prijs }} incl. btw{% if wenskaart_special %} (special-ontwerp){% endif %}.{% else %}Met datum, locatie en aanmelden{% if occasion == "kerst" %}, bijvoorbeeld voor het kerstdiner{% endif %}.{% endif %}</p>
+          <p class="segmented__hint">{% if soort == "wenskaart" %}Alleen een persoonlijke groet, zonder datum, locatie of aanmelden.{% if not prijs_v2 %} {{ wenskaart_prijs }} incl. btw{% if wenskaart_special %} (special-ontwerp){% endif %}.{% endif %}{% else %}Met datum, locatie en aanmelden{% if occasion == "kerst" %}, bijvoorbeeld voor het kerstdiner{% endif %}.{% endif %}</p>
         </dd></div>{% endif %}
         <div><dt>Kleur</dt><dd class="kleurkeuze">
           {# Per kleurvariant een knop met drie kleurbolletjes en de naam; de gekozen variant heeft een donkere rand. #}

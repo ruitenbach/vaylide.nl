@@ -741,3 +741,8 @@ html:has(body.studio-page) { scrollbar-gutter: stable; }
 .bon-kaart__badge { display: inline-block; font-family: var(--font-body, inherit); font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; padding: .1rem .45rem; margin-left: .3rem; border-radius: 999px; background: var(--accent-soft, #f3e7d0); color: var(--accent-text); vertical-align: middle; }
 .bon-kaart__wijzig { align-self: flex-start; padding: .45rem 0 .45rem .5rem; min-height: 24px; }
 
+
+/* Nieuwe prijsstructuur: de prijs bij een ontwerp en bij de gekozen kaart */
+.detail-prijs { margin: 1.1rem 0 .7rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: .15rem .6rem; }
+.detail-prijs__bedrag { font-size: 1.3rem; font-weight: 700; }
+.kaart-gekozen__prijs { display: block; margin-top: .15rem; font-weight: 600; color: var(--accent-text); }

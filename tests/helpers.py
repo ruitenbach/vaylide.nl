@@ -67,6 +67,7 @@ class VaylideTestCase(TestCase):
             TEST_MODE=True,
             EMAIL_MODE="outbox",
             PAYMENT_PROVIDER="test",
+            PRICING_V2=False,     # de bestaande tests gelden voor de oude structuur; tests van de nieuwe zetten hem zelf aan (tests/test_prijsstructuur.py)
             JOBS_RUN_INLINE=True,
             FACES_BACKGROUND=False,
             ANTHROPIC_API_KEY="",

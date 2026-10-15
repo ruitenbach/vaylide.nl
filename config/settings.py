@@ -270,6 +270,12 @@ DEFAULT_FROM_EMAIL = env("VIERLIEF_FROM_EMAIL", f"VAYLIDE <{CONTACT_EMAIL}>")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 # --- Betalingen --------------------------------------------------------------
+# Nieuwe prijsstructuur (Basis, Luxe, Special per ontwerp en gelegenheid; catalog/prijzen.py). Staat standaard UIT: dan werkt alles zoals voorheen
+# (pakketten Essentieel en Compleet, wenskaart vast, opties). Per omgeving aan te zetten; terugdraaien = weer uitzetten.
+PRICING_V2 = env_bool("VIERLIEF_PRICING_V2", False)
+# Concepten die vóór dit moment zijn gemaakt, zien bij het bestellen expliciet dat de prijs is bijgewerkt (ISO-tijd met tijdzone, bijv. 2026-11-01T08:00:00+01:00).
+PRICING_V2_SINCE = env("VIERLIEF_PRICING_V2_SINCE", "")
+
 PAYMENT_PROVIDER = env("VIERLIEF_PAYMENT_PROVIDER", "test" if TEST_MODE else "mollie").lower()
 MOLLIE_API_KEY = env("MOLLIE_API_KEY")
 MOLLIE_API_BASE = env("MOLLIE_API_BASE", "https://api.mollie.com/v2")

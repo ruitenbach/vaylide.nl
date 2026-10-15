@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from catalog import wenskaart
+from catalog import prijzen, wenskaart
 from catalog.features import feature_label
 from catalog.specials import is_special, special_addon
 from catalog.models import AddOn, Package, format_euro
@@ -63,6 +63,24 @@ def optional_addons() -> list[AddOn]:
     return list(AddOn.objects.filter(is_active=True, extra_months__gt=0).order_by("sort_order"))
 
 
+def build_tier_quote(content: dict, template_version, occasion: str) -> Quote:
+    """De nieuwe prijsstructuur: één regel, één prijs, geen toeslagen. De indeling van het ontwerp en de gelegenheid bepalen het bedrag (catalog.prijzen);
+    alles wat de klant kan personaliseren zit erin. Zonder prijs voor dit ontwerp of deze gelegenheid is het niet te bestellen (nooit een verzonnen prijs).
+    Eigen gezichten (Balzaal) zijn geen onderdeel van de indeling en blijven een aparte, nu uitgeschakelde optie."""
+    soort = "wenskaart" if wenskaart.is_wenskaart(content) else ""
+    if template_version is None or prijzen.prijs_cents(template_version, occasion, soort) is None:
+        raise PricingError("Voor dit ontwerp en deze gelegenheid is op dit moment geen prijs beschikbaar. Kies een ander ontwerp.")
+    package = prijzen.tier_package(template_version, occasion, soort)
+    info = prijzen.prijs_info(template_version, occasion, soort)
+    quote = Quote(package=package, features=set(package.features or []), max_gallery_photos=package.max_gallery_photos, availability_months=package.availability_months)
+    naam = getattr(getattr(template_version, "template", template_version), "name", "")
+    quote.lines.append(QuoteLine(code=f"tier:{package.code}:{info['rij']}", description=f"{package.name}: {naam} ({info['rij_label']})"[:200], unit_price_cents=package.price_cents))
+    missing = required_features(content) - quote.features
+    if missing:   # alleen eigen gezichten kunnen hier nog ontbreken
+        raise PricingError(f"'{feature_label(sorted(missing)[0])}' is op dit moment niet beschikbaar. Zet dit onderdeel uit.")
+    return quote
+
+
 def build_wenskaart_quote(content: dict, template_version=None) -> Quote:
     """Een wenskaart: één vaste prijs (€ 14,95, bij een special-ontwerp € 24,95, incl. btw), geen pakketten, opties of meerprijzen."""
     package = wenskaart.package(template_version)
@@ -71,7 +89,9 @@ def build_wenskaart_quote(content: dict, template_version=None) -> Quote:
     return quote
 
 
-def build_quote(content: dict, package: Package, optional_codes: list[str] | None = None, template_version=None) -> Quote:
+def build_quote(content: dict, package: Package | None, optional_codes: list[str] | None = None, template_version=None, occasion: str = "") -> Quote:
+    if prijzen.actief():
+        return build_tier_quote(content, template_version, occasion)
     if wenskaart.is_wenskaart(content):
         return build_wenskaart_quote(content, template_version)
     if not package.is_active:
@@ -121,7 +141,9 @@ def build_quote(content: dict, package: Package, optional_codes: list[str] | Non
     return quote
 
 
-def compare_packages(content: dict, optional_codes: list[str] | None = None, template_version=None) -> list[Quote]:
+def compare_packages(content: dict, optional_codes: list[str] | None = None, template_version=None, occasion: str = "") -> list[Quote]:
+    if prijzen.actief():
+        return [build_tier_quote(content, template_version, occasion)]
     if wenskaart.is_wenskaart(content):
         return [build_wenskaart_quote(content, template_version)]
     quotes = []

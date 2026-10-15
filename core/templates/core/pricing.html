@@ -1,6 +1,6 @@
 {% extends "base.html" %}{% load static vl %}
 {% block title %}Prijzen{% endblock %}
-{% block description %}Pakketten en extra opties voor digitale uitnodigingen van VAYLIDE. Eenmalig betalen, geen kosten per gast.{% endblock %}
+{% block description %}{% if prijs_v2 %}De prijs van elke digitale kaart van VAYLIDE staat bij het ontwerp: Basis, Luxe of Special, per gelegenheid. Eenmalig betalen, inclusief btw, geen kosten per gast.{% else %}Pakketten en extra opties voor digitale uitnodigingen van VAYLIDE. Eenmalig betalen, geen kosten per gast.{% endif %}{% endblock %}
 {% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
 {% block content %}
 <section class="paginakop" data-sparkles>
@@ -13,6 +13,52 @@
   </div>
 </section>
 
+{% if prijs_v2 %}
+<section class="section section--flush" aria-labelledby="tabel-titel">
+  <div class="container container--mid">
+    <div class="sectie-kop">
+      <h2 id="tabel-titel">Prijs per soort kaart</h2>
+      <p>Elk ontwerp heeft één vaste indeling: Basis, Luxe of Special. Je ziet de indeling en de prijs bij het ontwerp, en nog eens bij het bestellen. Het bedrag dat je ziet is het bedrag dat je betaalt: er komen geen toeslagen of extra's bij.</p>
+    </div>
+    <div class="table-wrap prijstabel">
+      <table class="table-simple">
+        <caption class="visually-hidden">Prijzen per soort kaart en indeling, inclusief btw</caption>
+        <thead><tr><th scope="col">Soort kaart</th>{% for t in tiers %}<th scope="col" class="num">{{ t.naam }}</th>{% endfor %}</tr></thead>
+        <tbody>{% for r in tabel %}<tr><th scope="row">{{ r.label }}{% if r.rij == "bedank" %} <span class="small muted">(wenskaart, alleen een groet)</span>{% endif %}</th>{% for c in r.cellen %}<td class="num" data-label="{{ c.naam }}">{% if c.cents %}{{ c.cents|euro }}{% else %}<span class="muted" aria-label="niet beschikbaar">&ndash;</span>{% endif %}</td>{% endfor %}</tr>{% endfor %}</tbody>
+      </table>
+    </div>
+    <p class="small muted table-note">Alle prijzen zijn inclusief btw en eenmalig. Een streepje betekent dat er voor die soort kaart op dit moment geen ontwerp in die indeling is.</p>
+  </div>
+</section>
+
+<section class="section section--flush" aria-label="De indelingen">
+  <div class="container">
+    <div class="prijskolommen">
+      {% for t in tiers %}
+      <article class="prijskaart{% if t.tier == "luxe" %} prijskaart--uitgelicht{% endif %}">
+        <div class="prijskaart__kop"><h2>{{ t.naam }}</h2><span class="prijskaart__soort prijskaart__soort--vast">Vaste prijs per ontwerp</span></div>
+        <p class="muted">{{ t.beschrijving }}</p>
+        <ul class="checklist">{% for h in t.punten %}<li>{{ h }}</li>{% endfor %}</ul>
+        <a class="btn {% if t.tier == "luxe" %}btn--primary{% else %}btn--secondary{% endif %}" href="{% url 'core:designs' %}">Bekijk de ontwerpen</a>
+      </article>
+      {% endfor %}
+      <article class="prijskaart prijskaart--maat">
+        <div class="prijskaart__kop"><h2>Op maat</h2><span class="prijskaart__soort prijskaart__soort--aanvraag">Op aanvraag</span></div>
+        <p class="price price--text">Prijs op aanvraag</p>
+        <p class="muted">Voor wie iets wil dat nergens anders te vinden is.</p>
+        <ul class="checklist">
+          <li>Een ontwerp in jullie eigen stijl of huisstijl</li>
+          <li>Je eigen logo of beeldmerk, ook op het zegel</li>
+          <li>Een andere taal of een bijzondere opbouw</li>
+          <li>Eerst een voorstel met prijs; we beginnen pas na jouw akkoord</li>
+        </ul>
+        <a class="btn btn--primary" href="{% url 'core:contact' %}?onderwerp=maatwerk">Vraag een voorstel aan {% icon "pijl" %}</a>
+      </article>
+    </div>
+    <p class="small muted center aside-line">De online periode telt vanaf de aankoopdatum: de dag waarop je betaling is bevestigd. Er is geen automatische verlenging. Zie de <a href="{% url 'core:terms' %}#artikel-6">algemene voorwaarden</a>.</p>
+  </div>
+</section>
+{% else %}
 <section class="section section--flush" aria-label="Pakketten">
   <div class="container">
     <div class="prijskolommen">
@@ -87,4 +133,5 @@
     <p class="small muted table-note">Alle prijzen zijn inclusief btw. Vaste prijzen; alleen maatwerk is op aanvraag. De online periode (6 of 12 maanden) telt vanaf de aankoopdatum: de dag waarop je betaling is bevestigd. Er is geen automatische verlenging. Zie de <a href="{% url 'core:terms' %}#artikel-6">algemene voorwaarden</a>.</p>
   </div>
 </section>
+{% endif %}
 {% endblock %}
