@@ -439,9 +439,10 @@ class Pagina(NieuwePrijzen):
         html = Client().get("/prijzen/").content.decode()
         for tekst in ("Kerstkaart / nieuwjaarswens", "Trouwuitnodiging", "€ 89,95", "€ 24,95", "€ 69,00", "€ 19,95"):
             self.assertIn(tekst, html)
-        kerstrij = re.search(r"<tr><th[^>]*>Kerstkaart / nieuwjaarswens.*?</tr>", html.replace("\n", ""))
-        self.assertIsNotNone(kerstrij)
-        self.assertNotIn("9,95", kerstrij.group(0).replace("49,95", "").replace("€ 24,95", ""), "Kerst Basis bestaat niet (geen ontwerp) en wordt niet getoond")
+        basis = html[html.index("<h3>Basis</h3>"):html.index("<h3>Luxe</h3>")].replace("\n", "")
+        kerstrij = re.search(r'<li class="is-leeg"><span>Kerstkaart / nieuwjaarswens.*?</li>', basis)
+        self.assertIsNotNone(kerstrij, "Kerst Basis bestaat niet (geen ontwerp) en toont een streepje")
+        self.assertNotIn("€", kerstrij.group(0))
         self.assertNotIn("Essentieel", html)
         self.assertNotIn("Compleet", html)
         self.assertNotIn("Geboortekaart", html)
