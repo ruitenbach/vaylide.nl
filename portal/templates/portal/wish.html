@@ -12,7 +12,9 @@
       <h2 id="voorstel-titel">Ons voorstel</h2>
       <p class="msg__body">{{ req.proposal_text }}</p>
       <p><strong>Prijs: {{ req.proposal_price_display }}</strong></p>
-      <form method="post" class="btn-row" data-once>{% csrf_token %}<button type="submit" name="actie" value="akkoord" class="btn btn--primary">{% if req.proposal_price_cents %}Akkoord en betalen{% else %}Akkoord{% endif %}</button></form>
+      <form method="post" data-once>{% csrf_token %}
+        <label class="check terms-check"><input type="checkbox" name="terms" value="on" required><span>Ik ga akkoord met de <a href="{% url 'core:terms' %}" target="_blank" rel="noopener">algemene voorwaarden</a> van VAYLIDE. <span class="hint">Versie {{ voorwaarden.date|date:"j F Y" }} · <a href="{% url 'core:terms_pdf' voorwaarden.version %}" target="_blank" rel="noopener">open als pdf</a> om te lezen of op te slaan.</span></span></label>
+        <div class="btn-row"><button type="submit" name="actie" value="akkoord" class="btn btn--primary">{% if req.proposal_price_cents %}Akkoord en betalen{% else %}Akkoord{% endif %}</button></div></form>
       <p class="small muted">Liever iets aanpassen? Stuur hieronder een bericht.</p>
     </section>
     {% elif req.status == "awaiting_payment" %}

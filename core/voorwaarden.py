@@ -8,10 +8,24 @@ from __future__ import annotations
 
 from datetime import date
 
+# CURRENT is de versie bij de huidige structuur (Essentieel en Compleet). NIEUW hoort bij de nieuwe prijsstructuur (Basis, Luxe, Special;
+# VIERLIEF_PRICING_V2). Wat geldt bij het bestellen bepaalt current(): prijzen en voorwaarden gaan zo altijd samen live, en de schakelaar
+# terugzetten zet ook de voorwaarden terug. Beide versies blijven bereikbaar; een bestaande bestelling houdt de versie waarop ze is gemaakt.
 CURRENT = "2026-09-29"
+NIEUW = "2026-10-16"
 VERSIONS = {
     "2026-09-29": {"template": "core/voorwaarden/2026-09-29.html", "date": date(2026, 9, 29), "status": "Concept"},
+    # Status blijft "Concept" tot de eigenaar de definitieve tekst goedkeurt (dan "Definitief" en vervalt de conceptmelding).
+    # strikt: bedrijfsgegevens die de eigenaar niet zelf heeft gezet, verschijnen als invulveld (core/company.py).
+    "2026-10-16": {"template": "core/voorwaarden/2026-10-16.html", "date": date(2026, 10, 16), "status": "Concept", "strikt": True},
 }
+
+
+def current() -> str:
+    """De versie die nu bij een bestelling hoort: NIEUW met de nieuwe prijsstructuur, anders CURRENT."""
+    from django.conf import settings
+
+    return NIEUW if getattr(settings, "PRICING_V2", False) else CURRENT
 
 # De teksten bij het bestellen. Teksten van de eigenaar (3 oktober 2026), letterlijk gebruikt; de twee toestemmingen worden letterlijk met tijdstip
 # vastgelegd op de bestelling en herhaald in de bestelbevestiging. Juridisch nog te beoordelen: zie docs/VOORWAARDEN.md.
@@ -34,7 +48,7 @@ SERVICE_CONSENT = (
 
 
 def version_info(version: str | None = None) -> dict:
-    version = version or CURRENT
+    version = version or current()
     info = VERSIONS[version]
     return {"version": version, **info}
 

@@ -12,7 +12,7 @@ from datetime import date
 from django.conf import settings
 from django.core import checks
 
-VERSION = date(2026, 9, 30)
+VERSION = date(2026, 10, 16)
 
 # Door de eigenaar vast te stellen. None = nog open (invulveld op de testversie, blokkeert live).
 # Voorstellen met onderbouwing: docs/PRIVACY.md, onder "Besluiten".
@@ -37,7 +37,7 @@ BESLUITEN: dict[str, str | None] = {
     "bewaar_account": "Gebruik je je account 24 maanden niet en heb je geen kaarten meer bij ons, dan verwijderen wij je "
                       "naam en e-mailadres. Je krijgt 30 dagen van tevoren een e-mail; log je in, dan blijft je account "
                       "bestaan (automatisch).",
-    "bewaar_gekochte_kaarten": "90 dagen nadat de kaart offline ging verwijderd, met foto's, muziek en andere inhoud "
+    "bewaar_gekochte_kaarten": "90 dagen na de einddatum van de looptijd verwijderd, ook als de kaart eerder offline is gehaald, met foto's, muziek en andere inhoud "
                                "(automatisch). De bestelling zelf blijft bewaard voor de administratie.",
     "bewaar_contact": "12 maanden na ontvangst verwijderd (automatisch)",
     "bewaar_herroepingen": "7 jaar, net als de bestelgegevens waar ze bij horen; daarna verwijderd (automatisch)",
@@ -138,7 +138,8 @@ def suppliers() -> list[dict]:
         })
     if email_active():
         rows.append({
-            "naam": settings.PRIVACY_EMAIL_PROVIDER or None,
+            # Alleen met naam als de eigenaar de aanbieder zelf heeft gezet (VIERLIEF_EMAIL_AANBIEDER); de standaardwaarde is geen bewijs.
+            "naam": (settings.PRIVACY_EMAIL_PROVIDER if settings.PRIVACY_EMAIL_PROVIDER_CONFIRMED else None) or None,
             "dienst": "Versturen van inlogcodes, bestelbevestigingen en andere servicemails",
             "gegevens": "Je e-mailadres en de inhoud van het bericht.",
             "rol": "Verwerker",
@@ -205,6 +206,9 @@ def cookies() -> list[dict]:
          "doel": "Zodat je je eigen antwoord later kunt terugzien, wijzigen of verwijderen.", "duur": "1 jaar"},
         {"naam": "vierlief-open:…", "soort": "Sessieopslag in je browser",
          "doel": "Onthoudt dat je de envelop van een uitnodiging al opende, zodat je die niet steeds opnieuw ziet.",
+         "duur": "Tot je het tabblad sluit"},
+        {"naam": "vaylide-auto-start:…, vierlief-studio-eigen-muziek", "soort": "Sessieopslag in je browser",
+         "doel": "Alleen tijdens het samenstellen: onthoudt dat een vervolgstap al automatisch is gestart en dat je bij Muziek voor eigen muziek koos, zodat de pagina na het uploaden goed terugkomt.",
          "duur": "Tot je het tabblad sluit"},
         {"naam": "vierlief-beweging", "soort": "Lokale opslag in je browser",
          "doel": "Onthoudt of je bewegende effecten op een uitnodiging hebt uitgezet. Alleen als je daarop tikt.",

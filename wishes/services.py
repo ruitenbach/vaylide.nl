@@ -134,15 +134,19 @@ def send_proposal(req: CustomRequest, *, author, text: str, price_cents: int | N
     return req
 
 
-def accept_proposal(req: CustomRequest, *, user):
-    """Akkoord van de klant. Geeft een Payment terug als er betaald moet worden, anders None."""
+def accept_proposal(req: CustomRequest, *, user, terms_accepted: bool = False):
+    """Akkoord van de klant, met de algemene voorwaarden. Geeft een Payment terug als er betaald moet worden, anders None."""
+    from core.voorwaarden import current, version_info
     from orders.services import create_custom_order, create_payment
 
     if req.status != CustomRequest.Status.PROPOSAL:
         raise WishError("Er staat geen voorstel open om te accepteren.")
+    if not terms_accepted:
+        raise WishError("Ga akkoord met de algemene voorwaarden om het voorstel te accepteren.")
+    versie = version_info(current())
     with transaction.atomic():
         req.accepted_at = timezone.now()
-        RequestMessage.objects.create(request=req, author=user, from_staff=False, body="Akkoord met het voorstel.")
+        RequestMessage.objects.create(request=req, author=user, from_staff=False, body=f"Akkoord met het voorstel en met de algemene voorwaarden (versie {versie['date'].day}-{versie['date'].month}-{versie['date'].year}).")
         if req.proposal_price_cents:
             req.status = CustomRequest.Status.AWAITING_PAYMENT
             req.unread_by_staff = True

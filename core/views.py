@@ -474,7 +474,7 @@ def privacy(request):
     from .company import company
 
     return render(request, "core/privacy.html", {
-        "config": SiteConfig.get(), "b": company(), "versie": pv.VERSION, "besluit": pv.BESLUITEN,
+        "config": SiteConfig.get(), "b": company(strikt=True), "versie": pv.VERSION, "nieuwe_prijzen": prijzen.actief(), "besluit": pv.BESLUITEN,
         "open_punten": pv.open_points(), "aanbieders": pv.suppliers(), "cookies": pv.cookies(),
         "ai_actief": pv.ai_active(), "email_actief": pv.email_active(), "backup_actief": pv.backup_offsite_active(),
         "gezichten_actief": dj_settings.FACES_ENABLED,
@@ -488,20 +488,21 @@ def _terms_context(version: str) -> dict:
     from django.urls import reverse
 
     from .company import company
-    from .voorwaarden import CURRENT, VERSIONS, version_info
+    from .voorwaarden import VERSIONS, current, version_info
 
     if version not in VERSIONS:
         raise Http404()
     base = dj_settings.BASE_URL.rstrip("/")
     links = {"contact": base + reverse("core:contact"), "privacy": base + reverse("core:privacy"),
              "herroepen": base + reverse("orders:withdraw"), "terms": base + reverse("core:terms_version", args=[version])}
-    return {"terms": version_info(version), "is_current": version == CURRENT, "b": company(), "links": links, "config": SiteConfig.get()}
+    info = version_info(version)
+    return {"terms": info, "is_current": version == current(), "b": company(strikt=bool(info.get("strikt"))), "links": links, "config": SiteConfig.get()}
 
 
 def terms(request):
-    from .voorwaarden import CURRENT
+    from .voorwaarden import current
 
-    return render(request, "core/terms.html", _terms_context(CURRENT))
+    return render(request, "core/terms.html", _terms_context(current()))
 
 
 def terms_version(request, version):

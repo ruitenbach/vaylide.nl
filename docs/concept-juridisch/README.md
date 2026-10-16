@@ -1,6 +1,6 @@
 # Concept juridische teksten bij de nieuwe prijsstructuur
 
-Status: **concept, niet toegepast in de site.** De eigenaar ging op 15 oktober 2026 akkoord met deze teksten als concept. Ze zijn nog niet juridisch beoordeeld.
+Status: **technisch toegepast op de ontwikkelbranch als versie `2026-10-16` van de voorwaarden en in de privacyverklaring (16 oktober 2026, lokaal, nog niet live en nog 'Concept'); zie `docs/VOORWAARDEN.md`.** Eerdere status: concept, niet toegepast. De eigenaar ging op 15 oktober 2026 akkoord met deze teksten als concept. Ze zijn nog niet juridisch beoordeeld.
 
 - `voorwaarden-nieuw.md`: volledige algemene voorwaarden met de wijzigingen in artikel 3, 4, 6 en 7 (Basis, Luxe, Special, 12 maanden online, overgangsregel, geen toeslagen).
 - `privacyverklaring-nieuw.md`: volledige privacyverklaring met twee gewijzigde zinnen (onderdeel 2 en 9). Gemaakt uit de site in testmodus: in productie komen er afhankelijk van de instellingen onderdelen bij (Mollie, e-maildienst, analytics, tweede back-uplocatie).

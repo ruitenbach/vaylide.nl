@@ -14,12 +14,15 @@ from core.privacy import apply_retention
 from .helpers import VaylideTestCase
 
 ALLES_BESLOTEN = {key: "Vastgesteld door de eigenaar." for key in pv.BESLUITEN}
+# De eigenaar heeft alle bedrijfsgegevens zelf in de omgeving gezet (zie settings.COMPANY_CONFIRMED).
+ALLES_BEVESTIGD = {"kvk": True, "btw": True, "adres": True, "email": True}
 
 
 class StatementTests(VaylideTestCase):
     def page(self):
         return Client().get("/privacy/").content.decode()
 
+    @override_settings(COMPANY_CONFIRMED=ALLES_BEVESTIGD)
     def test_all_sections_and_facts(self):
         html = self.page()
         for kop in ("1. Wie verantwoordelijk is", "4. Uitnodigingen, aanmeldingen en de organisator", "8. Verwerking buiten",
@@ -38,7 +41,7 @@ class StatementTests(VaylideTestCase):
 
         config = SiteConfig.get()
         html = self.page()
-        self.assertIn(f"{config.guest_data_retention_days} dagen nadat de uitnodiging offline ging", html)
+        self.assertIn(f"{config.guest_data_retention_days} dagen na de einddatum van de looptijd van de kaart", html)
         self.assertIn(f"{config.unpaid_draft_retention_days} dagen na de laatste wijziging", html)
 
     def test_open_decisions_are_visible_on_the_test_version(self):
@@ -65,7 +68,7 @@ class StatementTests(VaylideTestCase):
         with override_settings(EMAIL_MODE="smtp", PRIVACY_EMAIL_PROVIDER=""):
             self.assertIn(pv.LABELS["email_aanbieder"], pv.open_points())
             self.assertIn("[naam en land aanbieder]", self.page())
-        with override_settings(EMAIL_MODE="smtp", PRIVACY_EMAIL_PROVIDER="Voorbeeld Mail B.V. (Nederland)"):
+        with override_settings(EMAIL_MODE="smtp", PRIVACY_EMAIL_PROVIDER="Voorbeeld Mail B.V. (Nederland)", PRIVACY_EMAIL_PROVIDER_CONFIRMED=True):
             self.assertNotIn(pv.LABELS["email_aanbieder"], pv.open_points())
             self.assertIn("Voorbeeld Mail B.V.", self.page())
 
@@ -87,7 +90,8 @@ class LiveGuardTests(VaylideTestCase):
         self.assertEqual(errors[0].id, "vaylide.E001")
 
     @override_settings(TEST_MODE=False, COMPANY_LEGAL_NAME="Voorbeeld", COMPANY_ADDRESS="Straat 1|1234 AB Plaats",
-                       EMAIL_MODE="smtp", PRIVACY_EMAIL_PROVIDER="Voorbeeld Mail B.V. (Nederland)", ANTHROPIC_API_KEY="")
+                       EMAIL_MODE="smtp", PRIVACY_EMAIL_PROVIDER="Voorbeeld Mail B.V. (Nederland)", ANTHROPIC_API_KEY="",
+                       COMPANY_CONFIRMED=ALLES_BEVESTIGD, PRIVACY_EMAIL_PROVIDER_CONFIRMED=True)
     def test_live_passes_when_everything_is_decided(self):
         with mock.patch.dict(pv.BESLUITEN, ALLES_BESLOTEN):
             self.assertEqual(pv.open_points(), [])

@@ -1208,3 +1208,7 @@ Zie `docs/KERSTFILMKAARTEN.md`. Uitgevoerd:
 - Volledige pagina 390x844, 360x640, 844x390 en 1440x900: het tikvlak ligt op het zegel, wordt geraakt (`elementFromPoint`), valt binnen het scherm en een tik start de film.
 - 'Speel de opening opnieuw' ligt in het kleine kader niet meer onder Beweging en Muziek (bekeken op screenshot).
 - Niet gedaan: echte telefoon, Safari, Firefox.
+
+## Voorwaarden 16 oktober 2026 en privacyverklaring (lokaal)
+
+Uitgevoerd op de lokale branch, testmodus, SQLite: de hele testset (1051 tests, 1 overgeslagen, geslaagd) en met `VIERLIEF_PRICING_V2=1` de tests van prijsstructuur, voorwaarden, nieuwe voorwaarden, privacyverklaring en wensen (101, geslaagd). Gedekt: twee versies naast elkaar en de oude ongewijzigd; `current()` volgt de schakelaar; de juiste versie bij bestellen, de bestelling, de bevestigingsmail en de pdf; maatwerk met verplicht vinkje en vastgelegde versie; invulvelden voor onbevestigde bedrijfsgegevens en de activeringsdatum; de conceptmelding; de looptijdtekst en bewaartermijnen in de privacyverklaring; alleen actieve diensten in de verklaring. Niet uitgevoerd: een juridische beoordeling, een controle in een echte browser, en een controle op staging of productie.

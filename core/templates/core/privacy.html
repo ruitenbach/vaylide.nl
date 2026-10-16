@@ -12,14 +12,14 @@
   <p>VAYLIDE maakt digitale uitnodigingen en wenskaarten. Om de website te laten werken, bestellingen uit te voeren en gasten te laten reageren, verwerken wij persoonsgegevens. Hieronder lees je welke gegevens, waarom, met wie wij ze delen, hoe lang wij ze bewaren en welke rechten je hebt.</p>
 
   <h2 id="wie">1. Wie verantwoordelijk is</h2>
-  <p>VAYLIDE is een handelsnaam van {{ b.juridische_naam|invul:"[juridische naam onderneming en rechtsvorm]" }}, ingeschreven bij de Kamer van Koophandel onder nummer {{ b.kvk|invul:"[KvK-nummer]" }}. Voor privacyvragen mail je naar <a href="mailto:{{ b.email }}">{{ b.email }}</a>. Het vestigingsadres en onze andere gegevens staan op <a href="{% url 'core:contact' %}">Contact &amp; bedrijfsgegevens</a>.</p>
+  <p>VAYLIDE is een handelsnaam van {{ b.juridische_naam|invul:"[juridische naam onderneming en rechtsvorm]" }}, ingeschreven bij de Kamer van Koophandel onder nummer {{ b.kvk|invul:"[KvK-nummer]" }}. Voor privacyvragen mail je naar {{ b.email|mailto }}. Het vestigingsadres en onze andere gegevens staan op <a href="{% url 'core:contact' %}">Contact &amp; bedrijfsgegevens</a>.</p>
   <p>Wij zijn verwerkingsverantwoordelijke voor de verwerkingen waarvan wij zelf het doel en de middelen bepalen: je account, bestellingen en betalingen, klantcontact en de beveiliging van de site. Voor de gegevens van gasten lees je in <a href="#gasten">onderdeel 4</a> hoe het zit. Wij hebben geen functionaris voor gegevensbescherming.</p>
 
   <h2 id="gegevens">2. Welke gegevens wij verwerken</h2>
   <h3>Account en inloggen</h3>
   <p>Je e-mailadres, en je naam als je die invult in Mijn VAYLIDE. Je logt in met een code die wij per e-mail sturen; er is geen wachtwoord. Die code bewaren wij alleen versleuteld (als hash). Hij is twintig minuten geldig en na vijf foute pogingen ongeldig. Ook bewaren wij of je de nieuwsbrief wilt ontvangen, met de tekst waarmee en het moment waarop je dat aangaf.</p>
   <h3>Bestellingen en betalingen</h3>
-  <p>Bestelnummer, het ontwerp en de titel van je kaart, pakket en extra's, bedragen, de betaalstatus, de betaalmethode, de referentie van de betaalprovider, de aankoopdatum en de datum tot wanneer je kaart online staat. Ook bewaren wij met welke versie van de algemene voorwaarden je akkoord ging, en wanneer en met welke tekst je toestemming gaf voor directe levering. Rekening-, kaart- en PayPal-gegevens vul je in bij de betaalprovider; die krijgen wij niet.</p>
+  <p>Bestelnummer, het ontwerp en de titel van je kaart, {% if nieuwe_prijzen %}de indeling (Basis, Luxe of Special){% else %}pakket en extra's{% endif %}, bedragen, de betaalstatus, de betaalmethode, de referentie van de betaalprovider, de aankoopdatum en de datum tot wanneer je kaart online staat. Ook bewaren wij met welke versie van de algemene voorwaarden je akkoord ging, en wanneer en met welke tekst je toestemming gaf voor directe levering. Rekening-, kaart- en PayPal-gegevens vul je in bij de betaalprovider; die krijgen wij niet.</p>
   <h3>Inhoud van je kaart</h3>
   <p>Wat je zelf invult of uploadt: namen, datum, tijd, locatie en adres, programma, dresscode, persoonlijke teksten, foto's, muziek, een eigen logo of initialen voor het lakzegel, en eventueel een contactpersoon met telefoonnummer of e-mailadres. Die inhoud kan gegevens van andere mensen bevatten. Zet er alleen gegevens en foto's op die je met de genodigden mag delen.</p>
   <h3>Gegevens van gasten</h3>
@@ -89,17 +89,17 @@
     <li><strong>{{ s.naam|invul:"[aanbieder]" }}:</strong> {{ ""|invul:"[doorgifte en waarborgen invullen]" }}</li>{% endif %}{% endfor %}
     <li>De overige partijen hierboven zijn gevestigd in de EER.</li>
   </ul>
-  <p>Een kopie van de waarborgen vraag je op via <a href="mailto:{{ b.email }}">{{ b.email }}</a>.</p>
+  <p>Een kopie van de waarborgen vraag je op via {{ b.email|mailto }}.</p>
 
   <h2 id="bewaren">9. Hoe lang wij gegevens bewaren</h2>
-  <p>Je kaart staat online met Essentieel 6 maanden en met Compleet 12 maanden, vanaf de bevestigde betaling. Dat is de looptijd van de dienst, niet de bewaartermijn. De bewaartermijnen staan hieronder. Termijnen met 'automatisch' voert de site elke nacht zelf uit.</p>
+  {% if nieuwe_prijzen %}<p>Je kaart staat 12 maanden online, vanaf de bevestigde betaling. Voor kaarten waarvoor je vóór <mark class="invulveld">[activeringsdatum van de nieuwe prijzen]</mark> akkoord bent gegaan met de voorwaarden (versie 29 september 2026), geldt de einddatum in je bestelbevestiging: 6 maanden bij Essentieel, 12 maanden bij Compleet en 6 maanden bij een wenskaart, vermeerderd met de extra maanden die je bij die bestelling hebt gekocht. Dat is de looptijd van de dienst, niet de bewaartermijn.{% else %}<p>Je kaart staat online met Essentieel 6 maanden en met Compleet 12 maanden, vanaf de bevestigde betaling. Dat is de looptijd van de dienst, niet de bewaartermijn.{% endif %} De bewaartermijnen staan hieronder. Termijnen met 'automatisch' voert de site elke nacht zelf uit.</p>
   <div class="table-wrap"><table class="table-simple table-stapel">
     <thead><tr><th scope="col">Gegevens</th><th scope="col">Bewaartermijn</th></tr></thead>
     <tbody>
       <tr><td data-label="Gegevens">Inlogcodes</td><td data-label="Bewaartermijn">20 minuten geldig, na 2 dagen verwijderd (automatisch)</td></tr>
       <tr><td data-label="Gegevens">Ontwerpen die nooit aan een bevestigd e-mailadres zijn gekoppeld, met hun foto's</td><td data-label="Bewaartermijn">{{ config.anonymous_draft_retention_days }} dagen na de laatste wijziging (automatisch)</td></tr>
       <tr><td data-label="Gegevens">Ontwerpen in je account die nooit zijn besteld, met hun foto's</td><td data-label="Bewaartermijn">{{ config.unpaid_draft_retention_days }} dagen na de laatste wijziging (automatisch)</td></tr>
-      <tr><td data-label="Gegevens">Aanmeldingen van gasten</td><td data-label="Bewaartermijn">{{ config.guest_data_retention_days }} dagen nadat de uitnodiging offline ging (automatisch). De organisator of de gast kan ze eerder verwijderen.</td></tr>
+      <tr><td data-label="Gegevens">Aanmeldingen van gasten</td><td data-label="Bewaartermijn">{{ config.guest_data_retention_days }} dagen na de einddatum van de looptijd van de kaart (automatisch). De organisator of de gast kan ze eerder verwijderen.</td></tr>
       <tr><td data-label="Gegevens">Gekochte kaarten, foto's en andere inhoud na de looptijd</td><td data-label="Bewaartermijn">{{ besluit.bewaar_gekochte_kaarten|invul:"[termijn na afloop van de looptijd]" }}</td></tr>
       <tr><td data-label="Gegevens">Account</td><td data-label="Bewaartermijn">Tot je het verwijdert in Mijn VAYLIDE. {{ besluit.bewaar_account|invul:"[termijn voor accounts die niet meer worden gebruikt]" }}</td></tr>
       <tr><td data-label="Gegevens">Bestel- en betaalgegevens</td><td data-label="Bewaartermijn">7 jaar (fiscale bewaarplicht). Verwijder je je account, dan blijven deze gegevens zonder naam, e-mailadres en kaarttitel bewaard.</td></tr>
@@ -172,12 +172,12 @@
     <li>het beheer is alleen bereikbaar met een eigen login;</li>
     <li>dagelijkse back-ups{% if backup_actief %}, met een versleutelde kopie op een tweede locatie{% endif %}.</li>
   </ul>
-  <p>Vermoed je een beveiligingsprobleem? Mail <a href="mailto:{{ b.email }}">{{ b.email }}</a>. Stuur geen inlogcodes, wachtwoorden of onnodige persoonsgegevens mee.</p>
+  <p>Vermoed je een beveiligingsprobleem? Mail {{ b.email|mailto }}. Stuur geen inlogcodes, wachtwoorden of onnodige persoonsgegevens mee.</p>
 
   <h2 id="rechten">12. Jouw rechten</h2>
   <p>Afhankelijk van de verwerking heb je recht op inzage, correctie, verwijdering, beperking van de verwerking, overdracht van je gegevens en bezwaar tegen verwerking op grond van gerechtvaardigd belang. Een toestemming kun je altijd intrekken, en tegen direct marketing kun je altijd bezwaar maken.</p>
   <p>Veel kun je zelf in Mijn VAYLIDE: je naam aanpassen, je nieuwsbrief uitzetten, een uitnodiging of een aanmelding verwijderen, de gastenlijst downloaden en je account verwijderen. Gasten wijzigen of verwijderen hun antwoord via hun persoonlijke link.</p>
-  <p>Voor andere verzoeken mail je naar <a href="mailto:{{ b.email }}">{{ b.email }}</a>. Wij reageren binnen een maand. Bij ingewikkelde of veel verzoeken kan dat met hoogstens twee maanden worden verlengd; dat laten wij je dan binnen de eerste maand weten, met de reden. Als het nodig is, controleren wij op een passende manier of het verzoek van jou komt. Stuur niet uit jezelf een kopie van je identiteitsbewijs. Kunnen wij een verzoek niet (helemaal) uitvoeren, bijvoorbeeld door een wettelijke bewaarplicht, dan leggen wij uit waarom.</p>
+  <p>Voor andere verzoeken mail je naar {{ b.email|mailto }}. Wij reageren binnen een maand. Bij ingewikkelde of veel verzoeken kan dat met hoogstens twee maanden worden verlengd; dat laten wij je dan binnen de eerste maand weten, met de reden. Als het nodig is, controleren wij op een passende manier of het verzoek van jou komt. Stuur niet uit jezelf een kopie van je identiteitsbewijs. Kunnen wij een verzoek niet (helemaal) uitvoeren, bijvoorbeeld door een wettelijke bewaarplicht, dan leggen wij uit waarom.</p>
   <p>Je kunt ook een klacht indienen bij de <a href="https://www.autoriteitpersoonsgegevens.nl" rel="noopener">Autoriteit Persoonsgegevens</a>.</p>
 
   <h2 id="besluiten">13. Geautomatiseerde besluiten</h2>

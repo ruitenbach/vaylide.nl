@@ -68,6 +68,16 @@ def invul(value, placeholder):
 
 
 @register.filter
+def mailto(value, placeholder="[contact-e-mailadres]"):
+    """Een mailtolink, of een herkenbaar invulveld als het adres (nog) niet is bevestigd."""
+    from django.utils.html import format_html
+
+    if value:
+        return format_html('<a href="mailto:{0}">{0}</a>', value)
+    return format_html('<mark class="invulveld">{}</mark>', placeholder)
+
+
+@register.filter
 def json_ld(data):
     """Zet een dict om naar een JSON-LD-gegevensblok (zie core/seo.py)."""
     return render_json_ld(data)

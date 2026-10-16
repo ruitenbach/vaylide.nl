@@ -94,6 +94,15 @@ COMPANY_LEGAL_NAME = env("VIERLIEF_JURIDISCHE_NAAM")
 COMPANY_ADDRESS = env("VIERLIEF_ADRES", "Händellaan 73|8031 EG Zwolle")
 COMPANY_PHONE = env("VIERLIEF_TELEFOON")
 OWNER_NOTIFY_EMAIL = env("VIERLIEF_OWNER_EMAIL", CONTACT_EMAIL)
+# Welke bedrijfsgegevens de eigenaar zelf in de omgeving heeft gezet (Render). Een standaardwaarde uit de code is geen bewijs dat
+# een gegeven juist is: de voorwaarden van versie 2026-10-16 en de privacyverklaring tonen zo'n gegeven als invulveld
+# totdat de eigenaar het bevestigt door de variabele te zetten (core/company.py, company(strikt=True)).
+COMPANY_CONFIRMED = {
+    "kvk": bool(env("VIERLIEF_KVK")),
+    "btw": bool(env("VIERLIEF_BTW")),
+    "adres": bool(env("VIERLIEF_ADRES")),
+    "email": bool(env("VIERLIEF_CONTACT_EMAIL")),
+}
 # Optioneel één wachtwoord voor de hele site (inlogvenster van de browser), bijvoorbeeld zolang een
 # testversie online staat. Leeg = uit. Zie core.middleware.PreviewPasswordMiddleware.
 PREVIEW_PASSWORD = env("VIERLIEF_PREVIEW_PASSWORD", "")
@@ -332,6 +341,7 @@ AI_ENABLED = env_bool("VIERLIEF_AI_ENABLED", True)
 # invulveld op de testversie; in live-modus weigert `manage.py check` dan.
 # Besluit eigenaar (beslislijst C1, 1 oktober 2026): Vimexx verstuurt de e-mail (SMTP via mail.zxcs.nl).
 PRIVACY_EMAIL_PROVIDER = env("VIERLIEF_EMAIL_AANBIEDER", "Vimexx B.V. (Nederland)")
+PRIVACY_EMAIL_PROVIDER_CONFIRMED = bool(env("VIERLIEF_EMAIL_AANBIEDER"))
 PRIVACY_BACKUP_PROVIDER = env("VIERLIEF_BACKUP_AANBIEDER")
 PRIVACY_AI_AFSPRAKEN = env("VIERLIEF_AI_AFSPRAKEN")  # doorgifte-afspraken met Anthropic, na eigen controle
 

@@ -304,7 +304,7 @@ def wish_detail(request, uid):
         action = request.POST.get("actie")
         try:
             if action == "akkoord":
-                payment = accept_proposal(req, user=request.user)
+                payment = accept_proposal(req, user=request.user, terms_accepted=request.POST.get("terms") == "on")
                 if payment is not None:
                     return redirect(payment.checkout_url)
                 messages.success(request, "Bedankt voor je akkoord. We gaan aan de slag.")
@@ -321,7 +321,9 @@ def wish_detail(request, uid):
             messages.error(request, str(exc))
     thread = req.messages.filter(internal=False).select_related("author").prefetch_related("attachments")
     attachments = req.attachments.filter(Q(message__isnull=True) | Q(message__internal=False))
-    return render(request, "portal/wish.html", {"req": req, "thread": thread, "form": form, "attachments": attachments})
+    from core.voorwaarden import current, version_info
+
+    return render(request, "portal/wish.html", {"req": req, "thread": thread, "form": form, "attachments": attachments, "voorwaarden": version_info(current())})
 
 
 @customer_required

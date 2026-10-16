@@ -51,7 +51,7 @@ class WishFlowTests(VaylideTestCase):
         self.assertEqual(req.status, CustomRequest.Status.PROPOSAL)
         self.assertEqual(req.proposal_price_cents, 3500)
         self.assertTrue(OutboundEmail.objects.filter(kind="wish_update").exists())
-        response = self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord"})
+        response = self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on"})
         self.assertEqual(response.status_code, 302)
         req.refresh_from_db()
         self.assertEqual(req.status, CustomRequest.Status.AWAITING_PAYMENT)
@@ -75,17 +75,17 @@ class WishFlowTests(VaylideTestCase):
 
         req = self.create()
         self.staff.post(f"/beheer/wensen/{req.uid}/", {"actie": "voorstel", "text": "We maken een tweetalige versie.", "price": "35.00"})
-        self.assertEqual(self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord"}).status_code, 302)
+        self.assertEqual(self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on"}).status_code, 302)
         order = Order.objects.get(kind=Order.Kind.CUSTOM)
         self.assertEqual(order.terms_version, CURRENT)
-        with mock.patch("orders.services.TERMS_VERSION", "2099-01-01"):
+        with mock.patch("core.voorwaarden.CURRENT", "2099-01-01"):
             order.refresh_from_db()
             self.assertEqual(order.terms_version, CURRENT, "een nieuwere versie verandert de vastgelegde versie van een bestaande bestelling niet")
 
     def test_free_proposal_starts_after_agreement(self):
         req = self.create()
         self.staff.post(f"/beheer/wensen/{req.uid}/", {"actie": "voorstel", "text": "Dat kan kosteloos.", "price": ""})
-        self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord"})
+        self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on"})
         req.refresh_from_db()
         self.assertEqual(req.status, CustomRequest.Status.EXECUTING)
         self.assertFalse(Order.objects.filter(kind=Order.Kind.CUSTOM).exists())
@@ -113,3 +113,28 @@ class WishFlowTests(VaylideTestCase):
     def test_anonymous_help_request_requires_login(self):
         response = Client().get("/account/wensen/nieuw/")
         self.assertIn("/inloggen/", response["Location"])
+
+
+    def test_akkoord_met_een_voorstel_vraagt_om_de_voorwaarden(self):
+        """Ook bij maatwerk kan de klant de geldende voorwaarden lezen en moet hij ze accepteren vóór het akkoord; zonder vinkje gebeurt er niets."""
+        req = self.create()
+        self.staff.post(f"/beheer/wensen/{req.uid}/", {"actie": "voorstel", "text": "We maken een tweetalige versie.", "price": "35.00"})
+        pagina = self.c.get(f"/account/wensen/{req.uid}/")
+        self.assertContains(pagina, 'name="terms"')
+        self.assertContains(pagina, "/voorwaarden/pdf/")
+        antwoord = self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord"})
+        self.assertContains(antwoord, "Ga akkoord met de algemene voorwaarden")
+        req.refresh_from_db()
+        self.assertEqual(req.status, CustomRequest.Status.PROPOSAL)
+        self.assertFalse(Order.objects.filter(kind=Order.Kind.CUSTOM).exists())
+
+    def test_maatwerk_met_de_nieuwe_prijsstructuur_legt_de_nieuwe_voorwaardenversie_vast(self):
+        from django.test import override_settings
+
+        req = self.create()
+        self.staff.post(f"/beheer/wensen/{req.uid}/", {"actie": "voorstel", "text": "Extra.", "price": "35.00"})
+        with override_settings(PRICING_V2=True):
+            self.assertContains(self.c.get(f"/account/wensen/{req.uid}/"), "16 oktober 2026")
+            self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on"})
+        self.assertEqual(Order.objects.get(kind=Order.Kind.CUSTOM).terms_version, "2026-10-16")
+        self.assertTrue(req.messages.filter(body__contains="algemene voorwaarden (versie 16-10-2026)").exists())

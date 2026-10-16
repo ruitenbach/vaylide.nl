@@ -18,7 +18,7 @@ from django.utils import timezone
 
 from catalog import prijzen, wenskaart
 from catalog.models import Package
-from core.voorwaarden import CURRENT as TERMS_VERSION, DELIVERY_CONSENT, SERVICE_CONSENT
+from core.voorwaarden import DELIVERY_CONSENT, SERVICE_CONSENT, current as terms_version_now
 from invitations.content import publish_issues
 from invitations.models import Invitation, Source
 from invitations.services import snapshot
@@ -109,7 +109,7 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
             availability_months=quote.availability_months,
             total_cents=quote.total_cents,
             terms_accepted_at=timezone.now(),
-            terms_version=TERMS_VERSION,
+            terms_version=terms_version_now(),
             delivery_consent_at=timezone.now() if delivery_consent else None,
             delivery_consent_text=DELIVERY_CONSENT if delivery_consent else "",
             service_consent_at=timezone.now() if service_consent else None,
@@ -137,7 +137,7 @@ def create_custom_order(custom_request, *, user) -> Order:
         custom_request=custom_request,
         total_cents=custom_request.proposal_price_cents or 0,
         terms_accepted_at=timezone.now(),
-        terms_version=TERMS_VERSION,    # de versie die gold op het moment van akkoord; artikel 16 van de voorwaarden
+        terms_version=terms_version_now(),    # de versie die gold op het moment van akkoord; artikel 16 van de voorwaarden
         test_mode=settings.TEST_MODE,
     )
     OrderLine.objects.create(

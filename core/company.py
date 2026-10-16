@@ -11,9 +11,12 @@ TRADE_NAME = "VAYLIDE"
 NEWLINE = chr(10)
 
 
-def company() -> dict:
+def company(strikt: bool = False) -> dict:
+    """De bedrijfsgegevens. Met `strikt=True` (de juridische teksten) alleen wat de eigenaar zelf in de omgeving heeft gezet: een
+    standaardwaarde uit de code blijft dan leeg en verschijnt als herkenbaar invulveld. `bevestigd` zegt per gegeven of het is bevestigd."""
     raw = (settings.COMPANY_ADDRESS or "").replace(NEWLINE, "|")
     address = [line.strip() for line in raw.split("|") if line.strip()]
+    confirmed = getattr(settings, "COMPANY_CONFIRMED", {})
     data = {
         "handelsnaam": TRADE_NAME,
         "juridische_naam": settings.COMPANY_LEGAL_NAME,
@@ -23,6 +26,17 @@ def company() -> dict:
         "email": settings.CONTACT_EMAIL,
         "telefoon": settings.COMPANY_PHONE,
     }
+    data["onbevestigd"] = [label for key, label in (("kvk", "KvK-nummer"), ("btw", "btw-id"), ("adres", "vestigingsadres"),
+                                                    ("email", "contact-e-mailadres")) if not confirmed.get(key)]
+    if strikt:
+        if not confirmed.get("kvk"):
+            data["kvk"] = ""
+        if not confirmed.get("btw"):
+            data["btw"] = ""
+        if not confirmed.get("adres"):
+            data["adres"] = []
+        if not confirmed.get("email"):
+            data["email"] = ""
     data["ontbreekt"] = [label for key, label in (("juridische_naam", "juridische naam en rechtsvorm"), ("adres", "vestigingsadres"),
                                                   ("kvk", "KvK-nummer")) if not data[key]]
     return data

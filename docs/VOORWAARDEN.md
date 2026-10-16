@@ -4,6 +4,16 @@ Werk op de **lokale branch `claude/algemene-voorwaarden`**. Niet gepusht: de bra
 `claude/kerstkaarten-website-design-51mn9k` gaat automatisch naar Render, en publiceren gebeurt pas na akkoord van de
 eigenaar. De tekst is een **concept**. Hij is niet juridisch beoordeeld en de site zegt dat ook zo.
 
+## Versie 16 oktober 2026 (nieuwe prijsstructuur, lokaal, niet gepusht)
+
+- **Twee versies naast elkaar.** `2026-09-29` (Essentieel en Compleet) blijft ongewijzigd bereikbaar. `2026-10-16` hoort bij Basis, Luxe en Special: 12 maanden online voor elke kaart, geen toeslagen (artikel 3, 4, 6 en 7), met de overgangsregel voor bestellingen waarvoor vóór de activering akkoord is gegeven. Beide staan in `VERSIONS` (`core/voorwaarden.py`).
+- **Welke geldt bij een bestelling:** `core.voorwaarden.current()`. Met `VIERLIEF_PRICING_V2` aan is dat `2026-10-16`, anders `2026-09-29`. Prijzen en voorwaarden gaan zo altijd samen live; de schakelaar terugzetten zet ook de voorwaarden terug. Bij het bestellen (studio en maatwerk), de bestelling (`Order.terms_version`), de bevestigingsmail en de pdf-bijlage is het steeds dezelfde versie. Een bestaande bestelling houdt haar eigen versie.
+- **Maatwerk:** het voorstel in Mijn VAYLIDE heeft nu een verplicht vinkje voor de voorwaarden (met de versie en de pdf). Zonder vinkje gebeurt er niets; met vinkje legt het bericht "Akkoord met het voorstel en met de algemene voorwaarden (versie …)" het moment en de versie vast, en de maatwerkbestelling slaat dezelfde versie op.
+- **Conceptstatus:** de nieuwe versie heeft status "Concept" en toont de conceptmelding, net als de privacyverklaring. Pas na goedkeuring van de eigenaar zet je de status op "Definitief" (en haal je de conceptmelding bij de privacyverklaring weg).
+- **Onbevestigde bedrijfsgegevens:** de nieuwe versie en de privacyverklaring tonen KvK-nummer, btw-id, vestigingsadres en contact-e-mailadres alleen als de eigenaar ze zelf in de omgeving heeft gezet (`VIERLIEF_KVK`, `VIERLIEF_BTW`, `VIERLIEF_ADRES`, `VIERLIEF_CONTACT_EMAIL`; `settings.COMPANY_CONFIRMED`). Een standaardwaarde uit de code verschijnt daar als geel invulveld. Hetzelfde geldt voor de naam van de e-maildienst in de privacyverklaring (`VIERLIEF_EMAIL_AANBIEDER`). De footer en de contactpagina tonen de standaardwaarden nog zoals voorheen.
+- **Nog in te vullen vóór de definitieve versie:** de activeringsdatum in artikel 6 (en in onderdeel 9 van de privacyverklaring), de juridische naam en rechtsvorm, en de vier bedrijfsgegevens hierboven.
+- Tests: `tests/test_voorwaarden_nieuw.py`, `tests/test_wishes.py`.
+
 ## Wat er gebouwd is
 
 | Onderdeel | Waar |
