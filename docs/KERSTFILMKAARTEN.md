@@ -30,3 +30,20 @@ Gekozen versie voor nieuwe klanten: komt een nieuw ontwerp meteen met meer versi
 
 ## Tekst vrij van confetti en sneeuwvlokken (16 oktober 2026)
 Bij Kerstpaleis (v1) en Kerstbal (v2) lagen de deeltjes van het openen en vieren (de `.fx-burst`-laag van `effects.js`, die boven de pagina ligt) soms over de tekst. Beide ontwerpen laden nu `invitations/static/invitations/tekstvrij.js`: dat knipt de laag rond de zichtbare tekst weg (met een marge van 5 px, tien keer per seconde bijgewerkt). De effecten zelf, hun instellingen in het manifest en de ontwerpen zijn niet veranderd; de gedeelde `effects.js` en `effects.css` ook niet. Andere ontwerpen laden het script niet. Beide versies stonden nog niet op productie. Controle: `tests/test_tekstvrij.py` (script geladen) en een visuele vergelijking met en zonder script op 390 px.
+
+## Kerstmagie (16 oktober 2026): kerstkaart met een openingsfilm van de eigenaar
+
+Een vijfde kerstontwerp met een film, in `designs/kerstmagie/v1/`. De film (staand, 10 seconden, zonder geluid) opent met een sneeuwkristal in close-up dat overgaat in een kerstdorp met een stoomtrein. Een tik in het midden start hem, nooit vanzelf; daarna gaat hij over in de kerstkaart, die op het laatste beeld van de film begint. Stukken uit de film keren terug in de kaart: het eindbeeld achter de kop, de trein en het plein als zachte beeldstroken tussen de onderdelen, het sneeuwkristal op het monogram.
+
+**Productindeling (gelijk aan Kerstmarkt, Kerstpaleis, Kerstcoupé en Kerstbal):**
+- gelegenheid: alleen de bestaande gelegenheid **Kerst** (`occasions: ["kerst"]`). Er is geen gelegenheid bijgekomen en er staan geen andere gelegenheden (Bruiloft, Verloving, Verjaardag, Jubileum, Zakelijk) meer in het manifest. Een kerstborrel van een bedrijf is een kerstkaart met een programma en past dus binnen Kerst;
+- `envelope_mode: built_in` (de eigen filmopening; geen stap Envelop & zegel), `opening: film`, sneeuw als sfeer (bestaand effect);
+- collectie: groep B in `catalog/collectie.py`, naast de vier andere kerstfilmontwerpen; `sort_order` 47 (uniek), `added_at` 16 oktober 2026 (dus bovenaan bij 'nieuwste eerst' in de kerstcollectie);
+- prijs: indeling **Luxe** in `catalog/prijzen.py`, zoals de vier andere kerstfilmontwerpen: kerstkaart Luxe € 24,95, 12 maanden online. Geen nieuwe prijs, geen toeslag, geen pakketkeuze; de prijstabel is niet aangeraakt. Ontwerp en prijs zijn alleen voor Kerst te koop (voor andere gelegenheden bestaat geen prijs). De indeling Luxe is een keuze naar analogie met de vier films; de eigenaar bevestigt hem of kiest Special (dan € 49,95 en de specials-vlag);
+- voorbeeld: `/voorbeeld/kerstmagie/` opent als kerstkaart (`DEFAULT_DEMO_OCCASION` in `invitations/demo.py`), met de kerstbeelden van de andere kerstontwerpen.
+
+**Bestanden:** `intro.js` (gedrag), `media/` (mp4, webm-reserve, stills), kaartbeeld `static/img/designs/kerstmagie.webp`; de media zijn opnieuw te maken met `tools/kerstmagie/maak_media.py`. De film wordt pas geladen als de pagina klaar is en niet bij een directe link naar de aanmelding of 'databesparing'. Bij 'minder beweging' of de knop Beweging op stil opent een tik direct, met een knop **Bekijk eerst de film**. Start de film niet, dan opent de kaart gewoon.
+
+**Rechten:** de film is door de eigenaar aangeleverd; de eigenaar bevestigt de rechten, zoals bij de andere films.
+
+**Nog te doen:** de teksten in `intro.js` en het openingsscherm zeggen op enkele plekken (onzichtbare knoppen en schermlezertekst) 'uitnodiging' waar bij Kerst 'kerstkaart' hoort; dat is bewust niet aangepast bij het rechtzetten van de koppeling.

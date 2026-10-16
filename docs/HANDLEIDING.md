@@ -258,3 +258,7 @@ Alleen tijdens het ontwikkelen, als er nog geen echte uitnodigingen op een versi
 - **Een klant is de link kwijt.** De klant logt in met een code per e-mail en vindt alles in *Mijn Vaylide*.
 - **Een gast wil een antwoord wijzigen.** Na het versturen krijgt de gast een persoonlijke link om het eigen antwoord te wijzigen of te verwijderen. Op hetzelfde apparaat herkent de uitnodiging het antwoord ook. De klant kan een antwoord verwijderen in *Mijn Vaylide → Aanmeldingen*.
 - **De dag is voorbij.** De uitnodiging blijft leesbaar tot het einde van de beschikbaarheid, met de melding dat de dag heeft plaatsgevonden. Aanmelden kan dan niet meer.
+
+## Ontwerp met een openingsfilm (Kerstmagie)
+
+Kerstmagie opent met een film van 10 seconden (sneeuwkristal, kerstdorp, stoomtrein) die pas start na een tik in het midden. De bestanden staan in `designs/kerstmagie/v1/media/` (mp4 en webm, stilstaande beelden) en het gedrag in `intro.js`. Een andere film gebruiken: een stille, staande film (9:16) van ongeveer 10 seconden, daarna `.venv/bin/python tools/kerstmagie/maak_media.py <film.mp4>` en de uitsneden bovenin dat script bijstellen; na de livegang als nieuwe ontwerpversie (`v2`). Het ontwerp hoort bij de gelegenheid Kerst (indeling Luxe); zie `docs/KERSTFILMKAARTEN.md`.

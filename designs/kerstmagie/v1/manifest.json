@@ -1,0 +1,97 @@
+{
+  "slug": "kerstmagie",
+  "added_at": "2026-10-16T18:30:00Z",
+  "version": 1,
+  "name": "Kerstmagie",
+  "tagline": "Een kleine film opent de winter: van sneeuwkristal tot sprankelend kerstdorp",
+  "description": "Een donkere winterkaart met een korte openingsfilm. Met een tik in het midden begint een sneeuwkristal te stralen en opent zich een kerstdorp met een stoomtrein. Daarna gaat de film over in de kerstkaart, met beelden uit de film, zacht dwarrelende sneeuw en gouden details.",
+  "style_notes": "Donkere winternacht, sneeuw, warm goud, korte openingsfilm",
+  "occasions": [
+    "kerst"
+  ],
+  "envelope_mode": "built_in",
+  "sort_order": 47,
+  "opening": "film",
+  "opening_label": "Openingsfilm",
+  "palettes": [
+    {
+      "key": "nachtblauw",
+      "name": "Winternacht & goud",
+      "swatch": [
+        "#07101F",
+        "#0E1A30",
+        "#D9BE84"
+      ],
+      "vars": {
+        "--kl-bg": "#07101F",
+        "--kl-bg-2": "#0E1A30",
+        "--kl-ink": "#F3EFE6",
+        "--kl-muted": "#BFC8D8",
+        "--kl-gold": "#D9BE84",
+        "--kl-gold-2": "#F2E2B8",
+        "--kl-glow": "rgba(217, 190, 132, 0.13)"
+      }
+    },
+    {
+      "key": "ijsblauw",
+      "name": "IJsblauw & zilver",
+      "swatch": [
+        "#0A1626",
+        "#122338",
+        "#BFD6EE"
+      ],
+      "vars": {
+        "--kl-bg": "#0A1626",
+        "--kl-bg-2": "#122338",
+        "--kl-ink": "#F4F8FC",
+        "--kl-muted": "#BCCBDD",
+        "--kl-gold": "#BFD6EE",
+        "--kl-gold-2": "#E6F1FB",
+        "--kl-glow": "rgba(191, 214, 238, 0.12)"
+      }
+    },
+    {
+      "key": "dennengroen",
+      "name": "Dennengroen & goud",
+      "swatch": [
+        "#0A1C17",
+        "#10281F",
+        "#D6BA7E"
+      ],
+      "vars": {
+        "--kl-bg": "#0A1C17",
+        "--kl-bg-2": "#10281F",
+        "--kl-ink": "#F2EFE4",
+        "--kl-muted": "#C3CEC4",
+        "--kl-gold": "#D6BA7E",
+        "--kl-gold-2": "#F0DFB3",
+        "--kl-glow": "rgba(214, 186, 126, 0.13)"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "sneeuw",
+    "knal": "vonken",
+    "viering": "vonken",
+    "namen": "zacht",
+    "onthul": "zacht",
+    "extra": [
+      "kenburns"
+    ]
+  },
+  "changelog": "Eerste versie: de openingsfilm van de eigenaar (sneeuwkristal, kerstdorp, stoomtrein) die pas start na een tik in het midden, met stukken uit de film in de kaart zelf.",
+  "demo_melody": "stille-nacht"
+}

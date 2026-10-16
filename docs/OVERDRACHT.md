@@ -124,3 +124,5 @@ In een logische volgorde. Punt 2 alleen met akkoord van de eigenaar.
 - Prijzen staan op "Voorlopige prijzen" (Essentieel € 39, Compleet € 69) en zijn aan te passen in Beheer.
 - De voorbeelduitnodigingen gebruiken fictieve namen en locaties en zijn als voorbeeld gemarkeerd.
 - De lettertypen staan op de eigen server (open source, OFL); er gaan geen verzoeken naar Google Fonts.
+
+14. **Kerstmagie** (16 oktober 2026, experimentele branch, nog niet samengevoegd): kerstkaart met een openingsfilm van de eigenaar, bij de bestaande gelegenheid Kerst (groep B, indeling Luxe € 24,95 zoals Kerstmarkt, Kerstpaleis, Kerstcoupé en Kerstbal). Zie `docs/KERSTFILMKAARTEN.md`. Open: de eigenaar bevestigt de indeling Luxe (of Special) en de rechten op de film; de film is niet op een iPhone of Android bekeken (de mp4 is niet in een browser afgespeeld) en de schermlezertekst zegt nog 'uitnodiging' in plaats van 'kerstkaart'.

@@ -31,6 +31,7 @@ DEFAULT_DEMO_OCCASION = {
     "kerstpaleis": "kerst",
     "kerstcoupe": "kerst",
     "kerstbal": "kerst",
+    "kerstmagie": "kerst",
 }
 
 DESIGN_IMAGES = {
@@ -83,6 +84,8 @@ DESIGN_IMAGES = {
     "kerstbal": ["kerst-lichtjes", "kerst-boom", "kerst-kaarsen", "kerst-winterbos", "goud-lichtjes"],
     # Kerstcoupé: de kop is het raam uit het filmpje; deze beelden staan bij de brief en in de galerij.
     "kerstcoupe": ["kerst-kaarsen", "kerst-winterbos", "kerst-lichtjes", "kerst-boom", "goud-lichtjes"],
+    # Kerstmagie: de kop en de vensters zijn stukken uit de openingsfilm; deze beelden staan bij de brief en in de galerij.
+    "kerstmagie": ["kerst-lichtjes", "kerst-boom", "kerst-kaarsen", "kerst-winterbos", "goud-lichtjes"],
     "voor-altijd": ["rozen", "waterverf-bloesem", "bloemblaadjes", "eucalyptus", "duinen-staand"],
     "eerste-dans": ["waterverf-bloesem", "rozen", "kaarslicht", "bloemblaadjes", "zijde-goud"],
     "balzaal": ["rozen", "waterverf-bloesem", "kaarslicht", "bloemblaadjes", "zijde-goud"],
