@@ -150,7 +150,9 @@ class KerstbalV2Tests(VaylideTestCase):
         self.assertNotIn("kerstbal/v1/", html)
         self.assertIn("kerstbal/v2/img/kerstbal.webm", html)
         v1_html = (self.V1 / "invitation.html").read_text(encoding="utf-8").replace("v1", "v2")
-        self.assertEqual(v1_html.replace('data-duration="4100"', 'data-duration="5900"').replace('data-fx-intro="3500"', 'data-fx-intro="5200"'), html)
+        # Verschil met v1: de timing, en het script dat de tekst vrij houdt van confetti (zie tests/test_tekstvrij.py).
+        zonder_tekstvrij = html.replace("\n<script src=\"{% static 'invitations/tekstvrij.js' %}\" defer></script>", "")
+        self.assertEqual(v1_html.replace('data-duration="4100"', 'data-duration="5900"').replace('data-fx-intro="3500"', 'data-fx-intro="5200"'), zonder_tekstvrij)
         template = Template.objects.get(slug="kerstbal")
         version = template.versions.get(number=2)
         v = build_view(occasion="kerst", content=demo_content("kerstbal", "kerst"), overrides={}, template_version=version,
