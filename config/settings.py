@@ -284,6 +284,11 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 PRICING_V2 = env_bool("VIERLIEF_PRICING_V2", False)
 # Concepten die vóór dit moment zijn gemaakt, zien bij het bestellen expliciet dat de prijs is bijgewerkt (ISO-tijd met tijdzone, bijv. 2026-11-01T08:00:00+01:00).
 PRICING_V2_SINCE = env("VIERLIEF_PRICING_V2_SINCE", "")
+# Bevestigingen van de eigenaar voor de nieuwe juridische teksten (voorwaarden van 16 oktober 2026 en de privacyverklaring). Zonder deze waarden blijven de
+# teksten een concept met invulveld voor de activeringsdatum. VIERLIEF_TEKSTEN_DEFINITIEF=1: de eigenaar heeft beide teksten definitief goedgekeurd (de
+# conceptmeldingen vervallen). VIERLIEF_ACTIVERINGSDATUM: de datum waarop de nieuwe prijzen ingaan (YYYY-MM-DD), zoals in artikel 6 genoemd.
+TEXTS_DEFINITIVE = env_bool("VIERLIEF_TEKSTEN_DEFINITIEF", False)
+PRICING_V2_ACTIVATION = env("VIERLIEF_ACTIVERINGSDATUM", "")
 
 PAYMENT_PROVIDER = env("VIERLIEF_PAYMENT_PROVIDER", "test" if TEST_MODE else "mollie").lower()
 MOLLIE_API_KEY = env("MOLLIE_API_KEY")

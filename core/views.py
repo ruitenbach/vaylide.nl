@@ -474,7 +474,7 @@ def privacy(request):
     from .company import company
 
     return render(request, "core/privacy.html", {
-        "config": SiteConfig.get(), "b": company(strikt=True), "versie": pv.VERSION, "nieuwe_prijzen": prijzen.actief(), "besluit": pv.BESLUITEN,
+        "config": SiteConfig.get(), "b": company(strikt=True), "versie": pv.VERSION, "nieuwe_prijzen": prijzen.actief(), "besluit": pv.BESLUITEN, "definitief": dj_settings.TEXTS_DEFINITIVE,
         "open_punten": pv.open_points(), "aanbieders": pv.suppliers(), "cookies": pv.cookies(),
         "ai_actief": pv.ai_active(), "email_actief": pv.email_active(), "backup_actief": pv.backup_offsite_active(),
         "gezichten_actief": dj_settings.FACES_ENABLED,

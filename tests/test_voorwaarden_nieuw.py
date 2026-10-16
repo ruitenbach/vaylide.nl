@@ -163,3 +163,122 @@ class PrivacyTests(VaylideTestCase):
                 self.assertNotIn(f"<td data-label=\"Partij\">{niet_actief}", html)
             else:
                 self.assertNotIn(niet_actief, html)
+
+
+class DefinitiefMakenTests(VaylideTestCase):
+    """De eigenaar maakt de teksten definitief met omgevingsvariabelen; er is daarvoor geen codewijziging nodig en niets wordt vooraf als definitief getoond."""
+
+    def pagina(self, pad):
+        return Client().get(pad).content.decode()
+
+    def test_standaard_blijven_de_nieuwe_teksten_een_concept_met_open_activeringsdatum(self):
+        self.assertEqual(voorwaarden.version_info("2026-10-16")["status"], "Concept")
+        tekst = self.pagina("/voorwaarden/versie/2026-10-16/")
+        self.assertIn("Deze voorwaarden zijn een concept", tekst)
+        self.assertIn("[activeringsdatum van de nieuwe prijzen]", tekst)
+        privacy = self.pagina("/privacy/")
+        self.assertIn("Concept · bijgewerkt op", privacy)
+
+    @override_settings(TEXTS_DEFINITIVE=True, PRICING_V2_ACTIVATION="2026-11-01", COMPANY_CONFIRMED=ALLES_BEVESTIGD)
+    def test_met_de_bevestigingen_van_de_eigenaar_vervallen_concept_en_invulveld(self):
+        self.assertEqual(voorwaarden.version_info("2026-10-16")["status"], "Definitief")
+        tekst = self.pagina("/voorwaarden/versie/2026-10-16/")
+        self.assertNotIn("Deze voorwaarden zijn een concept", tekst)
+        self.assertNotIn("[activeringsdatum van de nieuwe prijzen]", tekst)
+        self.assertIn("1 november 2026", tekst)
+        with V2:
+            privacy = self.pagina("/privacy/")
+        self.assertNotIn("Concept", privacy.split("<main")[1][:600])
+        self.assertIn("1 november 2026", privacy)
+        # De oude versie blijft een ongewijzigd stuk tekst, ook met de nieuwe bevestigingen.
+        self.assertNotIn("1 november 2026", self.pagina("/voorwaarden/versie/2026-09-29/"))
+
+    @override_settings(PRICING_V2_ACTIVATION="morgen")
+    def test_een_ongeldige_activeringsdatum_telt_niet_als_bevestigd(self):
+        self.assertIsNone(voorwaarden.activation_date())
+        self.assertIn("[activeringsdatum van de nieuwe prijzen]", self.pagina("/voorwaarden/versie/2026-10-16/"))
+
+
+class LiveGuardNieuwePrijzenTests(VaylideTestCase):
+    """De prijsschakelaar kan in live-modus niet aan zonder bevestigde bedrijfsgegevens, activeringsdatum en goedgekeurde teksten."""
+
+    def test_zonder_de_nieuwe_prijzen_verandert_er_niets_aan_de_open_punten(self):
+        from core import privacyverklaring as pv
+
+        self.assertEqual(pv.nieuwe_prijzen_open_points(), [])
+
+    @V2
+    @override_settings(COMPANY_CONFIRMED={"kvk": False, "btw": True, "adres": False, "email": True}, PRICING_V2_ACTIVATION="", TEXTS_DEFINITIVE=False)
+    def test_met_de_nieuwe_prijzen_staan_alle_openstaande_bevestigingen_in_de_lijst(self):
+        from core import privacyverklaring as pv
+
+        punten = " | ".join(pv.nieuwe_prijzen_open_points())
+        for deel in ("KvK-nummer", "vestigingsadres", "activeringsdatum", "VIERLIEF_TEKSTEN_DEFINITIEF"):
+            self.assertIn(deel, punten)
+        self.assertNotIn("btw-id", punten)
+
+    @V2
+    @override_settings(TEST_MODE=False, PRICING_V2_ACTIVATION="", TEXTS_DEFINITIVE=False)
+    def test_live_weigert_de_nieuwe_prijzen_zolang_er_iets_openstaat(self):
+        from core import privacyverklaring as pv
+
+        self.assertEqual([f.id for f in pv.check_privacy_statement()], ["vaylide.E001"])
+
+    @V2
+    @override_settings(TEST_MODE=False, COMPANY_LEGAL_NAME="Voorbeeld", COMPANY_ADDRESS="Straat 1|1234 AB Plaats", EMAIL_MODE="smtp", ANTHROPIC_API_KEY="",
+                       PRIVACY_EMAIL_PROVIDER="Voorbeeld Mail B.V. (Nederland)", PRIVACY_EMAIL_PROVIDER_CONFIRMED=True, COMPANY_CONFIRMED=ALLES_BEVESTIGD,
+                       PRICING_V2_ACTIVATION="2026-11-01", TEXTS_DEFINITIVE=True)
+    def test_live_laat_de_nieuwe_prijzen_toe_als_alles_bevestigd_is(self):
+        from unittest import mock
+
+        from core import privacyverklaring as pv
+
+        with mock.patch.dict(pv.BESLUITEN, {key: "Vastgesteld door de eigenaar." for key in pv.BESLUITEN}):
+            self.assertEqual(pv.check_privacy_statement(), [])
+
+
+class BestaandeKlantenTests(VaylideTestCase):
+    """Bestaande bestellingen behouden hun prijs, einddatum, voorwaardenversie en rechten, wat er ook met de prijsschakelaar gebeurt."""
+
+    @staticmethod
+    def vastgelegd(order):
+        order.refresh_from_db()
+        return (order.total_cents, order.terms_version, order.availability_months, order.package_code, sorted(order.features or []),
+                order.terms_accepted_at, order.delivery_consent_text, order.service_consent_text)
+
+    def test_een_bestelling_van_voor_de_nieuwe_prijzen_blijft_ongewijzigd_bij_aan_en_uitzetten(self):
+        klant = self.make_customer()
+        oud = self.make_invitation(owner=klant)
+        self.pay(oud, klant)
+        order = Order.objects.get(invitation=oud)
+        voor = self.vastgelegd(order)
+        self.assertEqual(order.terms_version, "2026-09-29")
+        with V2:
+            self.assertEqual(self.vastgelegd(order), voor)
+            # De oude voorwaarden blijven voor deze klant bereikbaar, ook als pdf, en de bevestigingsmail blijft op de oude versie.
+            for pad in ("/voorwaarden/versie/2026-09-29/", "/voorwaarden/pdf/2026-09-29/"):
+                self.assertEqual(Client().get(pad).status_code, 200, pad)
+        self.assertEqual(self.vastgelegd(order), voor)
+        mail = OutboundEmail.objects.get(order=order, kind="order_confirmation")
+        self.assertEqual(mail.attach_terms_version, "2026-09-29")
+
+    def test_een_bestelling_onder_de_nieuwe_prijzen_blijft_bij_terugdraaien_van_de_schakelaar_ongewijzigd(self):
+        klant = self.make_customer()
+        nieuw = self.make_invitation(owner=klant)
+        with V2:
+            payment = self.pay(nieuw, klant)
+        order = Order.objects.get(pk=payment.order_id)
+        voor = self.vastgelegd(order)
+        self.assertEqual(order.terms_version, "2026-10-16")
+        self.assertEqual(order.total_cents, 5995)
+        # Schakelaar terug: de bestelling houdt prijs, einddatum en de versie waarmee de klant akkoord ging; die versie blijft bereikbaar.
+        self.assertEqual(self.vastgelegd(order), voor)
+        for pad in ("/voorwaarden/versie/2026-10-16/", "/voorwaarden/pdf/2026-10-16/", "/voorwaarden/download/2026-10-16/"):
+            self.assertEqual(Client().get(pad).status_code, 200, pad)
+        self.assertEqual(Payment.objects.get(order=order).status, Payment.Status.PAID)
+        self.assertEqual(OutboundEmail.objects.get(order=order, kind="order_confirmation").attach_terms_version, "2026-10-16")
+        # Nieuwe bestellingen krijgen met de schakelaar uit weer de oude versie; de eerdere bestelling blijft zoals ze was.
+        weer = self.make_invitation(owner=klant)
+        tweede = self.pay(weer, klant)
+        self.assertEqual(Order.objects.get(pk=tweede.order_id).terms_version, "2026-09-29")
+        self.assertEqual(self.vastgelegd(order), voor)

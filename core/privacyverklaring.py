@@ -258,6 +258,24 @@ def open_points() -> list[str]:
         points.append(LABELS["clarity"])
     if google_active() and not GOOGLE_TEKST_GOEDGEKEURD:
         points.append(LABELS["google"])
+    points += nieuwe_prijzen_open_points()
+    return points
+
+
+def nieuwe_prijzen_open_points() -> list[str]:
+    """Pas als de nieuwe prijzen aanstaan: de bevestigingen van de eigenaar die de nieuwe voorwaarden en deze verklaring nodig hebben. Zonder de
+    nieuwe prijzen verandert er niets, zodat de schakelaar nooit aan kan zonder dat de teksten kloppen."""
+    from core.company import company
+    from core.voorwaarden import activation_date
+    from catalog import prijzen
+
+    if not prijzen.actief():
+        return []
+    points = [f"bevestiging van {naam}" for naam in company(strikt=True)["onbevestigd"]]
+    if not activation_date():
+        points.append("activeringsdatum van de nieuwe prijzen (VIERLIEF_ACTIVERINGSDATUM)")
+    if not settings.TEXTS_DEFINITIVE:
+        points.append("definitieve goedkeuring van voorwaarden en privacyverklaring (VIERLIEF_TEKSTEN_DEFINITIEF)")
     return points
 
 

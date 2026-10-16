@@ -47,9 +47,24 @@ SERVICE_CONSENT = (
 )
 
 
+def activation_date() -> date | None:
+    """De activeringsdatum van de nieuwe prijzen, alleen als de eigenaar hem als geldige datum (YYYY-MM-DD) heeft gezet (VIERLIEF_ACTIVERINGSDATUM)."""
+    from django.conf import settings
+
+    try:
+        return date.fromisoformat((getattr(settings, "PRICING_V2_ACTIVATION", "") or "").strip())
+    except ValueError:
+        return None
+
+
 def version_info(version: str | None = None) -> dict:
     version = version or current()
     info = VERSIONS[version]
+    if version == NIEUW:
+        from django.conf import settings
+
+        # Pas "Definitief" als de eigenaar de tekst zelf heeft goedgekeurd (VIERLIEF_TEKSTEN_DEFINITIEF); anders blijft het een concept.
+        info = {**info, "status": "Definitief" if getattr(settings, "TEXTS_DEFINITIVE", False) else "Concept"}
     return {"version": version, **info}
 
 

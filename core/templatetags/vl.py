@@ -90,3 +90,17 @@ def special_zin():
 
     return special_prijszin()
 
+
+
+@register.simple_tag
+def activeringsdatum():
+    """De activeringsdatum van de nieuwe prijzen, of een herkenbaar invulveld zolang de eigenaar hem niet heeft bevestigd."""
+    from django.template.defaultfilters import date as date_filter
+    from django.utils.html import format_html
+
+    from core.voorwaarden import activation_date
+
+    datum = activation_date()
+    if datum:
+        return date_filter(datum, "j F Y")
+    return format_html('<mark class="invulveld">{}</mark>', "[activeringsdatum van de nieuwe prijzen]")

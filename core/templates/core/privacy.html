@@ -3,9 +3,9 @@
 {% block description %}Hoe VAYLIDE omgaat met persoonsgegevens van klanten, gasten en bezoekers.{% endblock %}
 {% block content %}
 <section class="page-head"><div class="container container--mid">
-  <p class="eyebrow">Concept · bijgewerkt op {{ versie|date:"j F Y" }}</p>
+  <p class="eyebrow">{% if definitief %}Bijgewerkt op{% else %}Concept · bijgewerkt op{% endif %} {{ versie|date:"j F Y" }}</p>
   <h1>Privacyverklaring</h1>
-  <p class="notice notice--warning"><strong>Concept</strong>Deze verklaring beschrijft hoe de site nu werkt. Ze is nog niet juridisch beoordeeld.</p>
+  {% if not definitief %}<p class="notice notice--warning"><strong>Concept</strong>Deze verklaring beschrijft hoe de site nu werkt. Ze is nog niet juridisch beoordeeld.</p>{% endif %}
   {% if open_punten %}<p class="notice notice--test"><strong>Invulvelden</strong>Nog vast te stellen: {{ open_punten|join:"; " }}. Deze versie is alleen bedoeld voor de afgeschermde testomgeving.</p>{% endif %}
 </div></section>
 <section class="section section--flush"><div class="container container--mid prose voorwaarden privacy">
@@ -92,7 +92,7 @@
   <p>Een kopie van de waarborgen vraag je op via {{ b.email|mailto }}.</p>
 
   <h2 id="bewaren">9. Hoe lang wij gegevens bewaren</h2>
-  {% if nieuwe_prijzen %}<p>Je kaart staat 12 maanden online, vanaf de bevestigde betaling. Voor kaarten waarvoor je vóór <mark class="invulveld">[activeringsdatum van de nieuwe prijzen]</mark> akkoord bent gegaan met de voorwaarden (versie 29 september 2026), geldt de einddatum in je bestelbevestiging: 6 maanden bij Essentieel, 12 maanden bij Compleet en 6 maanden bij een wenskaart, vermeerderd met de extra maanden die je bij die bestelling hebt gekocht. Dat is de looptijd van de dienst, niet de bewaartermijn.{% else %}<p>Je kaart staat online met Essentieel 6 maanden en met Compleet 12 maanden, vanaf de bevestigde betaling. Dat is de looptijd van de dienst, niet de bewaartermijn.{% endif %} De bewaartermijnen staan hieronder. Termijnen met 'automatisch' voert de site elke nacht zelf uit.</p>
+  {% if nieuwe_prijzen %}<p>Je kaart staat 12 maanden online, vanaf de bevestigde betaling. Voor kaarten waarvoor je vóór {% activeringsdatum %} akkoord bent gegaan met de voorwaarden (versie 29 september 2026), geldt de einddatum in je bestelbevestiging: 6 maanden bij Essentieel, 12 maanden bij Compleet en 6 maanden bij een wenskaart, vermeerderd met de extra maanden die je bij die bestelling hebt gekocht. Dat is de looptijd van de dienst, niet de bewaartermijn.{% else %}<p>Je kaart staat online met Essentieel 6 maanden en met Compleet 12 maanden, vanaf de bevestigde betaling. Dat is de looptijd van de dienst, niet de bewaartermijn.{% endif %} De bewaartermijnen staan hieronder. Termijnen met 'automatisch' voert de site elke nacht zelf uit.</p>
   <div class="table-wrap"><table class="table-simple table-stapel">
     <thead><tr><th scope="col">Gegevens</th><th scope="col">Bewaartermijn</th></tr></thead>
     <tbody>

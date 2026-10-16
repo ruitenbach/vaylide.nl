@@ -1212,3 +1212,7 @@ Zie `docs/KERSTFILMKAARTEN.md`. Uitgevoerd:
 ## Voorwaarden 16 oktober 2026 en privacyverklaring (lokaal)
 
 Uitgevoerd op de lokale branch, testmodus, SQLite: de hele testset (1051 tests, 1 overgeslagen, geslaagd) en met `VIERLIEF_PRICING_V2=1` de tests van prijsstructuur, voorwaarden, nieuwe voorwaarden, privacyverklaring en wensen (101, geslaagd). Gedekt: twee versies naast elkaar en de oude ongewijzigd; `current()` volgt de schakelaar; de juiste versie bij bestellen, de bestelling, de bevestigingsmail en de pdf; maatwerk met verplicht vinkje en vastgelegde versie; invulvelden voor onbevestigde bedrijfsgegevens en de activeringsdatum; de conceptmelding; de looptijdtekst en bewaartermijnen in de privacyverklaring; alleen actieve diensten in de verklaring. Niet uitgevoerd: een juridische beoordeling, een controle in een echte browser, en een controle op staging of productie.
+
+### Definitief maken en terugdraaien van de prijsschakelaar (16 oktober 2026, lokaal)
+
+Uitgevoerd: de hele testset (1064 tests, 1 overgeslagen, geslaagd) in testmodus op SQLite. Nieuw getest: concept en invulveld standaard, definitief na `VIERLIEF_TEKSTEN_DEFINITIEF` en `VIERLIEF_ACTIVERINGSDATUM`, ongeldige datum, de live-controle die de nieuwe prijzen weigert zolang er iets openstaat, en dat bestaande bestellingen (voor en onder de nieuwe prijzen) bij aan- en uitzetten van de schakelaar hun prijs, voorwaardenversie, looptijd en bevestigingsmail houden. Niet gedaan: staging of productie (niet bereikbaar vanuit deze omgeving), juridische beoordeling.
