@@ -106,7 +106,7 @@ class IndelingEnTabel(VaylideTestCase):
         for occasion, cents in verwacht.items():
             self.assertEqual(prijzen.prijs_cents(luxe, occasion), cents, occasion)
             self.assertEqual(prijzen.prijs_cents(luxe, occasion, "wenskaart"), 1995)
-        self.assertEqual(prijzen.prijs_info(luxe, "bruiloft")["label"], "Luxe — € 59,95")
+        self.assertEqual(prijzen.prijs_info(luxe, "bruiloft")["label"], "Luxe € 59,95")
 
     def test_prijsweergave_altijd_twee_decimalen_in_de_nieuwe_structuur(self):
         with override_settings(PRICING_V2=False):
@@ -425,13 +425,13 @@ class Pagina(NieuwePrijzen):
     def test_ontwerppagina_toont_indeling_en_prijs_per_gelegenheid(self):
         c = Client()
         html = c.get("/ontwerpen/liefde-op-papier/?gelegenheid=bruiloft").content.decode()
-        self.assertIn("Luxe — € 59,95", html)
+        self.assertIn("Luxe € 59,95", html)
         self.assertIn("12 maanden online", html)
-        self.assertIn('data-prijs-wenskaart="Luxe — € 19,95"', html)
+        self.assertIn('data-prijs-wenskaart="Luxe € 19,95"', html)
         html = c.get("/ontwerpen/liefde-op-papier/?gelegenheid=verjaardag").content.decode()
-        self.assertIn("Luxe — € 34,95", html)
+        self.assertIn("Luxe € 34,95", html)
         html = c.get("/ontwerpen/monogram/?gelegenheid=bruiloft").content.decode()
-        self.assertIn("Basis — € 29,95", html)
+        self.assertIn("Basis € 29,95", html)
         self.assertIn("12 maanden online", html)
         self.assertNotIn("6 maanden", html)
 
@@ -450,8 +450,8 @@ class Pagina(NieuwePrijzen):
     def test_studio_toont_per_kaart_de_prijs(self):
         c = Client()
         html = c.get(reverse("studio:start") + "?gelegenheid=kerst").content.decode()
-        self.assertIn("Luxe — € 24,95", html)
-        self.assertIn("Special — € 49,95", html)
+        self.assertIn("Luxe € 24,95", html)
+        self.assertIn("Special € 49,95", html)
 
     def test_bestellen_toont_een_regel_geen_pakketkeuze_en_geen_extra_opties(self):
         owner = self.make_customer()

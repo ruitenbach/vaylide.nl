@@ -125,7 +125,7 @@ def prijs_info(template_or_version, occasion: str, soort: str = "") -> dict | No
     indeling = tier(template_or_version)
     naam = TIER_NAAM[indeling]
     rij = categorie(occasion, soort)
-    return {"tier": indeling, "naam": naam, "cents": cents, "display": format_euro(cents), "label": f"{naam} — {format_euro(cents)}",
+    return {"tier": indeling, "naam": naam, "cents": cents, "display": format_euro(cents), "label": f"{naam} {format_euro(cents)}",
             "maanden": MAANDEN_ONLINE[indeling], "rij": rij, "rij_label": CATEGORIE_LABEL[rij]}
 
 

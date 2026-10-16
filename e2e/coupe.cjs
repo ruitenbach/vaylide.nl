@@ -1,6 +1,6 @@
 // Contrast van de tekst op het raam van Kerstcoupé tegen de foto erachter (met de nachtblauwe waas, zoals de gast hem ziet).
 // De gewone toegankelijkheidscontrole slaat tekst op een beeld over ([data-tekst-op-beeld]); deze meet de echte pixels.
-// Per regel (groet, wens, afzender, namen, ondertitel, 'Lees verder'): de tekstkleur tegen de 2% slechtste
+// Per regel (groet, wens, afzender, namen, ondertitel, 'Scroll naar beneden'): de tekstkleur tegen de 2% slechtste
 // achtergrondpixels in het vak van die regel, zonder de schaduw rond de letters, met het licht van het lampje en de kaarsen
 // op volle sterkte (slechtste geval) en zonder sneeuw. Eis: 4,5:1, en 3:1 voor grote tekst (vanaf 24 pixels).
 // De laatste regel geeft de slechtste waarde gedeeld door de eis (1 of meer is goed).
@@ -34,7 +34,7 @@ const SELECTOR = ".kc-greet, .kc-wish, .kc-names, .kc-members, .kc-tagline, .kc-
         const fs = parseFloat(cs.fontSize);
         return { cls: el.className.split(" ")[0].replace("kc-", ""), rects, color: c, large: fs >= 24 || (fs >= 18.66 && +cs.fontWeight >= 700) };
       }), SELECTOR);
-      // De letters onzichtbaar maken, de waas en de achtergrond van 'Lees verder' blijven staan.
+      // De letters onzichtbaar maken, de waas en de achtergrond van 'Scroll naar beneden' blijven staan.
       await p.addStyleTag({ content: `${SELECTOR.split(",").map((s) => s.trim() + ", " + s.trim() + " *").join(", ")} { color: transparent !important; text-shadow: none !important; } .kc-scroll svg { visibility: hidden; }` });
       await p.waitForTimeout(150);
       const shot = await p.screenshot({ type: "png" });

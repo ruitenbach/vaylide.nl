@@ -5,7 +5,7 @@
    Bij 'minder beweging' of 'Beweging uit' speelt het filmpje niet: de kaart verschijnt dan direct.
    Zonder dit script of zonder filmpje werkt alles ook: dan blijft het eerste beeld staan tot de kaart verschijnt.
    Wijzig een uitgebrachte versie niet: maak een v2. */
-/* De kaart vult precies het scherm: de voorbeeldbalk bovenaan gaat eraf, zodat 'Lees verder' in beeld blijft. */
+/* De kaart vult precies het scherm: de voorbeeldbalk bovenaan gaat eraf, zodat de scrollaanwijzing in beeld blijft. */
 (function () {
   "use strict";
   var bar = document.querySelector(".inv-banner");

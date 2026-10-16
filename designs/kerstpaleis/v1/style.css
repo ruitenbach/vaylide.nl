@@ -179,10 +179,11 @@ body {
 .kp-from__name--xlong { font-size: max(12px, 3.1cqi); letter-spacing: .1em; margin-right: -.1em; overflow-wrap: anywhere; }
 .kp-from__members { max-width: 66cqi; font: italic 500 max(14px, 3.9cqi)/1.3 var(--kp-serif); color: var(--kp-cream-2); text-wrap: balance; }
 .kp-scroll {
-  position: absolute; left: 50%; bottom: calc(100cqi * 176 / 720); z-index: 4; translate: -50% 0;
-  display: inline-flex; align-items: center; gap: .3rem; min-height: 44px; padding: .3rem 1.05rem; border-radius: 999px;
-  background: color-mix(in srgb, var(--kp-dark) 62%, transparent); color: var(--kp-cream); text-decoration: none;
-  font: italic 500 1.02rem/1.3 var(--kp-serif); white-space: nowrap;
+  position: absolute; z-index: 4; left: 50%; bottom: calc(100cqi * 176 / 720); translate: -50% 0;
+  display: inline-flex; flex-direction: column; align-items: center; gap: 0; min-height: 44px; padding: .35rem 1rem .25rem;
+  border-radius: 999px; background: rgba(16, 7, 4, .34); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  color: #F8F1E4; text-decoration: none; white-space: nowrap; text-shadow: 0 1px 6px rgba(16, 7, 4, .6);
+  font-family: var(--kp-serif); font-size: .84rem; font-weight: 500; letter-spacing: .03em; opacity: .92;
 }
 
 /* ================================================================ de rest van de kaart, op fluweel */

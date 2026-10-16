@@ -1870,3 +1870,8 @@ a[href] img[src^="/static/"] { pointer-events: none; }
   .info__knop::after { content: ""; position: absolute; inset: -.45rem; }
 }
 
+
+/* Ontwerppagina: de indeling (Basis, Luxe of Special) en de prijs, onderscheiden door lettertype en witruimte, zonder leesteken. */
+.detail-prijs { margin: 1.1rem 0 .7rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: .15rem .6rem; }
+.detail-prijs__bedrag { display: inline-flex; align-items: baseline; gap: .7rem; font-size: 1.3rem; font-weight: 700; }
+.detail-prijs__tier { font-size: .78rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text); }

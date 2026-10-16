@@ -125,7 +125,9 @@
       if (hint) hint.textContent = soortTekst[soort] || "";
       document.querySelectorAll("[data-prijs]").forEach(function (el) {
         var tekst = el.getAttribute("data-prijs-" + soort), doel = el.querySelector("[data-prijs-tekst]");
-        if (tekst && doel) doel.textContent = tekst;
+        if (!tekst || !doel) return;
+        var delen = tekst.match(/^(\S+)\s+(.+)$/), tier = doel.querySelector(".detail-prijs__tier"), euro = doel.querySelector(".detail-prijs__euro");
+        if (delen && tier && euro) { tier.textContent = delen[1]; euro.textContent = delen[2]; } else doel.textContent = tekst;
       });
       if (window.history && history.replaceState) history.replaceState(null, "", zetParam(window.location.href, "soort", soort));
     });

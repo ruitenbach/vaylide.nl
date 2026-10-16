@@ -134,7 +134,7 @@ def _knoppen(step: str, paid: bool, skip, labels) -> dict:
 
 
 def _prijzen_per_ontwerp(templates, occasion: str, soort: str = "") -> dict:
-    """Nieuwe prijsstructuur: bij elke kaart op de keuzepagina 'Luxe — € 34,95' voor de gekozen gelegenheid en kaartsoort (leeg als de structuur uit staat)."""
+    """Nieuwe prijsstructuur: bij elke kaart op de keuzepagina 'Luxe € 34,95' voor de gekozen gelegenheid en kaartsoort (leeg als de structuur uit staat)."""
     if not prijzen.actief() or not occasion:
         return {}
     uit = {}

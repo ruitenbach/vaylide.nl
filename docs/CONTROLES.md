@@ -1216,3 +1216,11 @@ Uitgevoerd op de lokale branch, testmodus, SQLite: de hele testset (1051 tests, 
 ### Definitief maken en terugdraaien van de prijsschakelaar (16 oktober 2026, lokaal)
 
 Uitgevoerd: de hele testset (1064 tests, 1 overgeslagen, geslaagd) in testmodus op SQLite. Nieuw getest: concept en invulveld standaard, definitief na `VIERLIEF_TEKSTEN_DEFINITIEF` en `VIERLIEF_ACTIVERINGSDATUM`, ongeldige datum, de live-controle die de nieuwe prijzen weigert zolang er iets openstaat, en dat bestaande bestellingen (voor en onder de nieuwe prijzen) bij aan- en uitzetten van de schakelaar hun prijs, voorwaardenversie, looptijd en bevestigingsmail houden. Niet gedaan: staging of productie (niet bereikbaar vanuit deze omgeving), juridische beoordeling.
+
+## Afwerking 16 oktober 2026 (prijsweergave en scrollaanwijzing)
+
+Echt uitgevoerd, lokaal met `VIERLIEF_PRICING_V2=1` en Chromium (390 en 1366 pixels breed): `tests.test_afwerking` en `tests.test_prijsstructuur` slagen; de volledige set draaide met 1062 geslaagd en 2 mislukte tests in `tests.test_voorwaarden_nieuw` (invulvelden voor bedrijfsgegevens), die ook zonder deze wijziging mislukten in deze omgeving (met de `.env` uit `.env.example`). Schermafbeeldingen van de scrollaanwijzing bij Kerstmarkt, Kerstcoupé en Kerstpaleis, en van de ontwerppagina, voor en na. Niet gedaan: echte telefoon, Safari, staging.
+
+- Het prijslabel is nu `Luxe € 24,95` (geen streepje); op de ontwerppagina staan indeling en prijs met lettertype en witruimte uit elkaar.
+- De knop "Lees verder" bij Kerstmarkt, Kerstcoupé en Kerstpaleis is nu een rustige aanwijzing "Scroll naar beneden" met een dun pijltje (zelfde link naar de kaart eronder).
+- Haperingen: alleen onderzocht, zie het rapport in de projectmap.
