@@ -211,6 +211,27 @@ De eigenaar vroeg eerst: "vierlief moet worden aangepast naar Vaylia met een nie
 - **Eigen repository.** De eigenaar maakte `bootsman075-ops/vaylide.nl` aan, openbaar; op de vraag of dat zo mocht blijven, koos de eigenaar "Openbaar is goed". Vóór het versturen is de hele geschiedenis doorzocht op wachtwoorden en sleutels (niets gevonden). De eerste commit van de repository (een README van één regel) is samengevoegd; er is niets overschreven.
 - **De website zelf** is verder niet veranderd.
 
+## Ronde 7: Kerstmagie
+
+**Opdracht.** Een kaart met de aangeleverde film als intro: de gast klikt in het midden om de film te starten, en stukken uit de intro komen terug in de kaart zelf.
+
+**De film.** Stil, staand (720 × 1280), 10 seconden: 0 tot 3 s een sneeuwkristal in close-up, 3 tot 4,5 s een warme gloed die overgaat in een kerstdorp bij avond, 4,5 tot 10 s het dorp met een stoomtrein die de brug op rijdt. Er zit geen geluid in; er is dus ook niets om te laten starten of te dempen.
+
+**Keuzes.**
+
+- **Een tik start de film, nooit vanzelf.** De afspeelknop staat precies in het midden van het scherm; een tik ergens anders op het openingsscherm werkt ook. Er is geen autoplay: gasten op mobiele data of met 'databesparing' krijgen niets wat ze niet startten.
+- **Overslaan en vangnetten.** Tijdens de film staat rechtsonder **Overslaan**. Start de film niet (geblokkeerd, te traag na 9 seconden, een fout, haperen langer dan 12 seconden), dan opent de uitnodiging gewoon; de film is een extra, geen voorwaarde.
+- **Minder beweging.** Bij 'minder beweging' in het systeem of een tik op **Beweging** (stil) opent een tik in het midden direct de uitnodiging en staat er een knop **Bekijk eerst de film**. De film is beweging die een gast zelf kan kiezen, geen opgelegde beweging.
+- **Naadloos van film naar kaart.** De film blijft op zijn laatste beeld staan en vervaagt in de kop van de uitnodiging, die hetzelfde beeld als achtergrond heeft (met een donkere sluier boven en onder voor de leesbaarheid van namen en datum). Daardoor springt er niets.
+- **Stukken uit de intro in de kaart**: het eindbeeld (kop), twee uitsneden (de trein op de brug, het plein met draaimolen en boom) als zachte vensters tussen de onderdelen, en het sneeuwkristal uit het begin op het monogram aan het eind. Alle beelden zijn stills uit de film, geen aparte bewegende lus: de trein rijdt door beeld, dus een lus zou springen.
+- **Gewicht.** De film is op 720 × 1280 teruggebracht tot 2,7 MB (H.264, 30 beelden per seconde) met een webm-reserve van 1,9 MB voor browsers zonder H.264. Bij het openingsscherm laadt eerst het stilstaande beeld (193 KB); de film begint pas 1,2 seconden na het laden van de pagina te laden en wordt niet geladen voor wie de uitnodiging al eerder opende, via een directe link naar het aanmeldformulier komt, of 'databesparing' aan heeft (dan na de tik). De bron van 25 MB staat niet in de repository; `tools/kerstmagie/maak_media.py` maakt alles opnieuw.
+- **Breed scherm.** Op een computer staat de film als staand beeld in het midden met een vervaagde achtergrond en zachte zijkanten, in plaats van een sterk bijgesneden beeld.
+- **Sneeuw als nieuw effect.** Voor de sfeer is een nieuwe soort toegevoegd (`sneeuw`: zachte vlokken met af en toe een kristal, wit of ijsblauw), op dezelfde manier als de andere soorten getekend, met dezelfde knop om stil te zetten. Als knal bij het openen is `vonken` gekozen (goud).
+- **Kleurvarianten**: Winternacht & goud, IJsblauw & zilver en Dennengroen & goud. Alle tekstkleuren hebben minstens 4,5:1 contrast op beide achtergronden (getest).
+- **Gelegenheden.** Er is geen gelegenheid Kerst of Feestdagen; die toevoegen raakt het samenstellen en de teksten en is aan de eigenaar. Daarom staat Kerstmagie bij Zakelijk evenement (eerste, dus daar vooraan in de collectie), Bruiloft, Verloving, Verjaardag en Jubileum. De voorbeeldteksten zijn de bestaande per gelegenheid.
+
+**Aannames.** De eigenaar heeft de rechten op de aangeleverde film. Een staande film is genoeg: er is geen liggende versie.
+
 ## Referenties en schermopname
 
 Hier staat eerlijk wat wel en niet is bekeken.

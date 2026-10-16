@@ -53,6 +53,7 @@ DESIGN_IMAGES = {
     "congres": ["architectuur", "stadslicht", "zee-horizon", "confetti", "duinen-staand"],
     "borrel": ["terracotta", "kaarslicht", "goud-lichtjes", "stadslicht", "zee-horizon"],
     "mijlpaal": ["zijde-goud", "stadslicht", "architectuur", "goud-lichtjes", "zee-horizon"],
+    "kerstmagie": ["sterrenhemel", "goud-lichtjes", "kaarslicht", "stadslicht", "duinen-staand"],
 }
 IMAGE_SIZES = {
     "waterverf-bloesem": (1200, 1500),

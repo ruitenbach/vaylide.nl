@@ -14,7 +14,7 @@ cp .env.example .env                      # zet een eigen DJANGO_SECRET_KEY; gee
 .venv/bin/python manage.py migrate        # leest ook de ontwerpen in (sync_designs)
 .venv/bin/python manage.py createsuperuser
 .venv/bin/python manage.py runserver      # http://127.0.0.1:8000, testmodus
-.venv/bin/python manage.py test tests     # 139 tests, moeten altijd slagen
+.venv/bin/python manage.py test tests     # 146 tests, moeten altijd slagen
 ```
 
 Visuele controles (Node met Playwright en Chromium): zie "Zelf herhalen" in `docs/CONTROLES.md` (`e2e/fixtures.py`, `e2e/controle2.cjs`, `e2e/toegankelijkheid.cjs` en `e2e/effecten.cjs`). Beelden opnieuw maken: `tools/logo/README.md` (logo en iconen), `tools/merkbeelden/README.md` (website), `tools/generate_demo_images.py` (voorbeeldbeelden) en `e2e/make_design_images.cjs` (kaartbeelden van de ontwerpen).
@@ -27,6 +27,7 @@ Visuele controles (Node met Playwright en Chromium): zie "Zelf herhalen" in `doc
 | Kop, voet, logo, iconen | `templates/partials/` (`logo.html`, `icons.html`); de bestanden komen uit `tools/logo/maak_logo.py` |
 | Huisstijl | `static/css/vierlief.css` (tokens in `:root`), app-schermen in `static/css/app.css` |
 | Uitnodigingsontwerpen | `designs/<code>/v<N>/` (manifest, template, stylesheet), weergave in `invitations/`. 30 ontwerpen delen de Atelier-opbouw in `designs/_atelier/v1/`; beschrijving en generator in `tools/atelier/`, keuzes en contrastcontrole in `catalog/atelier.py` |
+| Ontwerp met openingsfilm (Kerstmagie) | `designs/kerstmagie/v1/`: `intro.js` (tik in het midden start de film), `media/` (film en stukken uit de film), opnieuw maken met `tools/kerstmagie/maak_media.py` |
 | Effecten op uitnodigingen | `invitations/static/invitations/effects.js` en `effects.css`; keuzes per ontwerp in het manifest (`effects`), opties en websiteteksten in `catalog/effects.py` |
 | Samenstellen, bestellen, betalen | `studio/`, `orders/` (testbetaling en Mollie achter één koppeling) |
 | Verwerking na betaling en e-mail | `processing/` (takenwachtrij met herhalingen) |

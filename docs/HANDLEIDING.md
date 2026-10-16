@@ -165,6 +165,17 @@ static/img/designs/mijn-ontwerp.webp   ← voorbeeldafbeelding (800×1000), opti
 7. **Publiceren**: controleer het in **Beheer → Ontwerpen** (zichtbaar, volgorde) en zet het live met een nieuwe deployment.
 8. **Testen**: `python manage.py test tests`. Het is ook verstandig de browsercontrole te draaien (zie `docs/CONTROLES.md`).
 
+### Ontwerp met een openingsfilm (Kerstmagie)
+
+Kerstmagie opent met een korte film in plaats van een envelop of deur. Het openingsscherm toont het eerste beeld met een afspeelknop in het midden. Een tik (in het midden of ergens op het scherm) start de film; staat hij uit, dan gebeurt er niets. Na de film (of na **Overslaan**) vervaagt het scherm in de uitnodiging, waarvan de kop op het laatste beeld van de film begint. Onderweg in de kaart keren stukken uit de film terug: het eindbeeld als achtergrond van de kop, de trein en het dorpsplein als zachte vensters tussen de onderdelen, en het sneeuwkristal uit het begin op het monogram aan het eind.
+
+- **Bestanden**: `designs/kerstmagie/v1/media/` (`intro.mp4` en `intro.webm`, `poster.webp`, `dorp.webp`, `trein.webp`, `plein.webp`, `sneeuwvlok.webp`) en `intro.js` voor het gedrag. De film heeft geen geluid.
+- **Andere film gebruiken**: een stille, staande film (9:16) van ongeveer 10 seconden. Draai `.venv/bin/python tools/kerstmagie/maak_media.py <film.mp4>`; dat maakt alle bestanden opnieuw. Kijk daarna naar `dorp.webp` (het laatste beeld) en pas zo nodig de uitsneden bovenin het script aan. Zo'n wijziging aan een uitgebrachte versie hoort na de livegang in `designs/kerstmagie/v2/`.
+- **Gewicht**: de film is 2,7 MB (webm 1,9 MB). Hij wordt pas geladen als de pagina klaar is en niet bij 'databesparing' of bij wie de uitnodiging al eerder opende. Een test bewaakt de grootte van de bestanden.
+- **Mocht de film niet starten** (te traag, geblokkeerd, fout): de uitnodiging opent vanzelf, zonder foutmelding.
+- **Minder beweging of de knop Beweging op stil**: een tik in het midden opent direct. Er staat dan een knop **Bekijk eerst de film** voor wie hem toch wil zien.
+- **Gelegenheden**: er is nog geen gelegenheid Kerst of Feestdagen. Kerstmagie staat daarom bij Zakelijk evenement (bijvoorbeeld een kerstborrel), Bruiloft, Verloving, Verjaardag en Jubileum.
+
 ## Effecten
 
 Elk ontwerp heeft bewegende effecten: zwevende deeltjes (sfeer), een knal op het moment dat de uitnodiging opengaat, een feestje als een gast laat weten dat hij komt, een entree voor de namen, onthullingen bij het scrollen en een paar extra's. De keuzes staan per ontwerp in `manifest.json` in het blok `effects` (bij Atelier-ontwerpen in `tools/atelier/specs.py`, de generator zet ze in het manifest). De werking staat in `invitations/static/invitations/effects.js` en `effects.css`, de toegestane waarden in `catalog/effects.py`.
@@ -175,7 +186,7 @@ Elk ontwerp heeft bewegende effecten: zwevende deeltjes (sfeer), een knal op het
 
 | Onderdeel | Keuzes |
 |---|---|
-| `sfeer`: zwevende deeltjes, op het openingsscherm en achter de tekst | `geen`, `blaadjes` (bloemblaadjes), `bloesem`, `bladeren`, `lauwerblaadjes`, `pluisjes`, `confetti`, `harten`, `ballonnen`, `bellen` (zeepbellen), `champagne`, `bokeh` (zachte lichtjes), `stippen`, `stofjes`, `zonlicht`, `neon`, `geometrie` (lijnvormen), `wolkjes`, `goudstof`, `glitter`, `sterren` (met vallende sterren), `netwerk`, `raster` (lichtgolf over puntjes), `film` (korrel en krasjes), `cadeautjes` (vallende cadeautjes met wat confetti) |
+| `sfeer`: zwevende deeltjes, op het openingsscherm en achter de tekst | `geen`, `blaadjes` (bloemblaadjes), `bloesem`, `bladeren`, `lauwerblaadjes`, `pluisjes`, `confetti`, `harten`, `ballonnen`, `bellen` (zeepbellen), `champagne`, `bokeh` (zachte lichtjes), `stippen`, `stofjes`, `zonlicht`, `neon`, `geometrie` (lijnvormen), `wolkjes`, `goudstof`, `glitter`, `sterren` (met vallende sterren), `netwerk`, `raster` (lichtgolf over puntjes), `film` (korrel en krasjes), `cadeautjes` (vallende cadeautjes met wat confetti), `sneeuw` (dwarrelende sneeuwvlokken en kristallen) |
 | `knal` (bij het openen) en `viering` (na "Ja, ik kom") | `geen`, `blaadjes`, `bloesem`, `bladeren`, `lauwerblaadjes`, `pluisjes`, `confetti`, `kanon` (twee confettikanonnen), `vonken` (vonken en glanzende confetti), `sterren`, `harten`, `bellen`, `ballonnen`, `lijnen` (lichtlijnen), `neon`, `flits` (cameraflits), `champagne`, `stippen`, `netwerk`, `bokeh`, `cadeautjes` (plof, en een fontein van cadeautjes met confetti; past bij de opening `cadeau`) |
 | `namen` | `zacht` (uit de mist), `schrijf` (alsof ze geschreven worden), `folie` (een lichtstreep glijdt af en toe over de namen), `gloed` (neon dat aangaat), `pop` (springt tevoorschijn) |
 | `onthul`: secties bij het scrollen | `omhoog`, `zacht`, `zoom`, `kanteling`, `wissel` (afwisselend van links en rechts) |

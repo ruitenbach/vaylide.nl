@@ -1,0 +1,170 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Kerstmagie v1 — donkere winterkaart met een openingsfilm. Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/cinzel-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>{% endblock %}
+
+{% block cover %}
+{# De film start pas na een tik in het midden; intro.js laadt het bestand pas als het openingsscherm echt getoond wordt. #}
+<section class="cover kl-cover" data-cover data-duration="1900" data-fx-delay="450" data-fx-intro="1000" aria-label="Openingsfilm: een sneeuwkristal opent zich naar een kerstdorp met een stoomtrein">
+  {# Opent direct, zonder film. intro.js drukt hierop als de film klaar is; staat vooraan zodat [data-open] hem als eerste vindt. #}
+  <button type="button" class="kl-finish" data-open data-kl-finish tabindex="-1" aria-hidden="true">Open de uitnodiging</button>
+  <div class="kl-stage" aria-hidden="true">
+    <img class="kl-stage__backdrop" src="{% static 'designs/kerstmagie/v1/media/poster.webp' %}" alt="" width="720" height="1280" loading="lazy">
+    <img class="kl-stage__poster" src="{% static 'designs/kerstmagie/v1/media/poster.webp' %}" alt="" width="720" height="1280" loading="lazy">
+    <video class="kl-video" data-kl-video preload="none" data-src-mp4="{% static 'designs/kerstmagie/v1/media/intro.mp4' %}" data-src-webm="{% static 'designs/kerstmagie/v1/media/intro.webm' %}" muted playsinline disablepictureinpicture disableremoteplayback tabindex="-1"></video>
+  </div>
+  <div class="kl-cover__shade" aria-hidden="true"></div>
+  <div class="fx-slot" data-fx-slot="cover" aria-hidden="true" style="--fx-z: 2"></div>
+  <div class="kl-cover__center">
+    <p class="kl-cover__kicker">{{ v.kicker }}</p>
+    <button type="button" class="kl-play fx-pulse" data-kl-play data-fx-origin aria-label="Start de openingsfilm">
+      <svg class="kl-play__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.2v13.6a.6.6 0 0 0 .92.5l10.6-6.8a.6.6 0 0 0 0-1L8.92 4.7a.6.6 0 0 0-.92.5Z"/></svg>
+    </button>
+    <div class="kl-cover__text">
+      <p class="kl-cover__title">{{ v.title }}</p>
+      <p class="kl-cover__hint" data-kl-hint>Tik in het midden om te beginnen</p>
+    </div>
+  </div>
+  <button type="button" class="kl-watch" data-kl-watch hidden>Bekijk eerst de film</button>
+  <button type="button" class="kl-skip" data-open data-kl-skip hidden>Overslaan</button>
+  <p class="kl-status visually-hidden" data-kl-status role="status"></p>
+  <script src="{% static 'designs/kerstmagie/v1/intro.js' %}" defer></script>
+</section>
+{% endblock %}
+
+{% block content %}
+<header class="kl-hero">
+  <div class="kl-hero__bg" aria-hidden="true">
+    <img class="kl-hero__back" src="{% static 'designs/kerstmagie/v1/media/dorp.webp' %}" alt="" width="720" height="1280">
+    <img class="kl-hero__img" src="{% static 'designs/kerstmagie/v1/media/dorp.webp' %}" alt="" width="720" height="1280" fetchpriority="high">
+  </div>
+  <div class="kl-hero__top">
+    <p class="kl-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
+    <h1 class="kl-names kl-names--{{ v.names_size }} fx-names">
+      {% if v.is_couple %}<span>{{ v.names.0 }}</span><span class="kl-names__amp" aria-label="en">&amp;</span><span>{{ v.names.1 }}</span>
+      {% else %}<span>{{ v.names.0 }}</span>{% endif %}
+    </h1>
+    <p class="kl-tagline fx-intro" style="--fx-d:4">{{ v.tagline }}</p>
+  </div>
+  <div class="kl-hero__bottom">
+    {% if v.date %}
+    <div class="kl-date fx-intro" style="--fx-d:5">
+      <span class="kl-date__weekday">{{ v.weekday }}</span>
+      <span class="kl-date__day">{{ v.day }}</span>
+      <span class="kl-date__month">{{ v.month_name }} {{ v.year }}</span>
+    </div>
+    {% endif %}
+    {% if v.time_display or v.venue %}<p class="kl-hero__meta fx-intro" style="--fx-d:6">{% if v.time_display %}<span class="kl-hero__time">{{ v.time_display }}</span>{% endif %}{% if v.time_display and v.venue %}<span class="kl-dot" aria-hidden="true"></span>{% endif %}{% if v.venue %}<span class="kl-hero__venue">{{ v.venue }}</span>{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+  </div>
+</header>
+
+{% if v.hero %}
+<section class="kl-section kl-portrait" data-reveal aria-label="Foto">
+  <figure class="kl-frame"><div class="ph kl-frame__img fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero eager=True sizes="(min-width: 900px) 420px, 84vw" %}</div></figure>
+</section>
+{% endif %}
+
+{% if v.welcome %}
+<section class="kl-section kl-welcome" data-reveal aria-label="Welkom">
+  {% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="kl-section kl-countdown" data-reveal aria-labelledby="kl-cd-title">
+  <h2 id="kl-cd-title" class="kl-h2">{% if v.is_past %}Dank voor een onvergetelijke avond{% else %}Het aftellen is begonnen{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+<div class="kl-band kl-band--trein" data-reveal aria-hidden="true"><img src="{% static 'designs/kerstmagie/v1/media/trein.webp' %}" alt="" width="540" height="300" loading="lazy"></div>
+
+{% if v.show.story %}
+<section class="kl-section kl-story" data-reveal aria-labelledby="kl-story-title">
+  <h2 id="kl-story-title" class="kl-h2">{{ v.story_title }}</h2>
+  {% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="kl-section kl-program" data-reveal aria-labelledby="kl-program-title">
+  <h2 id="kl-program-title" class="kl-h2">Programma</h2>
+  <ol class="kl-program__list">
+    {% for item in v.program %}
+    <li>
+      <span class="kl-program__time">{% if item.time %}{{ item.time }}{% endif %}</span>
+      <div><h3 class="kl-program__title">{{ item.title }}</h3>{% if item.description %}<p>{{ item.description }}</p>{% endif %}</div>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if v.show.location %}
+<section class="kl-section kl-location" data-reveal aria-labelledby="kl-location-title">
+  <h2 id="kl-location-title" class="kl-h2">Locatie</h2>
+  <div class="kl-panel">
+    {% if v.venue %}<p class="kl-location__venue">{{ v.venue }}</p>{% endif %}
+    {% if v.address_lines %}<address>{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+    {% if v.date_display %}<p class="kl-muted">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>{% endif %}
+    {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Route plannen</a>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="kl-section kl-dresscode" data-reveal aria-labelledby="kl-dress-title">
+  <h2 id="kl-dress-title" class="kl-h2">Dresscode</h2>
+  {% for p in v.dresscode_text %}<p>{{ p|linebreaksbr }}</p>{% endfor %}
+  {% if v.dresscode_colors %}<ul class="kl-swatches" aria-label="Kleuren voor de dresscode">
+    {% for c in v.dresscode_colors %}<li style="background:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="kl-section kl-practical" data-reveal aria-labelledby="kl-practical-title">
+  <h2 id="kl-practical-title" class="kl-h2">Goed om te weten</h2>
+  <dl class="kl-practical__list">
+    {% for item in v.practical %}<div>{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+{% if v.show.gallery %}
+<section class="kl-section kl-gallery" data-reveal aria-labelledby="kl-gallery-title">
+  <h2 id="kl-gallery-title" class="kl-h2">Momenten</h2>
+  <ul class="kl-gallery__grid">
+    {% for photo in v.gallery %}<li class="kl-gallery__item kl-gallery__item--{{ photo.orientation }}"><figure class="ph">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 900px) 320px, 46vw" %}</figure>{% if photo.caption %}<p class="kl-caption">{{ photo.caption }}</p>{% endif %}</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<div class="kl-band kl-band--plein" data-reveal aria-hidden="true"><img src="{% static 'designs/kerstmagie/v1/media/plein.webp' %}" alt="" width="420" height="340" loading="lazy"></div>
+
+{% if v.show.rsvp %}
+<section class="kl-section kl-rsvp" id="aanmelden" data-reveal aria-labelledby="kl-rsvp-title">
+  <h2 id="kl-rsvp-title" class="kl-h2">{% if v.formal %}Bent u erbij?{% else %}Ben jij erbij?{% endif %}</h2>
+  <div class="kl-panel kl-panel--form">{% include "invitations/partials/rsvp.html" %}</div>
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="kl-section kl-contact" data-reveal aria-labelledby="kl-contact-title">
+  <h2 id="kl-contact-title" class="kl-h2">Vragen</h2>
+  {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+  <p class="kl-contact__name">{{ v.contact.name }}</p>
+  <p class="kl-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="kl-section kl-closing" data-reveal aria-label="Afsluiting">
+  {% if v.show.closing %}{% for p in v.closing %}<p class="kl-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  <p class="kl-closing__mono" aria-hidden="true"><img src="{% static 'designs/kerstmagie/v1/media/sneeuwvlok.webp' %}" alt="" width="640" height="640" loading="lazy"><span>{{ v.monogram }}</span></p>
+  {% include "invitations/partials/share_buttons.html" %}
+</section>
+{% endblock %}

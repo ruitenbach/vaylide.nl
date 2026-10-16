@@ -15,7 +15,7 @@
 /* Achter de tekst iets rustiger dan op het openingsscherm; grote vormen nog wat zachter. */
 .fx-slot--page.is-running .fx-canvas { opacity: var(--fx-page-opacity, .85); }
 :is([data-fx-sfeer="ballonnen"], [data-fx-sfeer="neon"], [data-fx-sfeer="stippen"], [data-fx-sfeer="cadeautjes"]) { --fx-page-opacity: .6; }
-:is([data-fx-sfeer="wolkjes"], [data-fx-sfeer="harten"], [data-fx-sfeer="geometrie"]) { --fx-page-opacity: .7; }
+:is([data-fx-sfeer="wolkjes"], [data-fx-sfeer="harten"], [data-fx-sfeer="geometrie"], [data-fx-sfeer="sneeuw"]) { --fx-page-opacity: .7; }
 [data-fx-sfeer="raster"] { --fx-page-opacity: .5; }
 .fx .inv-main, .fx .inv-colophon { position: relative; z-index: 1; }
 .fx-burst { position: fixed; inset: 0; z-index: 70; pointer-events: none; }

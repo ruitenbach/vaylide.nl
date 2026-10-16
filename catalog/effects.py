@@ -9,7 +9,7 @@ EFFECT_OPTIONS = {
     # Zwevende deeltjes op de achtergrond (en op het openingsscherm).
     "sfeer": ["geen", "blaadjes", "bloesem", "bladeren", "lauwerblaadjes", "pluisjes", "confetti", "harten", "ballonnen", "bellen",
               "champagne", "bokeh", "stippen", "stofjes", "zonlicht", "neon", "geometrie", "wolkjes", "goudstof",
-              "glitter", "sterren", "netwerk", "raster", "film", "cadeautjes"],
+              "glitter", "sterren", "netwerk", "raster", "film", "cadeautjes", "sneeuw"],
     # Uitbarsting op het moment dat de uitnodiging opengaat.
     "knal": ["geen", "blaadjes", "bloesem", "bladeren", "lauwerblaadjes", "pluisjes", "confetti", "kanon", "vonken", "sterren", "harten",
              "bellen", "ballonnen", "lijnen", "neon", "flits", "champagne", "stippen", "netwerk", "bokeh", "cadeautjes"],
@@ -37,7 +37,7 @@ EFFECT_LABELS = {
     "zonlicht": "Zonnestofjes", "neon": "Neonvormen", "geometrie": "Lijnvormen", "wolkjes": "Wolkjes",
     "goudstof": "Goudstof", "glitter": "Glitter", "sterren": "Sterrenhemel", "netwerk": "Netwerk", "raster": "Lichtgolf",
     "film": "Filmkorrel", "vonken": "Vonken en glanzende confetti", "lijnen": "Lichtlijnen", "flits": "Flits",
-    "cadeautjes": "Cadeautjes", "geen": "Geen",
+    "cadeautjes": "Cadeautjes", "sneeuw": "Sneeuw", "geen": "Geen",
 }
 
 # Voor de website: wat een gast ziet (kleine letters, midden in een zin).
@@ -51,6 +51,7 @@ SFEER_TEXT = {
     "glitter": "fonkelende glitter", "sterren": "een fonkelende sterrenhemel met vallende sterren",
     "netwerk": "een bewegend netwerk van lijnen", "raster": "een lichtgolf over een puntjesraster",
     "film": "filmkorrel en krasjes als bij een oude projector", "cadeautjes": "vallende cadeautjes",
+    "sneeuw": "zacht dwarrelende sneeuw",
 }
 KNAL_TEXT = {
     "blaadjes": "een regen van bloemblaadjes", "bloesem": "een wolk bloesem", "bladeren": "opwaaiende blaadjes",

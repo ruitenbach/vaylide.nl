@@ -154,7 +154,8 @@
       }
       return boxes.map(function (b, i) { return b.concat(lint(b, ribbons[i])); });
     },
-    film: function (p) { return p.dark ? [WHITE] : [mix(p.c1, BLACK, 0.55)]; }
+    film: function (p) { return p.dark ? [WHITE] : [mix(p.c1, BLACK, 0.55)]; },
+    sneeuw: function (p) { return p.dark ? [WHITE, [232, 242, 255], [210, 228, 252]] : [mix(p.c1, WHITE, 0.15), mix(p.c1, WHITE, 0.35)]; }
   };
 
   /* ---------------------------------------------------------------- sprites
@@ -345,6 +346,27 @@
       core.addColorStop(1, css(c, 0));
       g.fillStyle = core;
       g.beginPath(); g.arc(0, 0, 0.2, 0, TAU); g.fill();
+    } },
+    /* Sneeuwkristal: zes armen met twee zijtakjes en een zachte kern. */
+    crystal: { w: 1, h: 1, draw: function (g, c) {
+      g.strokeStyle = css(c);
+      g.lineCap = "round";
+      g.lineWidth = 0.075;
+      for (var i = 0; i < 6; i++) {
+        g.save();
+        g.rotate(i * TAU / 6);
+        g.beginPath();
+        g.moveTo(0, 0); g.lineTo(0.46, 0);
+        g.moveTo(0.27, 0); g.lineTo(0.38, 0.11);
+        g.moveTo(0.27, 0); g.lineTo(0.38, -0.11);
+        g.stroke();
+        g.restore();
+      }
+      var core = g.createRadialGradient(0, 0, 0, 0, 0, 0.16);
+      core.addColorStop(0, css(c, 0.95));
+      core.addColorStop(1, css(c, 0));
+      g.fillStyle = core;
+      g.beginPath(); g.arc(0, 0, 0.16, 0, TAU); g.fill();
     } },
     speck: { w: 1, h: 1, draw: function (g, c) {
       var grad = g.createRadialGradient(0, 0, 0, 0, 0, 0.5);
@@ -571,6 +593,10 @@
     cadeautjes: { type: "multi", layers: [
       { type: "drift", sprites: [["gift", 1]], colors: "cadeau", density: 1.5, min: 5, max: 11, size: [17, 30], speed: [24, 46], dir: "down", sway: [10, 24], swayFreq: [0.3, 0.65], spin: [-0.7, 0.7], alpha: [0.92, 1] },
       { type: "drift", sprites: [["rect", 0.5], ["circle", 0.3], ["ribbon", 0.2]], colors: "feest", density: 2.4, min: 6, max: 16, size: [6, 10], speed: [30, 60], dir: "down", sway: [8, 20], swayFreq: [0.5, 1.1], spin: [-3, 3], flip: [2, 6], alpha: [0.8, 1], back: true }
+    ] },
+    sneeuw: { type: "multi", layers: [
+      { type: "drift", sprites: [["speck", 1]], colors: "sneeuw", density: 7, min: 18, max: 64, size: [3, 8], speed: [16, 38], dir: "down", sway: [10, 30], swayFreq: [0.25, 0.7], alpha: [0.5, 0.95] },
+      { type: "drift", sprites: [["crystal", 1]], colors: "sneeuw", density: 1.3, min: 4, max: 12, size: [11, 19], speed: [14, 30], dir: "down", sway: [14, 36], swayFreq: [0.2, 0.55], spin: [-0.6, 0.6], flip: [0.4, 1.1], alpha: [0.6, 0.95] }
     ] },
     goudstof: { type: "field", colors: "goud", specks: { density: 10, min: 24, max: 70, size: [1.4, 3.4], drift: [3, 11], alpha: [0.35, 0.95], twinkle: [0.6, 1.8] }, flares: { rate: 1.1, size: [9, 18], life: [0.9, 1.6] } },
     glitter: { type: "field", colors: "goud", specks: { density: 22, min: 50, max: 140, size: [1.2, 3.8], drift: [4, 14], alpha: [0.35, 1], twinkle: [1, 3] }, flares: { rate: 3.4, size: [10, 24], life: [0.8, 1.4] } },
