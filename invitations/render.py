@@ -642,6 +642,7 @@ def build_view(
         "template_version": template_version,
         "design_slug": template_version.template.slug,
         "effects": effect_view((template_version.manifest or {}).get("effects")),
+        "film": template_version.film,
         "stylesheet": template_version.stylesheet,
         "notice": (overrides.get("notice") or "").strip()[:300],
     }

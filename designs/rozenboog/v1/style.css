@@ -1,0 +1,453 @@
+/* Rozenboog v1 — crème rozen die opengaan naar een rozenboog op een terras aan zee; de opening is een film (opening.mp4).
+   De film eindigt op de rozenboog bij zonsondergang. De kop toont precies dat laatste beeld (boog.webp): de namen staan
+   in de lucht binnen de boog, datum, tijd en plek op een crème kaart in boogvorm op het terras. Film en kop staan in
+   hetzelfde kader van 9:16 (.rb-frame), zodat ze naadloos in elkaar overgaan. Maten in het kader zijn
+   container-eenheden: ze schalen mee met het beeld. */
+
+@font-face { font-family: "Pinyon Script"; src: url("../../../fonts/pinyon-script-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../../../fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "Figtree"; src: url("../../../fonts/figtree-latin-wght-normal.woff2") format("woff2"); font-weight: 300 900; font-display: swap; }
+
+body {
+  --inv-bg: var(--rb-page);
+  --inv-text: var(--rb-ink);
+  --inv-muted: var(--rb-muted);
+  --inv-accent: var(--rb-accent);
+  --inv-accent-contrast: #fff;
+  --inv-focus: var(--rb-accent);
+  --inv-surface-2: color-mix(in srgb, var(--rb-paper-2) 70%, transparent);
+  --inv-field-border: color-mix(in srgb, var(--rb-ink) 30%, transparent);
+  --inv-field-bg: #fff;
+  --inv-btn-border: color-mix(in srgb, var(--rb-accent) 55%, transparent);
+  --inv-btn-text: var(--rb-accent);
+  --inv-btn-hover-bg: color-mix(in srgb, var(--rb-paper-2) 70%, transparent);
+  --inv-font-body: "Cormorant Garamond", Georgia, serif;
+  --inv-font-ui: "Figtree", system-ui, sans-serif;
+  --inv-font-size: 1.2rem;
+  --inv-radius: 6px;
+  --inv-music-bg: color-mix(in srgb, var(--rb-paper) 94%, transparent);
+  --inv-music-text: var(--rb-accent);
+  --inv-music-border: color-mix(in srgb, var(--rb-gold) 60%, transparent);
+  /* Rondom het beeld op een breed scherm: de kleuren van de avondlucht. */
+  --rb-surround: radial-gradient(ellipse 70% 80% at 50% 38%, var(--rb-page-2) 0%, var(--rb-page) 55%, var(--rb-dusk) 100%);
+  --rb-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .22  0 0 0 0 .12  0 0 0 .07 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  /* Crème papier voor het label en de kaart in het beeld: licht doorschijnend, zodat het kaarslicht er zacht doorheen schijnt. */
+  --rb-glass: rgba(255, 250, 242, .9);
+  background-color: var(--rb-page);
+  background-image: var(--rb-grain), radial-gradient(ellipse 120% 50% at 50% 100%, var(--rb-dusk), transparent 70%);
+  font-weight: 450;
+}
+
+/* ---------- Het kader van de film en de kop (9:16) ---------- */
+/* Op een telefoon vult het kader de hoogte en vallen de zijkanten net buiten beeld; op een breder
+   scherm staat het in het midden, met zacht verlopende zijkanten. */
+.rb-frame {
+  position: absolute; top: 0; left: 50%; height: 100%; aspect-ratio: 9 / 16; transform: translateX(-50%);
+  container-type: size;
+}
+.rb-film {
+  position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; display: block;
+}
+/* De kop: het laatste beeld van de film (boog.webp) als achtergrond van het kader. */
+.rb-frame--hero { background-size: cover; background-position: center; background-repeat: no-repeat; }
+@media (min-aspect-ratio: 5 / 8) {
+  .rb-film, .rb-frame--hero {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+  }
+}
+
+/* ---------- Openingsscherm: de wand van rozen (eerste beeld van de film) ---------- */
+.js .rb-cover { background: var(--rb-surround); display: block; }
+/* invite.js zet het kader precies op de plek van de kop eronder (ook als er een balk boven staat). */
+.rb-frame--cover {
+  top: var(--film-top, 0px); left: var(--film-left, 50%);
+  width: var(--film-width, auto); height: var(--film-height, 100%);
+  transform: var(--film-shift, translateX(-50%));
+}
+/* Pas zichtbaar als het kader op zijn plek ligt (geen verspringen); vangnet na 1,2 s. */
+.js .rb-frame--cover { opacity: 0; animation: rb-frame-in 0s linear 1.2s forwards; }
+.js .rb-frame--cover.is-aligned { opacity: 1; animation: none; transition: opacity .25s ease; }
+@keyframes rb-frame-in { to { opacity: 1; } }
+
+/* Het label op de rozen: crème, met een boog als bovenkant, zoals de rozenboog die achter de rozen verscholen ligt. */
+.rb-label {
+  /* In het midden van het zichtbare deel: de film is minstens 560 pixels hoog en kan onder het scherm doorlopen
+     (liggende telefoon, of een balk erboven). Op een liggend scherm is de film smal: het label mag dan breder zijn. */
+  position: absolute; left: 50%; z-index: 1; width: max(72cqw, min(300px, 86vw)); transform: translate(-50%, -50%);
+  top: calc((100vh - var(--film-top, 0px)) / 2);
+  top: calc((100svh - var(--film-top, 0px)) / 2);
+  display: grid; justify-items: center; gap: 1.6cqh; text-align: center;
+  padding: 15cqw 7cqw 7cqw;
+  background: var(--rb-glass); color: var(--rb-ink);
+  border-radius: 36cqw 36cqw 2.4cqw 2.4cqw / 30cqw 30cqw 2.4cqw 2.4cqw;
+  box-shadow: 0 2.4cqh 5cqh -1.6cqh rgba(92, 58, 30, .45), 0 .3cqh 1cqh rgba(92, 58, 30, .18);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.rb-label::before {
+  content: ""; position: absolute; inset: 2.2cqw; pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--rb-gold) 85%, transparent);
+  border-radius: 34cqw 34cqw 1.2cqw 1.2cqw / 28cqw 28cqw 1.2cqw 1.2cqw;
+}
+.rb-label__to {
+  font-family: "Cormorant Garamond", serif; font-style: italic; font-weight: 500;
+  font-size: 1.1rem; font-size: clamp(15px, 5cqw, 24px); line-height: 1.25; color: var(--rb-muted);
+}
+.rb-label__names {
+  font-family: "Pinyon Script", cursive; color: var(--rb-accent); line-height: 1.12;
+  font-size: 2.4rem; font-size: clamp(28px, 11cqw, 62px);
+  text-wrap: balance; overflow-wrap: anywhere; max-width: 100%;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;
+}
+.rb-label__names--long { font-size: clamp(24px, 8.8cqw, 50px); }
+/* Heel lange namen: kleiner en tot vijf regels, zodat ook de tweede naam op het label past. */
+.rb-label__names--xlong { font-size: clamp(17px, 5.6cqw, 34px); -webkit-line-clamp: 5; line-clamp: 5; }
+.rb-label__rule { width: 34cqw; height: auto; color: var(--rb-gold-line); }
+/* Laag scherm (liggende telefoon): compacter, zodat de knop altijd in beeld blijft. */
+@media (max-height: 520px) {
+  .rb-label { gap: .35rem; padding: 2.4rem 1.2rem .9rem; }
+  .rb-label__to { font-size: 15px; }
+  .rb-label__names { font-size: 26px; }
+  .rb-label__names--long { font-size: 22px; }
+  .rb-label__names--xlong { font-size: 16px; }
+  .rb-label__rule { display: none; }
+}
+.rb-open {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  min-height: 44px; padding: .6rem 1.4rem; margin-top: .4cqh; border-radius: 999px; cursor: pointer;
+  background: var(--rb-accent); color: #fff; text-decoration: none;
+  font-family: "Figtree", sans-serif; font-weight: 600; letter-spacing: .04em;
+  font-size: .95rem; font-size: clamp(14px, 4.2cqw, 18px);
+  box-shadow: 0 6px 16px -6px rgba(92, 40, 18, .6);
+  --fx-pulse: var(--rb-gold);
+}
+.rb-open:hover { background: color-mix(in srgb, var(--rb-accent) 88%, #000); }
+.rb-open:focus-visible { outline: 3px solid var(--rb-accent); outline-offset: 4px; }
+.rb-open-music {
+  min-height: 44px; padding: .45rem 1.1rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--rb-accent) 55%, transparent); background: transparent; color: var(--rb-accent);
+  font-family: "Figtree", sans-serif; font-size: .9rem; font-weight: 600;
+}
+.rb-skip {
+  position: fixed; right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); z-index: 56;
+  min-height: 44px; padding: .55rem 1.1rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--inv-music-border); background: var(--inv-music-bg); color: var(--rb-accent);
+  font-family: "Figtree", sans-serif; font-size: .9rem; font-weight: 600;
+  box-shadow: 0 6px 20px rgba(60, 30, 10, .2); transition: opacity .5s ease;
+}
+.inv-embed .rb-skip { right: .6rem; bottom: .6rem; }
+
+/* Openen: het label verdwijnt, de film speelt; aan het eind vervaagt het scherm naar de kop eronder. */
+.is-opening .rb-label { opacity: 0; transform: translate(-50%, -48%); pointer-events: none; }
+.is-film-end .rb-cover { opacity: 0; transition: opacity 1s ease; }
+.is-film-end .rb-skip { opacity: 0; pointer-events: none; }
+.is-opening-reduced .rb-cover { opacity: 0; transition: opacity .2s ease; }
+
+/* ---------- Kop: het laatste beeld van de film ---------- */
+.rb-hero {
+  position: relative; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden;
+  background: var(--rb-surround);
+}
+/* De lucht binnen de boog (in boog.webp ongeveer 160–520 × 150–480 van 720 × 1280). Een zachte gloed van
+   avondlicht achter de tekst houdt hem leesbaar, ook waar de ranken en wolken donkerder zijn. */
+.rb-sky {
+  position: absolute; left: 13%; right: 13%; top: 12.5%; height: 27.5%;
+  container-type: size;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; color: var(--rb-sky-ink);
+}
+.rb-sky::before {
+  content: ""; position: absolute; inset: -12% -12%; z-index: -1; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 244, 230, .78) 0%, rgba(255, 244, 230, .7) 45%, rgba(255, 244, 230, .38) 72%, rgba(255, 244, 230, .12) 88%, rgba(255, 244, 230, 0) 100%);
+}
+.rb-kicker {
+  position: relative; padding: .45em 1em;
+  font-family: "Figtree", sans-serif; font-weight: 600; letter-spacing: .24em; text-transform: uppercase;
+  font-size: .8rem; font-size: clamp(11.5px, 4.3cqw, 18px); line-height: 1.45; color: var(--rb-sky-ink);
+  text-wrap: balance;
+}
+/* Kleine letters bovenin staan deels op de ranken van de boog: een eigen, zacht vervaagd vlakje avondlicht. */
+.rb-kicker::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: rgba(255, 244, 230, .86); border-radius: 999px; filter: blur(7px);
+}
+.rb-names {
+  display: grid; justify-items: center; margin: 3cqh 0 0;
+  font-family: "Pinyon Script", cursive; font-weight: 400; color: var(--rb-sky-ink);
+  font-size: 3.2rem; font-size: min(18cqw, 30cqh); line-height: 1.06;
+  overflow-wrap: anywhere; text-wrap: balance;
+  text-shadow: 0 0 .35em rgba(255, 248, 238, .9);
+}
+.rb-names--long { font-size: min(14cqw, 25cqh); }
+.rb-names--xlong { font-size: min(9.6cqw, 17cqh); }
+.rb-names__amp { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: .46em; color: var(--rb-sky-muted); line-height: 1.15; }
+/* Lange namen of een lange kopregel: alles iets kleiner, zodat het binnen de boog blijft. */
+/* Dan loopt de tekst tot over de berghelling: een voller, zacht vervaagd vlak avondlicht achter de hele tekst. */
+.rb-sky--dense::before { inset: -3% -5%; background: rgba(255, 244, 230, .85); border-radius: 12cqw; filter: blur(12px); }
+.rb-sky--dense .rb-kicker { font-size: clamp(10.5px, 3.6cqw, 15px); letter-spacing: .14em; }
+.rb-sky--dense .rb-names { margin-top: 2cqh; font-size: min(13cqw, 23cqh); }
+.rb-sky--dense .rb-names--long { font-size: min(10.5cqw, 19cqh); }
+.rb-sky--dense .rb-names--xlong { font-size: min(7.6cqw, 13.5cqh); }
+
+/* De kaart op het terras (in boog.webp 130–590 × 830–1210): crème, met een boog als bovenkant. */
+.rb-card {
+  position: absolute; left: 18%; right: 18%; top: 64.5%; bottom: 5%;
+  container-type: size;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5cqh;
+  /* Procenten van de breedte van het beeld (niet cqh: dat zou naar het beeld verwijzen, niet naar de kaart). */
+  padding: 13% 6.5% 5.5%; text-align: center; color: var(--rb-ink);
+  background: var(--rb-glass);
+  border-radius: 50% 50% 3% 3% / 30% 30% 3% 3%;
+  box-shadow: 0 1.4cqh 4cqh -1cqh rgba(92, 58, 30, .5);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  --inv-muted: var(--rb-muted);
+}
+.rb-card__sprig { position: absolute; left: 50%; top: 9.5%; width: 34cqw; height: auto; transform: translateX(-50%); color: var(--rb-sage); }
+.rb-card::before {
+  content: ""; position: absolute; inset: 3.2cqw; pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--rb-gold) 85%, transparent);
+  border-radius: 50% 50% 2% 2% / 30% 30% 2% 2%;
+}
+/* Weekdag en maand tussen twee gouden lijnen; loopt de maand over twee regels, dan blijven de lijnen gelijk. */
+.rb-date {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 4cqw; width: 100%;
+}
+.rb-date__weekday, .rb-date__month {
+  display: flex; align-items: center;
+  font-family: "Figtree", sans-serif; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+  font-size: .78rem; font-size: clamp(10.5px, 4.4cqw, 16px); line-height: 1.35; color: var(--rb-ink);
+  padding: .45em 0; border-top: 1px solid var(--rb-gold-line); border-bottom: 1px solid var(--rb-gold-line);
+}
+.rb-date__weekday { justify-content: flex-end; text-align: right; }
+.rb-date__month { justify-content: flex-start; text-align: left; }
+.rb-date__day { align-self: center; font-size: 3rem; font-size: min(19cqw, 30cqh); line-height: 1; color: var(--rb-accent); font-weight: 500; }
+.rb-meta { display: grid; gap: .1em; font-size: 1.15rem; font-size: clamp(14px, 6.4cqw, 24px); line-height: 1.28; color: var(--rb-ink); text-wrap: balance; }
+.rb-meta__time { font-weight: 600; }
+.rb-card--dense { gap: 3cqh; }
+.rb-card--dense .rb-date__day { font-size: min(15cqw, 24cqh); }
+.rb-card--dense .rb-meta { font-size: clamp(12.5px, 5cqw, 20px); }
+
+/* ---------- Bladen onder de kop ---------- */
+.rb-body {
+  display: grid; justify-items: center; gap: clamp(1.4rem, 4.5vw, 2.4rem);
+  padding: clamp(2.4rem, 7vw, 4rem) 1rem 0;
+}
+.rb-sheet {
+  --inv-text: var(--rb-ink); --inv-muted: var(--rb-muted); --inv-focus: var(--rb-accent);
+  position: relative; width: min(100%, 38rem);
+  padding: clamp(2.2rem, 7vw, 3.2rem) clamp(1.4rem, 6vw, 3.2rem);
+  background-color: var(--rb-paper); background-image: var(--rb-grain);
+  color: var(--rb-ink); text-align: center; border-radius: 4px;
+  box-shadow: 0 30px 50px -34px rgba(92, 58, 30, .55), 0 2px 8px rgba(92, 58, 30, .12);
+}
+/* Fijne gouden lijn binnen de rand, zoals bij gedrukt papier. */
+.rb-sheet::before {
+  content: ""; position: absolute; inset: 9px; pointer-events: none; border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--rb-gold) 75%, transparent);
+}
+.rb-h2 {
+  font-family: "Pinyon Script", cursive; font-weight: 400; color: var(--rb-accent);
+  font-size: clamp(2.3rem, 9vw, 3.1rem); line-height: 1.15; margin-bottom: 1rem;
+}
+
+/* Het welkomstblad heeft de vorm van de boog. */
+.rb-welcome {
+  padding-top: clamp(4.2rem, 16vw, 6rem);
+  border-radius: min(19rem, 46vw) min(19rem, 46vw) 4px 4px / min(9rem, 24vw) min(9rem, 24vw) 4px 4px;
+}
+.rb-welcome::before { border-radius: min(18.4rem, 44vw) min(18.4rem, 44vw) 2px 2px / min(8.6rem, 22.6vw) min(8.6rem, 22.6vw) 2px 2px; }
+.rb-welcome__sprig { width: min(60%, 13rem); height: auto; margin: 0 auto 1.1rem; color: var(--rb-sage); }
+.rb-welcome__tagline { font-style: italic; font-weight: 500; font-size: clamp(1.35rem, 4.6vw, 1.6rem); line-height: 1.45; color: var(--rb-accent); text-wrap: balance; }
+.rb-welcome p + p { margin-top: 1rem; font-size: clamp(1.2rem, 4vw, 1.35rem); text-wrap: pretty; }
+
+/* Portret onder een boog, zoals het uitzicht in de film. */
+.rb-portrait {
+  width: min(84vw, 440px); margin: 0; padding: 10px; background: var(--rb-paper);
+  border-radius: 220px 220px 4px 4px / 200px 200px 4px 4px;
+  box-shadow: 0 30px 50px -34px rgba(92, 58, 30, .55);
+}
+.rb-portrait__img { aspect-ratio: 4 / 5; border-radius: 210px 210px 2px 2px / 190px 190px 2px 2px; }
+
+.rb-countdown .cd { margin-bottom: 1.6rem; }
+.rb-countdown .cd__unit {
+  min-width: 4.3rem; padding: .7rem .4rem .55rem; border-radius: 4px;
+  background: var(--rb-paper-2); border: 1px solid color-mix(in srgb, var(--rb-gold) 70%, transparent);
+}
+.rb-countdown .cd__num { color: var(--rb-accent); font-weight: 500; }
+
+.rb-story__text p { font-size: 1.25rem; text-wrap: pretty; }
+.rb-story__text p + p { margin-top: 1rem; }
+
+.rb-timeline { display: grid; gap: 1.2rem; max-width: 28rem; margin: 0 auto; text-align: left; }
+.rb-timeline__item { display: grid; grid-template-columns: 4.4rem 1fr; gap: 1rem; align-items: baseline; }
+.rb-timeline__item:not(:has(.rb-timeline__time)) .rb-timeline__body { grid-column: 2; }
+.rb-timeline__time { font-size: 1.3rem; font-weight: 600; color: var(--rb-accent); text-align: right; font-variant-numeric: lining-nums tabular-nums; }
+.rb-timeline__body { padding-left: 1rem; border-left: 1px solid color-mix(in srgb, var(--rb-gold) 80%, transparent); }
+.rb-timeline__title { font-size: 1.35rem; font-weight: 600; line-height: 1.3; }
+.rb-timeline__body p { color: var(--rb-muted); font-size: 1.1rem; }
+
+.rb-location { display: grid; gap: .6rem; justify-items: center; }
+.rb-location__venue { font-size: 1.55rem; font-weight: 600; color: var(--rb-accent); line-height: 1.25; }
+.rb-location__address { font-style: normal; font-size: 1.2rem; }
+.rb-location__when { color: var(--rb-muted); margin-bottom: .6rem; }
+
+.rb-dresscode p { font-size: 1.25rem; }
+.rb-swatches { display: flex; flex-wrap: wrap; justify-content: center; gap: .7rem; margin-top: 1.2rem; }
+.rb-swatch { width: 46px; height: 46px; border-radius: 50%; border: 3px solid var(--rb-paper); box-shadow: 0 0 0 1px var(--rb-gold); }
+
+.rb-practical__list { display: grid; gap: 1rem; text-align: left; }
+.rb-practical__item { padding: 1rem 1.2rem; border-radius: 4px; background: var(--rb-paper-2); }
+.rb-practical__item dt { font-family: "Figtree", sans-serif; font-size: .8rem; letter-spacing: .16em; text-transform: uppercase; color: var(--rb-accent); font-weight: 600; margin-bottom: .2rem; }
+.rb-practical__item dd { margin: 0; font-size: 1.15rem; }
+@media (min-width: 720px) { .rb-practical { width: min(100%, 52rem); } .rb-practical__list { grid-template-columns: 1fr 1fr; } }
+
+.rb-gallery { width: min(100%, 56rem); }
+.rb-gallery__grid { columns: 2 150px; column-gap: .7rem; }
+.rb-gallery__item { break-inside: avoid; margin-bottom: .7rem; }
+.rb-gallery__item figure { margin: 0; border-radius: 2px; }
+.rb-gallery__item--liggend .ph { aspect-ratio: 4 / 3; }
+.rb-gallery__item--staand .ph { aspect-ratio: 3 / 4; }
+.rb-gallery__item--vierkant .ph { aspect-ratio: 1; }
+.rb-gallery__item figcaption { font-size: .95rem; font-style: italic; padding: .4rem .2rem 0; color: var(--rb-muted); }
+@media (min-width: 720px) { .rb-gallery__grid { columns: 3 200px; } }
+
+.rb-contact__name { font-size: 1.35rem; font-weight: 600; margin-top: .4rem; }
+.rb-contact__links { margin-top: .3rem; font-family: "Figtree", sans-serif; font-size: 1rem; overflow-wrap: anywhere; }
+
+/* ---------- Afsluiting: de rozen nog één keer ---------- */
+.rb-closing { width: 100%; display: grid; justify-items: center; gap: 1rem; text-align: center; padding: clamp(1rem, 4vw, 2rem) 0 0; color: var(--rb-ink); }
+.rb-closing__band {
+  width: min(100%, 560px); height: auto; margin-bottom: .5rem;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%), linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%), linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+  mask-composite: intersect;
+}
+.rb-closing__text { font-family: "Pinyon Script", cursive; font-size: clamp(2rem, 8vw, 2.8rem); line-height: 1.3; color: var(--rb-accent); max-width: 34rem; padding: 0 1rem; }
+.rb-closing__names { font-style: italic; font-size: 1.25rem; letter-spacing: .04em; color: var(--rb-muted); margin-bottom: 1.4rem; padding: 0 1rem; }
+.inv-colophon { color: var(--rb-muted); }
+
+/* ---------- Effecten (invitations/static/invitations/effects.js en effects.css) ---------- */
+body { --fx-1: var(--rb-paper); --fx-2: var(--rb-blush); --fx-3: var(--rb-gold); --fx-4: #F6E3CF; --fx-bg: var(--rb-page); }
+/* De kop begint pas als de film klaar is (invite:reveal): de tekst komt in beeld tijdens het vervagen. */
+
+/* =====================================================================================================
+   De kaart als verlengstuk van de film.
+   Beelden komen uit de bestaande film (boog.webp en rozen.webp); de film zelf blijft ongewijzigd.
+   ===================================================================================================== */
+body {
+  --rb-veil: 240, 224, 205;
+  /* Witte/crème blaadjes: --fx-bg is donker, zodat het script ze niet grijs maakt (het maakt kleuren die te dicht bij de achtergrond liggen donkerder). */
+  --fx-1: #FFF8EC; --fx-2: #FDEFDD; --fx-3: #F7E4C9; --fx-4: #FFFFFF; --fx-bg: #3A2A20;
+  background-image: none;
+}
+
+/* Sfeer rondom: het laatste beeld van de film, sterk vervaagd (niet uitgerekt: het is alleen kleur en licht). */
+html.inv-rozenboog::before {
+  content: ""; position: fixed; inset: -6%; z-index: -2; pointer-events: none;
+  background: linear-gradient(rgba(255, 238, 220, .22), rgba(255, 238, 220, .22)), url("boog.webp") center 30% / cover no-repeat;
+  filter: blur(26px) saturate(1.15);
+}
+/* Een lichte sluier in het midden, met zachte randen: het "papier" van de uitnodiging. De blaadjes vallen erboven, de tekst erboven. */
+body::before {
+  content: ""; position: fixed; top: 0; bottom: 0; left: 50%; z-index: -1; width: min(100%, 50rem); transform: translateX(-50%); pointer-events: none;
+  background: rgba(var(--rb-veil), .94);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+}
+@media (max-width: 760px) { body::before { width: 100%; -webkit-mask-image: none; mask-image: none; } }
+/* Feestdeeltjes vallen achter de tekst, nooit erover. */
+html.inv-rozenboog .fx-burst { z-index: 0; }
+
+/* ---------- Kop: de film loopt door in de uitnodiging ---------- */
+.rb-hero { background: none; }
+.rb-sky, .rb-card { z-index: 1; }
+.rb-frame--hero::after {
+  content: ""; position: absolute; left: 8%; top: 28.6%; width: 44%; aspect-ratio: 1; z-index: 0; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 224, 150, .6), rgba(255, 224, 150, 0) 66%); mix-blend-mode: screen; opacity: .3;
+}
+.fx-motion .rb-frame--hero::after { animation: rb-glow 7s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
+@keyframes rb-glow { 0%, 100% { opacity: .22; } 50% { opacity: .62; } }
+
+/* Geen kaart meer op het terras: de film vervaagt naar het papier en de datum staat vrij in het licht. */
+.rb-card {
+  left: 0; right: 0; top: 56%; bottom: -1px; padding: 0 9% 10%; gap: 3.4cqh; justify-content: flex-end;
+  background: linear-gradient(180deg, rgba(var(--rb-veil), 0) 0, rgba(var(--rb-veil), .62) 26%, rgba(var(--rb-veil), .93) 58%, rgb(var(--rb-veil)) 86%);
+  border-radius: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+.rb-card::before { display: none; }
+.rb-card__sprig { position: static; transform: none; width: 26cqw; order: -1; color: var(--rb-gold-line); opacity: .85; }
+.rb-date { position: relative; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 3.6cqw; padding: 1.1cqh 0; }
+.rb-date::before, .rb-date::after {
+  content: ""; position: absolute; left: 4%; right: 4%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rb-gold-line) 22%, var(--rb-gold-line) 78%, transparent);
+}
+.rb-date::before { top: 0; } .rb-date::after { bottom: 0; }
+.rb-date__weekday, .rb-date__month { border: 0; padding: 0; font-size: clamp(10.5px, 3.5cqw, 15px); letter-spacing: .26em; font-weight: 500; }
+.rb-date__day {
+  font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; line-height: .95;
+  font-size: min(25cqw, 22cqh); padding: .02em .04em 0;
+  color: #8A4A2C; background: linear-gradient(180deg, #B67B3B 0%, #8A4A2C 62%, #6E3820 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.rb-meta { font-size: clamp(14px, 5.6cqw, 22px); }
+.rb-meta__time { letter-spacing: .08em; }
+.rb-card--dense .rb-date__day { font-size: min(19cqw, 17cqh); }
+
+/* ---------- Onderdelen: geen zware kaders, de boog als motief ---------- */
+.rb-body { gap: clamp(1.6rem, 5vw, 2.6rem); padding-top: clamp(1.6rem, 5vw, 2.6rem); }
+.rb-sheet { background: none; box-shadow: none; border-radius: 0; padding: clamp(.8rem, 3vw, 1.4rem) clamp(1rem, 6vw, 2.4rem); }
+.rb-sheet::before { display: none; }
+.rb-welcome { padding-top: clamp(.8rem, 3vw, 1.4rem); border-radius: 0; }
+.rb-h2::before {
+  content: ""; display: block; width: 38px; height: 22px; margin: 0 auto .55rem;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 22'><path d='M3 22V12a16 12 0 0 1 32 0v10' fill='none' stroke='%239C7536' stroke-width='1.3'/><path d='M10 22V13a9 8 0 0 1 18 0v9' fill='none' stroke='%239C7536' stroke-width='1' opacity='.55'/></svg>") center / contain no-repeat;
+}
+.rb-countdown .cd__unit {
+  min-width: 4.4rem; padding: 1rem .4rem .6rem; background: rgba(255, 251, 245, .5);
+  border-radius: 999px 999px 8px 8px / 30px 30px 8px 8px; border: 1px solid color-mix(in srgb, var(--rb-gold) 70%, transparent);
+}
+.rb-practical__item { background: none; border-radius: 0; border-top: 1px solid color-mix(in srgb, var(--rb-gold) 65%, transparent); padding: .9rem .2rem .2rem; }
+.rb-rsvp {
+  width: min(100%, 34rem); padding-top: clamp(3.4rem, 12vw, 4.6rem); background: rgba(255, 251, 245, .6);
+  border: 1px solid color-mix(in srgb, var(--rb-gold) 60%, transparent); border-bottom-width: 1px;
+  border-radius: 999px 999px 14px 14px / 120px 120px 14px 14px;
+}
+.rb-rsvp .rb-h2::before { margin-bottom: .8rem; }
+
+/* ---------- Uitsneden uit de film tussen de onderdelen ---------- */
+.rb-cut { position: relative; margin: .4rem 0; width: min(100%, 40rem); overflow: visible; }
+.rb-cut img { display: block; width: 100%; height: auto; }
+.rb-cut--terras img, .rb-cut--rozen img, .rb-cut--urnen img {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 78%, transparent 100%), linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 78%, transparent 100%), linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+  mask-composite: intersect;
+}
+.rb-cut--urnen { width: min(100%, 34rem); }
+.rb-cut--sea { width: min(74vw, 21rem); margin: .8rem 0; }
+.rb-cut--sea img { aspect-ratio: 460 / 500; object-fit: cover; border-radius: 999px 999px 8px 8px / 46% 46% 8px 8px; box-shadow: 0 26px 44px -30px rgba(92, 58, 30, .6); }
+.rb-cut--sea::after {
+  content: ""; position: absolute; inset: -8px; pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--rb-gold) 80%, transparent); border-radius: 999px 999px 14px 14px / 48% 48% 14px 14px;
+}
+@supports (animation-timeline: view()) {
+  .fx-motion .rb-cut img { animation: rb-drift linear both; animation-timeline: view(); animation-range: cover; }
+}
+@keyframes rb-drift { from { transform: scale(1.06) translateY(-1.5%); } to { transform: scale(1.06) translateY(1.5%); } }
+.rb-cut--sea img { overflow: hidden; }
+
+/* Voorbeeldbeelden: stills uit de film in plaats van generieke foto's. */
+.rb-gallery__grid--stills { columns: 2 150px; }
+.rb-gallery__item--still .ph { aspect-ratio: auto; }
+.rb-gallery__item--still img { display: block; width: 100%; height: auto; border-radius: 80px 80px 4px 4px / 70px 70px 4px 4px; }
+.rb-gallery__item--still:nth-child(even) img { border-radius: 4px 4px 80px 80px / 4px 4px 70px 70px; }
+.rb-closing { padding-bottom: 0; }
+.rb-portrait--film { padding: 0; background: none; box-shadow: none; width: min(80vw, 24rem); position: relative; }
+.rb-portrait--film img { display: block; width: 100%; height: auto; border-radius: 999px 999px 8px 8px / 36% 36% 8px 8px; box-shadow: 0 30px 50px -34px rgba(92, 58, 30, .65); }
+.rb-portrait--film::after { content: ""; position: absolute; inset: -8px; pointer-events: none; border: 1px solid color-mix(in srgb, var(--rb-gold) 80%, transparent); border-radius: 999px 999px 14px 14px / 38% 38% 14px 14px; }
+.rb-card { padding-bottom: 13%; }
+html.inv-rozenboog::before { filter: blur(38px) saturate(1.02); }
+.rb-gallery__item--still:nth-child(even) img { border-radius: 80px 80px 4px 4px / 70px 70px 4px 4px; }
+.rb-gallery { width: min(100%, 36rem); }
+@media (min-width: 720px) { .rb-gallery__grid--stills { columns: 2 150px; } }

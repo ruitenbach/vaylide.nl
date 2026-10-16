@@ -1,0 +1,185 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Rozenboog v1 — een wand van crème rozen die opengaat naar een rozenboog op een terras aan zee; de opening is een film
+   (blok "film" in manifest.json). De film eindigt op de rozenboog bij zonsondergang; de kop hieronder toont precies dat
+   beeld (boog.webp), met de namen in de lucht; datum, tijd en plek staan vrij in het licht op een sluier die de film
+   laat overgaan in de uitnodiging. Tussen de onderdelen staan uitsneden uit de film (cut-*.webp, gal-*.webp).
+   Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/pinyon-script-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+{% if v.opening_enabled %}<link rel="preload" href="{% static v.film.poster %}" as="image">{% endif %}
+<link rel="preload" href="{% static v.film.end %}" as="image">{% endblock %}
+
+{% block cover %}
+<section class="cover rb-cover" data-cover data-duration="22000" data-film-fade="1000" aria-label="Openingsscherm">
+  <div class="rb-frame rb-frame--cover" data-film-frame>
+    {# preload="none": invite.js zet het laden aan als de film mag spelen; bij 'minder beweging' en in het kleine voorbeeld wordt niets opgehaald. #}
+    <video class="rb-film" data-cover-film muted playsinline preload="none" disablepictureinpicture disableremoteplayback
+           poster="{% static v.film.poster %}" aria-hidden="true" tabindex="-1">
+      {# Met het exacte codecprofiel: een browser die het niet kan afspelen, slaat de bron over zonder hem te downloaden. #}
+      <source src="{% static v.film.src %}" type='video/mp4; codecs="avc1.64001F"'>
+      {% if v.film.webm %}<source src="{% static v.film.webm %}" type='video/webm; codecs="vp9"'>{% endif %}
+    </video>
+    <div class="rb-label">
+      <p class="rb-label__to">{% if v.card_kind == "wenskaart" %}Een wenskaart voor {% else %}Een uitnodiging voor {% endif %}{% if v.formal %}u{% else %}jou{% endif %}</p>
+      <p class="rb-label__names rb-label__names--{{ v.names_size }}">{{ v.title }}</p>
+      <svg class="rb-label__rule" viewBox="0 0 160 16" aria-hidden="true" focusable="false"><path d="M4 8h58M98 8h58" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><path d="M80 2c4 3 4 9 0 12-4-3-4-9 0-12Zm-9 6c3-3 7-3 9 0-2 3-6 3-9 0Zm18 0c-3-3-7-3-9 0 2 3 6 3 9 0Z" fill="currentColor"/></svg>
+      <a href="#uitnodiging" class="rb-open fx-pulse" data-open data-fx-origin>Open de uitnodiging</a>
+      {% if v.show.music %}<button type="button" class="rb-open-music" data-open data-open-music>Openen met muziek</button>{% endif %}
+    </div>
+  </div>
+  <button type="button" class="rb-skip" data-cover-skip hidden>Overslaan</button>
+</section>
+{% endblock %}
+
+{% block content %}
+<header class="rb-hero">
+  <div class="rb-frame rb-frame--hero" data-film-target style="background-image: url('{% static v.film.end %}')">
+    <div class="rb-sky{% if v.title|length > 40 or v.kicker|length > 34 %} rb-sky--dense{% endif %}">
+      <p class="rb-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
+      <h1 class="rb-names rb-names--{{ v.names_size }} fx-names" data-fx-reveal-origin>
+        {% if v.is_couple %}<span class="rb-names__one">{{ v.names.0 }}</span><span class="rb-names__amp" aria-label="en">&amp;</span><span class="rb-names__two">{{ v.names.1 }}</span>
+        {% else %}<span class="rb-names__one">{{ v.names.0 }}</span>{% endif %}
+      </h1>
+    </div>
+    {% if v.date or v.time_display or v.venue %}
+    <div class="rb-card{% if v.venue|length > 48 %} rb-card--dense{% endif %}">
+      <svg class="rb-card__sprig" viewBox="0 0 240 48" aria-hidden="true" focusable="false" data-fx-draw><path d="M8 40c38-2 70-14 112-30M120 10c34 16 72 26 112 30M58 30c-6-10-2-18 8-22-2 10-2 16-8 22Zm28-10c-4-10 2-17 12-19-3 9-5 15-12 19Zm66 0c4-10-2-17-12-19 3 9 5 15 12 19Zm28 10c6-10 2-18-8-22 2 10 2 16 8 22Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="120" cy="10" r="3.2" fill="currentColor"/></svg>
+      {% if v.date %}
+      <p class="rb-date fx-intro" style="--fx-d:5">
+        <span class="rb-date__weekday">{{ v.weekday }}</span>
+        <span class="rb-date__day">{{ v.day }}</span>
+        <span class="rb-date__month">{{ v.month_name }} {{ v.year }}</span>
+      </p>
+      {% endif %}
+      {% if v.time_display or v.venue %}<p class="rb-meta fx-intro" style="--fx-d:6">{% if v.time_display %}<span class="rb-meta__time">{{ v.time_display }}</span>{% endif %}{% if v.venue %}<span class="rb-meta__venue">{{ v.venue }}</span>{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</header>
+
+<div class="rb-body">
+<section class="rb-sheet rb-welcome" data-reveal aria-label="Welkom">
+  <svg class="rb-welcome__sprig" viewBox="0 0 240 48" aria-hidden="true" focusable="false" data-fx-draw><path d="M8 40c38-2 70-14 112-30M120 10c34 16 72 26 112 30M58 30c-6-10-2-18 8-22-2 10-2 16-8 22Zm28-10c-4-10 2-17 12-19-3 9-5 15-12 19Zm66 0c4-10-2-17-12-19 3 9 5 15 12 19Zm28 10c6-10 2-18-8-22 2 10 2 16 8 22Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="120" cy="10" r="3.2" fill="currentColor"/></svg>
+  <p class="rb-welcome__tagline">{{ v.tagline|capfirst }}</p>
+  {% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+
+<figure class="rb-cut rb-cut--terras" data-reveal aria-hidden="true"><img src="{% static 'designs/rozenboog/v1/cut-terras.webp' %}" alt="" width="640" height="380" loading="lazy" decoding="async"></figure>
+
+{% if v.hero and not v.is_demo %}
+<figure class="rb-portrait" data-reveal><div class="ph rb-portrait__img fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 700px) 440px, 84vw" %}</div></figure>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="rb-sheet rb-countdown" data-reveal aria-labelledby="rb-cd-title">
+  <h2 id="rb-cd-title" class="rb-h2">{% if v.is_past %}Dank je wel{% else %}Nog even geduld{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+<figure class="rb-cut rb-cut--rozen" data-reveal aria-hidden="true"><img src="{% static 'designs/rozenboog/v1/cut-rozen.webp' %}" alt="" width="640" height="400" loading="lazy" decoding="async"></figure>
+
+{% if v.show.story %}
+<section class="rb-sheet rb-story" data-reveal aria-labelledby="rb-story-title">
+  <h2 id="rb-story-title" class="rb-h2">{{ v.story_title }}</h2>
+  <div class="rb-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="rb-sheet rb-program" data-reveal aria-labelledby="rb-program-title">
+  <h2 id="rb-program-title" class="rb-h2">Programma</h2>
+  <ol class="rb-timeline">
+    {% for item in v.program %}
+    <li class="rb-timeline__item">
+      {% if item.time %}<span class="rb-timeline__time">{{ item.time }}</span>{% endif %}
+      <div class="rb-timeline__body">
+        <h3 class="rb-timeline__title">{{ item.title }}</h3>
+        {% if item.description %}<p>{{ item.description }}</p>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+<figure class="rb-cut rb-cut--sea" data-reveal aria-hidden="true"><img src="{% static 'designs/rozenboog/v1/cut-sea.webp' %}" alt="" width="460" height="500" loading="lazy" decoding="async"></figure>
+
+{% if v.show.location %}
+<section class="rb-sheet rb-location" data-reveal aria-labelledby="rb-location-title">
+  <h2 id="rb-location-title" class="rb-h2">Locatie</h2>
+  {% if v.venue %}<p class="rb-location__venue">{{ v.venue }}</p>{% endif %}
+  {% if v.address_lines %}<address class="rb-location__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+  {% if v.date_display %}<p class="rb-location__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>{% endif %}
+  {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Route plannen</a>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="rb-sheet rb-dresscode" data-reveal aria-labelledby="rb-dress-title">
+  <h2 id="rb-dress-title" class="rb-h2">Dresscode</h2>
+  {% for p in v.dresscode_text %}<p>{{ p|linebreaksbr }}</p>{% endfor %}
+  {% if v.dresscode_colors %}<ul class="rb-swatches" aria-label="Kleuren voor de dresscode">
+    {% for c in v.dresscode_colors %}<li class="rb-swatch" style="background:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="rb-sheet rb-practical" data-reveal aria-labelledby="rb-practical-title">
+  <h2 id="rb-practical-title" class="rb-h2">Goed om te weten</h2>
+  <dl class="rb-practical__list">
+    {% for item in v.practical %}<div class="rb-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+<figure class="rb-cut rb-cut--urnen" data-reveal aria-hidden="true"><img src="{% static 'designs/rozenboog/v1/cut-urnen.webp' %}" alt="" width="520" height="190" loading="lazy" decoding="async"></figure>
+
+{% if v.show.gallery %}
+<section class="rb-sheet rb-gallery" data-reveal aria-labelledby="rb-gallery-title">
+  <h2 id="rb-gallery-title" class="rb-h2">Momenten</h2>
+  {% if v.is_demo %}
+  <ul class="rb-gallery__grid rb-gallery__grid--stills" aria-label="Voorbeeldbeelden uit de film">
+    <li class="rb-gallery__item rb-gallery__item--still"><figure class="ph"><img src="{% static 'designs/rozenboog/v1/gal-1.webp' %}" alt="" loading="lazy" decoding="async"></figure></li>
+    <li class="rb-gallery__item rb-gallery__item--still"><figure class="ph"><img src="{% static 'designs/rozenboog/v1/gal-2.webp' %}" alt="" loading="lazy" decoding="async"></figure></li>
+    <li class="rb-gallery__item rb-gallery__item--still"><figure class="ph"><img src="{% static 'designs/rozenboog/v1/gal-3.webp' %}" alt="" loading="lazy" decoding="async"></figure></li>
+    <li class="rb-gallery__item rb-gallery__item--still"><figure class="ph"><img src="{% static 'designs/rozenboog/v1/gal-4.webp' %}" alt="" loading="lazy" decoding="async"></figure></li>
+  </ul>
+  {% else %}
+  <ul class="rb-gallery__grid">
+    {% for photo in v.gallery %}<li class="rb-gallery__item rb-gallery__item--{{ photo.orientation }}"><figure class="ph">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 900px) 280px, 42vw" %}{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="rb-sheet rb-rsvp" id="aanmelden" data-reveal aria-labelledby="rb-rsvp-title">
+  <h2 id="rb-rsvp-title" class="rb-h2">{% if v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+  {% include "invitations/partials/rsvp.html" %}
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="rb-sheet rb-contact" data-reveal aria-labelledby="rb-contact-title">
+  <h2 id="rb-contact-title" class="rb-h2">Vragen?</h2>
+  {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+  <p class="rb-contact__name">{{ v.contact.name }}</p>
+  <p class="rb-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="rb-closing" data-reveal aria-label="Afsluiting">
+  <img class="rb-closing__band" src="{% static 'designs/rozenboog/v1/rozen-band.webp' %}" alt="" width="720" height="560" loading="lazy" decoding="async">
+  {% if v.show.closing %}{% for p in v.closing %}<p class="rb-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  <p class="rb-closing__names" aria-hidden="true">{{ v.title }}</p>
+  {% include "invitations/partials/share_buttons.html" %}
+</section>
+</div>
+{% endblock %}

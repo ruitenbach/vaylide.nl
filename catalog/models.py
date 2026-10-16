@@ -100,6 +100,15 @@ class TemplateVersion(models.Model):
         return f"designs/{self.renderer}/style.css"
 
     @property
+    def film(self) -> dict:
+        """Opening als film (blok 'film' in het manifest): paden voor {% static %}, of leeg zonder film."""
+        film = self.manifest.get("film") or {}
+        if not film.get("src"):
+            return {}
+        base = f"designs/{self.renderer}/"
+        return {key: base + film[key] for key in ("src", "webm", "poster", "end") if film.get(key)}
+
+    @property
     def palettes(self) -> list[dict]:
         return self.manifest.get("palettes", [])
 

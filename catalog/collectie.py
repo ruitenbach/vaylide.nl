@@ -32,6 +32,7 @@ C = (
     "wolkje", "stipjes", "door-de-jaren", "mijlpaal",                  # lijken sterk op een beter ontwerp (ballonfeest, regenboog, polaroid, gouden-jaren)
     "borrel", "congres", "lijnenspel",                                  # kaartbeeld met leeg vlak; nog niet premium genoeg
     "kerstmagie",                                                       # verborgen tot de rechten op de film zijn bevestigd (docs/KERSTFILMKAARTEN.md)
+    "rozenboog",                                                        # eigen film; verborgen tot de commerciële filmrechten bevestigd zijn
 )
 
 # Specials: bijzondere ontwerpen onder Specials, met een eigen meerprijs (catalog/specials.py). Winterlicht is bewust geen special.

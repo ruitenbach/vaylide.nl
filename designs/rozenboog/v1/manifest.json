@@ -1,0 +1,79 @@
+{
+  "slug": "rozenboog",
+  "added_at": "2026-10-16T21:00:00Z",
+  "version": 1,
+  "name": "Rozenboog",
+  "tagline": "Crème rozen die opengaan naar een terras aan zee",
+  "description": "Een wand van crème rozen. Na een tik gaan de rozen langzaam uiteen en kijk je door een rozenboog over een terras met kaarsen naar de zee bij zonsondergang. Jullie namen staan in de avondlucht, de datum en de plek op een crème kaart op het terras.",
+  "style_notes": "Crème rozen, zonsondergang aan zee, terracotta en goud, handgeschreven namen",
+  "occasions": [
+    "bruiloft",
+    "verloving",
+    "jubileum"
+  ],
+  "sort_order": 16,
+  "opening": "film",
+  "opening_label": "Rozen die opengaan naar een rozenboog (film)",
+  "palettes": [
+    {
+      "key": "zonsondergang",
+      "name": "Zonsondergang",
+      "swatch": [
+        "#F3E7D8",
+        "#8A4A2C",
+        "#C9A45C"
+      ],
+      "vars": {
+        "--rb-page": "#F3E7D8",
+        "--rb-page-2": "#FAF2E8",
+        "--rb-dusk": "#E9CFB4",
+        "--rb-paper": "#FFFBF5",
+        "--rb-paper-2": "#F6EDE1",
+        "--rb-ink": "#3A2A20",
+        "--rb-muted": "#67513F",
+        "--rb-accent": "#8A4A2C",
+        "--rb-sage": "#56633D",
+        "--rb-gold": "#C9A45C",
+        "--rb-gold-line": "#9C7536",
+        "--rb-sky-ink": "#3B2418",
+        "--rb-sky-muted": "#5A3A28",
+        "--rb-blush": "#E8B9A0"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "blaadjes",
+    "knal": "blaadjes",
+    "viering": "blaadjes",
+    "namen": "schrijf",
+    "onthul": "zacht",
+    "extra": [
+      "kenburns",
+      "tik"
+    ]
+  },
+  "film": {
+    "src": "opening.mp4",
+    "webm": "opening.webm",
+    "poster": "rozen.webp",
+    "end": "boog.webp",
+    "seconds": 8.0,
+    "kaartbeeld": "kop"
+  },
+  "changelog": "Eerste versie: opening met de film van de eigenaar (rozen die opengaan naar een rozenboog aan zee; vertraagd en vloeiend gemaakt). De uitnodiging is een verlengstuk van de film: het eindbeeld vervaagt naar het papier, met uitsneden uit de film tussen de onderdelen en witte blaadjes achter de tekst. Verborgen voor klanten tot de rechten op de film zijn bevestigd.",
+  "envelope_mode": "built_in",
+  "hidden": true
+}

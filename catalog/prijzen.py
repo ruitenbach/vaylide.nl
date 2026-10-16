@@ -62,6 +62,8 @@ INDELING = {
     "kerstmarkt": LUXE, "kerstpaleis": LUXE, "kerstcoupe": LUXE, "kerstbal": LUXE,
     # Kerstmagie: eigen openingsfilm, zelfde indeling en prijs als de vier hierboven (geen nieuwe prijs of toeslag)
     "kerstmagie": LUXE,
+    # Rozenboog: eigen film, bewust Luxe op besluit van de eigenaar (16 oktober 2026); staat verborgen (groep C) tot de filmrechten bevestigd zijn
+    "rozenboog": LUXE,
     # Basis
     **{slug: BASIS for slug in (
         "ballonfeest", "borrel", "confetti", "congres", "door-de-jaren", "eucalyptus", "gala", "gatsby", "glitter", "gouden-jaren", "ja-woord",

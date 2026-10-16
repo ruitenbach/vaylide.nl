@@ -62,11 +62,18 @@ async function settings(page) {
       const own = await eigen(p);
       const coverInk = await inked(p, coverSel(own));
       const toggleVisible = await p.isVisible("[data-fx-toggle]");
-      check(`${slug} · Deeltjes op het openingsscherm (${fx.sfeer})`, coverInk > 0 && toggleVisible, `getekende punten: ${coverInk}, knop 'Beweging' zichtbaar: ${toggleVisible}`);
+      // Opening als film (Rozenboog): over de film zweeft bewust niets, en de knal komt als de film klaar is.
+      const film = (await p.$("[data-cover-film]")) !== null;
+      if (film) {
+        check(`${slug} · Openingsscherm is een film, zonder deeltjes erover`, coverInk === -1 && toggleVisible, `tekenvlak op het openingsscherm: ${coverInk === -1 ? "geen" : coverInk}, knop 'Beweging' zichtbaar: ${toggleVisible}`);
+      } else {
+        check(`${slug} · Deeltjes op het openingsscherm (${fx.sfeer})`, coverInk > 0 && toggleVisible, `getekende punten: ${coverInk}, knop 'Beweging' zichtbaar: ${toggleVisible}`);
+      }
       await p.click("[data-cover] [data-open]", { force: true });
+      if (film) await p.waitForFunction(() => document.documentElement.classList.contains("is-film-end"), null, { timeout: 25000 });
       await p.waitForTimeout(650);
       const burstInk = await inked(p, ".fx-burst .fx-canvas");
-      check(`${slug} · Knal bij het openen (${fx.knal})`, fx.knal === "geen" || burstInk > 0, `getekende punten: ${burstInk}`);
+      check(`${slug} · Knal bij het openen (${fx.knal})${film ? ", na de film" : ""}`, fx.knal === "geen" || burstInk > 0, `getekende punten: ${burstInk}`);
       await p.waitForFunction(() => document.documentElement.classList.contains("fx-done"), null, { timeout: 9000 });
       await p.waitForTimeout(600);
       const after = await p.evaluate((sel) => {
