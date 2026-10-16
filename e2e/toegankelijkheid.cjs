@@ -107,7 +107,8 @@ const results = [];
 async function run(page, name, url, open) {
   await page.goto(base + url, { waitUntil: "networkidle" });
   // Na het openen wachten tot de entree van de kop klaar is (effects.js zet dan 'fx-done').
-  if (open && await page.$("[data-open]")) { await page.evaluate(() => document.querySelector("[data-open]").click()); await page.waitForTimeout(3300); await page.waitForFunction(() => !document.documentElement.classList.contains("fx") || document.documentElement.classList.contains("fx-done"), null, { timeout: 10000 }).catch(() => {}); await page.waitForTimeout(300); }
+  // Na 3,3 s zijn de meeste openingen klaar; een opening als film (Rozenboog) duurt ruim 11 s.
+  if (open && await page.$("[data-open]")) { await page.evaluate(() => document.querySelector("[data-open]").click()); await page.waitForTimeout(3300); await page.waitForFunction(() => document.documentElement.classList.contains("is-open"), null, { timeout: 20000 }).catch(() => {}); await page.waitForFunction(() => !document.documentElement.classList.contains("fx") || document.documentElement.classList.contains("fx-done"), null, { timeout: 10000 }).catch(() => {}); await page.waitForTimeout(300); }
   await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 400) { window.scrollTo({ top: y, behavior: "instant" }); await new Promise((r) => setTimeout(r, 30)); } window.scrollTo(0, 0); });
   await page.waitForTimeout(700);
   // Wachten tot eenmalige animaties (onthullen, na elkaar invloeien) klaar zijn; doorlopende tellen niet mee.

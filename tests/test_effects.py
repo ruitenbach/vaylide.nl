@@ -24,7 +24,7 @@ def manifests():
 class EffectChoicesTests(TestCase):
     def test_every_design_has_valid_effects(self):
         found = manifests()
-        self.assertEqual(len(found), 33)
+        self.assertEqual(len(found), 34)
         for slug, data in found.items():
             self.assertIn("effects", data, slug)
             self.assertEqual(effects_errors(data["effects"]), [], slug)
@@ -77,6 +77,7 @@ class EffectRenderTests(TestCase):
             self.assertEqual(len(re.findall(r"<script>", html)), 1, slug)
 
     def test_every_design_renders_with_its_effects(self):
+        Template.objects.update(is_active=True)  # ook een verborgen ontwerp (Rozenboog) moet goed renderen
         for template in Template.objects.all():
             response = self.render(template.slug)
             self.assertEqual(response.status_code, 200, template.slug)

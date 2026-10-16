@@ -240,6 +240,15 @@ In eerdere rondes al opgelost: overlappende knop in de mobiele kop, de testbalk 
 - `python manage.py check --deploy` met productie-instellingen (opnieuw in ronde 5): alleen de bewuste meldingen W005 en W021. `makemigrations --check`: geen wijzigingen in het datamodel.
 - Docker (vorige ronde): de image bouwt vanaf nul, start met migraties op een leeg volume, laadt de ontwerpen, draait als gewone gebruiker (uid 10001), serveert statische bestanden en de eigen 404, en de onderhoudscommando's werken.
 
+## Ronde 7: Rozenboog (verborgen ontwerp met een film als opening)
+
+Alles uitgevoerd op 16 oktober 2026, in Chromium (Playwright), op SQLite, in testmodus.
+
+- **Tests**: `python manage.py test tests`: 159 tests, alle geslaagd (139 bestaand, 20 nieuw in `tests/test_film.py`). `makemigrations --check`: geen wijzigingen. Nieuw: het manifest en de bestanden van de film, de weergave van het voorbeeld, alle gelegenheden, lange teksten, zonder opening, het contrast van de tekstkleuren, blaadjes achter de tekst, een echte (betaalde) uitnodiging met aftelling, agenda (.ics), route en aanmelden, en dat Rozenboog verborgen is: de voorbeeld- en ontwerppagina geven 404, het staat niet in de collectie en kan niet worden besteld (`/maken/`).
+- **Rozenboog in de browser** (390 en 1366 pixels breed, ook 360 voor overloop): gesloten rozenwand, de film, het eindbeeld met namen en datum, en de hele pagina. axe-core 4 (WCAG 2.0/2.1 A en AA), dicht en open op 360, 390 en 1366: 0 bevindingen. Geen horizontaal scrollen, geen consolefouten of mislukte verzoeken. Na het aanmelden vallen bloemblaadjes achter de tekst. Zonder JavaScript en bij 'minder beweging' is de uitnodiging bruikbaar.
+- **Bestaande ontwerpen vergeleken met de code van vóór deze ronde** (twee servers naast elkaar, 33 ontwerpen op 390 en 1366 pixels, met 'minder beweging'): het openingsscherm is bij alle 66 pagina's pixel voor pixel gelijk; de geopende hele pagina verschilt bij alle 66 alleen in de lopende aftelling (seconden en minuten); er zijn geen consolefouten. Daarmee is zichtbaar dat de gedeelde bestanden de bestaande ontwerpen niet veranderen. Niet vergeleken: het gedrag zelf van de effecten en het 'Direct naar de uitnodiging' op andere ontwerpen dan met de tests.
+- **Niet gedaan in deze ronde**: Safari/iPhone, Android, Firefox, schermlezers, Lighthouse, het afspelen van de MP4 (Chromium speelt hier de WebM), een volledige herhaling van `e2e/controle2.cjs` en `e2e/effecten.cjs` over alle ontwerpen.
+
 ## Niet gecontroleerd
 
 - **Echte apparaten en andere browsers**: alleen Chromium is gebruikt, op telefoon- en computerformaat. Safari/WebKit (iPhone) en Firefox zijn niet getest. Test vóór de lancering op echte iPhones en Android-telefoons.

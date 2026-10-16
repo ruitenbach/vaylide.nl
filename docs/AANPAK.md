@@ -211,6 +211,19 @@ De eigenaar vroeg eerst: "vierlief moet worden aangepast naar Vaylia met een nie
 - **Eigen repository.** De eigenaar maakte `bootsman075-ops/vaylide.nl` aan, openbaar; op de vraag of dat zo mocht blijven, koos de eigenaar "Openbaar is goed". Vóór het versturen is de hele geschiedenis doorzocht op wachtwoorden en sleutels (niets gevonden). De eerste commit van de repository (een README van één regel) is samengevoegd; er is niets overschreven.
 - **De website zelf** is verder niet veranderd.
 
+## Ronde 7: Rozenboog, een opening als film
+
+De eigenaar leverde een filmpje aan (crème rozen die opengaan naar een rozenboog aan zee) en vroeg om een uitnodiging die een verlengstuk van die film is. Rozenboog komt als nieuw ontwerp (`designs/rozenboog/v1`), zonder iets aan bestaande ontwerpen te veranderen.
+
+- **De film blijft intact.** `opening.mp4` en `opening.webm` zijn de vertraagde film van de eigenaar; de uitnodiging gebruikt het eerste en laatste beeld ervan (`rozen.webp`, `boog.webp`) en uitsneden daaruit (`cut-*.webp`, `gal-*.webp`). Er zijn geen nieuwe beelden gemaakt.
+- **Eindbeeld naar uitnodiging.** De kop toont precies het laatste beeld van de film, met de namen in de lucht. Daaronder vervaagt het beeld naar een crèmekleurige sluier, waarop datum, tijd en plek vrij in het licht staan. Geen kaartje op het terras meer.
+- **Rondom de film.** Op een breed scherm staat de film als 9:16-vlak in het midden (niet uitgerekt). Het eindbeeld staat er sterk vervaagd omheen als sfeer, en een lichte sluier met zachte randen vormt het papier.
+- **Onderdelen.** Geen zware kaders: een boogje boven elke titel, aftelling in boogvormige tegels, uitsneden uit de film tussen de onderdelen. In het voorbeeld toont Momenten stills uit de film in plaats van voorbeeldfoto's; bij een echte uitnodiging staan daar de foto's van de klant.
+- **Blaadjes.** Wit en crème, achter de tekst. `--fx-bg` is in dit ontwerp bewust donker gezet, zodat `effects.js` de kleuren niet grijs maakt. De knal en het feestje bij aanmelden zijn bloemblaadjes en vallen achter de tekst (`.fx-burst` heeft in dit ontwerp `z-index: 0`); de harten zijn niet gebruikt.
+- **Gedeelde code.** Voor een film als opening zijn er kleine, eerder geteste uitbreidingen: `catalog/seed.py` (het blok `film` controleren, en `"hidden": true` laat een nieuw ontwerp onzichtbaar beginnen), `catalog/models.py` (`film` op een ontwerpversie), `invitations/render.py` (`film` in het weergavemodel), `invitations/demo.py` (voorbeeldbeelden), `invitations/static/invitations/invite.js` (film afspelen, overslaan, 'Direct naar de uitnodiging' laat het openingsscherm los) en `effects.js` (de knal wacht op het eind van de film). Bestaande ontwerpen hebben geen film; voor hen verandert niets, behalve dat 'Direct naar de uitnodiging' nu het openingsscherm opent in plaats van de uitnodiging geblokkeerd te laten.
+- **Verborgen.** Of de eigenaar de rechten op de film heeft om hem commercieel te gebruiken, is niet bevestigd. Rozenboog staat daarom op onzichtbaar tot dat zeker is.
+- **Rozenzegel niet meegenomen.** Een eerdere versie van het platform had een tweede filmontwerp (Rozenzegel); dat zit niet in deze repository.
+
 ## Referenties en schermopname
 
 Hier staat eerlijk wat wel en niet is bekeken.

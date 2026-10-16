@@ -42,7 +42,8 @@ async function audit(page, vp, name, url, { open = false, full = fullShots } = {
   page.on("pageerror", onError); page.on("console", onConsole); page.on("response", onResponse);
   const response = await page.goto(base + url, { waitUntil: "networkidle" });
   // Na het openen wachten tot de entree van de kop klaar is (effects.js zet dan 'fx-done').
-  if (open && await page.$("[data-open]")) { await page.click("[data-open]", { force: true }); await page.waitForTimeout(3300); await page.waitForFunction(() => !document.documentElement.classList.contains("fx") || document.documentElement.classList.contains("fx-done"), null, { timeout: 10000 }).catch(() => {}); await page.waitForTimeout(300); }
+  // Na 3,3 s zijn de meeste openingen klaar; een opening als film (Rozenboog) duurt ruim 11 s.
+  if (open && await page.$("[data-open]")) { await page.click("[data-open]", { force: true }); await page.waitForTimeout(3300); await page.waitForFunction(() => document.documentElement.classList.contains("is-open"), null, { timeout: 20000 }).catch(() => {}); await page.waitForFunction(() => !document.documentElement.classList.contains("fx") || document.documentElement.classList.contains("fx-done"), null, { timeout: 10000 }).catch(() => {}); await page.waitForTimeout(300); }
   await scrollThrough(page);
   const metrics = await page.evaluate(() => {
     const doc = document.documentElement;
@@ -219,6 +220,7 @@ async function loginStaff(context) {
       check(`${slug} · Toetsenbord: openknop bereikbaar met Tab`, onOpen, `focus op: ${focused}`);
       await p.keyboard.press("Enter");
       await p.waitForTimeout(3600);
+      await p.waitForFunction(() => document.documentElement.classList.contains("is-open"), null, { timeout: 20000 }).catch(() => {});
       const active = await p.evaluate(() => document.activeElement.tagName + " " + (document.activeElement.textContent || "").trim().replace(/\s+/g, " ").slice(0, 30));
       const inert = await p.evaluate(() => document.getElementById("uitnodiging").inert);
       check(`${slug} · Toetsenbord: na openen focus op de kop`, active.startsWith("H1") && !inert, `focus op: ${active}, inert=${inert}`);

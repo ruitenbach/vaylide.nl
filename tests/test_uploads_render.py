@@ -141,6 +141,7 @@ class RenderTests(VaylideTestCase):
         self.assertGreater(t.end, t.start)
 
     def test_all_demos_render_for_all_occasions(self):
+        Template.objects.update(is_active=True)  # ook een verborgen ontwerp (Rozenboog) moet goed renderen
         for template in Template.objects.all():
             for occasion, _ in OCCASION_CHOICES:
                 response = Client().get(f"/voorbeeld/{template.slug}/?gelegenheid={occasion}")

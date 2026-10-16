@@ -1,6 +1,6 @@
 # Overdracht: waar staan we
 
-Stand van 27 september 2026. Dit document is bedoeld voor wie het project overneemt, en voor de Claude die daarbij helpt.
+Stand van 16 oktober 2026. Dit document is bedoeld voor wie het project overneemt, en voor de Claude die daarbij helpt.
 
 ## In het kort
 
@@ -12,6 +12,7 @@ Wat er staat:
 - **33 uitnodigingsontwerpen**:
   - drie volledig eigen ontwerpen met elk vier kleurvarianten: Liefde op papier (envelop met lakzegel), Avondgoud (gouden dubbele deur) en Puur moment (doorschijnend vel);
   - 30 Atelier-ontwerpen, **vijf per gelegenheid**, elk met een eigen opening (envelop, vouwkaart, gordijn, cadeaulint, sluier, confetti, ballonnen, sterrenhemel, schuifpaneel, polaroid of een cadeau om uit te pakken) en drie kleurvarianten. Ze delen één opbouw in `designs/_atelier/v1/`. Overzicht en keuzes: `docs/AANPAK.md` onder "Uitbreiding: 30 nieuwe ontwerpen"; zelf een ontwerp toevoegen: `docs/HANDLEIDING.md`.
+- **Rozenboog (ronde 7, verborgen)**: een 34e ontwerp, het eerste met een film als opening: crème rozen die opengaan naar een rozenboog op een terras aan zee bij zonsondergang (de film van de eigenaar, vertraagd en vloeiend gemaakt). Het eindbeeld van de film loopt over in de uitnodiging, met uitsneden uit de film tussen de onderdelen en witte blaadjes achter de tekst. Eén kleurvariant, voor bruiloft, verloving en jubileum. **Het ontwerp staat verborgen voor klanten** (`"hidden": true` in het manifest) tot de rechten op de film zijn bevestigd; zie open punt 10. Zie `docs/AANPAK.md` onder "Ronde 7".
 - **Effecten op alle 33 uitnodigingen**: zwevende sfeer (bloemblaadjes, goudstof, een sterrenhemel, ballonnen, neon en meer), een knal op het moment dat de uitnodiging opengaat (bij de cadeau-opening springt het deksel eraf en vliegen er cadeautjes uit), een feestje als een gast zich aanmeldt, namen die verschijnen alsof ze geschreven worden of met een gouden glans, en onthullingen bij het scrollen. Elk ontwerp heeft een eigen combinatie. Met de knop **Beweging** zet een gast alles stil. Overzicht en keuzes: `docs/AANPAK.md` onder "Ronde 5"; zelf kiezen of aanpassen: `docs/HANDLEIDING.md` onder "Effecten".
 - **Samenstellen in stappen**: gelegenheid, ontwerp, gegevens, programma, aanmelden, foto's, stijl, voorbeeld en bestellen. Voortgang wordt per stap bewaard, ook zonder account.
 - **Bestellen en betalen**: testbetaling (of Mollie, zodra er een sleutel is). Publiceren gebeurt alleen na een serverzijdige betalingsbevestiging, via een takenwachtrij met herhalingen.
@@ -28,7 +29,7 @@ Gedane rondes:
 5. Effecten en beweging op alle 33 ontwerpen (zie hierboven), een nieuwe cadeau-opening (Glitter & goud, Regenboog en Stipjes), kaarten op de website die meebewegen en glanzen, nieuwe kaartbeelden, en het lakzegel van Liefde op papier met goed leesbare initialen.
 6. Nieuw merk: **Vaylide** (eerst kort Vaylide), met het logo van de eigenaar zoals aangeleverd (de V, VAYLIDE en de regel eronder) in de kop en voet, bij het samenstellen, in het beheer, in de e-mails, op de deelafbeelding en als icoon op het beginscherm; de V uit het logo als tabblad-icoon. Overal waar mensen de naam zien, staat Vaylide. Keuzes: `docs/AANPAK.md` onder "Ronde 6: Vaylide"; het logo opnieuw maken of vervangen: `tools/logo/README.md`.
 
-Wat getest is en hoe: `docs/CONTROLES.md`. Kort, na ronde 6: 139 tests (op SQLite; op PostgreSQL 16 in ronde 5), een browsercontrole op 816 pagina's (vier schermformaten, alle 33 ontwerpen, 264 gedragscontroles), toegankelijkheid van de website en een lokale nabootsing van de Render-instellingen met PostgreSQL. Uit ronde 5 (in ronde 6 veranderden aan de uitnodigingen alleen de naam onderaan en het tabblad-icoon): 264 controles van de effecten (ook stilzetten en 'minder beweging'), een meting van de belasting op een vertraagde processor, en toegankelijkheid en contrast van alle ontwerpen in alle kleuren.
+Wat getest is en hoe: `docs/CONTROLES.md`. Kort, na ronde 7 (Rozenboog): 159 tests en een browservergelijking met de code van vóór ronde 7 (zie `docs/CONTROLES.md`, Ronde 7). Kort, na ronde 6: 139 tests (op SQLite; op PostgreSQL 16 in ronde 5), een browsercontrole op 816 pagina's (vier schermformaten, alle 33 ontwerpen, 264 gedragscontroles), toegankelijkheid van de website en een lokale nabootsing van de Render-instellingen met PostgreSQL. Uit ronde 5 (in ronde 6 veranderden aan de uitnodigingen alleen de naam onderaan en het tabblad-icoon): 264 controles van de effecten (ook stilzetten en 'minder beweging'), een meting van de belasting op een vertraagde processor, en toegankelijkheid en contrast van alle ontwerpen in alle kleuren.
 
 Voorvertoning (statisch, alleen om te kijken): https://claude.ai/artifact/DYkTUBCKzn63jE8Mk9x28M
 
@@ -61,6 +62,9 @@ In een logische volgorde. Punt 2 alleen met akkoord van de eigenaar.
 7. **Docker**: de image is getest in ronde 2, niet opnieuw na de nieuwe vormgeving en de nieuwe ontwerpen.
 8. **Wens voor later**: de teksten van de website beheerbaar maken in Beheer (nu in `core/content.py`).
 9. **Technische namen** (optioneel, liefst vóór de livegang): de instellingen heten nog `VIERLIEF_…`, net als de cookie-, sessie- en opslagnamen, de cachetabel, het databasebestand (`data/vierlief.sqlite3`), het stijlbestand `static/css/vierlief.css` en de testaccounts (`controle@vierlief.test`). Bezoekers zien die niet. Omzetten naar `VAYLIDE_…` kan in één keer, maar dan moeten ook `.env`, de documentatie en de hosting mee, en vervallen bestaande sessies en keuzes van gasten.
+10. **Rechten op de film van Rozenboog** (blokkade voor livegang): de eigenaar stuurde het filmpje via WhatsApp. Of de eigenaar het zelf heeft gemaakt en het commercieel op de website mag gebruiken, is niet bevestigd. Rozenboog blijft verborgen (nieuwe ontwerpen met `"hidden": true` staan na het inlezen op onzichtbaar). Maak het pas zichtbaar in Beheer → Ontwerpen als de rechten schriftelijk bevestigd zijn. Hetzelfde geldt voor de beelden die uit de film zijn gehaald (uitsneden en stills).
+11. **Rozenboog testen op echte apparaten**: speelt de film (MP4) na een tik vloeiend af in Safari op de iPhone en op een ouder Android-toestel, en sluit het laatste beeld naadloos aan op de kop? De Chromium van de werkomgeving speelt de WebM-versie. De film (circa 2,6 MB) laadt al voordat de gast tikt (`preload="auto"` in `invite.js`, zodat hij meteen speelt); op mobiele data is dat zwaar. Lichter kan met een hogere compressie, als nieuwe ontwerpversie.
+12. **Bron en script van de film**: het bronfilmpje en het script waarmee de film vertraagd is (`tools/filmopening/`) staan niet in deze repository (7,5 MB), maar in `vaylide-2026-10-16 rezen.zip`. Zonder het script is de film niet opnieuw te maken.
 
 ## Goed om te weten
 

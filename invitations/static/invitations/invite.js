@@ -103,6 +103,50 @@
     main.inert = true;
     var opened = false;
 
+    /* Opening als film (blok "film" in het manifest, bijvoorbeeld Rozenboog). Het kader van de film
+       staat precies op de plek van [data-film-target] in de uitnodiging, zodat het laatste beeld
+       naadloos overgaat in de kop eronder, ook als er een balk of mededeling boven staat. */
+    var film = cover.querySelector("[data-cover-film]");
+    var filmFrame = film && film.closest("[data-film-frame]");
+    var filmTarget = film && document.querySelector("[data-film-target]");
+    function alignFilm() {
+      if (!filmFrame || !filmTarget || opened) return;
+      var r = filmTarget.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      filmFrame.style.setProperty("--film-top", r.top + "px");
+      filmFrame.style.setProperty("--film-left", r.left + "px");
+      filmFrame.style.setProperty("--film-width", r.width + "px");
+      filmFrame.style.setProperty("--film-height", r.height + "px");
+      filmFrame.style.setProperty("--film-shift", "none");
+      filmFrame.classList.add("is-aligned");
+    }
+    /* De film alvast laden (in de pagina staat 'metadata'); niet bij 'minder beweging', want dan speelt hij niet,
+       en niet in het kleine voorbeeld op de website (daar laadt hij pas na een tik). */
+    if (film && !reduceMotion && !html.classList.contains("inv-embed")) film.preload = "auto";
+    if (filmFrame && filmTarget) {
+      alignFilm();
+      var alignQueued = false;
+      var queueAlign = function () {
+        if (alignQueued) return;
+        alignQueued = true;
+        window.requestAnimationFrame(function () { alignQueued = false; alignFilm(); });
+      };
+      /* Opnieuw bij een ander schermformaat, en als de letters geladen zijn of de pagina erboven
+         (een balk of mededeling) van hoogte verandert. */
+      window.addEventListener("resize", queueAlign);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(queueAlign);
+      if ("ResizeObserver" in window) new ResizeObserver(queueAlign).observe(document.body);
+    }
+
+    /* 'Direct naar de uitnodiging' (de link voor toetsenbord en schermlezer) slaat het openingsscherm
+       over: zonder dit verdween het scherm wel, maar bleef de uitnodiging geblokkeerd. */
+    window.addEventListener("hashchange", function () {
+      if (opened || !/^#(aanmelden|aanmelden-formulier|uitnodiging)/.test(location.hash)) return;
+      opened = true;
+      finish(true);
+      main.focus({ preventScroll: true });
+    });
+
     cover.querySelectorAll("[data-open]").forEach(function (el) {
       el.addEventListener("click", function (event) {
         event.preventDefault();
@@ -120,14 +164,57 @@
       /* Rustig openen bij 'minder beweging' of als de gast de beweging heeft stilgezet (effects.js). */
       var calm = reduceMotion || html.classList.contains("fx-paused");
       var duration = calm ? 250 : parseInt(cover.getAttribute("data-duration") || "2200", 10);
+      var withFilm = !!film && !calm;
       html.classList.add("is-opening");
       if (calm) html.classList.add("is-opening-reduced");
-      document.dispatchEvent(new CustomEvent("invite:opening", { detail: { reduceMotion: calm } }));
+      document.dispatchEvent(new CustomEvent("invite:opening", { detail: { reduceMotion: calm, film: withFilm } }));
+      if (withFilm) { playFilm(duration); return; }
       window.setTimeout(function () { finish(false); }, duration);
     }
 
+    /* De film speelt na de tik. Aan het eind (of bij 'Overslaan') vervaagt het openingsscherm en
+       verschijnt de uitnodiging eronder (invite:reveal). Vangnetten: start de film niet binnen een
+       paar seconden (trage verbinding, geen ondersteuning) of loopt hij vast, dan gaat de uitnodiging
+       toch open. Zet een gast de beweging stil, dan stopt de film meteen. */
+    function playFilm(limit) {
+      var revealed = false;
+      var started = false;
+      var fade = parseInt(cover.getAttribute("data-film-fade") || "900", 10);
+      var skipButton = cover.querySelector("[data-cover-skip]");
+      var toggle = document.querySelector("[data-fx-toggle]");
+      var safety = window.setTimeout(reveal, limit);
+      var startCheck = window.setTimeout(function () { if (!started) reveal(); }, 4000);
+      function reveal() {
+        if (revealed) return;
+        revealed = true;
+        window.clearTimeout(safety);
+        window.clearTimeout(startCheck);
+        try { film.pause(); } catch (e) { /* niets te stoppen */ }
+        html.classList.add("is-film-end");
+        document.dispatchEvent(new CustomEvent("invite:reveal"));
+        window.setTimeout(function () { finish(false); }, fade);
+      }
+      html.classList.add("is-film");
+      film.addEventListener("playing", function () { started = true; });
+      film.addEventListener("ended", reveal);
+      film.addEventListener("error", reveal);
+      film.querySelectorAll("source").forEach(function (source) { source.addEventListener("error", reveal); });
+      if (skipButton) {
+        skipButton.hidden = false;
+        skipButton.addEventListener("click", reveal);
+      }
+      if (toggle) {
+        toggle.addEventListener("click", function () { if (html.classList.contains("fx-paused")) reveal(); });
+      }
+      /* Geen bruikbare bron (al mislukt bij het laden van de pagina): niet wachten. */
+      if (film.error || film.networkState === film.NETWORK_NO_SOURCE) { reveal(); return; }
+      try { film.currentTime = 0; } catch (e) { /* nog niet geladen */ }
+      var attempt = film.play();
+      if (attempt && attempt.catch) attempt.catch(reveal);
+    }
+
     function finish(instant) {
-      html.classList.remove("has-cover", "is-opening", "is-opening-reduced");
+      html.classList.remove("has-cover", "is-opening", "is-opening-reduced", "is-film", "is-film-end");
       html.classList.add("is-open");
       cover.hidden = true;
       main.inert = false;

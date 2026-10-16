@@ -1435,9 +1435,11 @@
     applyScenes();
   }
 
-  document.addEventListener("invite:opening", function () {
+  document.addEventListener("invite:opening", function (event) {
     html.classList.add("fx-opening");
     if (!motionOn()) return;
+    /* Opening als film: de knal en de kop wachten tot de film klaar is (invite:reveal). */
+    if (event.detail && event.detail.film) return;
     var cover = document.querySelector("[data-cover]");
     var origin = centerOf(cover && (cover.querySelector("[data-fx-origin]") || cover.querySelector("[data-open]")));
     var delay = parseInt((cover && cover.getAttribute("data-fx-delay")) || "0", 10);
@@ -1446,6 +1448,14 @@
     /* De kop begint al terwijl het openingsscherm vervaagt: geen leeg moment ertussen. */
     var introAt = parseInt((cover && cover.getAttribute("data-fx-intro")) || String(duration - 650), 10);
     window.setTimeout(function () { if (html.classList.contains("is-opening")) startPage(true); }, Math.max(0, introAt));
+  });
+
+  document.addEventListener("invite:reveal", function () {
+    if (!motionOn()) return;
+    var cover = document.querySelector("[data-cover]");
+    var origin = centerOf(document.querySelector("[data-fx-reveal-origin]") || (cover && cover.querySelector("[data-fx-origin]")));
+    fire(settings.knal, origin.x, origin.y, cover, 1);
+    startPage(true);
   });
 
   document.addEventListener("invite:opened", function (event) {
