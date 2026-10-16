@@ -34,6 +34,8 @@ Zie `designs/zwanenhart/v1/zwanenhart.js` en de tests in `tests/test_zwanenhart.
 Ontwerp, tests, indeling (Special), collectie (A), sort_order 14, demo-gegevens, bestelroute met € 89,95.
 Twee gerichte fixes (15 oktober 2026, zonder wijziging van film, animatie of vormgeving): (1) op een liggende telefoon (liggend, hoogte tot 520 px) heeft de kop geen vaste minimumhoogte meer, zodat de openingsknop helemaal in beeld en bedienbaar is; (2) de namen krijgen de klasse `zh-names--long` of `zh-names--xlong` (zelfde drempels als de rest van de site) en worden dan kleiner; in het kleine staande venster van een liggende telefoon staan de namen bovenin, boven de zwanen, en datum en knoppen onderin.
 
+Fix 16 oktober 2026: het voorbeeld op de ontwerppagina (iframe met `embed=1`) sloeg de opening over en toonde direct het eindbeeld, omdat `zwanenhart.js` `inv-embed` als 'direct openen' behandelde. Dat is verwijderd; alleen een link naar de aanmelding, de live kaart in de Studio en de bedankpagina (`data-direct-open`) tonen nog direct het eindbeeld. Film, timing en vormgeving zijn niet gewijzigd. Daarbij: een tik op het gouden lakzegel zelf start de opening ook (onzichtbaar tikvlak `data-zh-zegel` op het zegel; de knop "Tik om de envelop te openen" blijft het pad voor toetsenbord en schermlezer), en op lage schermen (hoogte tot 620 px, ook het voorbeeldkader) valt "Speel de opening opnieuw" niet meer onder de vaste knoppen Beweging en Muziek.
+
 ## 12. Wat nog moet gebeuren
 Echte telefoon, Safari, Firefox en H.264 in Chrome/Edge op Windows; `e2e/effecten.cjs` voor dit ontwerp.
 

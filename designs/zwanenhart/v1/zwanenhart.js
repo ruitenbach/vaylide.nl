@@ -123,6 +123,8 @@
   }
 
   if (open) open.addEventListener("click", begin);
+  var zegel = q("[data-zh-zegel]");   // ook op het gouden lakzegel zelf tikken start de opening (de knop eronder blijft het toetsenbord- en schermlezerpad)
+  if (zegel) zegel.addEventListener("click", function () { if (open && !open.disabled) begin(); });
   if (overslaan) overslaan.addEventListener("click", overslaanNu);
   if (nogmaals) nogmaals.addEventListener("click", opnieuw);
   if (bekijk) bekijk.addEventListener("click", function () {
@@ -137,7 +139,7 @@
   function start() {
     if (!heeftOpening || !open) { direct(); return; }
     var direct_open = /^#(aanmelden|aanmelden-formulier|uitnodiging)/.test(location.hash) || html.hasAttribute("data-live") ||
-      html.hasAttribute("data-direct-open") || html.classList.contains("inv-embed");
+      html.hasAttribute("data-direct-open");
     if (direct_open || gezien() || rustig()) { direct(); return; }
     zetStand(["zh-gate"]);
     vergrendel(true);

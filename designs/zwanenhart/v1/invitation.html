@@ -50,7 +50,8 @@
         </div>
       </div>
     </div>
-    {% if v.opening_enabled %}<button type="button" class="zh-open" data-zh-open data-fx-origin aria-label="Tik om de envelop te openen en speel de opening af">
+    {% if v.opening_enabled %}<div class="zh-zegelknop" data-zh-zegel aria-hidden="true"></div>
+    <button type="button" class="zh-open" data-zh-open data-fx-origin aria-label="Tik om de envelop te openen en speel de opening af">
       <svg class="zh-open__zegel" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><use href="#zh-zegel"/></svg>
       <span class="zh-open__tekst">Tik om de envelop te openen</span>
     </button>{% endif %}

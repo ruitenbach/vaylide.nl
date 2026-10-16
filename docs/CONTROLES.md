@@ -1202,3 +1202,9 @@ Zie `docs/KERSTFILMKAARTEN.md`. Uitgevoerd:
 - Zeer lange namen (`Zoë d'Artagnan & Émile`, `Max "de Ridder" van der Heijden-Smit`) in het eindbeeld: staand 390x844 en 360x640 en desktop 1440x900 vallen niet over de zwanen; liggend 844x390 en 667x375 staan de namen bovenin boven de zwanen (bekeken op screenshots). De lange namen zijn in de browser met een script in de kop gezet, omdat de voorbeeldpagina vaste namen heeft; de klassen staan ook in een test.
 - Niet gedaan: echte telefoon, Safari, Firefox.
 - Voorbereiding staging (15 oktober 2026, lokaal, `VIERLIEF_PRICING_V2=1`, nieuwe lege database): `controleer_prijzen` klopt (Luxe 14); per ontwerp in de browser (390 px, testmodus): ontwerppagina Luxe € 24,95 · 12 maanden, voorbeeld, samenstellen met een naam met speciale tekens, voorbeeld in de studio, bestelstap (geen pakketkeuze of toeslag, € 24,95), testbetaling, publicatie, gast opent de kaart (noindex). Kerstbal wordt na het inlezen vanzelf v2; de bestelling legt v2 vast. Hele suite 1006 geslaagd. Niet gedaan: echte Mollie, e-mail, staging zelf, Safari, Firefox, echte telefoon.
+### Zwanenhart: voorbeeldkader, lakzegel en knoppen (16 oktober 2026, lokaal, `VIERLIEF_PRICING_V2=1`)
+
+- Chromium (VP9-kopie van de film), voorbeeldkader op de ontwerppagina: vóór het herstel begon het direct bij het eindbeeld; nu gesloten envelop, tik op het lakzegel (of de knop) start de film, zegel gloeit, envelop opent, zwanen, namen. Mobiel en desktop.
+- Volledige pagina 390x844, 360x640, 844x390 en 1440x900: het tikvlak ligt op het zegel, wordt geraakt (`elementFromPoint`), valt binnen het scherm en een tik start de film.
+- 'Speel de opening opnieuw' ligt in het kleine kader niet meer onder Beweging en Muziek (bekeken op screenshot).
+- Niet gedaan: echte telefoon, Safari, Firefox.

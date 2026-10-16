@@ -92,6 +92,8 @@ html:not(.js) .zh-again, .zh-hero:not(.zh-klaar) .zh-again { display: none; }
   box-shadow: 0 14px 34px -16px rgba(90, 64, 24, .55), inset 0 0 0 4px rgba(255, 252, 245, .9), inset 0 0 0 5px rgba(190, 154, 92, .55); font: 600 11.5px var(--zh-kap); letter-spacing: .24em; text-indent: .24em; text-transform: uppercase;
   transition: background .3s, border-color .3s; }
 .zh-open__zegel { width: 26px; height: 26px; color: #8C6A30; }
+.zh-zegelknop { position: absolute; left: 50%; top: 52%; z-index: 6; display: none; width: clamp(88px, 30%, 150px); aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.zh-gate .zh-zegelknop { display: block; }
 .zh-open:hover { background: rgba(255, 252, 245, .94); border-color: #8C6A30; }
 .zh-gate .zh-open { display: flex; }
 .fx-motion .zh-gate .zh-open { animation: zh-adem 3.6s ease-in-out infinite; animation-play-state: var(--fx-play, running); }
@@ -141,7 +143,8 @@ html:not(.js) .zh-again, .zh-hero:not(.zh-klaar) .zh-again { display: none; }
 }
 @media (max-height: 620px) {
   .zh-heading { display: none; }
-  .zh-caption { padding-top: 70px; padding-bottom: 14px; } .zh-caption__teken { display: none; } .zh-datum { margin-bottom: 10px; } .zh-names { font-size: 32px; }
+  .zh-caption { padding-top: 70px; padding-bottom: max(64px, calc(env(safe-area-inset-bottom) + 60px)); } .zh-caption__teken { display: none; } .zh-datum { margin-bottom: 8px; } .zh-names { font-size: 32px; }
+  .zh-view, .zh-again { min-height: 40px; } .zh-caption__knoppen { gap: 2px 14px; }   /* onderaan blijft ruimte voor de vaste knoppen Beweging en Muziek: 'Speel de opening opnieuw' valt er niet onder */
 }
 
 /* lange namen: iets kleiner, zodat ze niet over de zwanen en het hart heen vallen (gewone namen blijven zoals ze waren) */

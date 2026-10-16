@@ -236,3 +236,32 @@ class ZwanenhartLiggendEnLangeNamenTests(VaylideTestCase):
         self.assertIn(".zh-hero { min-height: 0; }", blok)       # geen vaste minimumhoogte die de knop onder de rand duwt
         self.assertIn(".zh-open { bottom: max(10px, env(safe-area-inset-bottom))", blok)
         self.assertIn("grid-template-rows: auto auto 1fr auto auto", blok)   # namen bovenin, datum en knoppen onderin
+
+
+class ZwanenhartVoorbeeldOpOntwerppaginaTests(VaylideTestCase):
+    def test_het_voorbeeld_op_de_ontwerppagina_begint_met_de_gesloten_envelop(self):
+        """Het voorbeeld op de ontwerppagina is een iframe met ?embed=1. De opening mag daar niet worden overgeslagen: alleen een link naar de aanmelding,
+        de live kaart in de Studio en de bedankpagina (data-direct-open) tonen direct het eindbeeld."""
+        html = Client().get(DEMO + "&embed=1").content.decode()
+        self.assertIn("data-zh-opening", html)
+        self.assertIn("data-zh-open", html)
+        self.assertNotIn("data-direct-open", html)
+        js = (ONTWERP / "zwanenhart.js").read_text()
+        regel = js[js.index("var direct_open"):js.index("if (direct_open")]
+        self.assertNotIn("inv-embed", regel)
+        self.assertIn("data-direct-open", regel)
+
+    def test_het_gouden_lakzegel_is_ook_aan_te_tikken_en_de_knop_blijft_het_toegankelijke_pad(self):
+        html = Client().get(DEMO).content.decode()
+        self.assertIn('data-zh-zegel aria-hidden="true"', html)       # extra tikvlak op het zegel; de knop eronder blijft voor toetsenbord en schermlezer
+        self.assertIn("data-zh-open", html)
+        js = (ONTWERP / "zwanenhart.js").read_text()
+        self.assertIn('q("[data-zh-zegel]")', js)
+        css = (ONTWERP / "style.css").read_text()
+        self.assertIn(".zh-gate .zh-zegelknop { display: block; }", css)    # alleen op het eerste beeld, niet daarna
+
+    def test_op_lage_schermen_blijft_onderaan_ruimte_voor_beweging_en_muziek(self):
+        css = (ONTWERP / "style.css").read_text()
+        blok = css[css.index("@media (max-height: 620px) {\n  .zh-heading"):]
+        blok = blok[:blok.index("\n}\n")]
+        self.assertIn("padding-bottom: max(64px", blok)
