@@ -1228,3 +1228,5 @@ Echt uitgevoerd, lokaal met `VIERLIEF_PRICING_V2=1` en Chromium (390 en 1366 pix
 ## Afronding 16 oktober 2026 (prijzenpagina en Kerstmarkt-proef)
 
 Echt uitgevoerd (lokaal, `VIERLIEF_PRICING_V2=1`, Chromium op 390 en 1366 pixels): de volledige set tests (1066 tests; de twee tests in `test_voorwaarden_nieuw` slagen alleen als `VIERLIEF_CONTACT_EMAIL` niet in de omgeving staat, omdat een gezet adres als bevestigd telt); `e2e/kerstmarkt.cjs` na de proef (alles ok); schermopname van de overgang van Kerstmarkt v1 voor en na het weghalen van de vaste vertraging van 0,5 s (de stilstand na het filmeinde werd ruwweg gehalveerd, van ± 0,7 naar ± 0,35 s). Niet gedaan: echte telefoon, Safari, staging, axe.
+
+Footerfix en indelingsfilter (16 oktober 2026): `tests/test_bedrijfsgegevens.py` (KvK en btw-id in footer, contactpagina en bestelmail alleen als bevestigd via `VIERLIEF_KVK` en `VIERLIEF_BTW`) en `tests/test_afwerking.py` (het collectiefilter `?indeling=` toont geen onbeschikbare of inactieve ontwerpen).
