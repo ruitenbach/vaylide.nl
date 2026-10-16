@@ -44,7 +44,7 @@ body {
 /* ---------- Openingsscherm met film ---------- */
 .kl-cover { background: #04070f; }
 .kl-stage { position: absolute; inset: 0; overflow: hidden; }
-.kl-stage__backdrop { position: absolute; inset: -8%; width: 116%; height: 116%; object-fit: cover; filter: blur(28px) brightness(.5) saturate(1.2); }
+.kl-stage__backdrop { position: absolute; inset: -8%; width: 116%; max-width: none; height: 116%; object-fit: cover; filter: blur(28px) brightness(.82) saturate(1.1); }
 .kl-stage__poster, .kl-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: transparent; }
 /* Op brede schermen staat de film als staand beeld in het midden; de zijkanten lopen zacht uit. */
 @media (min-aspect-ratio: 9/16) {
@@ -53,37 +53,35 @@ body {
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
   }
 }
-.kl-cover__shade {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none; transition: opacity 1s ease;
-  background:
-    radial-gradient(ellipse 80% 56% at 50% 50%, rgba(5, 10, 24, .74), rgba(5, 10, 24, .3) 74%),
-    linear-gradient(180deg, rgba(5, 10, 24, .55), transparent 26%, transparent 66%, rgba(5, 10, 24, .6));
-}
-.kl-cover.is-playing .kl-cover__shade { opacity: 0; }
 .kl-cover__center {
   position: relative; z-index: 3; display: grid; grid-template-rows: 1fr auto 1fr; justify-items: center;
   width: 100%; height: 100%; padding: 2rem 1.5rem; text-align: center; transition: opacity .7s ease;
 }
 .kl-cover.is-playing .kl-cover__center { opacity: 0; pointer-events: none; }
-.kl-cover__kicker { align-self: end; margin-bottom: 2.4rem; font-family: "Figtree", sans-serif; font-size: .78rem; font-weight: 600; letter-spacing: .32em; text-transform: uppercase; color: var(--kl-gold-2); text-shadow: 0 1px 14px rgba(0, 0, 0, .7); }
-.kl-cover__text { align-self: start; display: grid; gap: .9rem; justify-items: center; margin-top: 2.4rem; }
-.kl-cover__title { font-family: "Cinzel", serif; font-size: clamp(1.3rem, 5.5vw, 1.9rem); letter-spacing: .06em; max-width: 18ch; text-wrap: balance; color: #fff; text-shadow: 0 2px 18px rgba(0, 0, 0, .75); }
-.kl-cover__hint { font-family: "Figtree", sans-serif; font-size: .82rem; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--kl-gold-2); text-shadow: 0 1px 12px rgba(0, 0, 0, .8); }
+.kl-cover__kicker { font-family: "Figtree", sans-serif; font-size: .7rem; font-weight: 700; letter-spacing: .3em; text-transform: uppercase; }
+.kl-cover__title { font-family: "Cinzel", serif; font-size: clamp(1.3rem, 5.5vw, 1.9rem); letter-spacing: .06em; max-width: 18ch; text-wrap: balance; }
+.kl-cover__hint { font-family: "Figtree", sans-serif; font-size: .74rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+/* Alle tekst staat in één rustige matglazen plaquette onder de knop: donkerblauwe letters, geen losse vlakken. Het kristal eromheen houdt zijn eigen helderheid. */
+.kl-cover__text {
+  grid-row: 3; align-self: start; display: grid; gap: .55rem; justify-items: center; margin-top: 2.2rem; max-width: 100%; padding: 1rem 1.7rem 1.05rem; color: #08173a;
+  background: rgba(244, 250, 255, .46); -webkit-backdrop-filter: blur(14px) saturate(1.05); backdrop-filter: blur(14px) saturate(1.05);
+  border: 1px solid rgba(255, 255, 255, .6); border-radius: 1.1rem;
+}
 
 /* De afspeelknop staat precies in het midden. */
 .kl-play {
-  --fx-pulse: var(--kl-gold-2);
-  position: relative; display: grid; place-items: center; width: clamp(96px, 27vw, 124px); aspect-ratio: 1; padding: 0; border-radius: 50%; cursor: pointer;
-  border: 1.5px solid var(--kl-gold-2); color: var(--kl-gold-2);
-  background: rgba(7, 16, 31, .48); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  box-shadow: 0 0 0 7px rgba(255, 255, 255, .07), 0 0 54px -4px color-mix(in srgb, var(--kl-gold) 60%, transparent), 0 18px 40px -18px rgba(0, 0, 0, .8);
+  --fx-pulse: #fff;
+  grid-row: 2; position: relative; display: grid; place-items: center; width: clamp(96px, 27vw, 124px); aspect-ratio: 1; padding: 0; border-radius: 50%; cursor: pointer;
+  border: 1.5px solid rgba(255, 255, 255, .85); color: #08173a;
+  background: rgba(238, 246, 255, .30); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  box-shadow: 0 0 0 7px rgba(255, 255, 255, .12), 0 10px 30px -12px rgba(8, 23, 58, .4);
   transition: transform .25s ease, background-color .25s ease;
 }
-.kl-play:hover { transform: scale(1.05); background: rgba(7, 16, 31, .62); }
-.kl-play:focus-visible { outline: 3px solid #fff; outline-offset: 7px; }
+.kl-play:hover { transform: scale(1.05); background: rgba(238, 246, 255, .42); }
+.kl-play:focus-visible { outline: 3px solid #08173a; outline-offset: 7px; box-shadow: 0 0 0 10px rgba(255, 255, 255, .9); }
 .kl-play__icon { width: 38%; height: 38%; margin-left: 7%; fill: currentColor; transition: opacity .2s; }
 /* Even wachten tot de film echt loopt: een draaiend randje in plaats van de driehoek. */
-.kl-play::before { content: ""; position: absolute; inset: -1.5px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--kl-gold-2); opacity: 0; transition: opacity .2s; }
+.kl-play::before { content: ""; position: absolute; inset: -1.5px; border-radius: 50%; border: 3px solid transparent; border-top-color: #08173a; opacity: 0; transition: opacity .2s; }
 .kl-cover.is-loading .kl-play__icon { opacity: 0; }
 .kl-cover.is-loading .kl-play::before { opacity: 1; animation: kl-spin 1.1s linear infinite; }
 @keyframes kl-spin { to { transform: rotate(360deg); } }
@@ -115,7 +113,7 @@ body {
   min-height: 100vh; min-height: max(100svh, 36rem); padding: clamp(2.8rem, 9vh, 5.5rem) 1.25rem clamp(2rem, 6vh, 3.5rem); text-align: center;
 }
 .kl-hero__bg { position: absolute; inset: 0; z-index: -1; background: var(--kl-bg); }
-.kl-hero__back { position: absolute; inset: -6%; width: 112%; height: 112%; object-fit: cover; filter: blur(26px) brightness(.55) saturate(1.15); }
+.kl-hero__back { position: absolute; inset: -6%; width: 112%; max-width: none; height: 112%; object-fit: cover; filter: blur(26px) brightness(.55) saturate(1.15); }
 .kl-hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 @media (min-aspect-ratio: 9/16) {
   .kl-hero__img {
@@ -244,8 +242,8 @@ body {
   border: 1px solid var(--kl-gold); outline: 1px solid color-mix(in srgb, var(--kl-gold) 40%, transparent); outline-offset: 4px;
 }
 .kl-closing__mono img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.kl-closing__mono::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle, rgba(7, 16, 31, .74), rgba(7, 16, 31, .4)); }
-.kl-closing__mono span { position: relative; z-index: 1; font-family: "Cinzel", serif; color: var(--kl-gold-2); letter-spacing: .06em; text-shadow: 0 1px 8px rgba(0, 0, 0, .8); }
+.kl-closing__mono::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle, rgba(240, 248, 255, .5), rgba(240, 248, 255, .16)); }
+.kl-closing__mono span { position: relative; z-index: 1; font-family: "Cinzel", serif; font-weight: 600; color: #08173a; letter-spacing: .06em; }
 .fx-motion .kl-closing__mono img { animation: kl-turn 120s linear infinite; animation-play-state: var(--fx-play, running); }
 @keyframes kl-turn { to { rotate: 360deg; } }
 

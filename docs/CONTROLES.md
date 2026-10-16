@@ -1239,3 +1239,11 @@ Op de stand van `claude/vaylide-master-collectie` met alleen Kerstmagie erbij; P
 - **Browser** (eigen gedragsscript, 18 controles, alle geslaagd; `e2e/effecten.cjs` 8 van 8; `e2e/toegankelijkheid.cjs` 6 pagina's, 0 bevindingen): zonder tik speelt de film niet, een tik in het midden start hem, Overslaan, het einde, minder beweging, de knop Beweging, een geblokkeerde film, toetsenbord en zonder JavaScript.
 - **Schermafbeeldingen** voor de beoordeling: opening, filmeinde en kaart, op 1366 × 768 en 390 × 844, de voorbeeldkaart `Familie Van Dijk` (Kerst). Geen console- of CSP-meldingen en geen horizontale scrollbalk.
 - **Niet gedaan**: de mp4 is niet in een browser afgespeeld (Chromium speelt hier de webm-reserve); geen iPhone of Android; geen Lighthouse; `e2e/controle2.cjs` niet gedraaid.
+
+## Kerstmagie: helderder openingsscherm (16 oktober 2026, lokaal, niet gepusht)
+
+- **Helderheid gemeten** (gemiddelde, Rec. 709): bronfilm 47%; mp4 gelijk; film zelf tijdens afspelen 49%; openingsscherm vóór de aanpassing 25% (mobiel) en 22% (desktop); na de aanpassing 49% en 49%.
+- **Contrast op de echte pixels** (`e2e/kerstmagie-contrast.cjs`, 360×640, 390×844, 768×1024 en 1366×768): kopregel, naam en aanwijzing halen in het slechtste pixel 5,2 tot 7,4:1 (eis 4,5:1). De knop staat op elk formaat precies in het midden van het scherm (gemeten).
+- **Tests**: 1103 tests, 2 mislukt; dat zijn dezelfde 2 (`test_voorwaarden_nieuw`) die ook op de ongewijzigde basis falen. Nieuw: geen sluier, geen filter op film of eerste beeld, achtergrond op volle breedte, tekst in één plaquette met de knop in het midden, lichte sluier op het monogram.
+- **Browser**: gedragsscript 18 van 18; `e2e/effecten.cjs` 8 van 8; `e2e/toegankelijkheid.cjs` 6 pagina's, 0 bevindingen.
+- **Met het oog**: opening en monogram op 1366×768 en 390×844. Niet bekeken: een echte telefoon of Safari (matglas via `backdrop-filter`).

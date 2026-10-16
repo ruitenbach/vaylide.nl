@@ -12,14 +12,14 @@
     <img class="kl-stage__poster" src="{% static 'designs/kerstmagie/v1/media/poster.webp' %}" alt="" width="720" height="1280" loading="lazy">
     <video class="kl-video" data-kl-video preload="none" data-src-mp4="{% static 'designs/kerstmagie/v1/media/intro.mp4' %}" data-src-webm="{% static 'designs/kerstmagie/v1/media/intro.webm' %}" muted playsinline disablepictureinpicture disableremoteplayback tabindex="-1"></video>
   </div>
-  <div class="kl-cover__shade" aria-hidden="true"></div>
   <div class="fx-slot" data-fx-slot="cover" aria-hidden="true" style="--fx-z: 2"></div>
   <div class="kl-cover__center">
-    <p class="kl-cover__kicker">{{ v.kicker }}</p>
     <button type="button" class="kl-play fx-pulse" data-kl-play data-fx-origin aria-label="Start de openingsfilm">
       <svg class="kl-play__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.2v13.6a.6.6 0 0 0 .92.5l10.6-6.8a.6.6 0 0 0 0-1L8.92 4.7a.6.6 0 0 0-.92.5Z"/></svg>
     </button>
-    <div class="kl-cover__text">
+    {# data-tekst-op-beeld: de tekst staat op de film; het contrast meet e2e/kerstmagie-contrast.cjs op de echte pixels. #}
+    <div class="kl-cover__text" data-tekst-op-beeld>
+      <p class="kl-cover__kicker">{{ v.kicker }}</p>
       <p class="kl-cover__title">{{ v.title }}</p>
       <p class="kl-cover__hint" data-kl-hint>Tik in het midden om te beginnen</p>
     </div>

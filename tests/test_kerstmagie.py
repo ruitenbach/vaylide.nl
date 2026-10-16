@@ -148,3 +148,46 @@ class KerstmagieKoppelingTests(VaylideTestCase):
             self.assertEqual((order.total_cents, payment.amount_cents, order.package_code, order.availability_months), (2495, 2495, prijzen.LUXE, 12))
             inv.refresh_from_db()
             self.assertTrue(inv.is_published)
+
+
+class KerstmagieHelderheidTests(TestCase):
+    """Het ijskristal op het openingsscherm houdt de helderheid van de film: geen donkere sluier en geen filter op de film zelf."""
+
+    def css(self):
+        return (DESIGN / "style.css").read_text(encoding="utf-8")
+
+    def test_geen_donkere_sluier_over_het_openingsbeeld(self):
+        html = Client().get("/voorbeeld/kerstmagie/", {"gelegenheid": "kerst"}).content.decode()
+        self.assertNotIn("kl-cover__shade", html)
+        self.assertNotIn("kl-cover__shade", self.css())
+
+    def test_geen_filter_op_de_film_of_het_eerste_beeld(self):
+        css = self.css()
+        for selector in (".kl-video", ".kl-stage__poster"):
+            blocks = re.findall(re.escape(selector) + r"[^{}]*\{([^}]*)\}", css)
+            self.assertTrue(blocks, selector)
+            for block in blocks:
+                self.assertNotIn("filter", block.replace("backdrop-filter", ""), selector)
+                self.assertNotIn("mix-blend", block, selector)
+
+    def test_vervaagde_achtergrond_dekt_de_hele_breedte(self):
+        """Een algemene regel img { max-width: 100% } hield de achtergrond op 100% in plaats van 116%: rechts bleef een donkere strook."""
+        css = self.css()
+        self.assertRegex(css, r"\.kl-stage__backdrop \{[^}]*max-width: none")
+        self.assertRegex(css, r"\.kl-hero__back \{[^}]*max-width: none")
+
+    def test_tekst_op_het_openingsscherm_staat_in_een_plaquette_en_de_knop_in_het_midden(self):
+        html = Client().get("/voorbeeld/kerstmagie/", {"gelegenheid": "kerst"}).content.decode()
+        text = re.search(r'<div class="kl-cover__text"[^>]*>(.*?)</div>', html, re.S).group(1)
+        for part in ("kl-cover__kicker", "kl-cover__title", "kl-cover__hint"):
+            self.assertIn(part, text)
+        self.assertRegex(self.css(), r"\.kl-play \{[^}]*grid-row: 2")
+        self.assertRegex(self.css(), r"\.kl-cover__text \{[^}]*grid-row: 3")
+
+    def test_monogram_gebruikt_een_lichte_sluier(self):
+        self.assertIn("rgba(240, 248, 255", self.css().split(".kl-closing__mono::after")[1].split("}")[0])
+
+    def test_tekst_op_de_film_wordt_op_de_echte_pixels_gemeten(self):
+        html = Client().get("/voorbeeld/kerstmagie/", {"gelegenheid": "kerst"}).content.decode()
+        self.assertRegex(html, r'<div class="kl-cover__text" data-tekst-op-beeld>')
+        self.assertTrue((Path(settings.BASE_DIR) / "e2e" / "kerstmagie-contrast.cjs").exists())

@@ -47,3 +47,16 @@ Een vijfde kerstontwerp met een film, in `designs/kerstmagie/v1/`. De film (staa
 **Rechten:** de film is door de eigenaar aangeleverd; de eigenaar bevestigt de rechten, zoals bij de andere films.
 
 **Nog te doen:** de teksten in `intro.js` en het openingsscherm zeggen op enkele plekken (onzichtbare knoppen en schermlezertekst) 'uitnodiging' waar bij Kerst 'kerstkaart' hoort; dat is bewust niet aangepast bij het rechtzetten van de koppeling.
+
+## Kerstmagie: helderder openingsscherm (16 oktober 2026)
+
+Het ijskristal op het openingsscherm was te donker. De bronfilm is helder (gemiddeld 47% helderheid, de kristalarmen ruim 90%) en mijn mp4 en webm zijn daarin gelijk. Het donker kwam van een donkere sluier die ik zelf over het openingsscherm had gelegd voor de leesbaarheid van de tekst (het scherm haalde 25% in plaats van 47 tot 49%), en op brede schermen van een te donkere vervaagde achtergrond.
+
+Wat is veranderd (alleen `designs/kerstmagie/v1/style.css` en `invitation.html`; de film, de bronbeelden en de stills zijn niet aangeraakt, en er is geen filter op de film):
+- de donkere sluier is weg; het kristal behoudt zijn eigen helderheid (49% op het scherm);
+- de afspeelknop is een ijswitte matglazen knop met een donkerblauwe driehoek;
+- kopregel, naam en aanwijzing staan samen in één rustige matglazen plaquette onder de knop, in donkerblauwe letters; de kopregel is daarvoor van boven de knop naar de plaquette verplaatst. De knop blijft precies in het midden van het scherm;
+- de vervaagde achtergrond is lichter. Een donkere strook rechts op brede schermen kwam doordat de algemene regel `img { max-width: 100% }` de achtergrond op 100% in plaats van 116% hield; `max-width: none` lost dat op, ook bij de achtergrond van de kop;
+- het sneeuwkristal op het monogram aan het eind heeft een lichte in plaats van donkere sluier, met een donkerblauwe letter.
+
+Contrast: de tekst op het openingsscherm staat op de film en valt onder `data-tekst-op-beeld`. `e2e/kerstmagie-contrast.cjs` meet hem op de echte pixels (slechtste pixel 5,2:1, eis 4,5:1).
