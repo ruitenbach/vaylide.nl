@@ -1224,3 +1224,7 @@ Echt uitgevoerd, lokaal met `VIERLIEF_PRICING_V2=1` en Chromium (390 en 1366 pix
 - Het prijslabel is nu `Luxe € 24,95` (geen streepje); op de ontwerppagina staan indeling en prijs met lettertype en witruimte uit elkaar.
 - De knop "Lees verder" bij Kerstmarkt, Kerstcoupé en Kerstpaleis is nu een rustige aanwijzing "Scroll naar beneden" met een dun pijltje (zelfde link naar de kaart eronder).
 - Haperingen: alleen onderzocht, zie het rapport in de projectmap.
+
+## Afronding 16 oktober 2026 (prijzenpagina en Kerstmarkt-proef)
+
+Echt uitgevoerd (lokaal, `VIERLIEF_PRICING_V2=1`, Chromium op 390 en 1366 pixels): de volledige set tests (1066 tests; de twee tests in `test_voorwaarden_nieuw` slagen alleen als `VIERLIEF_CONTACT_EMAIL` niet in de omgeving staat, omdat een gezet adres als bevestigd telt); `e2e/kerstmarkt.cjs` na de proef (alles ok); schermopname van de overgang van Kerstmarkt v1 voor en na het weghalen van de vaste vertraging van 0,5 s (de stilstand na het filmeinde werd ruwweg gehalveerd, van ± 0,7 naar ± 0,35 s). Niet gedaan: echte telefoon, Safari, staging, axe.
