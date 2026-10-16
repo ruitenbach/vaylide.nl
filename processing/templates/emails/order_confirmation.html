@@ -55,6 +55,16 @@
     </td></tr>
     {% endif %}
 
+    {% if order.service_consent_at %}
+    <tr><td class="vl-pad" style="padding:22px 40px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#3F3833;">
+      <h2 style="margin:0 0 10px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;font-size:20px;line-height:28px;color:#26211D;">Start van de online dienst</h2>
+      <p style="margin:0 0 10px;">Je hebt bij het afronden van je bestelling uitdrukkelijk gevraagd om de online beschikbaarheid van je uitnodiging direct te starten.</p>
+      <p style="margin:0 0 10px;"><strong style="color:#26211D;">Verzoek gedaan op:</strong> {{ order.service_consent_at|date:"j F Y H:i" }}</p>
+      <p style="margin:0 0 4px;color:#6B625A;font-size:14px;line-height:22px;">Vastgelegd verzoek:</p>
+      <p style="margin:0;padding:12px 16px;background:#FBF8F2;border:1px solid #EADFC9;border-radius:10px;font-size:14px;line-height:22px;color:#3F3833;"><em>&ldquo;{{ order.service_consent_text }}&rdquo;</em></p>
+    </td></tr>
+    {% endif %}
+
     {% if order.availability_months %}
     <tr><td class="vl-pad" style="padding:24px 40px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#3F3833;">
       <h2 style="margin:0 0 10px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;font-size:20px;line-height:28px;color:#26211D;">Online beschikbaarheid</h2>

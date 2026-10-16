@@ -25,6 +25,13 @@ Je hebt daarbij bevestigd dat je begrijpt dat je herroepingsrecht voor de digita
 Toestemming gegeven op: {{ order.delivery_consent_at|date:"j F Y H:i" }}
 Vastgelegde toestemming:
 "{{ order.delivery_consent_text }}"
+{% endif %}{% if order.service_consent_at %}
+Start van de online dienst
+Je hebt bij het afronden van je bestelling uitdrukkelijk gevraagd om de online beschikbaarheid van je uitnodiging direct te starten.
+
+Verzoek gedaan op: {{ order.service_consent_at|date:"j F Y H:i" }}
+Vastgelegd verzoek:
+"{{ order.service_consent_text }}"
 {% endif %}{% if order.availability_months %}
 Online beschikbaarheid
 Je digitale uitnodiging wordt via VAYLIDE online beschikbaar gesteld volgens de afspraken die bij je bestelling en in de algemene voorwaarden staan.

@@ -139,3 +139,7 @@ Bij het accepteren van een betaald maatwerkvoorstel (`portal/templates/portal/wi
 
 ## Label bij de voorwaarden van 29 september (16 oktober 2026)
 De oude versie draagt niet meer het label "Concept, nog niet juridisch beoordeeld". Op de webpagina, in de download en in de pdf staat nu "Eerdere versie" zodra de nieuwe prijzen gelden, en "Geldende versie" zolang ze nog niet gelden (dan is 29 september nog de versie waaronder besteld wordt). Alleen het label in `core/voorwaarden.py` (`version_info`) is aangepast: de tekst, het versienummer, de bestellingen en de vastgelegde toestemmingen zijn niet gewijzigd. De voorwaarden van 16 oktober en de status "Concept" of "Definitief" daarvan zijn ongemoeid. Artikel 9 blijft gemarkeerd voor juridische beoordeling; dit label zegt niets over een juridische goedkeuring.
+
+## Bestelbevestiging: ook het verzoek om de online dienst te starten (16 oktober 2026)
+
+De bestelbevestiging (tekst en HTML, `processing/templates/emails/order_confirmation.*`) toont naast de toestemming voor directe levering nu ook het verzoek om de online beschikbaarheid direct te starten (artikel 9.3): kopje "Start van de online dienst", tijdstip (`Order.service_consent_at`) en de letterlijke, bij de bestelling vastgelegde tekst (`Order.service_consent_text`). Alleen bij bestellingen waar dat verzoek is vastgelegd; oudere bestellingen zonder deze gegevens krijgen geen kopje en geen fout. De toestemmingsteksten, de voorwaarden-pdf en de overige mail zijn ongewijzigd. Tests: `tests/test_bevestigingsmail_dienst.py`.
