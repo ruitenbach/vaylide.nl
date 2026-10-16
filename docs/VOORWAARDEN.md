@@ -129,3 +129,7 @@ uitleg van de ACM nog raadplegen.
 ## Getest
 
 Zie `docs/CONTROLES.md`, onder "Algemene voorwaarden".
+
+## Maatwerk: afzonderlijke toestemmingen (16 oktober 2026)
+
+Bij het accepteren van een betaald maatwerkvoorstel (`portal/templates/portal/wish.html`) staan nu, naast het voorwaardenvinkje, dezelfde twee afzonderlijke, niet vooraf aangevinkte vinkjes als bij een gewone bestelling: directe digitale levering (art. 9.2, `DELIVERY_CONSENT`) en het verzoek om de online dienst direct te starten (art. 9.3, `SERVICE_CONSENT`). De letterlijke tekst en het tijdstip staan op de maatwerkbestelling (`Order.delivery_consent_*`, `service_consent_*`). Bij een kosteloos voorstel is er geen bestelling en blijft het bij de voorwaarden. Juridisch nog te beoordelen of hiermee het herroepingsrecht voor maatwerk correct is geregeld.

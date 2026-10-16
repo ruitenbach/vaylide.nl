@@ -14,6 +14,11 @@
       <p><strong>Prijs: {{ req.proposal_price_display }}</strong></p>
       <form method="post" data-once>{% csrf_token %}
         <label class="check terms-check"><input type="checkbox" name="terms" value="on" required><span>Ik ga akkoord met de <a href="{% url 'core:terms' %}" target="_blank" rel="noopener">algemene voorwaarden</a> van VAYLIDE. <span class="hint">Versie {{ voorwaarden.date|date:"j F Y" }} · <a href="{% url 'core:terms_pdf' voorwaarden.version %}" target="_blank" rel="noopener">open als pdf</a> om te lezen of op te slaan.</span></span></label>
+        {% if req.proposal_price_cents %}
+        <p class="small muted">Omdat je maatwerk na betaling direct wordt geleverd, vragen we hieronder apart toestemming voor directe levering en voor het direct starten van de online dienst. <a href="{% url 'core:terms' %}#artikel-9" target="_blank" rel="noopener">Lees meer over de bedenktijd<span class="visually-hidden"> (artikel 9 en 10 van de voorwaarden, opent in een nieuw venster)</span></a>.</p>
+        <label class="check terms-check"><input type="checkbox" name="direct_leveren" value="on" required><span>{{ levering_tekst }}</span></label>
+        <label class="check terms-check"><input type="checkbox" name="online_dienst" value="on" required><span>{{ dienst_tekst }}</span></label>
+        {% endif %}
         <div class="btn-row"><button type="submit" name="actie" value="akkoord" class="btn btn--primary">{% if req.proposal_price_cents %}Akkoord en betalen{% else %}Akkoord{% endif %}</button></div></form>
       <p class="small muted">Liever iets aanpassen? Stuur hieronder een bericht.</p>
     </section>

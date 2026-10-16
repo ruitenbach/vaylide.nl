@@ -51,7 +51,7 @@ class WishFlowTests(VaylideTestCase):
         self.assertEqual(req.status, CustomRequest.Status.PROPOSAL)
         self.assertEqual(req.proposal_price_cents, 3500)
         self.assertTrue(OutboundEmail.objects.filter(kind="wish_update").exists())
-        response = self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on"})
+        response = self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on", "direct_leveren": "on", "online_dienst": "on"})
         self.assertEqual(response.status_code, 302)
         req.refresh_from_db()
         self.assertEqual(req.status, CustomRequest.Status.AWAITING_PAYMENT)
@@ -75,7 +75,7 @@ class WishFlowTests(VaylideTestCase):
 
         req = self.create()
         self.staff.post(f"/beheer/wensen/{req.uid}/", {"actie": "voorstel", "text": "We maken een tweetalige versie.", "price": "35.00"})
-        self.assertEqual(self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on"}).status_code, 302)
+        self.assertEqual(self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on", "direct_leveren": "on", "online_dienst": "on"}).status_code, 302)
         order = Order.objects.get(kind=Order.Kind.CUSTOM)
         self.assertEqual(order.terms_version, CURRENT)
         with mock.patch("core.voorwaarden.CURRENT", "2099-01-01"):
@@ -135,6 +135,50 @@ class WishFlowTests(VaylideTestCase):
         self.staff.post(f"/beheer/wensen/{req.uid}/", {"actie": "voorstel", "text": "Extra.", "price": "35.00"})
         with override_settings(PRICING_V2=True):
             self.assertContains(self.c.get(f"/account/wensen/{req.uid}/"), "16 oktober 2026")
-            self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on"})
+            self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on", "direct_leveren": "on", "online_dienst": "on"})
         self.assertEqual(Order.objects.get(kind=Order.Kind.CUSTOM).terms_version, "2026-10-16")
         self.assertTrue(req.messages.filter(body__contains="algemene voorwaarden (versie 16-10-2026)").exists())
+
+    def _voorstel(self, price="35.00"):
+        req = self.create()
+        self.staff.post(f"/beheer/wensen/{req.uid}/", {"actie": "voorstel", "text": "We maken een tweetalige versie.", "price": price})
+        return req
+
+    def test_betaald_voorstel_toont_twee_afzonderlijke_niet_aangevinkte_toestemmingen(self):
+        from core.voorwaarden import DELIVERY_CONSENT, SERVICE_CONSENT
+
+        req = self._voorstel()
+        pagina = self.c.get(f"/account/wensen/{req.uid}/").content.decode()
+        for naam in ("direct_leveren", "online_dienst"):
+            vinkje = pagina[pagina.index(f'name="{naam}"') - 40:pagina.index(f'name="{naam}"') + 80]
+            self.assertIn("required", vinkje)
+            self.assertNotIn("checked", vinkje)
+        self.assertIn(DELIVERY_CONSENT, pagina)
+        self.assertIn(SERVICE_CONSENT, pagina)
+        self.assertIn("/voorwaarden/pdf/", pagina)
+
+    def test_zonder_een_van_beide_toestemmingen_komt_er_geen_bestelling(self):
+        req = self._voorstel()
+        for extra in ({}, {"direct_leveren": "on"}, {"online_dienst": "on"}):
+            antwoord = self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on", **extra})
+            self.assertContains(antwoord, "toestemming" if "direct_leveren" not in extra else "online dienst")
+            req.refresh_from_db()
+            self.assertEqual(req.status, CustomRequest.Status.PROPOSAL)
+            self.assertFalse(Order.objects.filter(kind=Order.Kind.CUSTOM).exists())
+
+    def test_beide_toestemmingen_worden_met_tekst_en_tijdstip_op_de_bestelling_bewaard(self):
+        from core.voorwaarden import DELIVERY_CONSENT, SERVICE_CONSENT
+
+        req = self._voorstel()
+        self.assertEqual(self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on", "direct_leveren": "on", "online_dienst": "on"}).status_code, 302)
+        order = Order.objects.get(kind=Order.Kind.CUSTOM)
+        self.assertEqual(order.delivery_consent_text, DELIVERY_CONSENT)
+        self.assertEqual(order.service_consent_text, SERVICE_CONSENT)
+        self.assertIsNotNone(order.delivery_consent_at)
+        self.assertIsNotNone(order.service_consent_at)
+
+    def test_kosteloos_voorstel_vraagt_alleen_de_voorwaarden(self):
+        req = self._voorstel(price="")
+        pagina = self.c.get(f"/account/wensen/{req.uid}/").content.decode()
+        self.assertNotIn('name="direct_leveren"', pagina)
+        self.assertEqual(self.c.post(f"/account/wensen/{req.uid}/", {"actie": "akkoord", "terms": "on"}).status_code, 302)

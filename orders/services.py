@@ -128,7 +128,7 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
     return create_payment(order)
 
 
-def create_custom_order(custom_request, *, user) -> Order:
+def create_custom_order(custom_request, *, user, delivery_consent: bool = False, service_consent: bool = False) -> Order:
     order = _create_order(
         kind=Order.Kind.CUSTOM,
         customer=user,
@@ -138,6 +138,10 @@ def create_custom_order(custom_request, *, user) -> Order:
         total_cents=custom_request.proposal_price_cents or 0,
         terms_accepted_at=timezone.now(),
         terms_version=terms_version_now(),    # de versie die gold op het moment van akkoord; artikel 16 van de voorwaarden
+        delivery_consent_at=timezone.now() if delivery_consent else None,
+        delivery_consent_text=DELIVERY_CONSENT if delivery_consent else "",
+        service_consent_at=timezone.now() if service_consent else None,
+        service_consent_text=SERVICE_CONSENT if service_consent else "",
         test_mode=settings.TEST_MODE,
     )
     OrderLine.objects.create(

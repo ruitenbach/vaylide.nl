@@ -134,7 +134,7 @@ def send_proposal(req: CustomRequest, *, author, text: str, price_cents: int | N
     return req
 
 
-def accept_proposal(req: CustomRequest, *, user, terms_accepted: bool = False):
+def accept_proposal(req: CustomRequest, *, user, terms_accepted: bool = False, delivery_consent: bool = False, service_consent: bool = False):
     """Akkoord van de klant, met de algemene voorwaarden. Geeft een Payment terug als er betaald moet worden, anders None."""
     from core.voorwaarden import current, version_info
     from orders.services import create_custom_order, create_payment
@@ -143,6 +143,12 @@ def accept_proposal(req: CustomRequest, *, user, terms_accepted: bool = False):
         raise WishError("Er staat geen voorstel open om te accepteren.")
     if not terms_accepted:
         raise WishError("Ga akkoord met de algemene voorwaarden om het voorstel te accepteren.")
+    if req.proposal_price_cents:
+        # Er komt een betaalde bestelling: dezelfde afzonderlijke toestemmingen als bij een gewone bestelling (artikel 9.2 en 9.3).
+        if not delivery_consent:
+            raise WishError("Geef toestemming voor directe levering om te kunnen betalen.")
+        if not service_consent:
+            raise WishError("Geef aan dat de online dienst direct mag starten om te kunnen betalen.")
     versie = version_info(current())
     with transaction.atomic():
         req.accepted_at = timezone.now()
@@ -151,7 +157,7 @@ def accept_proposal(req: CustomRequest, *, user, terms_accepted: bool = False):
             req.status = CustomRequest.Status.AWAITING_PAYMENT
             req.unread_by_staff = True
             req.save()
-            order = create_custom_order(req, user=user)
+            order = create_custom_order(req, user=user, delivery_consent=delivery_consent, service_consent=service_consent)
         else:
             req.status = CustomRequest.Status.EXECUTING
             req.unread_by_staff = True
