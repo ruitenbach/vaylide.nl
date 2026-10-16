@@ -6,7 +6,7 @@ from orders.methods import available_methods
 
 from .ai import ai_configured
 from .analytics import analyse_op_pagina, clarity_op_pagina, gtm_context
-from .company import company
+from .company import company_bevestigd
 from .social import social_links
 
 
@@ -18,6 +18,7 @@ def test_banner() -> str:
 
 
 def vierlief(request):
+    bedrijf = company_bevestigd()
     return {
         "TEST_MODE": settings.TEST_MODE,
         "TEST_BANNER": test_banner(),
@@ -27,9 +28,9 @@ def vierlief(request):
         "PAYMENT_METHODS": available_methods,
         "SOCIAL_LINKS": social_links,
         "CONTACT_EMAIL": settings.CONTACT_EMAIL,
-        "KVK": settings.COMPANY_KVK,
-        "BEDRIJF": company,
-        "BTW": settings.COMPANY_VAT,
+        "KVK": bedrijf["kvk"],
+        "BEDRIJF": lambda: bedrijf,
+        "BTW": bedrijf["btw"],
         "BASE_URL": settings.BASE_URL,
         "CURRENT_YEAR": timezone.localdate().year,
         "SLOGAN": "Elk bijzonder moment begint met een uitnodiging.",

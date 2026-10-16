@@ -42,9 +42,21 @@ def company(strikt: bool = False) -> dict:
     return data
 
 
+def company_bevestigd() -> dict:
+    """Voor de website buiten de juridische teksten (voettekst, contactpagina, bestelmail): KvK-nummer en btw-id alleen als de eigenaar ze zelf
+    in de omgeving heeft gezet. Een standaardwaarde uit de code is geen bewijs; zonder bevestiging blijft het gegeven leeg (de pagina toont dan
+    geen nummer of een herkenbaar invulveld). De rest van de gegevens blijft zoals `company()` ze geeft."""
+    data = company()
+    confirmed = getattr(settings, "COMPANY_CONFIRMED", {})
+    for key in ("kvk", "btw"):
+        if not confirmed.get(key):
+            data[key] = ""
+    return data
+
+
 def as_text(data: dict | None = None) -> str:
     """Voor e-mails: de bedrijfsgegevens als platte tekst (met invulvelden als iets ontbreekt)."""
-    data = data or company()
+    data = data or company_bevestigd()
     lines = [f"{TRADE_NAME} is een handelsnaam van {data['juridische_naam'] or '[juridische naam onderneming en rechtsvorm]'}"]
     # Het adres staat bewust niet in mails: alleen op "Contact & bedrijfsgegevens" en in de voorwaarden (ook de pdf-bijlage).
     lines.append("Vestigingsadres: zie Contact & bedrijfsgegevens op de website en de algemene voorwaarden")

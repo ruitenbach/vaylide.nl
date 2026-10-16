@@ -191,6 +191,7 @@ class CheckoutConsentTests(VaylideTestCase):
 
 
 class ConfirmationTests(VaylideTestCase):
+    @override_settings(COMPANY_CONFIRMED={"kvk": True, "btw": True, "adres": True, "email": True})  # KvK en btw-id staan er alleen als de eigenaar ze bevestigde
     def test_confirmation_is_complete_and_carries_the_terms(self):
         customer = self.make_customer()
         inv = self.make_invitation(owner=customer)
@@ -247,6 +248,7 @@ class TermsAndCompanyPageTests(VaylideTestCase):
         self.assertEqual(Client().get("/voorwaarden/versie/2026-09-29/").status_code, 200)
         self.assertEqual(Client().get("/voorwaarden/versie/1999-01-01/").status_code, 404)
 
+    @override_settings(COMPANY_CONFIRMED={"kvk": True, "btw": True, "adres": True, "email": True})  # KvK en btw-id staan er alleen als de eigenaar ze bevestigde
     def test_contact_and_company_page_in_the_footer(self):
         home = Client().get("/").content.decode()
         self.assertIn(">Contact &amp; bedrijfsgegevens</a>", home)

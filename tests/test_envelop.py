@@ -2,7 +2,7 @@
 import io
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client
+from django.test import Client, override_settings
 from PIL import Image
 
 from catalog.envelop import clean_initials
@@ -103,6 +103,7 @@ class EnvelopeChoiceTests(VaylideTestCase):
 
 
 class CompanyDetailsTests(VaylideTestCase):
+    @override_settings(COMPANY_CONFIRMED={"kvk": True, "btw": True, "adres": True, "email": True})  # KvK en btw-id staan er alleen als de eigenaar ze bevestigde
     def test_kvk_and_vat_without_address(self):
         for url in ("/", "/contact/", "/privacy/", "/voorwaarden/"):
             html = Client().get(url).content.decode()
