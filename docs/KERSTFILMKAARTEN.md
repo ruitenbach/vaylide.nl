@@ -44,7 +44,7 @@ Een vijfde kerstontwerp met een film, in `designs/kerstmagie/v1/`. De film (staa
 
 **Bestanden:** `intro.js` (gedrag), `media/` (mp4, webm-reserve, stills), kaartbeeld `static/img/designs/kerstmagie.webp`; de media zijn opnieuw te maken met `tools/kerstmagie/maak_media.py`. De film wordt pas geladen als de pagina klaar is en niet bij een directe link naar de aanmelding of 'databesparing'. Bij 'minder beweging' of de knop Beweging op stil opent een tik direct, met een knop **Bekijk eerst de film**. Start de film niet, dan opent de kaart gewoon.
 
-**Rechten:** de film is door de eigenaar aangeleverd; de eigenaar bevestigt de rechten, zoals bij de andere films.
+**Rechten:** de film is door de eigenaar aangeleverd. Bevestigd op 16 oktober 2026: de eigenaar heeft de film zelf gegenereerd op zijn eigen Runway-account, en Runway staat commercieel gebruik van zelf gegenereerde video's toe. De film is stil en alle stills komen uit de film zelf; er is geen muziek of ander extern materiaal. Zie `docs/OVERDRACHT.md` open punt 14.
 
 **Nog te doen:** de teksten in `intro.js` en het openingsscherm zeggen op enkele plekken (onzichtbare knoppen en schermlezertekst) 'uitnodiging' waar bij Kerst 'kerstkaart' hoort; dat is bewust niet aangepast bij het rechtzetten van de koppeling.
 
