@@ -282,3 +282,43 @@ class BestaandeKlantenTests(VaylideTestCase):
         tweede = self.pay(weer, klant)
         self.assertEqual(Order.objects.get(pk=tweede.order_id).terms_version, "2026-09-29")
         self.assertEqual(self.vastgelegd(order), voor)
+
+
+class EerdereVersieLabelTests(VaylideTestCase):
+    """Het label boven de voorwaarden van 29 september: alleen presentatie, geen 'Concept' meer; tekst en versie blijven ongewijzigd."""
+
+    def teksten(self):
+        from core.voorwaarden_pdf import render_pdf
+
+        client = Client()
+        return {
+            "pagina": client.get("/voorwaarden/versie/2026-09-29/").content.decode(),
+            "download": client.get("/voorwaarden/download/2026-09-29/").content.decode(),
+            "pdf": render_pdf("2026-09-29", compress=False),
+        }
+
+    def test_met_de_nieuwe_prijzen_heet_de_oude_versie_eerdere_versie_zonder_conceptmelding(self):
+        with V2:
+            self.assertEqual(voorwaarden.version_info("2026-09-29")["status"], "Eerdere versie")
+            teksten = self.teksten()
+        self.assertIn("Eerdere versie · versie 29 september 2026", teksten["pagina"])
+        self.assertIn("Eerdere versie · versie 29 september 2026", teksten["download"])
+        self.assertIn(b"Eerdere versie", teksten["pdf"])
+        for naam in ("pagina", "download"):
+            self.assertNotIn("Concept", teksten[naam], naam)
+            self.assertNotIn("niet juridisch beoordeeld", teksten[naam], naam)
+        self.assertNotIn(b"Concept", teksten["pdf"])
+        self.assertNotIn(b"niet juridisch", teksten["pdf"])
+
+    def test_zolang_de_oude_versie_nog_geldt_staat_er_geldende_versie(self):
+        self.assertEqual(voorwaarden.version_info("2026-09-29")["status"], "Geldende versie")
+        self.assertIn("Geldende versie · versie 29 september 2026", self.teksten()["pagina"])
+
+    def test_tekst_en_versienummer_van_de_oude_versie_blijven_gelijk(self):
+        self.assertEqual(voorwaarden.CURRENT, "2026-09-29")
+        self.assertEqual(voorwaarden.VERSIONS["2026-09-29"]["template"], "core/voorwaarden/2026-09-29.html")
+        self.assertIn(b"Essentieel", self.teksten()["pdf"])
+
+    @override_settings(TEXTS_DEFINITIVE=False)
+    def test_de_nieuwe_voorwaarden_blijven_een_concept_zolang_de_eigenaar_ze_niet_definitief_maakt(self):
+        self.assertEqual(voorwaarden.version_info("2026-10-16")["status"], "Concept")

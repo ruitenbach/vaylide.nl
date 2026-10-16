@@ -14,7 +14,7 @@ from datetime import date
 CURRENT = "2026-09-29"
 NIEUW = "2026-10-16"
 VERSIONS = {
-    "2026-09-29": {"template": "core/voorwaarden/2026-09-29.html", "date": date(2026, 9, 29), "status": "Concept"},
+    "2026-09-29": {"template": "core/voorwaarden/2026-09-29.html", "date": date(2026, 9, 29), "status": "Eerdere versie"},
     # Status blijft "Concept" tot de eigenaar de definitieve tekst goedkeurt (dan "Definitief" en vervalt de conceptmelding).
     # strikt: bedrijfsgegevens die de eigenaar niet zelf heeft gezet, verschijnen als invulveld (core/company.py).
     "2026-10-16": {"template": "core/voorwaarden/2026-10-16.html", "date": date(2026, 10, 16), "status": "Concept", "strikt": True},
@@ -60,6 +60,10 @@ def activation_date() -> date | None:
 def version_info(version: str | None = None) -> dict:
     version = version or current()
     info = VERSIONS[version]
+    if version == CURRENT:
+        # Alleen het label boven de tekst; de tekst en het versienummer blijven zoals ze waren. Zolang de nieuwe prijzen niet gelden is dit nog de
+        # versie waaronder besteld wordt, dan is "Eerdere versie" onjuist.
+        info = {**info, "status": "Eerdere versie" if current() != CURRENT else "Geldende versie"}
     if version == NIEUW:
         from django.conf import settings
 
