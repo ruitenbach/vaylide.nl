@@ -16,6 +16,12 @@ const [base, outDir, ...only] = process.argv.slice(2);
 fs.mkdirSync(outDir, { recursive: true });
 const designs = fs.readdirSync(path.join(process.cwd(), "designs")).filter((d) => !d.startsWith("_") && (!only.length || only.includes(d))).sort();
 const report = { checks: [], perf: [] };
+// Kerstmagie tekent zijn eigen sneeuw (snow.js, .kl-snow): daar tellen die canvassen in plaats van de vlakken van effects.js.
+const eigen = (p) => p.evaluate(() => !!document.querySelector(".kl-snow"));
+const coverSel = (own) => (own ? ".kl-snow--cover" : "[data-cover] .fx-canvas");
+const pageSel = (own) => (own ? ".kl-snow--page" : ".fx-slot--page .fx-canvas");
+const pageRunning = (own) => (own ? ".kl-snow--page.is-on" : ".fx-slot--page.is-running");
+const anyRunning = (own) => (own ? ".kl-snow--page.is-on" : ".fx-slot.is-running");
 const check = (name, ok, detail) => { report.checks.push({ name, ok, detail }); console.log(`${ok ? "ok    " : "FOUT  "} ${name}: ${detail}`); };
 
 // Aantal zichtbare beeldpunten op een tekenvlak, op ware grootte geteld. (Verkleind tellen liet
@@ -53,7 +59,8 @@ async function settings(page) {
       await p.goto(demo, { waitUntil: "networkidle" });
       await p.waitForTimeout(1600);
       const fx = await settings(p);
-      const coverInk = await inked(p, "[data-cover] .fx-canvas");
+      const own = await eigen(p);
+      const coverInk = await inked(p, coverSel(own));
       const toggleVisible = await p.isVisible("[data-fx-toggle]");
       check(`${slug} · Deeltjes op het openingsscherm (${fx.sfeer})`, coverInk > 0 && toggleVisible, `getekende punten: ${coverInk}, knop 'Beweging' zichtbaar: ${toggleVisible}`);
       await p.click("[data-cover] [data-open]", { force: true });
@@ -62,12 +69,12 @@ async function settings(page) {
       check(`${slug} · Knal bij het openen (${fx.knal})`, fx.knal === "geen" || burstInk > 0, `getekende punten: ${burstInk}`);
       await p.waitForFunction(() => document.documentElement.classList.contains("fx-done"), null, { timeout: 9000 });
       await p.waitForTimeout(600);
-      const after = await p.evaluate(() => {
+      const after = await p.evaluate((sel) => {
         const h1 = document.querySelector("h1");
         const style = h1 && getComputedStyle(h1);
-        return { h1: !!h1 && style.opacity === "1" && h1.getBoundingClientRect().height > 0, pageRunning: !!document.querySelector(".fx-slot--page.is-running") };
-      });
-      const pageInk = await inked(p, ".fx-slot--page .fx-canvas");
+        return { h1: !!h1 && style.opacity === "1" && h1.getBoundingClientRect().height > 0, pageRunning: !!document.querySelector(sel) };
+      }, pageRunning(own));
+      const pageInk = await inked(p, pageSel(own));
       check(`${slug} · Na het openen: kop zichtbaar en sfeer loopt`, after.h1 && after.pageRunning && pageInk > 0, `kop zichtbaar: ${after.h1}, sfeer actief: ${after.pageRunning}, getekende punten: ${pageInk}`);
       await p.screenshot({ path: path.join(outDir, `effect-${slug}-open.png`) });
       // Feestje na aanmelden in het voorbeeld.
@@ -89,6 +96,7 @@ async function settings(page) {
       const p = await ctx.newPage();
       await p.goto(demo + "#uitnodiging", { waitUntil: "networkidle" });
       await p.waitForTimeout(1200);
+      const own = await eigen(p);
       await p.click("[data-fx-toggle]");
       await p.waitForTimeout(300);
       const paused = await p.evaluate(() => ({
@@ -97,9 +105,9 @@ async function settings(page) {
         running: document.querySelectorAll(".fx-slot.is-running").length,
         loops: document.getAnimations().filter((a) => a.playState === "running" && a.effect && a.effect.getTiming().iterations === Infinity).length,
       }));
-      const inkA = await inked(p, ".fx-slot--page .fx-canvas");
+      const inkA = await inked(p, pageSel(own));
       await p.waitForTimeout(500);
-      const inkB = await inked(p, ".fx-slot--page .fx-canvas");
+      const inkB = await inked(p, pageSel(own));
       check(`${slug} · Beweging stilzetten`, paused.pressed === "true" && !paused.motion && paused.running === 0 && paused.loops === 0 && inkA === inkB,
         `ingedrukt: ${paused.pressed}, actieve vlakken: ${paused.running}, lopende herhalende animaties: ${paused.loops}, beeld ongewijzigd: ${inkA === inkB}`);
       await p.reload({ waitUntil: "networkidle" });
@@ -107,7 +115,7 @@ async function settings(page) {
       const remembered = await p.evaluate(() => document.querySelector("[data-fx-toggle]").getAttribute("aria-pressed") === "true" && document.documentElement.classList.contains("fx-paused"));
       await p.click("[data-fx-toggle]");
       await p.waitForTimeout(900);
-      const resumed = await p.evaluate(() => document.documentElement.classList.contains("fx-motion") && !!document.querySelector(".fx-slot.is-running"));
+      const resumed = await p.evaluate((sel) => document.documentElement.classList.contains("fx-motion") && !!document.querySelector(sel), anyRunning(own));
       check(`${slug} · Keuze onthouden en weer aanzetten`, remembered && resumed, `onthouden: ${remembered}, weer aan: ${resumed}`);
       await ctx.close();
     }

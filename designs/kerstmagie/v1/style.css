@@ -107,13 +107,24 @@ body {
 .is-opening .kl-cover__center, .is-opening .kl-skip, .is-opening .kl-watch { opacity: 0; pointer-events: none; }
 .is-opening-reduced .kl-cover { animation: none; opacity: 0; transition: opacity .25s; }
 
+/* ---------- Lagen: beelden onderaan, sneeuw erboven, tekst bovenaan ---------- */
+/* effects.css zet de hoofdinhoud op z-index 1; hier niet, zodat de sneeuw tussen de beelden (laag 0) en de tekst (laag 4) kan liggen. */
+.fx .inv-main { z-index: auto; }
+.fx .inv-colophon { z-index: 4; }
+.kl-layer, .kl-section { position: relative; z-index: 4; }
+.kl-snow { position: fixed; inset: 0; z-index: 3; pointer-events: none; opacity: 0; transition: opacity 1.8s ease; }
+.kl-snow.is-on { opacity: 1; }
+.kl-snow--cover { position: absolute; z-index: 2; }
+@media print { .kl-snow { display: none; } }
+
 /* ---------- Kop: het laatste beeld van de film ---------- */
+/* De kop is geen eigen stapelvlak (geen isolation) en gebruikt geen negatieve z-index: de achtergrond ligt op laag 0, de sneeuw op 3 en de tekst op 4. */
 .kl-hero {
-  position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; gap: 2.5rem;
-  min-height: 100vh; min-height: max(100svh, 36rem); padding: clamp(2.8rem, 9vh, 5.5rem) 1.25rem clamp(2rem, 6vh, 3.5rem); text-align: center;
+  position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; gap: 2.5rem;
+  min-height: 100vh; min-height: max(100svh, 38rem); padding: clamp(2.6rem, 8vh, 5rem) 1.25rem clamp(2rem, 6vh, 3.2rem); text-align: center;
 }
-.kl-hero__bg { position: absolute; inset: 0; z-index: -1; background: var(--kl-bg); }
-.kl-hero__back { position: absolute; inset: -6%; width: 112%; max-width: none; height: 112%; object-fit: cover; filter: blur(26px) brightness(.55) saturate(1.15); }
+.kl-hero__bg { position: absolute; inset: 0; z-index: 0; background: var(--kl-bg); }
+.kl-hero__back { position: absolute; inset: -6%; width: 112%; max-width: none; height: 112%; object-fit: cover; filter: blur(26px) brightness(.6) saturate(1.15); }
 .kl-hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 @media (min-aspect-ratio: 9/16) {
   .kl-hero__img {
@@ -121,41 +132,89 @@ body {
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
   }
 }
-/* Donker boven (voor de namen) en onderaan (voor de datum), de film blijft zichtbaar in het midden. */
+/* Donker boven (voor de namen) en onderaan (voor de datum); de film blijft zichtbaar in het midden. Op brede schermen valt de tekst lager op het beeld. */
 .kl-hero__bg::after {
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(180deg,
-    color-mix(in srgb, var(--kl-bg) 92%, transparent) 0, color-mix(in srgb, var(--kl-bg) 80%, transparent) 30%, color-mix(in srgb, var(--kl-bg) 52%, transparent) 46%, transparent 62%,
-    transparent 64%, color-mix(in srgb, var(--kl-bg) 78%, transparent) 86%, var(--kl-bg) 100%);
+    color-mix(in srgb, var(--kl-bg) 94%, transparent) 0, color-mix(in srgb, var(--kl-bg) 82%, transparent) 26%, color-mix(in srgb, var(--kl-bg) 50%, transparent) 44%, transparent 60%,
+    transparent 66%, color-mix(in srgb, var(--kl-bg) 80%, transparent) 88%, var(--kl-bg) 100%);
 }
-.kl-hero__top, .kl-hero__bottom { position: relative; width: 100%; max-width: 40rem; margin: 0 auto; }
-.kl-kicker { font-family: "Figtree", sans-serif; font-size: .8rem; font-weight: 600; letter-spacing: .34em; text-transform: uppercase; color: var(--kl-gold-2); margin-bottom: 1rem; text-shadow: 0 1px 14px rgba(0, 0, 0, .7); }
+@media (min-aspect-ratio: 9/16) {
+  /* Op een computer is de kop hoger en staat het dorp groter in beeld; de afwerking begint pas lager. */
+  .kl-hero { min-height: max(100svh, 50rem); }
+  .kl-hero__back { filter: blur(26px) brightness(.88) saturate(1.2); }
+  .kl-hero__bg::after {
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--kl-bg) 94%, transparent) 0, color-mix(in srgb, var(--kl-bg) 84%, transparent) 20%, color-mix(in srgb, var(--kl-bg) 58%, transparent) 36%, color-mix(in srgb, var(--kl-bg) 20%, transparent) 50%,
+      transparent 60%, transparent 74%, color-mix(in srgb, var(--kl-bg) 80%, transparent) 90%, var(--kl-bg) 100%);
+  }
+}
+.kl-hero__top, .kl-hero__bottom { width: 100%; max-width: 40rem; margin: 0 auto; }
+.kl-kicker {
+  display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.1rem;
+  font-family: "Figtree", sans-serif; font-size: .76rem; font-weight: 700; letter-spacing: .34em; text-transform: uppercase; color: var(--kl-gold-2); text-shadow: 0 1px 14px rgba(0, 0, 0, .7);
+}
+.kl-kicker::before, .kl-kicker::after { content: ""; width: clamp(1.6rem, 8vw, 3.4rem); height: 1px; background: linear-gradient(90deg, transparent, var(--kl-gold)); }
+.kl-kicker::after { transform: scaleX(-1); }
 .kl-names {
   display: grid; justify-items: center; gap: .1rem; font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500;
-  font-size: clamp(3rem, 15vw, 6rem); letter-spacing: .01em; line-height: 1; color: #fff;
-  overflow-wrap: anywhere; text-wrap: balance; text-shadow: 0 2px 26px rgba(0, 0, 0, .65);
+  font-size: clamp(3rem, 14vw, 6.4rem); letter-spacing: .005em; line-height: 1; color: #fff;
+  overflow-wrap: anywhere; text-wrap: balance; text-shadow: 0 2px 28px rgba(0, 0, 0, .6);
 }
 .kl-names--long { font-size: clamp(2.3rem, 10.5vw, 4.4rem); }
 .kl-names--xlong { font-size: clamp(1.8rem, 7.6vw, 3.2rem); }
 .kl-names__amp { font-style: italic; font-weight: 400; font-size: .62em; color: var(--kl-gold-2); letter-spacing: 0; }
-.kl-tagline { font-style: italic; font-size: 1.4rem; font-weight: 600; color: #fff; margin-top: 1rem; text-wrap: balance; text-shadow: 0 0 3px rgba(0, 0, 0, .7), 0 1px 18px rgba(0, 0, 0, .9); }
+/* Eén sierlijn met een klein kristal onder de naam, verder geen versiering in de kop. */
+.kl-orn { display: flex; align-items: center; justify-content: center; gap: .8rem; margin: 1.1rem 0 .9rem; color: var(--kl-gold); }
+.kl-orn i { display: block; width: clamp(2.6rem, 12vw, 5.5rem); height: 1px; background: linear-gradient(90deg, transparent, var(--kl-gold)); }
+.kl-orn i:last-child { transform: scaleX(-1); }
+.kl-orn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.2; stroke-linecap: round; }
+.kl-tagline { font-style: italic; font-size: clamp(1.35rem, 4.6vw, 1.75rem); font-weight: 600; color: #fff; text-wrap: balance; text-shadow: 0 0 3px rgba(0, 0, 0, .7), 0 1px 18px rgba(0, 0, 0, .9); }
+/* Datumblok: weekdag, dag en maand in één regel. */
 .kl-date {
-  display: inline-grid; justify-items: center; gap: .2rem; margin: 0 auto 1.1rem; padding: 1rem 2.2rem;
-  background: color-mix(in srgb, var(--kl-bg) 58%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-  border: 1px solid color-mix(in srgb, var(--kl-gold) 70%, transparent); outline: 1px solid color-mix(in srgb, var(--kl-gold) 30%, transparent); outline-offset: 5px;
+  position: relative; display: inline-grid; grid-template-columns: auto auto auto; align-items: center; gap: 0 clamp(.7rem, 3vw, 1.3rem); margin: 0 auto 1.1rem; padding: .9rem clamp(1rem, 4vw, 2rem);
+  background: color-mix(in srgb, var(--kl-bg) 60%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--kl-gold) 70%, transparent); outline: 1px solid color-mix(in srgb, var(--kl-gold) 28%, transparent); outline-offset: 5px;
 }
-.kl-date__weekday, .kl-date__month { font-family: "Figtree", sans-serif; font-size: .78rem; letter-spacing: .28em; text-transform: uppercase; color: var(--kl-gold-2); }
-.kl-date__day { font-family: "Cinzel", serif; font-size: 3.2rem; line-height: 1; color: var(--kl-gold); }
-.kl-hero__meta { font-size: 1.25rem; color: var(--kl-ink); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .2rem .7rem; text-shadow: 0 1px 14px rgba(0, 0, 0, .8); }
+.kl-date__weekday, .kl-date__month { font-family: "Figtree", sans-serif; font-size: .72rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--kl-gold-2); }
+.kl-date__weekday { text-align: right; }
+.kl-date__month { text-align: left; max-width: 7.5rem; }
+.kl-date__day { font-family: "Cinzel", serif; font-size: clamp(2.8rem, 10vw, 3.6rem); line-height: 1; color: var(--kl-gold); padding: 0 clamp(.7rem, 3vw, 1.3rem); border-left: 1px solid color-mix(in srgb, var(--kl-gold) 45%, transparent); border-right: 1px solid color-mix(in srgb, var(--kl-gold) 45%, transparent); }
+.kl-hero__meta { font-size: 1.25rem; color: var(--kl-ink); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .2rem .7rem; text-shadow: 0 1px 14px rgba(0, 0, 0, .85); }
 .kl-dot { width: 5px; height: 5px; transform: rotate(45deg); background: var(--kl-gold); display: inline-block; }
 @media (max-width: 560px) {
   /* Op smalle schermen tijd en locatie onder elkaar, zonder los scheidingsteken. */
   .kl-hero__meta { flex-direction: column; gap: .15rem; }
   .kl-hero__meta .kl-dot { display: none; }
+  .kl-date__month { max-width: 5.6rem; }
 }
 /* Het beeld ademt langzaam, zoals de camera in de film. */
 .fx-motion .kl-hero__img { animation: kl-drift 30s ease-in-out infinite alternate; animation-play-state: var(--fx-play, running); }
 @keyframes kl-drift { from { scale: 1; translate: 0 0; } to { scale: 1.07; translate: 0 -1.2%; } }
+
+/* ---------- De datum onder ijs (kras.js) ---------- */
+.kl-date--frost { min-height: 5.6rem; }
+.kl-frost { position: absolute; inset: 0; z-index: 2; transition: opacity .9s ease; }
+.kl-frost.is-melting { opacity: 0; pointer-events: none; }
+.kl-frost__ice { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.kl-frost__ice:active { cursor: grabbing; }
+.kl-frost__hint {
+  position: absolute; left: 50%; top: 36%; transform: translate(-50%, -50%); width: max-content; max-width: 90%; pointer-events: none; transition: opacity .4s ease;
+  font-family: "Figtree", sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: .26em; text-transform: uppercase; color: #08173a;
+}
+.kl-frost__hint.is-hidden { opacity: 0; }
+.kl-frost__btn {
+  position: absolute; left: 50%; bottom: -2px; transform: translateX(-50%); min-height: 44px; padding: 0 1rem; white-space: nowrap; cursor: pointer; background: none; border: 0;
+  font-family: "Figtree", sans-serif; font-size: .72rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #08173a; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(8, 23, 58, .45);
+}
+.kl-frost__btn:focus-visible { outline: 3px solid #08173a; outline-offset: -4px; border-radius: 2px; background: rgba(255, 255, 255, .5); }
+/* Een zachte glans glijdt af en toe over het ijs. */
+.fx-motion .kl-frost:not(.is-melting)::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, .55) 50%, transparent 60%); background-size: 300% 100%; background-position: 100% 0;
+  animation: kl-frost-shine 7s ease-in-out 1.5s infinite; animation-play-state: var(--fx-play, running);
+}
+@keyframes kl-frost-shine { 0%, 62% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .kl-frost { display: none; } }
 
 /* Een eigen foto van de klant, onder de kop. */
 .kl-portrait { padding-bottom: 0; }
@@ -165,16 +224,42 @@ body {
 .kl-frame::after { bottom: -7px; right: -7px; border-left: 0; border-top: 0; }
 .kl-frame__img { aspect-ratio: 4 / 5; }
 
-/* Stukken uit de film als zachte vensters tussen de onderdelen. */
-.kl-band { max-width: 44rem; margin: 0 auto; padding: 0 1.25rem; }
-.kl-band img {
-  display: block; width: 100%; height: clamp(160px, 42vw, 250px); object-fit: cover;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent), linear-gradient(180deg, transparent, #000 24%, #000 76%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent), linear-gradient(180deg, transparent, #000 24%, #000 76%, transparent);
+/* ---------- Beelden uit de film ---------- */
+/* Panorama onder de kop: bergen, viaduct en klokkentoren, aan alle kanten zacht uitlopend. */
+.kl-pano { position: relative; max-width: 60rem; margin: -1px auto 0; }
+.kl-pano img {
+  display: block; width: 100%; height: clamp(150px, 36vw, 330px); object-fit: cover;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent), linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent), linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent);
   -webkit-mask-composite: source-in; mask-composite: intersect;
 }
-.kl-band--trein img { object-position: 22% 55%; }
-.kl-band--plein img { object-position: 50% 45%; }
+/* Boogvenster: een beeld uit de film in een dunne gouden boog, als de bogen van het viaduct. */
+.kl-arch { position: relative; margin: 0; padding: 7px; border: 1px solid color-mix(in srgb, var(--kl-gold) 60%, transparent); border-radius: 999px 999px 10px 10px; box-shadow: 0 24px 50px -26px #000; }
+.kl-arch img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 999px 999px 4px 4px; }
+.kl-arch--small { padding: 5px; }
+.kl-arch--small img { aspect-ratio: 3 / 4; }
+/* Beeld naast tekst: op een telefoon boven elkaar, op een computer naast elkaar. */
+.kl-duo { max-width: 60rem; margin: 0 auto; padding: clamp(3rem, 8vw, 4.8rem) 1.25rem; display: grid; gap: 2.2rem; align-items: center; justify-items: center; box-sizing: border-box; text-align: center; }
+.kl-duo .kl-arch { width: min(78vw, 19rem); }
+.kl-duo__text { max-width: 34rem; }
+.kl-welcome p { font-style: italic; font-size: clamp(1.3rem, 4.5vw, 1.55rem); line-height: 1.55; }
+.kl-welcome p + p, .kl-story p + p { margin-top: 1rem; }
+.kl-story p { font-size: 1.25rem; }
+@media (min-width: 820px) {
+  .kl-duo { grid-template-columns: 19rem 1fr; gap: 4rem; padding-block: 4.4rem; }
+  .kl-duo--rev { grid-template-columns: 1fr 19rem; }
+  .kl-duo--rev .kl-arch { order: 2; }
+  .kl-duo__text { text-align: left; }
+}
+/* Locatie op een brede strook water en verlichte sparren. */
+.kl-scene { position: relative; overflow: hidden; text-align: center; padding: clamp(3.6rem, 9vw, 6rem) 1.25rem; }
+.kl-scene__img { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.kl-scene::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, var(--kl-bg) 0, rgba(7, 16, 31, .42) 24%, rgba(7, 16, 31, .4) 76%, var(--kl-bg) 100%); }
+.kl-scene__inner { max-width: 34rem; margin: 0 auto; }
+.kl-scene .kl-panel { background: rgba(7, 16, 31, .78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+/* Drieluik met drie kleine bogen vlak voor de afsluiting. */
+.kl-tri { max-width: 44rem; margin: 0 auto; padding: 3.4rem 1.25rem 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(.6rem, 2.5vw, 1.4rem); align-items: end; box-sizing: border-box; }
+.kl-tri .kl-arch:nth-child(2) { transform: translateY(-1.4rem); }
 
 /* ---------- Secties ---------- */
 .kl-section { max-width: 42rem; margin: 0 auto; padding: clamp(3rem, 8vw, 4.8rem) 1.25rem; text-align: center; }
@@ -182,9 +267,6 @@ body {
   font-family: "Cinzel", serif; font-weight: 500; font-size: clamp(1.35rem, 5vw, 1.8rem); letter-spacing: .14em; text-transform: uppercase;
   color: var(--kl-gold); margin-bottom: 1.5rem;
 }
-.kl-welcome p { font-style: italic; font-size: clamp(1.3rem, 4.5vw, 1.55rem); line-height: 1.55; }
-.kl-welcome p + p, .kl-story p + p { margin-top: 1rem; }
-.kl-story p { font-size: 1.25rem; }
 .kl-muted { color: var(--kl-muted); }
 
 .kl-countdown .cd { gap: 0; margin-bottom: 1.8rem; }

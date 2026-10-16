@@ -47,7 +47,8 @@ class KerstmagieDesignTests(TestCase):
 
     def test_media_files_exist_and_stay_light(self):
         for name, limit in (("intro.mp4", 3_500_000), ("intro.webm", 3_500_000), ("poster.webp", 300_000), ("dorp.webp", 400_000),
-                            ("trein.webp", 150_000), ("plein.webp", 150_000), ("sneeuwvlok.webp", 200_000)):
+                            ("trein.webp", 150_000), ("plein.webp", 150_000), ("sneeuwvlok.webp", 200_000), ("pano.webp", 120_000),
+                            ("gloed.webp", 200_000), ("tussen.webp", 150_000), ("rivier.webp", 100_000), ("water.webp", 100_000)):
             path = MEDIA / name
             self.assertTrue(path.exists(), name)
             self.assertLess(path.stat().st_size, limit, name)
@@ -191,3 +192,45 @@ class KerstmagieHelderheidTests(TestCase):
         html = Client().get("/voorbeeld/kerstmagie/", {"gelegenheid": "kerst"}).content.decode()
         self.assertRegex(html, r'<div class="kl-cover__text" data-tekst-op-beeld>')
         self.assertTrue((Path(settings.BASE_DIR) / "e2e" / "kerstmagie-contrast.cjs").exists())
+
+
+class KerstmagieKaartTests(TestCase):
+    """De rijkere kaart: beelden uit de film, sneeuw met diepte tijdens het scrollen en de datum onder een ijslaag."""
+
+    def html(self):
+        return Client().get("/voorbeeld/kerstmagie/", {"gelegenheid": "kerst"}).content.decode()
+
+    def test_scripts_staan_in_de_juiste_volgorde_zonder_inline_script(self):
+        html = self.html()
+        vooraf, effects = html.index("kerstmagie/v1/vooraf.js"), html.index("invitations/effects.js")
+        self.assertLess(vooraf, effects, "vooraf.js moet vóór effects.js lopen")
+        for name in ("snow.js", "kras.js", "intro.js"):
+            self.assertIn(f"/static/designs/kerstmagie/v1/{name}", html)
+        self.assertEqual(len(re.findall(r"<script>", html)), 1)   # alleen het vaste startscript (CSP)
+
+    def test_de_datum_staat_in_de_pagina_en_krijgt_pas_met_script_een_ijslaag(self):
+        html = self.html()
+        block = re.search(r'<div class="kl-date[^"]*"[^>]*data-kl-date[^>]*>(.*?)</div>', html, re.S).group(1)
+        self.assertIn("kl-date__day", block)
+        self.assertNotIn("kl-frost", html)   # de ijslaag wordt door kras.js gemaakt, niet door de server
+
+    def test_beelden_uit_de_film_en_alle_bestaande_onderdelen(self):
+        html = self.html()
+        for name in ("pano", "gloed", "trein", "plein", "tussen", "rivier", "water"):
+            self.assertIn(f"media/{name}.webp", html, name)
+        for part in ("kl-countdown", "kl-location", "Route plannen", "kl-rsvp", 'id="aanmelden"', "kl-program", "kl-contact", "kl-closing", "kl-arch"):
+            self.assertIn(part, html, part)
+        self.assertNotIn("kl-band", html)
+
+    def test_sneeuw_en_ijslaag_hebben_de_uitwegen(self):
+        snow = (DESIGN / "snow.js").read_text(encoding="utf-8")
+        for needle in ("fx-motion", "fx-paused", "visibilitychange", "devicePixelRatio", "scroll"):
+            self.assertIn(needle, snow, needle)
+        kras = (DESIGN / "kras.js").read_text(encoding="utf-8")
+        for needle in ("fx-motion", "sessionStorage", "Onthul de datum", "pointerdown", "catch (error)", "kl-frost"):
+            self.assertIn(needle, kras, needle)
+        css = (DESIGN / "style.css").read_text(encoding="utf-8")
+        self.assertRegex(css, r"\.fx \.inv-main \{ z-index: auto; \}")
+        self.assertRegex(css, r"\.kl-snow \{[^}]*z-index: 3")
+        self.assertRegex(css, r"\.kl-layer, \.kl-section \{[^}]*z-index: 4")
+        self.assertIn("prefers-reduced-motion", css.split(".kl-frost {")[1])

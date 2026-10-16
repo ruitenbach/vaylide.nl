@@ -1,6 +1,8 @@
 {% extends "invitations/base_invitation.html" %}{% load static %}
 {# Kerstmagie v1 — donkere winterkaart met een openingsfilm. Wijzig een uitgebrachte versie niet: maak een v2. #}
 {% block preload %}<link rel="preload" href="{% static 'fonts/cinzel-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>{% endblock %}
+{# Eerst vooraf.js: dat zet de eigen sneeuwlaag van effects.js uit, want Kerstmagie tekent zijn eigen sneeuw (snow.js). #}
+{% block extra_css %}<script src="{% static 'designs/kerstmagie/v1/vooraf.js' %}" defer></script>{% endblock %}
 
 {% block cover %}
 {# De film start pas na een tik in het midden; intro.js laadt het bestand pas als het openingsscherm echt getoond wordt. #}
@@ -37,17 +39,19 @@
     <img class="kl-hero__back" src="{% static 'designs/kerstmagie/v1/media/dorp.webp' %}" alt="" width="720" height="1280">
     <img class="kl-hero__img" src="{% static 'designs/kerstmagie/v1/media/dorp.webp' %}" alt="" width="720" height="1280" fetchpriority="high">
   </div>
-  <div class="kl-hero__top">
-    <p class="kl-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
+  <div class="kl-hero__top kl-layer">
+    <p class="kl-kicker fx-intro" style="--fx-d:1"><span>{{ v.kicker }}</span></p>
     <h1 class="kl-names kl-names--{{ v.names_size }} fx-names">
       {% if v.is_couple %}<span>{{ v.names.0 }}</span><span class="kl-names__amp" aria-label="en">&amp;</span><span>{{ v.names.1 }}</span>
       {% else %}<span>{{ v.names.0 }}</span>{% endif %}
     </h1>
+    <div class="kl-orn fx-intro" style="--fx-d:3" aria-hidden="true"><i></i><svg viewBox="0 0 24 24" focusable="false"><path d="M12 2v20M3.5 7l17 10M20.5 7l-17 10M9 3.5l3 2.5 3-2.5M9 20.5l3-2.5 3 2.5"/></svg><i></i></div>
     <p class="kl-tagline fx-intro" style="--fx-d:4">{{ v.tagline }}</p>
   </div>
-  <div class="kl-hero__bottom">
+  <div class="kl-hero__bottom kl-layer">
     {% if v.date %}
-    <div class="kl-date fx-intro" style="--fx-d:5">
+    {# De datum staat in de tekst en is altijd leesbaar voor schermlezers. kras.js legt er een ijslaag overheen die de bezoeker wegkrast (of met een knop onthult); zonder script of bij minder beweging ligt die laag er niet. #}
+    <div class="kl-date fx-intro" style="--fx-d:5" data-kl-date data-kl-vlok="{% static 'designs/kerstmagie/v1/media/sneeuwvlok.webp' %}">
       <span class="kl-date__weekday">{{ v.weekday }}</span>
       <span class="kl-date__day">{{ v.day }}</span>
       <span class="kl-date__month">{{ v.month_name }} {{ v.year }}</span>
@@ -57,6 +61,8 @@
   </div>
 </header>
 
+<div class="kl-pano" data-reveal aria-hidden="true"><img src="{% static 'designs/kerstmagie/v1/media/pano.webp' %}" alt="" width="720" height="350" loading="lazy"></div>
+
 {% if v.hero %}
 <section class="kl-section kl-portrait" data-reveal aria-label="Foto">
   <figure class="kl-frame"><div class="ph kl-frame__img fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero eager=True sizes="(min-width: 900px) 420px, 84vw" %}</div></figure>
@@ -64,8 +70,9 @@
 {% endif %}
 
 {% if v.welcome %}
-<section class="kl-section kl-welcome" data-reveal aria-label="Welkom">
-  {% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}
+<section class="kl-duo kl-welcome" data-reveal aria-label="Welkom">
+  <figure class="kl-arch" aria-hidden="true"><img src="{% static 'designs/kerstmagie/v1/media/gloed.webp' %}" alt="" width="640" height="800" loading="lazy"></figure>
+  <div class="kl-duo__text kl-layer">{% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
 </section>
 {% endif %}
 
@@ -77,37 +84,48 @@
 </section>
 {% endif %}
 
-<div class="kl-band kl-band--trein" data-reveal aria-hidden="true"><img src="{% static 'designs/kerstmagie/v1/media/trein.webp' %}" alt="" width="540" height="300" loading="lazy"></div>
-
 {% if v.show.story %}
+{% if v.welcome %}
 <section class="kl-section kl-story" data-reveal aria-labelledby="kl-story-title">
   <h2 id="kl-story-title" class="kl-h2">{{ v.story_title }}</h2>
   {% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}
 </section>
+{% else %}
+<section class="kl-duo kl-story" data-reveal aria-labelledby="kl-story-title">
+  <figure class="kl-arch" aria-hidden="true"><img src="{% static 'designs/kerstmagie/v1/media/gloed.webp' %}" alt="" width="640" height="800" loading="lazy"></figure>
+  <div class="kl-duo__text kl-layer"><h2 id="kl-story-title" class="kl-h2">{{ v.story_title }}</h2>{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+</section>
+{% endif %}
 {% endif %}
 
 {% if v.show.program %}
-<section class="kl-section kl-program" data-reveal aria-labelledby="kl-program-title">
-  <h2 id="kl-program-title" class="kl-h2">Programma</h2>
-  <ol class="kl-program__list">
-    {% for item in v.program %}
-    <li>
-      <span class="kl-program__time">{% if item.time %}{{ item.time }}{% endif %}</span>
-      <div><h3 class="kl-program__title">{{ item.title }}</h3>{% if item.description %}<p>{{ item.description }}</p>{% endif %}</div>
-    </li>
-    {% endfor %}
-  </ol>
+<section class="kl-duo kl-duo--rev kl-program" data-reveal aria-labelledby="kl-program-title">
+  <figure class="kl-arch" aria-hidden="true"><img src="{% static 'designs/kerstmagie/v1/media/trein.webp' %}" alt="" width="460" height="575" loading="lazy"></figure>
+  <div class="kl-duo__text kl-layer">
+    <h2 id="kl-program-title" class="kl-h2">Programma</h2>
+    <ol class="kl-program__list">
+      {% for item in v.program %}
+      <li>
+        <span class="kl-program__time">{% if item.time %}{{ item.time }}{% endif %}</span>
+        <div><h3 class="kl-program__title">{{ item.title }}</h3>{% if item.description %}<p>{{ item.description }}</p>{% endif %}</div>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
 </section>
 {% endif %}
 
 {% if v.show.location %}
-<section class="kl-section kl-location" data-reveal aria-labelledby="kl-location-title">
-  <h2 id="kl-location-title" class="kl-h2">Locatie</h2>
-  <div class="kl-panel">
-    {% if v.venue %}<p class="kl-location__venue">{{ v.venue }}</p>{% endif %}
-    {% if v.address_lines %}<address>{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
-    {% if v.date_display %}<p class="kl-muted">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>{% endif %}
-    {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Route plannen</a>{% endif %}
+<section class="kl-scene kl-location" data-reveal aria-labelledby="kl-location-title">
+  <img class="kl-scene__img" src="{% static 'designs/kerstmagie/v1/media/water.webp' %}" alt="" width="720" height="300" loading="lazy" aria-hidden="true">
+  <div class="kl-scene__inner kl-layer">
+    <h2 id="kl-location-title" class="kl-h2">Locatie</h2>
+    <div class="kl-panel">
+      {% if v.venue %}<p class="kl-location__venue">{{ v.venue }}</p>{% endif %}
+      {% if v.address_lines %}<address>{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+      {% if v.date_display %}<p class="kl-muted">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>{% endif %}
+      {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Route plannen</a>{% endif %}
+    </div>
   </div>
 </section>
 {% endif %}
@@ -140,8 +158,6 @@
 </section>
 {% endif %}
 
-<div class="kl-band kl-band--plein" data-reveal aria-hidden="true"><img src="{% static 'designs/kerstmagie/v1/media/plein.webp' %}" alt="" width="420" height="340" loading="lazy"></div>
-
 {% if v.show.rsvp %}
 <section class="kl-section kl-rsvp" id="aanmelden" data-reveal aria-labelledby="kl-rsvp-title">
   <h2 id="kl-rsvp-title" class="kl-h2">{% if v.formal %}Bent u erbij?{% else %}Ben jij erbij?{% endif %}</h2>
@@ -162,9 +178,17 @@
 </section>
 {% endif %}
 
+<div class="kl-tri" data-reveal aria-hidden="true">
+  <figure class="kl-arch kl-arch--small"><img src="{% static 'designs/kerstmagie/v1/media/plein.webp' %}" alt="" width="390" height="520" loading="lazy"></figure>
+  <figure class="kl-arch kl-arch--small"><img src="{% static 'designs/kerstmagie/v1/media/tussen.webp' %}" alt="" width="720" height="960" loading="lazy"></figure>
+  <figure class="kl-arch kl-arch--small"><img src="{% static 'designs/kerstmagie/v1/media/rivier.webp' %}" alt="" width="360" height="480" loading="lazy"></figure>
+</div>
+
 <section class="kl-section kl-closing" data-reveal aria-label="Afsluiting">
   {% if v.show.closing %}{% for p in v.closing %}<p class="kl-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
   <p class="kl-closing__mono" aria-hidden="true"><img src="{% static 'designs/kerstmagie/v1/media/sneeuwvlok.webp' %}" alt="" width="640" height="640" loading="lazy"><span>{{ v.monogram }}</span></p>
   {% include "invitations/partials/share_buttons.html" %}
 </section>
+<script src="{% static 'designs/kerstmagie/v1/snow.js' %}" defer></script>
+<script src="{% static 'designs/kerstmagie/v1/kras.js' %}" defer></script>
 {% endblock %}
