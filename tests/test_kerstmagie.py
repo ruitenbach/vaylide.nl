@@ -26,6 +26,15 @@ def manifest():
     return json.loads((DESIGN / "manifest.json").read_text(encoding="utf-8"))
 
 
+class ZichtbaarVoorDeTest:
+    """Kerstmagie staat standaard verborgen (groep C). Deze tests bekijken de kaart zelf en zetten hem alleen in de testdatabase aan;
+    in Beheer en op staging verandert er niets."""
+
+    def setUp(self):
+        super().setUp()
+        Template.objects.filter(slug="kerstmagie").update(is_active=True)
+
+
 class KerstmagieDesignTests(TestCase):
     def test_manifest_is_valid_and_registered(self):
         data = manifest()
@@ -55,7 +64,7 @@ class KerstmagieDesignTests(TestCase):
             self.assertTrue(finders.find(f"designs/kerstmagie/v1/media/{name}"), name)
 
 
-class KerstmagieRenderTests(TestCase):
+class KerstmagieRenderTests(ZichtbaarVoorDeTest, TestCase):
     def render(self, occasion):
         response = Client().get("/voorbeeld/kerstmagie/", {"gelegenheid": occasion})
         self.assertEqual(response.status_code, 200, occasion)
@@ -111,14 +120,14 @@ class KerstmagieKoppelingTests(VaylideTestCase):
             self.assertEqual(other["envelope_mode"], data["envelope_mode"], slug)
             self.assertEqual(other["opening"], data["opening"], slug)
 
-    def test_staat_in_de_kerstcollectie_en_niet_bij_andere_gelegenheden(self):
-        kerst = [c["template"].slug for c in Client().get("/ontwerpen/", {"gelegenheid": "kerst"}).context["cards"]]
-        self.assertIn("kerstmagie", kerst)
-        for occasion in ("bruiloft", "verloving", "verjaardag", "jubileum", "zakelijk", "babyshower"):
+    def test_staat_niet_in_de_collectie_en_niet_bij_andere_gelegenheden(self):
+        for occasion in ("kerst", "bruiloft", "verloving", "verjaardag", "jubileum", "zakelijk", "babyshower", ""):
             slugs = [c["template"].slug for c in Client().get("/ontwerpen/", {"gelegenheid": occasion}).context["cards"]]
             self.assertNotIn("kerstmagie", slugs, occasion)
-        self.assertEqual(collectie.groep("kerstmagie"), "B")
-        self.assertTrue(collectie.zichtbaar("kerstmagie"))
+        # De bestaande kerstontwerpen met eigen film blijven gewoon zichtbaar.
+        kerst = [c["template"].slug for c in Client().get("/ontwerpen/", {"gelegenheid": "kerst"}).context["cards"]]
+        for slug in ("kerstmarkt", "kerstpaleis", "kerstcoupe", "kerstbal"):
+            self.assertIn(slug, kerst)
 
     def test_valt_onder_de_bestaande_prijsstructuur_zonder_nieuwe_prijzen(self):
         self.assertEqual(prijzen.INDELING["kerstmagie"], prijzen.LUXE)
@@ -151,7 +160,54 @@ class KerstmagieKoppelingTests(VaylideTestCase):
             self.assertTrue(inv.is_published)
 
 
-class KerstmagieHelderheidTests(TestCase):
+class KerstmagieVerborgenTests(VaylideTestCase):
+    """Tot de rechten op de film zijn bevestigd is Kerstmagie verborgen en niet bestelbaar (groep C, zie docs/KERSTFILMKAARTEN.md)."""
+
+    def test_staat_in_groep_c_en_is_na_de_eerste_synchronisatie_niet_actief(self):
+        self.assertEqual(collectie.groep("kerstmagie"), "C")
+        self.assertFalse(collectie.zichtbaar("kerstmagie"))
+        self.assertFalse(Template.objects.get(slug="kerstmagie").is_active)
+        # Het ontwerp zelf blijft volledig aanwezig, met zijn versie en prijsindeling.
+        self.assertIsNotNone(Template.objects.get(slug="kerstmagie").current_version)
+        self.assertEqual(prijzen.INDELING["kerstmagie"], prijzen.LUXE)
+
+    def test_opnieuw_inlezen_maakt_het_niet_zichtbaar(self):
+        from catalog.seed import sync_designs
+
+        sync_designs()
+        sync_designs()
+        self.assertFalse(Template.objects.get(slug="kerstmagie").is_active)
+
+    def test_geen_pagina_geen_voorbeeld_en_geen_zoekresultaat(self):
+        client = Client()
+        self.assertEqual(client.get("/ontwerpen/kerstmagie/").status_code, 404)
+        self.assertEqual(client.get("/voorbeeld/kerstmagie/", {"gelegenheid": "kerst"}).status_code, 404)
+        self.assertEqual(client.get("/voorbeeld/kerstmagie/agenda.ics").status_code, 404)
+        self.assertNotIn("/ontwerpen/kerstmagie/", client.get("/zoeken/", {"q": "kerstmagie"}).content.decode())
+        self.assertNotIn("kerstmagie", client.get("/ontwerpen/", {"gelegenheid": "kerst"}).content.decode())
+
+    def test_niet_te_kiezen_in_de_bestelroute(self):
+        from invitations.models import Invitation
+
+        client = Client()
+        start = client.get(reverse("studio:start"), {"gelegenheid": "kerst", "ontwerp": "kerstmagie"})
+        self.assertNotContains(start, 'value="kerstmagie"')
+        before = Invitation.objects.count()
+        response = client.post(reverse("studio:start"), {"occasion": "kerst", "template": "kerstmagie"})
+        self.assertEqual(response.status_code, 200)       # formulier met een foutmelding, geen doorverwijzing
+        self.assertEqual(Invitation.objects.count(), before)
+        # Een ander kerstontwerp werkt nog wel.
+        ok = client.post(reverse("studio:start"), {"occasion": "kerst", "template": "kerstmarkt"})
+        self.assertEqual(ok.status_code, 302)
+
+    def test_prijs_en_bestaande_kerstkaarten_zijn_niet_veranderd(self):
+        self.assertEqual(prijzen.PRIJZEN["kerst"], (995, 2495, 4995))
+        for slug in ("kerstmarkt", "kerstpaleis", "kerstcoupe", "kerstbal"):
+            self.assertTrue(Template.objects.get(slug=slug).is_active, slug)
+            self.assertEqual(prijzen.INDELING[slug], prijzen.LUXE, slug)
+
+
+class KerstmagieHelderheidTests(ZichtbaarVoorDeTest, TestCase):
     """Het ijskristal op het openingsscherm houdt de helderheid van de film: geen donkere sluier en geen filter op de film zelf."""
 
     def css(self):
@@ -194,7 +250,7 @@ class KerstmagieHelderheidTests(TestCase):
         self.assertTrue((Path(settings.BASE_DIR) / "e2e" / "kerstmagie-contrast.cjs").exists())
 
 
-class KerstmagieKaartTests(TestCase):
+class KerstmagieKaartTests(ZichtbaarVoorDeTest, TestCase):
     """De rijkere kaart: beelden uit de film, sneeuw met diepte tijdens het scrollen en de datum onder een ijslaag."""
 
     def html(self):

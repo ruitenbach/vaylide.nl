@@ -25,12 +25,13 @@ B = (
     "lauwerkrans", "zilveren-feest", "gouden-jaren", "robijn",
     "confetti", "glitter", "neon", "tropisch", "ballonfeest", "regenboog", "maanlicht",
     "gala", "strak",
-    "kerstmarkt", "kerstpaleis", "kerstcoupe", "kerstbal", "kerstmagie",                    # kerst, met eigen film (Luxe)
+    "kerstmarkt", "kerstpaleis", "kerstcoupe", "kerstbal",                                  # kerst, met eigen film (Luxe)
 )
 C = (
     "kerstman", "sneeuwpop",                                            # cartoon-uitstraling, past niet bij het premium-niveau
     "wolkje", "stipjes", "door-de-jaren", "mijlpaal",                  # lijken sterk op een beter ontwerp (ballonfeest, regenboog, polaroid, gouden-jaren)
     "borrel", "congres", "lijnenspel",                                  # kaartbeeld met leeg vlak; nog niet premium genoeg
+    "kerstmagie",                                                       # verborgen tot de rechten op de film zijn bevestigd (docs/KERSTFILMKAARTEN.md)
 )
 
 # Specials: bijzondere ontwerpen onder Specials, met een eigen meerprijs (catalog/specials.py). Winterlicht is bewust geen special.

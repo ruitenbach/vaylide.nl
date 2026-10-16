@@ -24,7 +24,7 @@ class IndelingTests(VaylideTestCase):
         indeling = list(collectie.A) + list(collectie.B) + list(collectie.C)
         self.assertEqual(len(indeling), len(set(indeling)), "een ontwerp staat in meer dan één groep")
         self.assertEqual(set(indeling), set(MANIFESTEN), "elk ontwerp in designs/ staat in precies één groep, en andersom")
-        self.assertEqual((len(collectie.A), len(collectie.B), len(collectie.C)), (17, 31, 9))
+        self.assertEqual((len(collectie.A), len(collectie.B), len(collectie.C)), (17, 30, 10))
         self.assertEqual(len(MANIFESTEN), 57)
 
     def test_unknown_design_defaults_to_b_and_c_is_the_only_hidden_group(self):
@@ -111,7 +111,7 @@ class CatalogusTests(VaylideTestCase):
 class WebsiteTests(VaylideTestCase):
     def test_collection_hides_c_designs_but_shows_a_and_b(self):
         html = Client().get("/ontwerpen/").content.decode()
-        for slug in ("kerstman", "sneeuwpop", "wolkje", "stipjes", "door-de-jaren", "mijlpaal", "borrel", "congres", "lijnenspel"):
+        for slug in ("kerstman", "sneeuwpop", "wolkje", "stipjes", "door-de-jaren", "mijlpaal", "borrel", "congres", "lijnenspel", "kerstmagie"):
             self.assertNotIn(f"/ontwerpen/{slug}/", html, slug)
         for slug in ("liefde-op-papier", "voor-altijd", "winterlicht", "gloria", "eucalyptus", "eerste-dans"):
             self.assertIn(f"/ontwerpen/{slug}/", html, slug)
