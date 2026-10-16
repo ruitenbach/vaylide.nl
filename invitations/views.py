@@ -30,7 +30,11 @@ VARIANT_FIELDS = {"groot": "file", "middel": "file_medium", "klein": "file_thumb
 # ---------------------------------------------------------------- voorbeelden
 
 def _demo_setup(request, slug):
-    template = get_object_or_404(Template.objects.select_related("current_version"), slug=slug, is_active=True)
+    # Een verborgen ontwerp (niet zichtbaar in de collectie) is alleen voor ingelogde beheerders te bekijken; voor iedereen anders blijft het een 404.
+    templates = Template.objects.select_related("current_version")
+    if not (request.user.is_authenticated and request.user.is_staff):
+        templates = templates.filter(is_active=True)
+    template = get_object_or_404(templates, slug=slug)
     version = template.current_version
     if version is None:
         raise Http404("Geen ontwerpversie")
@@ -43,6 +47,13 @@ def _demo_setup(request, slug):
     if palette not in [p.get("key") for p in version.palettes]:
         palette = version.default_palette_key
     return template, version, occasion, palette
+
+
+def _private_if_hidden(response, template):
+    """Het voorbeeld van een verborgen ontwerp (alleen voor beheerders) mag nergens worden bewaard of gedeeld."""
+    if not template.is_active:
+        response["Cache-Control"] = "private, no-store"
+    return response
 
 
 @xframe_options_sameorigin
@@ -59,13 +70,14 @@ def demo(request, slug):
         embed=request.GET.get("embed") == "1",
     )
     view = build_view(occasion=occasion, content=content, overrides={}, template_version=version, options=options)
-    return render(request, version.template_path, {"v": view, "rsvp_form": {"client_token": "voorbeeld-formulier-0000", "form_ts": ""}})
+    response = render(request, version.template_path, {"v": view, "rsvp_form": {"client_token": "voorbeeld-formulier-0000", "form_ts": ""}})
+    return _private_if_hidden(response, template)
 
 
 def demo_ics(request, slug):
     template, version, occasion, palette = _demo_setup(request, slug)
     content = demo_content(slug, occasion, palette)
-    return _ics_response(content, uid=f"voorbeeld-{slug}", title=f"Voorbeeld: {template.name}", url=settings.BASE_URL)
+    return _private_if_hidden(_ics_response(content, uid=f"voorbeeld-{slug}", title=f"Voorbeeld: {template.name}", url=settings.BASE_URL), template)
 
 
 # ------------------------------------------------------------ live uitnodiging

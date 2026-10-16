@@ -1281,3 +1281,10 @@ Alleen lokaal uitgevoerd, op branch `claude/rozenboog-staging` (commit 83d6988 o
 - `manage.py test tests`: 1106 tests. Drie tests (`test_privacyverklaring.LiveGuardTests`, twee in `test_voorwaarden_nieuw.VersiesTests`) falen op deze machine ook op de ongewijzigde stagingcommit 715e9c7 (onbevestigde bedrijfsgegevens uit de omgeving); dat staat los van Rozenboog.
 - Browser (Chromium, 390 en 1366 px): sluier, film, kop, alle onderdelen en einde doorlopen met een tijdelijke, aangezette Rozenboog in een kladdatabase: geen consolefouten.
 - Niet gedaan: Safari/iPhone, Android, Firefox, schermlezers, Lighthouse, de e2e-scripts op alle ontwerpen.
+
+## Voorbeeld van verborgen ontwerpen voor beheerders (16 oktober 2026)
+
+Lokaal uitgevoerd op `claude/rozenboog-op-kerstmagie`:
+
+- `manage.py test tests`: 1139 tests; dezelfde 3 als eerder (bedrijfsgegevens uit de omgeving, falen ook op de ongewijzigde staging) mislukken. Nieuw: `tests/test_verborgen_voorbeeld.py` (7 tests): anoniem, klant en gebruiker zonder `is_staff` krijgen een 404 op voorbeeld en agendabestand van Rozenboog en Kerstmagie; beheerders krijgen 200 met `Cache-Control: private, no-store`; beide blijven buiten de collectie, de ontwerppagina en de bestelroute (ook voor beheerders) en blijven niet actief; een actief ontwerp werkt voor iedereen als voorheen, zonder `no-store`.
+- Niet in een browser bekeken: het voorbeeld als ingelogde beheerder op staging.
