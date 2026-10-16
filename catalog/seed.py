@@ -122,12 +122,39 @@ def validate_manifest(path: Path, data: dict) -> None:
         problems = atelier_errors(data["atelier"])
         if problems:
             raise DesignError(f"{where}: {'; '.join(problems)}.")
+    if "film" in data:
+        problems = film_errors(folder, data["film"])
+        if problems:
+            raise DesignError(f"{where}: {'; '.join(problems)}.")
     if "effects" in data:
         from .effects import effects_errors
 
         problems = effects_errors(data["effects"])
         if problems:
             raise DesignError(f"{where}: {'; '.join(problems)}.")
+
+
+FILM_FILES = {"src": (".mp4",), "poster": (".webp", ".jpg"), "end": (".webp", ".jpg")}
+FILM_OPTIONAL = {"webm": (".webm",)}
+
+
+def film_errors(folder: Path, film) -> list[str]:
+    """Controleert het blok 'film' (opening als film): de video (MP4, en optioneel WebM) en beide stilstaande
+    beelden staan in de ontwerpmap."""
+    if not isinstance(film, dict):
+        return ["'film' moet een blok zijn met src, poster en end"]
+    errors = []
+    for key, extensions in {**FILM_FILES, **FILM_OPTIONAL}.items():
+        name = film.get(key)
+        if key in FILM_OPTIONAL and name is None:
+            continue
+        if not name or not isinstance(name, str):
+            errors.append(f"film.{key} ontbreekt")
+        elif "/" in name or "\\" in name or not name.lower().endswith(extensions):
+            errors.append(f"film.{key} moet een bestandsnaam in de ontwerpmap zijn ({' of '.join(extensions)})")
+        elif not (folder / name).exists():
+            errors.append(f"film.{key}: {name} ontbreekt")
+    return errors
 
 
 def design_manifests() -> list[tuple[Path, dict]]:
@@ -164,7 +191,7 @@ def sync_designs(update_existing_manifest: bool = False) -> list[str]:
                 "occasions": data.get("occasions", []),
                 "sort_order": data.get("sort_order", 100),
                 "special": bool(data.get("special")),
-                "is_active": zichtbaar(slug),    # C-ontwerpen (catalog/collectie.py) staan voorlopig niet in de collectie
+                "is_active": zichtbaar(slug) and not data.get("hidden", False),    # C-ontwerpen (catalog/collectie.py) staan voorlopig niet in de collectie
             },
         )
         if created:

@@ -282,6 +282,19 @@ Dit is een andere opname dan `Referentie_Vierlief_3_Voorbeelden.mp4` uit de eers
 - **Een voorbeeld blijft een voorbeeld.** De voorbeeldkaart gebruikt de fictieve Familie Van Dijk en een voorbeeldadres, met de balk "Voorbeelduitnodiging · fictief evenement".
 - **Zwaarder dan de andere ontwerpen.** Het voorbeeld laadt voor het eerste beeld ongeveer 800 KB, drie tot vier keer zoveel als de andere ontwerpen: de envelop met reliëf en het kerstraam zijn getekende beelden. Daarom zijn de reliëfbeelden kleiner gemaakt en laadt de gouden laag pas na de rest. De lichtjes en de sneeuw vragen ook meer van de processor. De metingen staan in `docs/CONTROLES.md`; op een echt (ouder) toestel is het nog niet geprobeerd.
 
+## Ronde 8: Rozenboog, een opening als film
+
+De eigenaar leverde een filmpje aan (crème rozen die opengaan naar een rozenboog aan zee) en vroeg om een uitnodiging die een verlengstuk van die film is. Rozenboog komt als nieuw ontwerp (`designs/rozenboog/v1`), zonder iets aan bestaande ontwerpen te veranderen.
+
+- **De film blijft intact.** `opening.mp4` en `opening.webm` zijn de vertraagde film van de eigenaar; de uitnodiging gebruikt het eerste en laatste beeld ervan (`rozen.webp`, `boog.webp`) en uitsneden daaruit (`cut-*.webp`, `gal-*.webp`). Er zijn geen nieuwe beelden gemaakt.
+- **Eindbeeld naar uitnodiging.** De kop toont precies het laatste beeld van de film, met de namen in de lucht. Daaronder vervaagt het beeld naar een crèmekleurige sluier, waarop datum, tijd en plek vrij in het licht staan. Geen kaartje op het terras meer.
+- **Rondom de film.** Op een breed scherm staat de film als 9:16-vlak in het midden (niet uitgerekt). Het eindbeeld staat er sterk vervaagd omheen als sfeer, en een lichte sluier met zachte randen vormt het papier.
+- **Onderdelen.** Geen zware kaders: een boogje boven elke titel, aftelling in boogvormige tegels, uitsneden uit de film tussen de onderdelen. In het voorbeeld toont Momenten stills uit de film in plaats van voorbeeldfoto's; bij een echte uitnodiging staan daar de foto's van de klant.
+- **Blaadjes.** Wit en crème, achter de tekst. `--fx-bg` is in dit ontwerp bewust donker gezet, zodat `effects.js` de kleuren niet grijs maakt. De knal en het feestje bij aanmelden zijn bloemblaadjes en vallen achter de tekst (`.fx-burst` heeft in dit ontwerp `z-index: 0`); de harten zijn niet gebruikt.
+- **Gedeelde code.** Voor een film als opening zijn er kleine, eerder geteste uitbreidingen: `catalog/seed.py` (het blok `film` controleren, en `"hidden": true` laat een nieuw ontwerp onzichtbaar beginnen), `catalog/models.py` (`film` op een ontwerpversie), `invitations/render.py` (`film` in het weergavemodel), `invitations/demo.py` (voorbeeldbeelden), `invitations/static/invitations/invite.js` (film afspelen, overslaan, 'Direct naar de uitnodiging' laat het openingsscherm los) en `effects.js` (de knal wacht op het eind van de film). Bestaande ontwerpen hebben geen film; voor hen verandert niets, behalve dat 'Direct naar de uitnodiging' nu het openingsscherm opent in plaats van de uitnodiging geblokkeerd te laten.
+- **Verborgen.** Of de eigenaar de rechten op de film heeft om hem commercieel te gebruiken, is niet bevestigd. Rozenboog staat daarom op onzichtbaar tot dat zeker is.
+- **Rozenzegel niet meegenomen.** Een eerdere versie van het platform had een tweede filmontwerp (Rozenzegel); dat zit niet in deze repository.
+
 ## Referenties en schermopname
 
 Hier staat eerlijk wat wel en niet is bekeken.
@@ -301,3 +314,4 @@ Elk van deze drie ontwerpen heeft vier kleurvarianten, werkt voor meerdere geleg
 **Bewuste afwijkingen en onbekende onderdelen.** Omdat de referenties niet te bekijken waren, is niet vast te stellen waar Vaylide ervan afwijkt. Onbekend zijn onder meer: de exacte timing en volgorde van de openingsanimaties in de filmpjes, welke effecten alleen in de montage zitten, de volledige vragenlijst en bestelstappen van Webgency, en het gedrag van muziek en formulieren in de voorbeelden.
 
 **Vervolgstap:** sta de domeinen toe in de netwerkinstellingen van de omgeving en stuur de schermopname opnieuw mee, bijvoorbeeld als bestand in de repository. Dan volgt een vergelijkingsronde per filmpje: tijden, opening, overgangen en interacties. Aanpassingen komen als nieuwe ontwerpversie (`v2`), zodat bestaande uitnodigingen niet veranderen.
+- **Op de stagingbasis (715e9c7).** Rozenboog staat in groep C van `catalog/collectie.py` (verborgen en niet bestelbaar) en in de indeling Luxe van `catalog/prijzen.py` (bruiloft € 59,95, besluit van de eigenaar van 16 oktober 2026; er zijn geen nieuwe prijzen of toeslagen). Het manifest heeft `added_at`, `envelope_mode: built_in` en `hidden: true`. Als wenskaart staat in het openingsscherm "Een wenskaart voor jou".
