@@ -10,6 +10,7 @@
     <h1>{% if occasion_label %}Ontwerpen voor {{ occasion_label|lower }}{% else %}Onze ontwerpen{% endif %}</h1>
     <p class="lead">Elk ontwerp heeft een eigen opening en kleurvarianten om uit te kiezen.</p>
     <p class="page-head__noot">Nog niet zeker welk ontwerp? <a href="{% url 'core:make_invitation' %}">Lees stap voor stap hoe je een digitale uitnodiging maakt.</a></p>
+    {% if indeling %}<p class="page-head__noot">Je ziet de ontwerpen met de indeling {{ indeling_naam }}. <a href="{% url 'core:designs' %}">Toon alle ontwerpen</a></p>{% endif %}
     <nav class="filter-bar" aria-label="Filter op gelegenheid">
       <ul class="chips">
         <li><a class="chip" href="{% url 'core:designs' %}"{% if not occasion and not only_specials %} aria-current="true"{% endif %}>Alle</a></li>

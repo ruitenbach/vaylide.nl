@@ -293,11 +293,15 @@ def designs(request):
     if occasion not in OCCASION_LABELS:
         occasion = ""
     only_specials = request.GET.get("categorie") == "specials"
-    all_designs = [d for d in _designs() if not occasion or occasion in d.occasions]
+    # Vanaf de prijzenpagina: alleen de ontwerpen met een bepaalde indeling (Basis, Luxe of Special), alleen als de nieuwe prijsstructuur aan staat.
+    indeling = request.GET.get("indeling", "") if prijzen.actief() else ""
+    if indeling not in prijzen.TIERS:
+        indeling = ""
+    all_designs = [d for d in _designs() if (not occasion or occasion in d.occasions) and (not indeling or prijzen.tier(d) == indeling)]
     # Specials staan apart: nooit tussen de gewone kaarten, wel in een eigen blok en onder de keuze Specials.
     ordered = collectie_volgorde(all_designs)    # Specials eerst, daarna de gewone ontwerpen; overal het nieuwste eerst
-    specials = [d for d in ordered if d.special]
-    shown = [] if only_specials else [d for d in ordered if not d.special]
+    specials = [] if indeling else [d for d in ordered if d.special]
+    shown = [] if only_specials else [d for d in ordered if indeling or not d.special]
     list_path = reverse("core:designs")
     crumbs = [("Home", "/"), ("Collectie", list_path)]
     seo_title = seo_description = ""
@@ -313,6 +317,8 @@ def designs(request):
         "core/designs.html",
         {
             "only_specials": only_specials,
+            "indeling": indeling,
+            "indeling_naam": prijzen.TIER_NAAM.get(indeling, ""),
             "special_cards": _design_cards(specials, occasion),
             "cards": _design_cards(shown, occasion),
             "occasions": OCCASION_CHOICES,
@@ -393,6 +399,20 @@ def how(request):
     return render(request, "core/how.html", {"steps": STEPS, "feature_groups": groups})
 
 
+def _prijs_tiers() -> list[dict]:
+    """Per indeling: uitleg, de prijs per soort kaart (leeg waar geen ontwerp is) en het aantal beschikbare ontwerpen (voor de knop)."""
+    ontwerpen = prijzen._actieve_ontwerpen()
+    tabel = prijzen.overzicht_tabel(ontwerpen)
+    uit = []
+    for t in prijzen.TIERS:
+        rijen = []
+        for r in tabel:
+            cents = next((c["cents"] for c in r["cellen"] if c["tier"] == t), None)
+            rijen.append({"label": r["label"].split(" (")[0], "wens": r["rij"] == "bedank", "prijs": format_euro(cents) if cents else ""})
+        uit.append({"tier": t, "naam": prijzen.TIER_NAAM[t], "beschrijving": prijzen.BESCHRIJVING[t], "rijen": rijen, "aantal": sum(1 for d in ontwerpen if prijzen.tier(d) == t)})
+    return uit
+
+
 def pricing(request):
     return render(
         request,
@@ -406,7 +426,7 @@ def pricing(request):
             "wenskaart_punten": wenskaart.HIGHLIGHTS,
             "prijs_v2": prijzen.actief(),
             "tabel": prijzen.overzicht_tabel() if prijzen.actief() else [],
-            "tiers": [{"tier": t, "naam": prijzen.TIER_NAAM[t], "beschrijving": prijzen.BESCHRIJVING[t], "punten": prijzen.highlights(t)[1:]} for t in prijzen.TIERS] if prijzen.actief() else [],
+            "tiers": _prijs_tiers() if prijzen.actief() else [],
         },
     )
 

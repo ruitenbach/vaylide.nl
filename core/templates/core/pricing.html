@@ -14,48 +14,28 @@
 </section>
 
 {% if prijs_v2 %}
-<section class="section section--flush" aria-labelledby="tabel-titel">
-  <div class="container container--mid">
-    <div class="sectie-kop">
-      <h2 id="tabel-titel">Prijs per soort kaart</h2>
-      <p>Elk ontwerp heeft één vaste indeling: Basis, Luxe of Special. Je ziet de indeling en de prijs bij het ontwerp, en nog eens bij het bestellen. Het bedrag dat je ziet is het bedrag dat je betaalt: er komen geen toeslagen of extra's bij.</p>
-    </div>
-    <div class="table-wrap prijstabel">
-      <table class="table-simple">
-        <caption class="visually-hidden">Prijzen per soort kaart en indeling, inclusief btw</caption>
-        <thead><tr><th scope="col">Soort kaart</th>{% for t in tiers %}<th scope="col" class="num">{{ t.naam }}</th>{% endfor %}</tr></thead>
-        <tbody>{% for r in tabel %}<tr><th scope="row">{{ r.label }}{% if r.rij == "bedank" %} <span class="small muted">(wenskaart, alleen een groet)</span>{% endif %}</th>{% for c in r.cellen %}<td class="num" data-label="{{ c.naam }}">{% if c.cents %}{{ c.cents|euro }}{% else %}<span class="muted" aria-label="niet beschikbaar">&ndash;</span>{% endif %}</td>{% endfor %}</tr>{% endfor %}</tbody>
-      </table>
-    </div>
-    <p class="small muted table-note">Alle prijzen zijn inclusief btw en eenmalig. Een streepje betekent dat er voor die soort kaart op dit moment geen ontwerp in die indeling is.</p>
-  </div>
-</section>
-
-<section class="section section--flush" aria-label="De indelingen">
+<section class="section section--flush" aria-labelledby="indelingen-titel">
   <div class="container">
-    <div class="prijskolommen">
+    <h2 id="indelingen-titel" class="visually-hidden">Prijs per indeling en soort kaart</h2>
+    <ul class="prijs-zeker" aria-label="Wat altijd geldt"><li>Prijzen inclusief btw</li><li>Eenmalig betalen</li><li>12 maanden online</li><li>Geen extra toeslagen</li></ul>
+    <div class="prijs-grid">
       {% for t in tiers %}
-      <article class="prijskaart{% if t.tier == "luxe" %} prijskaart--uitgelicht{% endif %}">
-        <div class="prijskaart__kop"><h2>{{ t.naam }}</h2><span class="prijskaart__soort prijskaart__soort--vast">Vaste prijs per ontwerp</span></div>
-        <p class="muted">{{ t.beschrijving }}</p>
-        <ul class="checklist">{% for h in t.punten %}<li>{{ h }}</li>{% endfor %}</ul>
-        <a class="btn {% if t.tier == "luxe" %}btn--primary{% else %}btn--secondary{% endif %}" href="{% url 'core:designs' %}">Bekijk de ontwerpen</a>
+      <article class="prijs-tier{% if t.tier == "luxe" %} prijs-tier--luxe{% endif %}">
+        <h3>{{ t.naam }}</h3>
+        <p class="prijs-tier__tekst">{{ t.beschrijving }}</p>
+        <ul class="prijs-lijst" aria-label="Prijzen {{ t.naam }}, inclusief btw">
+          {% for r in t.rijen %}<li{% if not r.prijs %} class="is-leeg"{% endif %}><span>{{ r.label }}{% if r.wens %} <small>(alleen een groet)</small>{% endif %}</span><b>{% if r.prijs %}{{ r.prijs }}{% else %}<span aria-hidden="true">&ndash;</span><span class="visually-hidden">niet beschikbaar</span>{% endif %}</b></li>{% endfor %}
+        </ul>
+        {% if t.aantal %}<a class="btn {% if t.tier == "luxe" %}btn--primary{% else %}btn--secondary{% endif %}" href="{% url 'core:designs' %}?indeling={{ t.tier }}">Bekijk de {{ t.naam }}-ontwerpen</a>{% endif %}
       </article>
       {% endfor %}
-      <article class="prijskaart prijskaart--maat">
-        <div class="prijskaart__kop"><h2>Op maat</h2><span class="prijskaart__soort prijskaart__soort--aanvraag">Op aanvraag</span></div>
-        <p class="price price--text">Prijs op aanvraag</p>
-        <p class="muted">Voor wie iets wil dat nergens anders te vinden is.</p>
-        <ul class="checklist">
-          <li>Een ontwerp in jullie eigen stijl of huisstijl</li>
-          <li>Je eigen logo of beeldmerk, ook op het zegel</li>
-          <li>Een andere taal of een bijzondere opbouw</li>
-          <li>Eerst een voorstel met prijs; we beginnen pas na jouw akkoord</li>
-        </ul>
-        <a class="btn btn--primary" href="{% url 'core:contact' %}?onderwerp=maatwerk">Vraag een voorstel aan {% icon "pijl" %}</a>
-      </article>
     </div>
-    <p class="small muted center aside-line">De online periode telt vanaf de aankoopdatum: de dag waarop je betaling is bevestigd. Er is geen automatische verlenging. Zie de <a href="{% url 'core:terms' %}#artikel-6">algemene voorwaarden</a>.</p>
+    <p class="small muted center prijs-noot"><span class="prijs-noot__streep">Een streepje betekent dat er voor die soort kaart nog geen ontwerp met deze indeling is. </span>Tekst, foto's, muziek, aanmelden en agenda-knop zijn in elke indeling inbegrepen.</p>
+    <div class="prijs-maat">
+      <div><h3>Op maat</h3><p>Iets wat nergens anders te vinden is? Je krijgt eerst een voorstel met prijs; we beginnen pas na jouw akkoord.</p></div>
+      <a class="btn btn--secondary" href="{% url 'core:contact' %}?onderwerp=maatwerk">Vraag een voorstel aan</a>
+    </div>
+    <p class="small muted center aside-line">De online periode telt vanaf de aankoopdatum. Er is geen automatische verlenging. Zie de <a href="{% url 'core:terms' %}#artikel-6">algemene voorwaarden</a>.</p>
   </div>
 </section>
 {% else %}

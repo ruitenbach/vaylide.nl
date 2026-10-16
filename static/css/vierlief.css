@@ -1875,3 +1875,34 @@ a[href] img[src^="/static/"] { pointer-events: none; }
 .detail-prijs { margin: 1.1rem 0 .7rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: .15rem .6rem; }
 .detail-prijs__bedrag { display: inline-flex; align-items: baseline; gap: .7rem; font-size: 1.3rem; font-weight: 700; }
 .detail-prijs__tier { font-size: .78rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text); }
+
+/* Prijzenpagina (nieuwe prijsstructuur): drie indelingen naast elkaar, de prijzen per soort kaart onder elkaar. */
+.prijs-zeker { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem 1.6rem; margin: 0 0 2rem; padding: 0; list-style: none; font-size: .88rem; letter-spacing: .02em; color: var(--accent-text); }
+.prijs-zeker li + li::before { content: ""; display: inline-block; width: 4px; height: 4px; margin-right: 1.6rem; border-radius: 50%; background: var(--gold); vertical-align: middle; }
+.prijs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; align-items: stretch; }
+.prijs-tier { display: flex; flex-direction: column; padding: 2rem 1.8rem 1.8rem; border: 1px solid var(--line); border-radius: var(--radius-xl); background: var(--paper); box-shadow: var(--shadow-sm); }
+.prijs-tier--luxe { border-color: var(--gold); background: linear-gradient(180deg, #FFFAF0, var(--paper) 40%); box-shadow: var(--shadow); }
+.prijs-tier h3 { margin: 0 0 .3rem; font-family: var(--font-display); font-weight: 400; font-size: 2.1rem; }
+.prijs-tier__tekst { min-height: 3em; margin: 0 0 1.4rem; color: var(--muted); }
+.prijs-lijst { margin: 0 0 1.6rem; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.prijs-lijst li { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; min-height: 3.1rem; padding: .7rem 0; border-bottom: 1px solid var(--line); }
+.prijs-lijst li > span { font-size: .93rem; color: var(--ink-2); }
+.prijs-lijst small { color: var(--muted); }
+.prijs-lijst b { font-family: var(--font-display); font-weight: 500; font-size: 1.2rem; white-space: nowrap; color: var(--ink); }
+.prijs-lijst .is-leeg b, .prijs-lijst .is-leeg > span { color: var(--muted); font-weight: 400; }
+.prijs-tier .btn { margin-top: auto; justify-content: center; }
+.prijs-noot { max-width: 40rem; margin: 1.6rem auto 2.4rem; }
+.prijs-maat { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.5rem 1.8rem; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--ivory-2); }
+.prijs-maat h3 { margin: 0 0 .2rem; font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; }
+.prijs-maat p { margin: 0; color: var(--muted); }
+@media (max-width: 860px) {
+  .prijs-grid { grid-template-columns: 1fr; gap: 1.4rem; }
+  .prijs-tier { padding: 1.6rem 1.3rem; }
+  .prijs-tier h3 { font-size: 1.8rem; }
+  .prijs-tier__tekst { min-height: 0; }
+  .prijs-tier--luxe { order: -1; }
+  .prijs-lijst li { min-height: 0; }
+  .prijs-lijst .is-leeg { display: none; }
+  .prijs-maat { flex-direction: column; align-items: stretch; text-align: center; }
+}
+@media (max-width: 860px) { .prijs-noot__streep { display: none; } }
