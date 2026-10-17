@@ -763,7 +763,6 @@ html:has(body.studio-page) { scrollbar-gutter: stable; }
 .panel--na { margin-top: 1rem; }
 .prijzen-tabel th[scope="row"] { font-weight: 400; text-align: left; background: none; text-transform: none; letter-spacing: 0; color: var(--ink); font-size: 1rem; }
 .prijzen-tabel__geldt { display: block; margin-top: .15rem; max-width: 34ch; }
-.prijzen-tabel__stil { opacity: .72; }
 .prijs-cel { display: block; font-variant-numeric: tabular-nums; font-size: 1.15rem; font-weight: 600; color: var(--ink); }
 .prijs-cel__sub { display: block; }
 .prijzen-tabel td.is-leeg .prijs-cel { color: var(--muted); font-weight: 500; }

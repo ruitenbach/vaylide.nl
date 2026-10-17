@@ -459,6 +459,7 @@ class BeheerSchermen(PrijsbeheerBasis):
         for tekst in ("Vul een bedrag in met maximaal twee decimalen", "Een prijs ligt tussen € 1,00 en € 500,00", "Special kan niet goedkoper zijn dan Luxe"):
             self.assertIn(tekst, html)
         self.assertIn('value="abc"', html)
+        self.assertIn('role="alert" tabindex="-1" autofocus', html)     # de melding krijgt de focus, ook voor schermlezers en toetsenbordgebruikers
         self.assertEqual(prijsbeheer.lees("bruiloft", "luxe"), 5995)
 
     def test_een_verouderd_formulier_stuurt_terug_naar_de_nieuwe_stand(self):

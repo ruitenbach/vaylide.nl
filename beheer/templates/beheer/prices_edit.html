@@ -2,7 +2,7 @@
 {% block title %}Prijzen wijzigen{% endblock %}
 {% block content %}
 <div class="app-head"><div><p class="eyebrow"><a href="{% url 'beheer:prices' %}">Prijzen en acties</a></p><h1>Prijzen wijzigen</h1></div></div>
-{% if melding %}<p class="notice {% if fouten %}notice--error{% endif %}" role="alert">{{ melding }}</p>{% endif %}
+{% if melding %}<p class="notice {% if fouten %}notice--error{% endif %}" role="alert"{% if fouten %} tabindex="-1" autofocus{% endif %}>{{ melding }}</p>{% endif %}
 <p class="notice">Vul de bedragen in euro in, inclusief {{ btw_tarief }}% btw (bijvoorbeeld 29,95). Toegestaan: {{ min_euro }} tot {{ max_euro }}. In de volgende stap controleer je de wijziging; er wordt nu nog niets opgeslagen.</p>
 <form method="post" action="{% url 'beheer:prices_edit' %}" class="prijzen-form" novalidate data-once>
   {% csrf_token %}

@@ -1334,6 +1334,13 @@ De eigenaar bevestigde dat de onderneming niet meedoet aan de KOR; 21% btw blijf
 - **Op staging, alleen lezen in de database, na twee bestellingen met testbetaling (gesimuleerd, geen Mollie):** VL26-00004 (code BIGCODE30): voorbeeld € 59,95, korting € 17,99, totaal € 41,96, regels € 41,96, betaling € 41,96. VL26-00005 (aanbieding): € 59,95, korting € 11,99, totaal, regels en betaling € 47,96. De drie bestellingen van vóór de kortingen (VL26-00001 tot en met 00003) zijn ongewijzigd: € 39,00, korting 0, `subtotal_cents` leeg, betaling € 39,00. Het btw-deel (€ 7,28 bij € 41,96) is berekend met de formule, niet in Beheer bekeken omdat het beheeraccount toen al was ingetrokken.
 - **Niet gedaan:** een echte Mollie-testbetaling (nog geen testsleutel op staging), en een beoordeling door de boekhouder. De open fiscale vragen staan in `docs/KORTINGSCODES.md` onder "Btw".
 
+## Prijzenbeheer: toegankelijkheid en PostgreSQL (17 oktober 2026)
+
+- **Toegankelijkheid van de prijzenpagina's in Beheer** (`e2e/toegankelijkheid_prijzen.cjs`, axe-core 4 met WCAG 2.0/2.1 A en AA, lokale testserver met testgegevens): overzicht, wijzigen, bevestigen, foutmelding, logboek en terugdraaien, op 360, 390, 768, 1366 en 200% zoom (683 px): **30 metingen, 0 overtredingen**, geen horizontale scroll, elk invulveld met label. Toetsenbord (Tab door alle bedienbare elementen op 390 en 1366): alles bereikbaar, elk element een naam en zichtbare focus; het bedragveld toont de focus op zijn omlijsting. Uitvoer: `/mnt/project-files/prijzenbeheer/toegankelijkheid-uitvoer.json`.
+- **Gevonden en opgelost**: (1) de twee "stille" rijen (Geboortekaart, Save the date) stonden op 72% dekking, waardoor de tekst onder de 4,5:1 contrast kwam (axe: `color-contrast`, ernstig, op 360 px); de dekking is weggehaald. (2) Na een ongeldige invoer bleef de focus op de pagina zelf; de foutmelding krijgt nu de focus (`tabindex="-1" autofocus`); een test bewaakt dit.
+- Niet gedaan: een schermlezer (NVDA/VoiceOver) is niet gebruikt; de labels en `aria-describedby` zijn met axe en de DOM gecontroleerd.
+- **Gelijktijdige prijswijzigingen op PostgreSQL 16** (wegwerpdatabase, `tests/test_prijsbeheer_postgres.py`): 3 tests geslaagd; vijf gelijktijdige wijzigingen met dezelfde stempel geven precies één geslaagde en vier meldingen "intussen gewijzigd".
+
 ## Prijzenbeheer, fase A (17 oktober 2026, lokaal, niet gepusht)
 
 Echt uitgevoerd op een lokale testomgeving (SQLite, testmodus, testbetaling en nagebootste Mollie-antwoorden; geen Mollie-live, geen staging, geen productie):
