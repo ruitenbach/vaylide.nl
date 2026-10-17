@@ -25,6 +25,23 @@ Een klant kan bij Bestellen een kortingscode invullen. De korting is een negatie
 - Bij een terugbetaling blijft de code als gebruikt meetellen. Alleen een beheerder kan hem vrijgeven (Beheer → Bestelling → Kortingscode → "Weer beschikbaar maken"), met verplichte reden; naam, tijdstip en reden staan bij het gebruik en in het logboek van de bestelling.
 - De korting geldt op het bedrag inclusief btw; het btw-deel volgt proportioneel (totaal × 21 / 121, op centen afgerond). Beheer toont dat bij een bestelling met korting. **De boekhoudkundige verwerking moet vóór productie bevestigd worden.**
 
+## Btw
+
+Besluit van de eigenaar (17 oktober 2026): de onderneming doet **niet** mee aan de kleineondernemersregeling (KOR). Er wordt 21% btw gerekend (`VIERLIEF_BTW_PERCENTAGE`, standaard 21) en alle consumentenprijzen zijn inclusief btw. De verkoopprijzen zijn niet gewijzigd.
+
+Hoe de code ermee omgaat (nagelopen):
+- De korting is een negatieve regel op het bedrag inclusief btw. Het ordertotaal is de som van de regels, en dat bedrag gaat ongewijzigd naar Mollie (`orders/services.py::_check_discounted_order`, `orders/providers.py`).
+- Het btw-deel wordt berekend over het werkelijk betaalde bedrag (`kortingen/services.py::vat_part_cents`, halve centen naar boven). Voorbeeld: € 59,95 met 30% korting is € 41,96 betaald, daarvan € 7,28 btw (zonder korting € 10,40).
+- Alleen Beheer toont het btw-deel, en alleen bij een bestelling met korting. Er is geen factuurfunctie; bevestigingsmail en bon zijn geen factuur.
+- Bestellingen van vóór de kortingen houden hun bedrag: `discount_cents` is 0 en `subtotal_cents` leeg, en de migraties passen geen bestaand bedrag aan.
+
+Fiscale onzekerheden (voor de boekhouder, niet door de code te beantwoorden):
+1. Is 21% juist voor een digitale uitnodiging die een consument online afneemt? Voor klanten in andere EU-landen gelden regels voor digitale diensten aan consumenten (btw van het land van de klant, met een drempel en het OSS-loket). Nu wordt altijd 21% gerekend.
+2. Is "korting op het bedrag inclusief btw, btw-deel proportioneel" de juiste boeking?
+3. Facturen: welke gegevens moeten bij een bestelling met korting op de factuur of bon, en wie levert die aan klanten (zakelijke klanten vragen er vaak om)?
+4. Afronding per bestelling op hele centen: akkoord?
+5. Terugbetaling na een code: het betaalde bedrag wordt terugbetaald, niet de brutoprijs. Akkoord?
+
 ## Hoe een code gaat
 
 1. Controle (`kortingen.services.check_code`): actief, begin- en einddatum (de einddatum geldt tot het einde van die dag), bereik (gelegenheid, indeling, ontwerp; als er meer soorten beperking zijn gekozen moeten ze allemaal kloppen), minimum bestelbedrag, maximum aantal keer, maximum per klant, ondergrens.

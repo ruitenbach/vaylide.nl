@@ -23,7 +23,8 @@ beoordelen" (⚖).
 
 - [ ] Bevestig de prijzen: Essentieel € 39 (6 maanden online), Compleet € 69 (12 maanden online), extra opties
       € 6–12 (zie Beheer → Prijzen). Er zijn geen prijzen gewijzigd.
-- [ ] "Alle prijzen zijn inclusief btw" (prijzenpagina): klopt dit? Bij de KOR wordt er geen btw gerekend.
+- [x] Btw: de onderneming doet **niet** mee aan de KOR (bevestigd door de eigenaar, 17 oktober 2026). Er wordt dus 21% btw gerekend en "Alle prijzen zijn inclusief btw" klopt. De verkoopprijzen zijn niet gewijzigd.
+- [ ] Nog te laten bevestigen door de boekhouder: 21% voor een digitale uitnodiging aan consumenten (ook buiten Nederland: EU-regels voor digitale diensten), de boeking van korting en het factuurbeleid. Zie `docs/KORTINGSCODES.md`, onder "Btw".
 - [ ] Zet in Beheer → Instellingen "Voorlopige prijzen" uit zodra de prijzen definitief zijn.
 - [ ] Facturen: de site maakt geen btw-facturen; de bevestigingsmail is geen factuur. Hoe factureer je?
 - [ ] Terugbetalen: bij een dubbele betaling of een afwijkend bedrag zet de site de bestelling op

@@ -1325,3 +1325,11 @@ Uitgevoerd op een geïsoleerde PostgreSQL 16 (eigen cluster in een tijdelijke ma
 - **Correctie:** migratie `orders/0006_standaardwaarden_kortingskolommen` (`db_default` 0 en lege tekst), geen nieuwe functionaliteit.
 - **Rollbacktest** (`bbaa615` uit een aparte werkmap, nieuwe code uit de integratiebranch, dezelfde database): oude code migreert en maakt bestelling A; nieuwe code voert de kortingsmigraties uit en maakt bestelling B; alleen de code gaat terug naar `bbaa615`: bestelling C wordt aangemaakt; A, B en C staan er allemaal met korting 0. Zonder `0006` (controle) faalt stap C. Migratie 0006 is terug- en weer vooruit te draaien en `makemigrations --check` meldt niets.
 - **Tests:** twee nieuwe PostgreSQL-tests (`TerugdraaiVeilig`: de kolommen hebben een databasestandaard; een INSERT zonder kortingsvelden slaagt); zonder de correctie falen beide. Volledige suite: 1303 tests geslaagd op SQLite en op PostgreSQL 16.
+
+### Btw-controle van persoonlijke kortingscodes (17 oktober 2026)
+
+De eigenaar bevestigde dat de onderneming niet meedoet aan de KOR; 21% btw blijft, de verkoopprijzen zijn niet gewijzigd. Uitgevoerd:
+
+- **Lokaal:** `tests.test_kortingscodes` (106 tests) geslaagd, waaronder de btw-afronding (`vat_part_cents`), `test_bedrag_regels_betaling_en_mollie_zijn_exact_gelijk` (regels, ordertotaal en betaalbedrag gelijk; Mollie wordt in die test met een nepserver nagebootst, niet met Mollie zelf) en `test_prijzen_blijven_gelijk_alleen_het_bestelbedrag_verandert`.
+- **Op staging, alleen lezen in de database, na twee bestellingen met testbetaling (gesimuleerd, geen Mollie):** VL26-00004 (code BIGCODE30): voorbeeld € 59,95, korting € 17,99, totaal € 41,96, regels € 41,96, betaling € 41,96. VL26-00005 (aanbieding): € 59,95, korting € 11,99, totaal, regels en betaling € 47,96. De drie bestellingen van vóór de kortingen (VL26-00001 tot en met 00003) zijn ongewijzigd: € 39,00, korting 0, `subtotal_cents` leeg, betaling € 39,00. Het btw-deel (€ 7,28 bij € 41,96) is berekend met de formule, niet in Beheer bekeken omdat het beheeraccount toen al was ingetrokken.
+- **Niet gedaan:** een echte Mollie-testbetaling (nog geen testsleutel op staging), en een beoordeling door de boekhouder. De open fiscale vragen staan in `docs/KORTINGSCODES.md` onder "Btw".
