@@ -33,6 +33,10 @@ Criteria: **Special** = cinematisch of zeer uitgebreid (eigen film, 3D- of illus
 
 **Nieuw ontwerp?** Voeg bij `INDELING` een regel toe; zonder indeling is het ontwerp niet te bestellen (`tests/test_prijsstructuur.py` bewaakt dat elk ontwerp precies één indeling heeft).
 
+## Prijzen aanpassen zonder code
+
+Met `VIERLIEF_PRIJZENBEHEER=1` (standaard uit) past de eigenaar de bedragen aan in Beheer → Prijzen en acties; zie `docs/PRIJZENBEHEER.md`. `PRIJZEN` hierboven blijft de startstand.
+
 ## De schakelaar
 
 | Variabele | Betekenis |

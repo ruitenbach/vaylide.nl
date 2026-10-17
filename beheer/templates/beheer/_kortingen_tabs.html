@@ -1,4 +1,6 @@
-<nav class="tabs" aria-label="Soort korting"><ul class="segmented">
+<nav class="tabs" aria-label="Prijzen en acties"><ul class="segmented">
+  <li><a class="segmented__item" href="{% url 'beheer:prices' %}"{% if actief == 'prijzen' %} aria-current="page"{% endif %}>Prijzen</a></li>
   {% if korting_aan %}<li><a class="segmented__item" href="{% url 'beheer:discounts' %}"{% if actief == 'codes' %} aria-current="page"{% endif %}>Kortingscodes</a></li>{% endif %}
   {% if aanbod_aan %}<li><a class="segmented__item" href="{% url 'beheer:offers' %}"{% if actief == 'aanbiedingen' %} aria-current="page"{% endif %}>Automatische aanbiedingen</a></li>{% endif %}
+  <li><a class="segmented__item" href="{% url 'beheer:prices_log' %}"{% if actief == 'logboek' %} aria-current="page"{% endif %}>Logboek</a></li>
 </ul></nav>

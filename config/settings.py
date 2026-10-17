@@ -148,6 +148,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.SecurityHeadersMiddleware",
+    "catalog.prijsbeheer.PrijsCacheMiddleware",    # de prijstabel hoogstens één keer per verzoek lezen
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -302,6 +303,10 @@ AANBIEDING_REFERENTIE_DAGEN = int(env("VIERLIEF_AANBIEDING_REFERENTIE_DAGEN", "3
 DISCOUNT_MIN_TOTAL_CENTS = int(env("VIERLIEF_KORTING_MINIMUM_CENTEN", "100"))
 DISCOUNT_RESERVATION_MINUTES = int(env("VIERLIEF_KORTING_RESERVERING_MINUTEN", "120"))
 VAT_RATE_PERCENT = int(env("VIERLIEF_BTW_PERCENTAGE", "21"))
+# Prijzenbeheer (Beheer → Prijzen en acties). Standaard UIT: dan gelden de bedragen uit catalog/prijzen.py en is de pagina alleen-lezen. Aan: de bedragen komen
+# uit de database (catalog.PriceRule) en een ontbrekend of ongeldig bedrag maakt die kaart tijdelijk niet bestelbaar (nooit stil terugvallen op een andere prijs).
+# Werkt alleen samen met VIERLIEF_PRICING_V2. Alleen aanzetten na `manage.py controleer_prijsbron` en met akkoord van de eigenaar.
+PRICES_ADMIN = env_bool("VIERLIEF_PRIJZENBEHEER", False)
 
 PAYMENT_PROVIDER = env("VIERLIEF_PAYMENT_PROVIDER", "test" if TEST_MODE else "mollie").lower()
 MOLLIE_API_KEY = env("MOLLIE_API_KEY")

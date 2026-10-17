@@ -55,6 +55,7 @@ def _create_order(**fields) -> Order:
     for _ in range(5):
         try:
             with transaction.atomic():
+                fields.setdefault("vat_rate_percent", settings.VAT_RATE_PERCENT)    # het tarief van nu, vastgelegd op de nieuwe bestelling
                 return Order.objects.create(number=Order.next_number(), **fields)
         except IntegrityError:
             continue

@@ -1,0 +1,30 @@
+{% extends "beheer/base.html" %}
+{% block title %}Prijzen wijzigen{% endblock %}
+{% block content %}
+<div class="app-head"><div><p class="eyebrow"><a href="{% url 'beheer:prices' %}">Prijzen en acties</a></p><h1>Prijzen wijzigen</h1></div></div>
+{% if melding %}<p class="notice {% if fouten %}notice--error{% endif %}" role="alert">{{ melding }}</p>{% endif %}
+<p class="notice">Vul de bedragen in euro in, inclusief {{ btw_tarief }}% btw (bijvoorbeeld 29,95). Toegestaan: {{ min_euro }} tot {{ max_euro }}. In de volgende stap controleer je de wijziging; er wordt nu nog niets opgeslagen.</p>
+<form method="post" action="{% url 'beheer:prices_edit' %}" class="prijzen-form" novalidate data-once>
+  {% csrf_token %}
+  <input type="hidden" name="stempel" value="{{ stempel }}">
+  {% for r in rijen %}
+  <fieldset class="panel prijzen-rij{% if r.rij.rij == 'geboorte' or r.rij.rij == 'savethedate' %} prijzen-tabel__stil{% endif %}">
+    <legend><strong>{{ r.rij.label }}</strong></legend>
+    <p class="small muted">{{ r.rij.geldt_voor }}</p>
+    <div class="prijzen-rij__velden">
+      {% for c in r.cellen %}
+      <div class="field{% if c.fout %} field--error{% endif %}">
+        <label for="{{ c.cel.sleutel }}">{{ c.naam }}</label>
+        <div class="prijs-invoer"><span aria-hidden="true">€</span>
+          <input type="text" inputmode="decimal" autocomplete="off" id="{{ c.cel.sleutel }}" name="{{ c.cel.sleutel }}" value="{{ c.waarde }}"
+            aria-label="{{ r.rij.label }}, {{ c.naam }}, prijs in euro"{% if c.fout %} aria-invalid="true" aria-describedby="{{ c.cel.sleutel }}-fout"{% endif %}></div>
+        <span class="small muted">{% if c.cel.ontwerpen %}{{ c.cel.ontwerpen }} ontwerp{{ c.cel.ontwerpen|pluralize:"en" }}{% else %}geen ontwerp, niet te koop{% endif %}</span>
+        {% if c.fout %}<p class="field__error" id="{{ c.cel.sleutel }}-fout">{{ c.fout }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </fieldset>
+  {% endfor %}
+  <div class="btn-row prijzen-acties"><button class="btn btn--primary" type="submit">Controleer wijziging</button><a class="btn btn--ghost" href="{% url 'beheer:prices' %}">Annuleren</a></div>
+</form>
+{% endblock %}

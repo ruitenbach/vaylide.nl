@@ -65,6 +65,8 @@ class Order(models.Model):
     # Automatische aanbieding (app kortingen): dezelfde velden discount_cents/subtotal_cents; hier welke aanbieding, als tekst vastgelegd.
     discount_offer = models.ForeignKey("kortingen.Offer", null=True, blank=True, on_delete=models.PROTECT, related_name="orders")
     discount_offer_text = models.CharField("aanbieding", max_length=60, blank=True, default="", db_default="")
+    # Het btw-tarief dat bij het bestellen gold (settings.VAT_RATE_PERCENT). Leeg bij bestellingen van vóór deze kolom: die blijven ongemoeid.
+    vat_rate_percent = models.PositiveSmallIntegerField("btw-tarief (%)", null=True, blank=True)
     currency = models.CharField(max_length=3, default="EUR")
     status = models.CharField(max_length=12, choices=Status.choices, default=Status.PENDING)
     fulfilment_status = models.CharField(

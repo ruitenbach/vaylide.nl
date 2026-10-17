@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import prijzen_views, views
 
 app_name = "beheer"
 
@@ -20,6 +20,11 @@ urlpatterns = [
     path("wensen/<uuid:uid>/bijlage/<uuid:attachment_uid>/", views.wish_attachment, name="wish_attachment"),
     path("ontwerpen/", views.templates, name="templates"),
     path("ontwerpen/<int:pk>/", views.template_edit, name="template_edit"),
+    path("prijzen-en-acties/", prijzen_views.prices, name="prices"),
+    path("prijzen-en-acties/wijzigen/", prijzen_views.prices_edit, name="prices_edit"),
+    path("prijzen-en-acties/bevestigen/", prijzen_views.prices_confirm, name="prices_confirm"),
+    path("prijzen-en-acties/logboek/", prijzen_views.prices_log, name="prices_log"),
+    path("prijzen-en-acties/logboek/<int:pk>/terugdraaien/", prijzen_views.prices_revert, name="prices_revert"),
     path("prijzen/", views.pricing, name="pricing"),
     path("prijzen/pakket/nieuw/", views.package_edit, name="package_new"),
     path("prijzen/pakket/<int:pk>/", views.package_edit, name="package_edit"),

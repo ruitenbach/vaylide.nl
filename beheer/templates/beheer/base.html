@@ -37,7 +37,7 @@
     <li><a href="{% url 'beheer:customers' %}"{% if n == 'customers' or n == 'customer' %} aria-current="page"{% endif %}>Klanten</a></li>
     <li><a href="{% url 'beheer:processing' %}"{% if n == 'processing' or n == 'email' %} aria-current="page"{% endif %}>Verwerking{% if nav_counts.jobs %} <span class="count">{{ nav_counts.jobs }}</span>{% endif %}</a></li>
     <li><a href="{% url 'beheer:templates' %}"{% if n == 'templates' or n == 'template_edit' %} aria-current="page"{% endif %}>Ontwerpen</a></li>
-    <li><a href="{% url 'beheer:pricing' %}"{% if 'pricing' in n or 'package' in n or 'addon' in n %} aria-current="page"{% endif %}>Prijzen</a></li>
+    <li><a href="{% url 'beheer:prices' %}"{% if 'pricing' in n or 'package' in n or 'addon' in n or 'prices' in n %} aria-current="page"{% endif %}>Prijzen</a></li>
     {% if korting_aan or aanbod_aan %}<li><a href="{% if korting_aan %}{% url 'beheer:discounts' %}{% else %}{% url 'beheer:offers' %}{% endif %}"{% if 'discount' in n or 'offer' in n %} aria-current="page"{% endif %}>Kortingen</a></li>{% endif %}
     <li><a href="{% url 'beheer:contact_messages' %}"{% if n == 'contact_messages' %} aria-current="page"{% endif %}>Contact{% if nav_counts.contact %} <span class="count">{{ nav_counts.contact }}</span>{% endif %}</a></li>
     <li><a href="{% url 'beheer:withdrawals' %}"{% if n == 'withdrawals' %} aria-current="page"{% endif %}>Herroepingen</a></li>
@@ -46,6 +46,7 @@
 </nav>
 {% endwith %}
 {% endif %}
+{% if prijs_problemen %}<div class="container flash-wrap"><p class="flash flash--error" role="alert"><strong>Let op:</strong> {{ prijs_problemen|length }} prijs{{ prijs_problemen|length|pluralize:",zen" }} ontbreekt of is ongeldig; die kaarten zijn nu niet te bestellen. <a href="{% url 'beheer:prices' %}">Naar Prijzen en acties</a></p></div>{% endif %}
 {% if messages %}<div class="container flash-wrap">{% for message in messages %}<p class="flash flash--{{ message.tags }}" role="status">{{ message }}</p>{% endfor %}</div>{% endif %}
 <main id="inhoud" class="app-page" tabindex="-1"><div class="container">{% block content %}{% endblock %}</div></main>
 </body>

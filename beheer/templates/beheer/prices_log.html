@@ -1,0 +1,25 @@
+{% extends "beheer/base.html" %}
+{% block title %}Logboek prijzen{% endblock %}
+{% block content %}
+<div class="app-head"><div><p class="eyebrow">Beheer</p><h1>Prijzen en acties</h1></div></div>
+{% include "beheer/_kortingen_tabs.html" with actief="logboek" %}
+<p class="notice">Elke prijswijziging staat hier met wie, wanneer en waarom. Het logboek wordt nooit aangepast. Terugdraaien is een nieuwe, geregistreerde wijziging.</p>
+<section class="panel" aria-labelledby="log-kop">
+  <h2 id="log-kop">Logboek</h2>
+  {% for r in regels %}
+  <article class="log-item">
+    <header class="log-item__kop">
+      <span class="badge badge--{% if r.set.kind == 'seed' %}draft{% elif r.set.kind == 'terugdraaien' %}warning{% else %}live{% endif %}">{{ r.set.get_kind_display }}</span>
+      <strong>{{ r.set.created_at|date:"j-n-Y H:i" }}</strong>
+      <span class="small muted">{% if r.set.user %}{{ r.set.user.email }}{% else %}systeem{% endif %}</span>
+      {% if r.teruggedraaid %}<span class="badge badge--cancelled">teruggedraaid</span>{% endif %}
+    </header>
+    {% if r.set.reason %}<p class="log-item__reden">{{ r.set.reason }}</p>{% endif %}
+    {% if r.set.reverts_id %}<p class="small muted">Draait de wijziging van {{ r.set.reverts.created_at|date:"j-n-Y H:i" }} terug.</p>{% endif %}
+    <ul class="log-item__cellen">{% for c in r.cellen %}<li><span>{{ c.label }} · {{ c.tier }}</span><span class="num">{{ c.oud }} → <strong>{{ c.nieuw }}</strong></span></li>{% endfor %}</ul>
+    {% if r.kan_terug %}<a class="btn btn--secondary btn--sm" href="{% url 'beheer:prices_revert' r.set.pk %}">Draai terug</a>{% endif %}
+  </article>
+  {% empty %}<p class="muted">Nog geen wijzigingen.</p>{% endfor %}
+  {% if pagina.has_other_pages %}<p class="small">{% if pagina.has_previous %}<a href="?pagina={{ pagina.previous_page_number }}">Vorige</a>{% endif %} Pagina {{ pagina.number }} van {{ pagina.paginator.num_pages }} {% if pagina.has_next %}<a href="?pagina={{ pagina.next_page_number }}">Volgende</a>{% endif %}</p>{% endif %}
+</section>
+{% endblock %}

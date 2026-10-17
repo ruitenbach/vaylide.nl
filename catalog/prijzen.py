@@ -6,8 +6,9 @@ inclusief btw. Deze module is de enige bron: de ontwerppagina, het voorbeeld, Be
 
 Alles staat achter settings.PRICING_V2 (standaard uit, per omgeving aan te zetten). Staat dat uit, dan werkt alles zoals voorheen.
 
-Bewust niet gedaan: prijzen of pakketten in de database (Beheer → Prijzen blijft voor de oude structuur), handmatige correctierondes beloven, of extra
-gelegenheden aanmaken. Een gelegenheid of indeling zonder ontwerp is vanzelf niet te kiezen: er is dan geen ontwerp dat erbij hoort.
+De bedragen in PRIJZEN zijn de startstand. Met settings.PRICES_ADMIN (VIERLIEF_PRIJZENBEHEER, standaard uit) komen ze uit de database en past de eigenaar ze aan in
+Beheer → Prijzen en acties (catalog/prijsbeheer.py); `cel_cents` is dan de enige plek die de prijstabel leest. Bewust niet gedaan: handmatige correctierondes
+beloven of extra gelegenheden aanmaken. Een gelegenheid of indeling zonder ontwerp is vanzelf niet te kiezen: er is dan geen ontwerp dat erbij hoort.
 """
 from __future__ import annotations
 
@@ -118,7 +119,15 @@ def prijs_cents(template_or_version, occasion: str, soort: str = "") -> int | No
     template = getattr(template_or_version, "template", None) or template_or_version
     if occasion not in (getattr(template, "occasions", None) or []):
         return None     # een ontwerp is alleen te koop voor de gelegenheden waar het bij hoort
-    return PRIJZEN[rij][TIERS.index(indeling)]
+    return cel_cents(rij, indeling)
+
+
+def cel_cents(rij: str, indeling: str) -> int | None:
+    """Het geldende bedrag van één cel van de prijstabel. Met VIERLIEF_PRIJZENBEHEER uit: PRIJZEN hierboven. Aan: de database, en bij een ontbrekend of
+    ongeldig bedrag None (de kaart is dan niet te bestellen; nooit een stille terugval op een ander bedrag). Zie catalog/prijsbeheer.py."""
+    from . import prijsbeheer
+
+    return prijsbeheer.lees(rij, indeling)
 
 
 def prijs_info(template_or_version, occasion: str, soort: str = "") -> dict | None:
@@ -192,7 +201,7 @@ def beschikbaar(rij: str, ontwerpen=None) -> list[tuple[str, int]]:
                     gevonden.add(indeling)
             elif categorie(occasion, "") == rij or (rij == "kerst" and occasion == "kerst"):
                 gevonden.add(indeling)
-    return [(i, PRIJZEN[rij][TIERS.index(i)]) for i in TIERS if i in gevonden]
+    return [(i, c) for i in TIERS if i in gevonden for c in [cel_cents(rij, i)] if c is not None]
 
 
 def zin(rij: str, ontwerpen=None) -> str:

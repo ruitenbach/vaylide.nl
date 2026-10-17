@@ -1,0 +1,39 @@
+{% extends "beheer/base.html" %}
+{% block title %}Prijzen en acties{% endblock %}
+{% block content %}
+<div class="app-head"><div><p class="eyebrow">Beheer</p><h1>Prijzen en acties</h1></div>
+  <div class="btn-row">{% if kan_wijzigen and prijsbeheer_aan %}<a class="btn btn--primary btn--sm" href="{% url 'beheer:prices_edit' %}">Prijzen wijzigen</a>{% endif %}</div></div>
+{% include "beheer/_kortingen_tabs.html" with actief="prijzen" %}
+{% if not prijsbeheer_aan %}<p class="notice notice--warning"><strong>Prijsbeheer staat uit</strong>{% if v2 %}De prijzen hieronder komen uit de code en zijn alleen te bekijken. Wijzigen kan pas als de eigenaar prijsbeheer aanzet (VIERLIEF_PRIJZENBEHEER).{% else %}De nieuwe prijsstructuur staat uit in deze omgeving; er is niets te beheren.{% endif %}</p>{% endif %}
+{% if problemen %}<p class="notice notice--error" role="alert"><strong>Let op: {{ problemen|length }} prijs{{ problemen|length|pluralize:",zen" }} ontbreekt of is ongeldig</strong>Deze kaarten zijn nu niet te bestellen, zodat er nooit een verkeerd bedrag wordt afgerekend: {{ problemen|join:"; " }}. Herstel de prijs via "Prijzen wijzigen" of draai de laatste wijziging terug.</p>{% endif %}
+{% if verschillen and prijsbeheer_aan %}<p class="notice notice--warning"><strong>De database wijkt af van de code</strong>Dat is normaal na een wijziging in Beheer. De code is alleen de startstand.</p>{% endif %}
+<section class="panel" aria-labelledby="prijzen-kop">
+  <div class="panel__head"><h2 id="prijzen-kop">Verkoopprijzen</h2><span class="small muted">Je rol: {{ rol|default:"—" }}{% if not kan_wijzigen %} · alleen bekijken{% endif %}</span></div>
+  <p class="muted small">Alle bedragen zijn inclusief {{ btw_tarief }}% btw en eenmalig. Een wijziging geldt direct voor nieuwe bestellingen; bestaande bestellingen en openstaande betalingen houden hun bedrag.</p>
+  <div class="data-table-wrap"><table class="data-table data-table--cards prijzen-tabel">
+    <thead><tr><th scope="col">Soort kaart</th><th scope="col" class="num">Basis</th><th scope="col" class="num">Luxe</th><th scope="col" class="num">Special</th></tr></thead>
+    <tbody>{% for r in rijen %}<tr{% if r.rij.rij == 'geboorte' or r.rij.rij == 'savethedate' %} class="prijzen-tabel__stil"{% endif %}>
+      <th scope="row" data-label="Soort kaart"><strong>{{ r.rij.label }}</strong><span class="small muted prijzen-tabel__geldt">{{ r.rij.geldt_voor }}</span></th>
+      {% for c in r.cellen %}<td data-label="{{ c.naam }}" class="num{% if c.cel.probleem %} is-probleem{% endif %}{% if c.cel.ontwerpen == 0 %} is-leeg{% endif %}">
+        <span class="prijs-cel">{{ c.tekst }}</span>
+        <span class="small muted prijs-cel__sub">{% if c.cel.ontwerpen %}{{ c.cel.ontwerpen }} ontwerp{{ c.cel.ontwerpen|pluralize:"en" }}{% else %}geen ontwerp, niet te koop{% endif %}</span>
+      </td>{% endfor %}
+    </tr>{% endfor %}</tbody>
+  </table></div>
+  <ul class="small muted prijzen-noten">
+    <li><strong>Verloving en Jubileum</strong> gebruiken dezelfde prijsrij.</li>
+    <li><strong>Wenskaart buiten Kerst</strong> geldt voor een wenskaart bij elke gelegenheid behalve Kerst. Een wenskaart bij Kerst kost hetzelfde als een kerstkaart.</li>
+    <li>De indeling van een ontwerp (Basis, Luxe of Special) wijzig je hier niet; dat staat vast bij het ontwerp.</li>
+  </ul>
+</section>
+<section class="panel panel--na" aria-labelledby="stand-kop">
+  <h2 id="stand-kop">Stand van zaken</h2>
+  <ul class="stand-lijst">
+    <li><span>Prijsbeheer</span><strong>{% if prijsbeheer_aan %}aan{% else %}uit{% endif %}</strong></li>
+    <li><span>Nieuwe prijsstructuur</span><strong>{% if v2 %}aan{% else %}uit{% endif %}</strong></li>
+    <li><span>Kortingscodes</span><strong>{% if codes_aan %}aan{% else %}uit{% endif %}</strong></li>
+    <li><span>Automatische aanbiedingen</span><strong>{% if aanbod_aan %}aan{% else %}uit{% endif %}</strong></li>
+    <li><span>Laatst gewijzigd</span><strong>{% if laatste %}{{ laatste.created_at|date:"j-n-Y H:i" }} door {{ laatste.user.email|default:"onbekend" }}{% elif start %}nog niet; startstand van {{ start.created_at|date:"j-n-Y" }}{% else %}—{% endif %}</strong></li>
+  </ul>
+</section>
+{% endblock %}

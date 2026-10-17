@@ -178,3 +178,70 @@ class AddOn(models.Model):
     @property
     def price_display(self) -> str:
         return format_euro(self.price_cents)
+
+
+# ---------------------------------------------------------------- prijsbeheer (Beheer → Prijzen en acties; catalog/prijsbeheer.py)
+
+class PriceRule(models.Model):
+    """De geldende prijs van één cel in de prijstabel: prijsrij × indeling (Basis, Luxe of Special), in centen, inclusief btw.
+    Wordt alleen gelezen als settings.PRICES_ADMIN aan staat (VIERLIEF_PRIJZENBEHEER); anders gelden de bedragen uit catalog/prijzen.py."""
+
+    rij = models.CharField("prijsrij", max_length=30)
+    tier = models.CharField("indeling", max_length=10)
+    price_cents = models.PositiveIntegerField("prijs (centen, incl. btw)")
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey("accounts.User", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+
+    class Meta:
+        verbose_name = "verkoopprijs"
+        verbose_name_plural = "verkoopprijzen"
+        ordering = ["rij", "tier"]
+        constraints = [
+            models.UniqueConstraint(fields=["rij", "tier"], name="uniq_prijsregel_rij_tier"),
+            models.CheckConstraint(condition=models.Q(price_cents__gte=100, price_cents__lte=50000), name="prijsregel_binnen_grenzen"),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.rij}/{self.tier} {format_euro(self.price_cents)}"
+
+
+class PriceChangeSet(models.Model):
+    """Eén doorgevoerde prijswijziging (of de startstand, of een terugdraaiing). Alleen toevoegen: sets worden nooit bewerkt of verwijderd."""
+
+    class Kind(models.TextChoices):
+        SEED = "seed", "Startstand"
+        CHANGE = "wijziging", "Wijziging"
+        REVERT = "terugdraaien", "Terugdraaiing"
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey("accounts.User", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    kind = models.CharField(max_length=12, choices=Kind.choices)
+    reason = models.CharField("reden", max_length=300, blank=True)
+    reverts = models.ForeignKey("self", null=True, blank=True, on_delete=models.PROTECT, related_name="reverted_by")
+
+    class Meta:
+        verbose_name = "prijswijziging"
+        verbose_name_plural = "prijswijzigingen"
+        ordering = ["-id"]
+        permissions = [
+            ("prijzen_wijzigen", "Mag verkoopprijzen wijzigen"),
+            ("prijzen_terugdraaien", "Mag een prijswijziging terugdraaien"),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.get_kind_display()} #{self.pk}"
+
+
+class PriceChange(models.Model):
+    """Eén cel van een wijziging: oud en nieuw bedrag (oud is leeg bij de startstand)."""
+
+    change_set = models.ForeignKey(PriceChangeSet, on_delete=models.PROTECT, related_name="changes")
+    rij = models.CharField(max_length=30)
+    tier = models.CharField(max_length=10)
+    old_cents = models.PositiveIntegerField(null=True, blank=True)
+    new_cents = models.PositiveIntegerField()
+
+    class Meta:
+        verbose_name = "gewijzigde prijs"
+        verbose_name_plural = "gewijzigde prijzen"
+        ordering = ["id"]

@@ -1,0 +1,29 @@
+{% extends "beheer/base.html" %}
+{% block title %}Wijziging terugdraaien{% endblock %}
+{% block content %}
+<div class="app-head"><div><p class="eyebrow"><a href="{% url 'beheer:prices_log' %}">Logboek</a></p><h1>Wijziging terugdraaien</h1></div></div>
+{% if fouten %}<p class="notice notice--error" role="alert"><strong>Nog niet teruggedraaid</strong>{% for k, v in fouten.items %}{{ v }} {% endfor %}</p>{% endif %}
+<p class="notice">Je draait de wijziging van {{ zet.created_at|date:"j-n-Y H:i" }} terug door de oude bedragen opnieuw in te stellen. Dat wordt een nieuwe wijziging in het logboek; de oude regels blijven staan. Bedragen die intussen opnieuw zijn gewijzigd staan er wel bij, maar zijn niet aangevinkt.</p>
+<form method="post" class="panel form container--narrow" data-once novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="stempel" value="{{ stempel }}">
+  <fieldset class="field"><legend class="label">Welke bedragen draai je terug?</legend>
+    {% for v in voorstel %}<label class="check"><input type="checkbox" name="cel" value="{{ v.sleutel }}"{% if v.gekozen %} checked{% endif %}><span><strong>{{ v.label }} · {{ v.tier_naam }}</strong>: {{ v.huidig_tekst }} → {{ v.terug_tekst }}{% if not v.nog_zoals_gezet %} <em class="small muted">(intussen gewijzigd; de wijziging zette {{ v.gezet_tekst }})</em>{% endif %}</span></label>{% endfor %}
+  </fieldset>
+  {% if tabel %}<h2>Wat verandert</h2>{% include "beheer/_prijzen_wijzigingen.html" %}
+  <ul class="prijzen-gevolgen">
+    <li>Bestaande bestellingen en openstaande betalingen houden hun bedrag.</li>
+    <li>{% if codes %}Dit raakt {{ codes|length }} actieve of geplande kortingscode{{ codes|length|pluralize:"s" }}: {% for c in codes %}{{ c.code }}{% if not forloop.last %}, {% endif %}{% endfor %}.{% else %}Er zijn geen kortingscodes die dit raakt.{% endif %}</li>
+    <li>{% if aanbiedingen %}Dit raakt {{ aanbiedingen|length }} aanbieding{{ aanbiedingen|length|pluralize:"en" }}.{% else %}Er zijn geen aanbiedingen die dit raakt.{% endif %}</li></ul>
+  {% for w in waarschuwingen %}<p class="notice notice--warning" role="note">{{ w }}</p>{% endfor %}{% endif %}
+  <div class="field{% if fouten.reden %} field--error{% endif %}">
+    <label for="reden">Reden voor het terugdraaien <span class="req">(verplicht)</span></label>
+    <input type="text" id="reden" name="reden" value="{{ reden }}" maxlength="300" required{% if fouten.reden %} aria-invalid="true"{% endif %}>
+    {% if fouten.reden %}<p class="field__error">{{ fouten.reden }}</p>{% endif %}
+  </div>
+  {% if grote_sprong %}<div class="field"><label class="check"><input type="checkbox" name="grote_sprong" value="1"><span>Ik weet zeker dat de grote prijssprong klopt.</span></label></div>{% endif %}
+  <div class="field{% if fouten.begrepen %} field--error{% endif %}"><label class="check"><input type="checkbox" name="begrepen" value="1"><span>Ik begrijp dat dit direct geldt voor nieuwe bestellingen.</span></label>
+    {% if fouten.begrepen %}<p class="field__error">{{ fouten.begrepen }}</p>{% endif %}</div>
+  <div class="btn-row prijzen-acties"><button class="btn btn--primary" type="submit">Terugdraaien</button><a class="btn btn--ghost" href="{% url 'beheer:prices_log' %}">Annuleren</a></div>
+</form>
+{% endblock %}

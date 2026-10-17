@@ -45,6 +45,8 @@ def anonymize_user(user) -> None:
 
     from .models import ContactMessage
 
+    if user.is_staff or user.is_superuser:
+        raise ValueError("Een medewerkers- of eigenaarsaccount wordt nooit geanonimiseerd.")
     email = user.email
     with transaction.atomic():
         # Eerst de e-mails (ook meldingen aan de eigenaar) die over deze klant gaan.

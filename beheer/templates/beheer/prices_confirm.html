@@ -1,0 +1,33 @@
+{% extends "beheer/base.html" %}
+{% block title %}Controleer wijziging{% endblock %}
+{% block content %}
+<div class="app-head"><div><p class="eyebrow"><a href="{% url 'beheer:prices' %}">Prijzen en acties</a></p><h1>Controleer je wijziging</h1></div></div>
+{% if fouten %}<p class="notice notice--error" role="alert"><strong>Nog niet doorgevoerd</strong>{% for k, v in fouten.items %}{{ v }} {% endfor %}</p>{% endif %}
+<section class="panel" aria-labelledby="wijz-kop">
+  <h2 id="wijz-kop">Wat verandert</h2>
+  {% include "beheer/_prijzen_wijzigingen.html" %}
+  <ul class="prijzen-gevolgen">
+    <li>Dit raakt {{ ontwerpen_totaal }} ontwerp{{ ontwerpen_totaal|pluralize:"en" }} in de collectie, op de ontwerppagina's, in Studio en bij Bestellen. Betalen, de bon en de bevestigingsmail volgen hetzelfde bedrag.</li>
+    <li>Bestaande bestellingen en openstaande betalingen houden hun bedrag.</li>
+    <li>Alle bedragen zijn inclusief {{ btw_tarief }}% btw.</li>
+    <li>{% if codes %}Dit raakt {{ codes|length }} actieve of geplande kortingscode{{ codes|length|pluralize:"s" }}: {% for c in codes %}<a href="{% url 'beheer:discount_edit' c.pk %}">{{ c.code }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}. Een vast bedrag wordt nooit hoger dan de prijs min € 1,00.{% else %}Er zijn geen actieve of geplande kortingscodes die dit raakt.{% endif %}</li>
+    <li>{% if aanbiedingen %}Dit raakt {{ aanbiedingen|length }} aanbieding{{ aanbiedingen|length|pluralize:"en" }}: {% for o in aanbiedingen %}{{ o.name }}{% if not forloop.last %}, {% endif %}{% endfor %}.{% else %}Er zijn geen actieve of geplande aanbiedingen die dit raakt.{% endif %}</li>
+  </ul>
+  {% for w in waarschuwingen %}<p class="notice notice--warning" role="note">{{ w }}</p>{% endfor %}
+</section>
+<form method="post" action="{% url 'beheer:prices_confirm' %}" class="panel panel--na form container--narrow" data-once novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="stempel" value="{{ stempel }}">
+  {% for t in tabel %}<input type="hidden" name="{{ t.sleutel }}" value="{{ t.invoer }}">{% endfor %}
+  <div class="field{% if fouten.reden %} field--error{% endif %}">
+    <label for="reden">Reden voor deze wijziging <span class="req">(verplicht)</span></label>
+    <p class="hint">Komt in het logboek, bijvoorbeeld "Seizoensprijs bruiloften 2027".</p>
+    <input type="text" id="reden" name="reden" value="{{ reden }}" maxlength="300" required{% if fouten.reden %} aria-invalid="true"{% endif %}>
+    {% if fouten.reden %}<p class="field__error">{{ fouten.reden }}</p>{% endif %}
+  </div>
+  {% if grote_sprong %}<div class="field"><label class="check"><input type="checkbox" name="grote_sprong" value="1"><span>Ik weet zeker dat de grote prijssprong hierboven klopt.</span></label></div>{% endif %}
+  <div class="field{% if fouten.begrepen %} field--error{% endif %}"><label class="check"><input type="checkbox" name="begrepen" value="1"><span>Ik begrijp dat dit direct geldt voor nieuwe bestellingen.</span></label>
+    {% if fouten.begrepen %}<p class="field__error">{{ fouten.begrepen }}</p>{% endif %}</div>
+  <div class="btn-row prijzen-acties"><button class="btn btn--primary" type="submit">Prijzen doorvoeren</button><a class="btn btn--ghost" href="{% url 'beheer:prices_edit' %}">Terug naar bewerken</a></div>
+</form>
+{% endblock %}

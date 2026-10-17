@@ -12,7 +12,10 @@ def nav_counts(request):
 
     from django.conf import settings
 
+    from catalog import prijsbeheer
+
     return {
+        "prijs_problemen": prijsbeheer.problemen(),     # leeg zolang prijsbeheer uit staat of alle bedragen geldig zijn
         "korting_aan": settings.DISCOUNTS_ENABLED,
         "aanbod_aan": settings.OFFERS_ENABLED,
         "nav_counts": {

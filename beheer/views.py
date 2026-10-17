@@ -36,6 +36,12 @@ from wishes.services import WishError, add_message, send_proposal, set_status
 from .forms import AddOnForm, ExtendForm, OverridesForm, PackageForm, SiteConfigForm, TemplateForm
 
 
+def prijzen_actief() -> bool:
+    from catalog import prijzen
+
+    return prijzen.actief()
+
+
 def staff_required(view):
     @functools.wraps(view)
     def wrapper(request, *args, **kwargs):
@@ -194,8 +200,9 @@ def _btw_overzicht(order):
         return None
     from kortingen.services import vat_part_cents
 
-    return {"tarief": settings.VAT_RATE_PERCENT, "voor": vat_part_cents(order.subtotal_cents or order.total_cents + order.discount_cents),
-            "na": vat_part_cents(order.total_cents)}
+    tarief = settings.VAT_RATE_PERCENT if order.vat_rate_percent is None else order.vat_rate_percent    # het tarief van het moment van bestellen
+    return {"tarief": tarief, "voor": vat_part_cents(order.subtotal_cents or order.total_cents + order.discount_cents, tarief),
+            "na": vat_part_cents(order.total_cents, tarief)}
 
 
 # ------------------------------------------------------------- uitnodigingen
@@ -499,7 +506,7 @@ def pricing(request):
     nieuw = None
     if prijzen.actief():     # nieuwe prijsstructuur: alleen lezen; de bedragen en de indeling staan in catalog/prijzen.py
         telling = {t: sorted(slug for slug, i in prijzen.INDELING.items() if i == t) for t in prijzen.TIERS}
-        nieuw = {"rijen": [{"label": prijzen.CATEGORIE_LABEL[r], "prijzen": [prijzen.format_euro(c) for c in cs]} for r, cs in prijzen.PRIJZEN.items()],
+        nieuw = {"rijen": [{"label": prijzen.CATEGORIE_LABEL[r], "prijzen": [prijzen.format_euro(prijzen.cel_cents(r, t)) for t in prijzen.TIERS]} for r in prijzen.PRIJZEN],
                  "tiers": [{"naam": prijzen.TIER_NAAM[t], "maanden": prijzen.MAANDEN_ONLINE[t], "ontwerpen": telling[t]} for t in prijzen.TIERS]}
     return render(request, "beheer/pricing.html", {"packages": Package.objects.all(), "addons": AddOn.objects.all(),
                                                    "config": SiteConfig.get(), "nieuw": nieuw})
@@ -511,7 +518,7 @@ def package_edit(request, pk=None):
     form = PackageForm(request.POST or None, instance=package)
     if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, "Pakket opgeslagen. Nieuwe bestellingen gebruiken direct de nieuwe prijs; bestaande bestellingen veranderen niet.")
+        messages.success(request, "Pakket opgeslagen. Met de nieuwe prijsstructuur heeft dit geen effect op de verkoopprijzen: die pas je aan onder Prijzen en acties." if prijzen_actief() else "Pakket opgeslagen. Nieuwe bestellingen gebruiken direct de nieuwe prijs; bestaande bestellingen veranderen niet.")
         return redirect("beheer:pricing")
     return render(request, "beheer/edit_form.html", {"form": form, "title": "Pakket bewerken" if package else "Nieuw pakket", "back": reverse("beheer:pricing")})
 

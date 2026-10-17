@@ -1,0 +1,10 @@
+<div class="data-table-wrap"><table class="data-table data-table--cards">
+  <thead><tr><th scope="col">Prijs</th><th scope="col" class="num">Nu</th><th scope="col" class="num">Straks</th><th scope="col" class="num">Verschil</th><th scope="col" class="num">Waarvan btw</th></tr></thead>
+  <tbody>{% for t in tabel %}<tr>
+    <th scope="row" data-label="Prijs"><strong>{{ t.label }}</strong> · {{ t.tier_naam }}{% if t.gedeeld %}<span class="small muted prijzen-tabel__geldt">Geldt voor Verloving én Jubileum.</span>{% endif %}</th>
+    <td data-label="Nu" class="num">{{ t.oud }}</td>
+    <td data-label="Straks" class="num"><strong>{{ t.nieuw }}</strong></td>
+    <td data-label="Verschil" class="num {% if t.omhoog %}diff--omhoog{% else %}diff--omlaag{% endif %}">{{ t.verschil }}{% if t.procent %} <span class="small">({{ t.procent }})</span>{% endif %}</td>
+    <td data-label="Waarvan btw" class="num">{{ t.btw_oud }} → {{ t.btw_nieuw }}</td>
+  </tr>{% endfor %}</tbody>
+</table></div>
