@@ -58,3 +58,17 @@ Korte lijst met wat de eigenaar nog moet aanleveren: `docs/INVULLIJST.md`.
 - [ ] Een back-up terugzetten op een testomgeving.
 - [ ] De uitnodiging openen op je eigen telefoons (iPhone en Android) en in WhatsApp delen, om de linkvoorvertoning te zien.
 - [ ] Vergelijk de ontwerpen alsnog met de schermopname en de referentiesites (zie `docs/AANPAK.md`).
+
+## 6a. Automatische aanbiedingen (alleen als ze live gaan)
+
+- [ ] Juridische bevestiging van de referentieprijsregels voor digitale kaarten (zie `docs/AANBIEDINGEN.md`), en van de btw-verwerking.
+- [ ] Prijshistorie gecontroleerd (`manage.py sync_prijshistorie`; alleen met bewijs `--sinds`).
+- [ ] Alleen met uitdrukkelijk akkoord van de eigenaar: `VIERLIEF_AANBIEDINGEN=1` op productie.
+
+## 6. Kortingscodes (alleen als ze live gaan)
+
+- [ ] De boekhouder bevestigt de behandeling: korting op het bedrag inclusief btw, btw-deel proportioneel (zie `docs/KORTINGSCODES.md`).
+- [ ] Proef met een Mollie-testsleutel op staging: bestelling met korting, mislukte en afgebroken betaling, terugbetaling in Mollie, en het bedrag bij Mollie gelijk aan de bon en de mail. Minimumbedrag per betaalmethode in Mollie nagaan (we rekenen met minimaal € 1,00).
+- [ ] Proef op PostgreSQL (gelijktijdige bestellingen op de laatste plek van een code).
+- [ ] Juridisch: een korte regel over kortingscodes (niet combineerbaar, niet inwisselbaar voor geld) in de voorwaarden, als de eigenaar dat wil.
+- [ ] Alleen met uitdrukkelijk akkoord van de eigenaar: `VIERLIEF_KORTINGSCODES=1` op productie.

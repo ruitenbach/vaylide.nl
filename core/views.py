@@ -17,6 +17,7 @@ from catalog.models import AddOn, Package, Template, format_euro
 from catalog.specials import is_special, special_prijszin
 from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, collectie_volgorde, occasion_config
 from catalog.effects import effect_card_label, effect_summary
+from kortingen import aanbiedingen
 from invitations.demo import DEFAULT_DEMO_OCCASION
 
 from . import seo
@@ -39,8 +40,21 @@ def _designs():
     return list(Template.objects.filter(is_active=True, current_version__isnull=False).select_related("current_version"))
 
 
+def _aanbod_voor_kaart(template, occasion, ctx):
+    """De prijs met aanbieding voor een kaart (alleen met de vlag aan en als er een lopende aanbieding is). Zonder gelegenheid (bijvoorbeeld op de
+    homepage) alleen als het ontwerp maar één gelegenheid heeft; anders is er geen eenduidige prijs om te tonen."""
+    occ = occasion if occasion in template.occasions else (template.occasions[0] if len(template.occasions) == 1 else "")
+    if not occ:
+        return None
+    info = aanbiedingen.prijs(template, occ, "", ctx=ctx)
+    return info if info and info["aanbieding"] else None
+
+
 def _design_cards(designs, occasion=""):
     cards = []
+    ctx = aanbiedingen.Context() if aanbiedingen.enabled() else None
+    if ctx is not None and not ctx.active:
+        ctx = None
     for template in designs:
         version = template.current_version
         query = f"?gelegenheid={occasion}" if occasion in template.occasions else ""
@@ -51,6 +65,7 @@ def _design_cards(designs, occasion=""):
                 "effect_label": effect_card_label(version.manifest.get("effects"), version.manifest.get("opening_label", "")),
                 "detail_url": reverse("core:design_detail", args=[template.slug]) + query,
                 "image": design_image_url(template.slug),
+                "aanbod": _aanbod_voor_kaart(template, occasion, ctx) if ctx is not None else None,
             }
         )
     return cards
@@ -356,6 +371,16 @@ def design_detail(request, slug):
     wenskaart_prijs = format_euro(wenskaart.prijs_cents(template))
     prijs_u, prijs_w = prijzen.prijs_info(template, occasion, ""), prijzen.prijs_info(template, occasion, "wenskaart")
     prijs_nu = prijs_w if soort == "wenskaart" else prijs_u
+    # Met een lopende aanbieding (vlag aan): per soort kaart de actieprijs, en als dat aantoonbaar mag de doorgestreepte referentieprijs.
+    aanbod_varianten = []
+    if aanbiedingen.enabled() and prijzen.actief():
+        ctx = aanbiedingen.Context()
+        for key, gewoon in (("uitnodiging", prijs_u), ("wenskaart", prijs_w)):
+            info = aanbiedingen.prijs(template, occasion, "wenskaart" if key == "wenskaart" else "", ctx=ctx) if gewoon else None
+            if info:
+                aanbod_varianten.append({"soort": key, "info": info, "res": info["aanbieding"]})
+        if not any(v["res"] for v in aanbod_varianten):
+            aanbod_varianten = []
     extra = f"&soort={soort}" if soort else ""
     palettes = [
         {**p, "url": f"?gelegenheid={occasion}&kleur={p.get('key')}{extra}", "current": p.get("key") == kleur}
@@ -376,6 +401,7 @@ def design_detail(request, slug):
             "wenskaart_special": is_special(template),
             "prijs_v2": prijzen.actief(),
             "prijs_nu": prijs_nu if prijzen.actief() else None,
+            "aanbod_varianten": aanbod_varianten,
             "prijs_uitnodiging": prijs_u["label"] if prijs_u else "",
             "prijs_wenskaart": prijs_w["label"] if prijs_w else "",
             "occasion_choices": [(k, OCCASION_LABELS[k]) for k in template.occasions if k in OCCASION_LABELS],

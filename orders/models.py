@@ -56,6 +56,15 @@ class Order(models.Model):
     max_gallery_photos = models.PositiveSmallIntegerField(default=0)
     availability_months = models.PositiveSmallIntegerField(default=0)
     total_cents = models.PositiveIntegerField("totaal (centen)")
+    # Kortingscode (app kortingen). total_cents blijft het te betalen bedrag; bij bestellingen van vóór de kortingscodes is subtotal_cents leeg en
+    # discount_cents 0. De code staat ook als tekst op de bestelling, zodat de bestelling leesbaar blijft als de code later wordt uitgezet.
+    subtotal_cents = models.PositiveIntegerField("bedrag voor korting (centen)", null=True, blank=True)
+    discount_cents = models.PositiveIntegerField("korting (centen)", default=0)
+    discount_code = models.ForeignKey("kortingen.DiscountCode", null=True, blank=True, on_delete=models.SET_NULL, related_name="orders")
+    discount_code_text = models.CharField("kortingscode", max_length=40, blank=True)
+    # Automatische aanbieding (app kortingen): dezelfde velden discount_cents/subtotal_cents; hier welke aanbieding, als tekst vastgelegd.
+    discount_offer = models.ForeignKey("kortingen.Offer", null=True, blank=True, on_delete=models.PROTECT, related_name="orders")
+    discount_offer_text = models.CharField("aanbieding", max_length=60, blank=True)
     currency = models.CharField(max_length=3, default="EUR")
     status = models.CharField(max_length=12, choices=Status.choices, default=Status.PENDING)
     fulfilment_status = models.CharField(
@@ -115,8 +124,8 @@ class OrderLine(models.Model):
     code = models.CharField(max_length=50)
     description = models.CharField(max_length=200)
     quantity = models.PositiveSmallIntegerField(default=1)
-    unit_price_cents = models.PositiveIntegerField()
-    total_cents = models.PositiveIntegerField()
+    unit_price_cents = models.IntegerField()    # negatief bij een kortingsregel
+    total_cents = models.IntegerField()
 
     class Meta:
         verbose_name = "bestelregel"

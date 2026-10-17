@@ -245,6 +245,10 @@ def ensure_catalog() -> None:
     sync_designs()
     ensure_pricing()
     SiteConfig.get()
+    # Prijshistorie (voor een eventuele doorgestreepte referentieprijs): loopt ook door zolang de aanbiedingen uit staan.
+    from kortingen.aanbiedingen import sync_history
+
+    sync_history()
 
 
 def ensure_catalog_on_migrate(sender, **kwargs):

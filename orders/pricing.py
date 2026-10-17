@@ -36,6 +36,18 @@ class QuoteLine:
     def total_display(self) -> str:
         return format_euro(self.total_cents)
 
+    @property
+    def is_discount(self) -> bool:
+        return self.code.startswith("korting:")
+
+    @property
+    def is_offer(self) -> bool:
+        return self.code.startswith("korting:aanbieding:")
+
+    @property
+    def is_code_discount(self) -> bool:
+        return self.is_discount and not self.is_offer
+
 
 @dataclass
 class Quote:
@@ -45,10 +57,18 @@ class Quote:
     max_gallery_photos: int = 0
     availability_months: int = 0
     selected_optional: list[str] = field(default_factory=list)
+    discount_cents: int = 0     # kortingscode (app kortingen): staat als negatieve regel in `lines`
+    discount_code: str = ""
+    offer: object = None        # kortingen.aanbiedingen.OfferResult: de automatische aanbieding die in `lines` staat (of None)
 
     @property
     def total_cents(self) -> int:
         return sum(line.total_cents for line in self.lines)
+
+    @property
+    def subtotal_cents(self) -> int:
+        """Het bedrag vóór korting."""
+        return self.total_cents + self.discount_cents
 
     @property
     def total_display(self) -> str:
@@ -57,6 +77,14 @@ class Quote:
     @property
     def required_addon_lines(self) -> list[QuoteLine]:
         return [line for line in self.lines if line.reason]
+
+    @property
+    def has_discount(self) -> bool:
+        return self.discount_cents > 0
+
+    @property
+    def has_code(self) -> bool:
+        return bool(self.discount_code)
 
 
 def optional_addons() -> list[AddOn]:
@@ -75,6 +103,9 @@ def build_tier_quote(content: dict, template_version, occasion: str) -> Quote:
     quote = Quote(package=package, features=set(package.features or []), max_gallery_photos=package.max_gallery_photos, availability_months=package.availability_months)
     naam = getattr(getattr(template_version, "template", template_version), "name", "")
     quote.lines.append(QuoteLine(code=f"tier:{package.code}:{info['rij']}", description=f"{package.name}: {naam} ({info['rij_label']})"[:200], unit_price_cents=package.price_cents))
+    from kortingen import aanbiedingen
+
+    aanbiedingen.apply_to_quote(quote, aanbiedingen.beste(template_version, occasion, soort))    # no-op zolang de vlag uit staat
     missing = required_features(content) - quote.features
     if missing:   # alleen eigen gezichten kunnen hier nog ontbreken
         raise PricingError(f"'{feature_label(sorted(missing)[0])}' is op dit moment niet beschikbaar. Zet dit onderdeel uit.")

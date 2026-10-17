@@ -11,6 +11,7 @@
 <form method="post" class="form checkout" data-once novalidate>
   {% csrf_token %}
   <input type="hidden" name="actie" value="herberekenen" data-checkout-action>
+  {% if quote %}<input type="hidden" name="verwacht" value="{{ quote.total_cents }}">{% endif %}
   {% if quote %}
   <input type="hidden" name="package" value="{{ quote.package.code }}">
   <section class="studio-block" aria-labelledby="pakket-titel">
@@ -86,9 +87,23 @@
     </div>
     {% endif %}
     <table class="bon__tabel">
-      <tbody>{% for line in quote.lines %}<tr><td>{{ line.description }}{% if line.reason %}<span class="bon__reden">{{ line.reason }}</span>{% endif %}</td><td class="num">{{ line.total_display }}</td></tr>{% endfor %}</tbody>
+      <tbody>{% for line in quote.lines %}<tr{% if line.is_discount %} class="bon__korting{% if line.is_offer %} bon__korting--aanbieding{% endif %}"{% endif %}><td>{{ line.description }}{% if line.reason %}<span class="bon__reden">{{ line.reason }}</span>{% endif %}{% if line.is_code_discount %} <button type="submit" class="link-plain small" name="actie" value="code-verwijderen" formnovalidate>Verwijderen<span class="visually-hidden"> (kortingscode)</span></button>{% endif %}</td><td class="num">{{ line.total_display }}</td></tr>{% endfor %}</tbody>
       <tfoot><tr><th>Totaal <span class="bon__btw">incl. btw</span></th><th class="num">{{ quote.total_display }}</th></tr></tfoot>
     </table>
+    {% if korting_aan %}
+    {% if korting_melding %}<p class="small muted korting__melding" role="status">{{ korting_melding }}</p>{% endif %}
+    {% if not quote.has_code %}
+    <details class="korting"{% if korting_open or korting_fout %} open{% endif %}>
+      <summary class="korting__vraag">Heb je een kortingscode?</summary>
+      <div class="korting__veld">
+        <label class="visually-hidden" for="kortingscode">Kortingscode</label>
+        <input class="input" id="kortingscode" name="kortingscode" type="text" value="{{ korting_invoer }}" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false"{% if korting_fout %} aria-invalid="true" aria-describedby="korting-fout"{% endif %}>
+        <button type="submit" class="btn btn--ghost btn--sm" name="actie" value="code-toepassen" formnovalidate>Toepassen</button>
+      </div>
+      {% if korting_fout %}<p class="field__error" id="korting-fout" role="alert">{{ korting_fout }}</p>{% endif %}
+    </details>
+    {% elif korting_fout %}<p class="field__error" role="alert">{{ korting_fout }}</p>{% endif %}
+    {% endif %}
     <p class="small muted">Je {% if wenskaart_vast %}wenskaart{% else %}uitnodiging{% endif %} blijft {{ quote.availability_months }} maanden online vanaf de aankoopdatum: de dag waarop je betaling is bevestigd.{% if looptijd %} Betaal je vandaag, dan staat hij online tot en met {{ looptijd.end|date:"j F Y" }}.{% endif %} Er is geen automatische verlenging.</p>
     {% if looptijd.before_event %}<p class="notice notice--warning"><strong>Let op</strong>Je evenement is op {{ looptijd.event|date:"j F Y" }}, na het einde van de online periode ({{ looptijd.end|date:"j F Y" }}). Je kunt later bestellen{% if not prijs_vast %}, of kiezen voor een langere looptijd{% endif %}.</p>{% endif %}
   </section>

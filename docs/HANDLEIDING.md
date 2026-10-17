@@ -77,6 +77,14 @@ Overzicht van klanten met hun uitnodigingen, bestellingen en aanvragen. **Anonim
   - een overzicht van welke koppelingen actief zijn en welke in testmodus staan.
 - **Contact**: berichten uit het contactformulier.
 
+## Kortingen: codes en automatische aanbiedingen
+
+Beheer → Kortingen heeft twee tabbladen. Automatische aanbiedingen (`VIERLIEF_AANBIEDINGEN=1`, standaard uit): zonder code, voor ontwerpen of de hele collectie, einddatum verplicht, "Nu stoppen" per direct. Zie `docs/AANBIEDINGEN.md`.
+
+### Kortingscodes
+
+Staan standaard uit (`VIERLIEF_KORTINGSCODES=1` zet ze aan). Beheer → Kortingscodes: aanmaken, uitzetten en per code zien wie hem gebruikte; bij een bestelling kun je een code, bijvoorbeeld na een terugbetaling, weer beschikbaar maken (met reden). Alle regels en de klantreis: `docs/KORTINGSCODES.md`.
+
 ## Teksten en beelden van de website
 
 Deze staan (nog) niet in Beheer, maar in de code. Na een wijziging: opnieuw publiceren op de server (`collectstatic` voor beelden).

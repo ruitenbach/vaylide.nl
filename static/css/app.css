@@ -460,6 +460,17 @@ html:has(body.studio-page) { scrollbar-gutter: stable; }
 .bon__tabel tfoot th { border-bottom: 0; padding-top: .8rem; font-size: 1.15rem; }
 .bon__reden { display: block; font-size: .82rem; color: var(--muted); font-weight: 400; }
 .bon__btw { font-size: .8rem; font-weight: 400; color: var(--muted); }
+/* Kortingscode: bewust bescheiden, een gewone tekstregel onder het overzicht, geen banner. */
+.korting { margin-top: .7rem; font-size: .93rem; }
+.korting__vraag { display: inline-block; cursor: pointer; color: var(--accent-text); text-decoration: underline; text-underline-offset: .15em; list-style: none; }
+.korting__vraag::-webkit-details-marker { display: none; }
+.korting__vraag:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
+.korting__veld { display: flex; gap: .6rem; align-items: center; margin-top: .6rem; max-width: 24rem; }
+.korting__veld .input { flex: 1 1 auto; min-width: 0; text-transform: uppercase; letter-spacing: .06em; }
+.korting__melding { margin: .6rem 0 0; }
+.bon__korting td { color: var(--ink-2); }
+.bon__korting--aanbieding td:first-child { font-style: normal; }
+.bon__korting .link-plain { display: inline; margin: 0 0 0 .4rem; }
 .betaal-hint { margin: .4rem 0 0; text-align: right; }
 
 /* ---------- Start: pakket en account ---------- */

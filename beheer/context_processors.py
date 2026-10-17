@@ -10,7 +10,11 @@ def nav_counts(request):
     from processing.models import Job
     from wishes.models import CustomRequest
 
+    from django.conf import settings
+
     return {
+        "korting_aan": settings.DISCOUNTS_ENABLED,
+        "aanbod_aan": settings.OFFERS_ENABLED,
         "nav_counts": {
             "wishes": CustomRequest.objects.filter(unread_by_staff=True).exclude(status=CustomRequest.Status.CLOSED).count(),
             "orders": Order.objects.filter(fulfilment_status=Order.Fulfilment.ATTENTION).count(),

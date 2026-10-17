@@ -10,6 +10,7 @@ from django.core.management.base import BaseCommand
 
 from catalog import prijzen
 from catalog.models import Template, format_euro
+from kortingen import aanbiedingen
 from orders.pricing import PricingError, build_quote
 
 
@@ -53,8 +54,13 @@ class Command(BaseCommand):
                             fouten.append(f"{t.slug} / {occasion} / {soort or 'uitnodiging'}: geen offerte ({exc})")
                             continue
                         gecontroleerd += 1
-                        if info is None or quote.total_cents != info["cents"] or len(quote.lines) != 1 or quote.total_display != info["display"]:
-                            fouten.append(f"{t.slug} / {occasion} / {soort or 'uitnodiging'}: getoond {info and info['display']} maar offerte {quote.total_display} ({len(quote.lines)} regels)")
+                        # Met een lopende aanbieding (alleen als VIERLIEF_AANBIEDINGEN aan staat) is de offerte de gewone prijs min één aanbiedingsregel,
+                        # en moet de getoonde actieprijs daar exact mee overeenkomen.
+                        weergave = aanbiedingen.prijs(t, occasion, soort)
+                        regels = 1 + (1 if quote.offer is not None else 0)
+                        if (info is None or weergave is None or quote.subtotal_cents != info["cents"] or len(quote.lines) != regels
+                                or quote.total_cents != weergave["nu_cents"] or quote.total_display != weergave["nu_display"]):
+                            fouten.append(f"{t.slug} / {occasion} / {soort or 'uitnodiging'}: getoond {weergave and weergave['nu_display']} maar offerte {quote.total_display} ({len(quote.lines)} regels)")
                         regel.append(f"{occasion}{'*' if soort else ''} {format_euro(quote.total_cents)}")
                 if opts["tabel"]:
                     out(f"{t.slug:20s} {prijzen.TIER_NAAM[indeling]:8s} " + " | ".join(regel))

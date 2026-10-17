@@ -129,6 +129,7 @@
         var delen = tekst.match(/^(\S+)\s+(.+)$/), tier = doel.querySelector(".detail-prijs__tier"), euro = doel.querySelector(".detail-prijs__euro");
         if (delen && tier && euro) { tier.textContent = delen[1]; euro.textContent = delen[2]; } else doel.textContent = tekst;
       });
+      document.querySelectorAll("[data-prijs-variant]").forEach(function (el) { el.hidden = el.getAttribute("data-prijs-variant") !== soort; });
       if (window.history && history.replaceState) history.replaceState(null, "", zetParam(window.location.href, "soort", soort));
     });
   });
