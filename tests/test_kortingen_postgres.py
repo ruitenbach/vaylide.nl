@@ -132,3 +132,35 @@ class Gelijktijdig(TransactionTestCase):
         self.assertEqual(red.state, DiscountRedemption.State.REDEEMED)
         self.assertEqual(Order.objects.get(pk=payment.order_id).status, Order.Status.PAID)
         self.assertEqual(k.active_redemptions(code), 1)
+
+
+@unittest.skipUnless(POSTGRES, "Alleen op PostgreSQL (zie de uitleg bovenaan dit bestand).")
+class TerugdraaiVeilig(VaylideTestCase):
+    """Oudere code (zonder de kortingsvelden) moet nog bestellingen kunnen aanmaken in een database met de kortingsmigraties.
+
+    De verplichte kolommen van orders_order die de kortingen toevoegen hebben daarom een standaardwaarde in de database zelf
+    (migratie orders/0006). Zonder die waarde geeft een INSERT van oudere code een NOT NULL-fout."""
+
+    def test_verplichte_kortingskolommen_hebben_databasestandaard(self):
+        with connection.cursor() as cur:
+            cur.execute(
+                "select column_name, column_default from information_schema.columns "
+                "where table_name = 'orders_order' and is_nullable = 'NO' and column_default is null "
+                "and column_name in ('discount_cents', 'discount_code_text', 'discount_offer_text')"
+            )
+            zonder = [r[0] for r in cur.fetchall()]
+        self.assertEqual(zonder, [])
+
+    def test_insert_zonder_kortingsvelden_slaagt(self):
+        klant = User.objects.create_user(email="terugdraai@example.test", password="x" * 12)
+        with connection.cursor() as cur:
+            cur.execute(
+                "insert into orders_order (uid, number, kind, invitation_title, package_code, package_name, features, "
+                "max_gallery_photos, availability_months, total_cents, currency, status, fulfilment_status, fulfilment_note, "
+                "test_mode, created_at, updated_at, customer_id, delivery_consent_text, terms_version, service_consent_text) "
+                "select gen_random_uuid(), 'OUD-1', 'invitation', '', '', '', '[]', 0, 0, 1995, 'EUR', 'pending', 'none', '', "
+                "true, now(), now(), %s, '', '', ''",
+                [klant.pk],
+            )
+        order = Order.objects.get(number="OUD-1")
+        self.assertEqual((order.discount_cents, order.discount_code_text, order.discount_offer_text), (0, "", ""))

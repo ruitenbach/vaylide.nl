@@ -56,3 +56,11 @@ Bronnen van het onderzoek: ACM (https://www.acm.nl/nl/publicaties/acm-wil-eerlij
 3. De volledige suite en `tests/test_kortingen_postgres.py` op de PostgreSQL-database van staging (een eigen testdatabase, nooit productie).
 4. `migrate` draaien en `manage.py sync_prijshistorie` controleren; schakelaars alleen op staging aanzetten.
 5. De juridische vragen (zie hierboven) beantwoorden vóór activering op productie.
+
+### Terugzetten van de code na de kortingsmigraties
+
+De kortingsmigraties (`kortingen` 0001 en 0002, `orders` 0004 tot en met 0006) voegen alleen toe. Code terugzetten verwijdert niets uit de database; de database terugzetten is een afzonderlijke handeling.
+
+- **Code terug** (zonder de migraties terug te draaien): oudere code kent de nieuwe kolommen niet. De verplichte kolommen van `orders_order` (`discount_cents`, `discount_code_text`, `discount_offer_text`) hebben daarom een standaardwaarde in de database zelf (migratie `orders/0006`, `db_default`). Zonder die waarde gaf elke nieuwe bestelling met oudere code een NOT NULL-fout. De overige nieuwe kolommen mogen leeg zijn en de nieuwe tabellen schrijft oudere code niet.
+- **Database terug:** `manage.py migrate orders 0003` en `manage.py migrate kortingen zero` (verwijdert de nieuwe kolommen en tabellen met de gegevens erin), of een herstel naar het tijdstip van vóór de uitrol.
+- Bewaakt door `tests/test_kortingen_postgres.py` (`TerugdraaiVeilig`).
