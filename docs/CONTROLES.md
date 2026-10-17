@@ -1288,3 +1288,11 @@ Lokaal uitgevoerd op `claude/rozenboog-op-kerstmagie`:
 
 - `manage.py test tests`: 1139 tests; dezelfde 3 als eerder (bedrijfsgegevens uit de omgeving, falen ook op de ongewijzigde staging) mislukken. Nieuw: `tests/test_verborgen_voorbeeld.py` (7 tests): anoniem, klant en gebruiker zonder `is_staff` krijgen een 404 op voorbeeld en agendabestand van Rozenboog en Kerstmagie; beheerders krijgen 200 met `Cache-Control: private, no-store`; beide blijven buiten de collectie, de ontwerppagina en de bestelroute (ook voor beheerders) en blijven niet actief; een actief ontwerp werkt voor iedereen als voorheen, zonder `no-store`.
 - Niet in een browser bekeken: het voorbeeld als ingelogde beheerder op staging.
+
+## Kortingscodes (17 oktober 2026, lokaal, niet gepusht)
+
+Uitgevoerd: `python manage.py test tests`, 1245 tests, geslaagd (waarvan 106 nieuw in `tests/test_kortingscodes.py`, elk onderdeel voor de oude pakketten én voor Basis/Luxe/Special). Gecontroleerd: berekening en afronding, ondergrens € 1,00 en geen 100%, alle foutmeldingen, bereik per gelegenheid/indeling/ontwerp, reserveren/definitief/vrijgeven bij betaald, mislukt, verlopen, afgebroken en vervangen, de laatste plek, per klant (ook plusje en Gmail-puntjes), terugbetaling en handmatig vrijgeven met reden, bedrag in Mollie-verzoek gelijk aan bestelling, mail en bon, historische bestelling ongewijzigd, schakelaar uit = geen veld/geen Beheeronderdeel/code geweigerd. Daarnaast: `makemigrations --check` zonder wijzigingen, en de migratie `orders.0004` uitgevoerd op een SQLite-database met een bestaande bestelling (die bleef ongewijzigd).
+
+Visueel (lokale testserver in testmodus, Chromium, `VIERLIEF_KORTINGSCODES=1`, `VIERLIEF_PRICING_V2=1`): de bestelstap dicht, met een foutmelding en met een toegepaste code bekeken op 390 en 1366 px (screenshots bekeken), en op 360 en 768 px alleen gemeten op horizontaal scrollen (geen). Daarna is een kleine stijlaanpassing gedaan (Verwijderen op dezelfde regel) die niet opnieuw is bekeken.
+
+**Niet uitgevoerd:** PostgreSQL (alleen SQLite, dus geen echte gelijktijdigheid), een echte of testbetaling bij Mollie, de toegankelijkheidscontrole (`e2e/toegankelijkheid.cjs`) en een controle met schermlezer of op echte apparaten.
