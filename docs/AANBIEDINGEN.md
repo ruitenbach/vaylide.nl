@@ -48,3 +48,11 @@ Bronnen van het onderzoek: ACM (https://www.acm.nl/nl/publicaties/acm-wil-eerlij
 ## Waar zit wat
 
 `kortingen/models.py` (`Offer`, `PriceStand`), `kortingen/aanbiedingen.py` (bereik, beste aanbieding, referentie, offerte, weergave), `kortingen/services.py` (`toepassen`: voordeligste van code en aanbieding), `kortingen/forms.py` (`OfferForm`), Beheer `beheer/views.py` (`offers`, `offer_edit`, `offer_stop`), kaart `templates/partials/design_card.html`, ontwerppagina `core/templates/core/design_detail.html`, Studio `studio/views.py` (`_prijzen_per_ontwerp`, `_korting_stap`, `_verwacht`). Tests: `tests/test_aanbiedingen.py`. `manage.py controleer_prijzen` controleert ook actieprijs = offerte.
+
+## Voor een veilige stagingtest
+
+1. Eerst `bbaa615` (of de actuele opvolger) in de branch mergen op een testbranch en de volledige suite draaien (de proefmerge was conflictvrij).
+2. Een echte Mollie-**testsleutel** (`test_...`) via de omgeving en `e2e/mollie_kortingen.py` draaien (code, aanbieding, beide); dit is nog niet gedaan.
+3. De volledige suite en `tests/test_kortingen_postgres.py` op de PostgreSQL-database van staging (een eigen testdatabase, nooit productie).
+4. `migrate` draaien en `manage.py sync_prijshistorie` controleren; schakelaars alleen op staging aanzetten.
+5. De juridische vragen (zie hierboven) beantwoorden vóór activering op productie.

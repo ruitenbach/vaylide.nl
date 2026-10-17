@@ -151,7 +151,7 @@ def _prijzen_per_ontwerp(templates, occasion: str, soort: str = "") -> dict:
         res = info.get("aanbieding")
         if res:
             oud = format_html(' <s class="prijs-oud"><span class="visually-hidden">Was </span>{}</s>', res.reference_display) if res.reference_cents else ""
-            uit[t.slug] = format_html('{}{} {} <span class="prijs-aanbieding">Aanbieding</span>', info["naam"], oud, info["nu_display"])
+            uit[t.slug] = format_html('{}{} <span class="prijs-nu">{}</span> <span class="prijs-aanbieding">Aanbieding</span>', info["naam"], oud, info["nu_display"])
         else:
             uit[t.slug] = info["label"]
     return uit

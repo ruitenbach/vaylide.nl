@@ -450,7 +450,9 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
 .aanbod-chip { display: inline-flex; align-items: center; gap: .3rem; padding: .12rem .55rem .12rem .4rem; border: 1px solid color-mix(in srgb, var(--accent-text) 45%, transparent); border-radius: 999px; font-size: .74rem; font-weight: 600; letter-spacing: .04em; color: var(--accent-text); line-height: 1.4; white-space: nowrap; }
 .aanbod-chip .icon { flex: none; }
 .prijs-oud { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; font-weight: 400; }
-.design-card__aanbod { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .6rem; margin-top: .35rem; }
+.design-card__aanbod { display: block; text-align: inherit; margin-top: .4rem; }
+.design-card__aanbod .aanbod-chip { margin: 0 .5rem .2rem 0; vertical-align: middle; }
+.design-card__aanbod .design-card__prijs { display: inline-block; margin-bottom: .2rem; vertical-align: middle; }
 .design-card__prijs { font-size: .92rem; font-weight: 600; color: var(--ink); }
 .design-card__prijs .prijs-oud { font-size: .84rem; margin-right: .15rem; }
 .detail-prijs--aanbieding { align-items: center; }
@@ -458,7 +460,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
 .detail-prijs--aanbieding .detail-prijs__bedrag { gap: .55rem; }
 .detail-prijs__einde { flex-basis: 100%; }
 .prijs-aanbieding { display: block; font-size: .72rem; font-weight: 600; letter-spacing: .04em; color: var(--accent-text); }
-.kaart-keuze__prijs .prijs-oud { white-space: nowrap; }
+.kaart-keuze__prijs .prijs-oud, .kaart-keuze__prijs .prijs-nu { white-space: nowrap; }
 @media (max-width: 560px) {
   .grid--trio .design-card__visual { border-radius: var(--radius); margin-bottom: .6rem; }
   .grid--trio .design-card__name { font-size: .86rem; line-height: 1.3; }
