@@ -24,6 +24,24 @@
       </dl>
       <table class="table-simple"><tbody>{% for l in order.lines.all %}<tr><td>{{ l.description }}</td><td class="num">{{ l.total_display }}</td></tr>{% endfor %}</tbody><tfoot><tr><th>Totaal</th><th class="num">{{ order.total_display }}</th></tr></tfoot></table>
     </section>
+    {% if order.discount_cents %}
+    <section class="panel">
+      <h2>Kortingscode</h2>
+      <dl class="kv">
+        <dt>Code</dt><dd>{% if order.discount_code %}<a href="{% url 'beheer:discount_edit' order.discount_code.pk %}">{{ order.discount_code_text }}</a>{% else %}{{ order.discount_code_text }}{% endif %}</dd>
+        <dt>Bedrag voor korting</dt><dd>{{ order.subtotal_cents|euro }}</dd>
+        <dt>Korting</dt><dd>&minus; {{ order.discount_cents|euro }}</dd>
+        <dt>Betaald bedrag</dt><dd>{{ order.total_display }}</dd>
+        {% if btw %}<dt>Waarvan btw ({{ btw.tarief }}%)</dt><dd>{{ btw.na|euro }} <span class="small muted">(zonder korting {{ btw.voor|euro }})</span></dd>{% endif %}
+        {% if redemption %}<dt>Gebruik</dt><dd>{{ redemption.get_state_display }}{% if redemption.released_reason %}: {{ redemption.released_reason }}{% if redemption.released_by %} ({{ redemption.released_by.email }}){% endif %}{% endif %}</dd>
+        {% if redemption.note %}<dt>Let op</dt><dd>{{ redemption.note }}</dd>{% endif %}{% endif %}
+      </dl>
+      {% if order.status == "refunded" %}<p class="small muted">Bij een terugbetaling blijft de code als gebruikt meetellen. Hieronder maak je hem, als je dat wilt, weer beschikbaar.</p>{% endif %}
+      {% if redemption and redemption.state != "released" %}
+      <form method="post" class="form-inline" data-confirm="Kortingscode weer beschikbaar maken?">{% csrf_token %}<input type="hidden" name="actie" value="kortingscode-vrijgeven"><label class="field"><span class="label">Reden (verplicht)</span><input class="input" type="text" name="reden" maxlength="200" required></label><button class="btn btn--ghost btn--sm" type="submit">Weer beschikbaar maken</button></form>
+      {% endif %}
+    </section>
+    {% endif %}
     <section class="panel">
       <h2>Betalingen</h2>
       {% if payments %}<div class="data-table-wrap"><table class="data-table data-table--cards"><thead><tr><th>Provider</th><th>Referentie</th><th>Status</th><th>Methode</th><th>Aangemaakt</th><th class="num">Bedrag</th></tr></thead><tbody>

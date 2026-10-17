@@ -39,6 +39,8 @@ from invitations.services import (
     save_draft,
 )
 from invitations.views import serve_asset
+from kortingen import services as kortingen
+from kortingen.models import normalize_code
 from orders.pricing import PricingError, compare_packages, optional_addons, recommended
 from orders.services import CheckoutError, invitation_is_paid, start_checkout
 
@@ -886,6 +888,65 @@ def _prijs_bijgewerkt(inv: Invitation, quote) -> dict | None:
     return {"eerder": eerder, "nu": quote.total_display, "naam": quote.package.name}
 
 
+KORTING_SESSIE = "vierlief_korting"    # per concept de code die de klant invoerde; alleen een voorstel, bij het bestellen volgt altijd een nieuwe controle
+
+
+def _korting_stap(request, inv: Invitation, quote, customer) -> dict:
+    """De kortingscode in de bestelstap (alleen met settings.DISCOUNTS_ENABLED). Bewaart de code in de sessie, controleert hem opnieuw bij elke
+    weergave en zet de korting als negatieve regel in de offerte. De browser bepaalt nooit een bedrag."""
+    ctx = {"korting_aan": kortingen.enabled(), "korting_invoer": "", "korting_fout": "", "korting_melding": "", "korting_open": False,
+           "korting_code": "", "korting_blokkeer": False, "korting_vervallen": False}
+    if not ctx["korting_aan"] or quote is None:
+        return ctx
+    posted = request.method == "POST"
+    if not posted:
+        ctx["korting_invoer"] = (request.GET.get("code") or "")[:40]
+        ctx["korting_open"] = bool(ctx["korting_invoer"])
+    store = dict(request.session.get(KORTING_SESSIE) or {})
+    key = str(inv.uid)
+    code = store.get(key, "")
+    actie = request.POST.get("actie", "") if posted else ""
+    typed = (request.POST.get("kortingscode") or "").strip()[:40] if posted else ""
+
+    def toets(waarde):
+        return kortingen.evaluate(waarde, subtotal_cents=quote.total_cents, template_version=inv.template_version, occasion=inv.occasion, customer=customer)
+
+    if actie == "code-verwijderen":
+        store.pop(key, None)
+        code = ""
+    elif typed and normalize_code(typed) != normalize_code(code):
+        if not rate_limit(f"kortingscode:{ip_fingerprint(request)}", 10, 900):
+            ctx.update(korting_fout="Je hebt even te vaak geprobeerd. Wacht een paar minuten en probeer het opnieuw.", korting_invoer=typed, korting_open=True)
+        else:
+            try:
+                result = toets(typed)
+            except kortingen.DiscountError as exc:
+                ctx.update(korting_fout=exc.message, korting_invoer=typed, korting_open=True)
+            else:
+                store[key] = code = result.code.code
+                if actie == "betalen":    # nieuw ingetikt maar nog niet toegepast: eerst het nieuwe bedrag laten zien, niet meteen betalen
+                    ctx["korting_blokkeer"] = True
+    elif posted and actie == "code-toepassen" and not typed:
+        ctx.update(korting_fout="Vul een kortingscode in.", korting_open=True)
+    if code:
+        try:
+            result = toets(code)
+        except kortingen.DiscountError as exc:
+            store.pop(key, None)
+            code = ""
+            ctx.update(korting_fout=ctx["korting_fout"] or exc.message, korting_open=True)
+            if actie == "betalen":    # de code is sinds het toepassen vervallen: nooit stilletjes tegen de volle prijs afrekenen
+                ctx["korting_blokkeer"] = True
+                ctx["korting_vervallen"] = True
+        else:
+            kortingen.apply_to_quote(quote, result)
+            ctx["korting_melding"] = result.note
+            ctx["korting_code"] = result.code.code
+    if store != (request.session.get(KORTING_SESSIE) or {}):
+        request.session[KORTING_SESSIE] = store
+    return ctx
+
+
 def checkout_step(request, inv: Invitation):
     if invitation_is_paid(inv):
         return redirect("portal:invitation", uid=inv.uid)
@@ -930,6 +991,7 @@ def checkout_step(request, inv: Invitation):
             upgrade["diff_display"] = format_euro(abs(upgrade["diff_cents"]))
         smaller = [q for q in quotes if q.package.price_cents < quote.package.price_cents]
         downgrade = max(smaller, key=lambda q: q.package.price_cents) if smaller else None
+    korting = _korting_stap(request, inv, quote, request.user if owner_here and not request.user.is_staff else None)
     form = CheckoutForm(request.POST or None, packages=[q.package for q in quotes] if vast else packages, optional=optional,
                         initial={"package": chosen, "extras": selected_extras})
     error = ""
@@ -938,6 +1000,9 @@ def checkout_step(request, inv: Invitation):
             error = "Bevestig eerst je e-mailadres om te kunnen bestellen."
         elif issues:
             error = "Je kaart is nog niet klaar om te bestellen. Bekijk de punten hieronder."
+        elif korting["korting_blokkeer"]:
+            korting["korting_melding"] = ("Het bedrag is aangepast, omdat de kortingscode niet meer geldt. " if korting["korting_vervallen"] else "Je kortingscode is toegepast. ") + \
+                "Controleer het bedrag en kies dan nog een keer Bestellen en betalen."
         elif form.is_valid():
             if form.cleaned_data.get("nieuwsbrief"):
                 from accounts.newsletter import subscribe
@@ -946,7 +1011,7 @@ def checkout_step(request, inv: Invitation):
             try:
                 payment = start_checkout(inv, user=request.user, package_code=form.cleaned_data["package"],
                                          optional_codes=form.cleaned_data.get("extras") or [], terms_accepted=True,
-                                         delivery_consent=True, service_consent=True)
+                                         delivery_consent=True, service_consent=True, discount_code=korting["korting_code"])
             except (CheckoutError, PricingError) as exc:
                 error = str(exc)
             else:
@@ -958,7 +1023,7 @@ def checkout_step(request, inv: Invitation):
                  selected_extras=selected_extras, issues=issues, error=error, kaart=kaart, test_payments=settings.PAYMENT_PROVIDER == "test",
                  upgrade=upgrade, downgrade=downgrade, nieuwsbrief_tekst=_newsletter_text(),
                  voorwaarden=_terms_info(), **_consent_texts(), looptijd=_availability_hint({**content, "date": ""} if wens else content, quote), losse_extras=pakket.extras_for(quote.package, quote) if quote and not vast else [],
-                 prijs_vast=vast, prijs_bijgewerkt=_prijs_bijgewerkt(inv, quote),
+                 prijs_vast=vast, prijs_bijgewerkt=_prijs_bijgewerkt(inv, quote), **korting,
                  looptijd_uitleg=pakket.looptijd_uitleg(packages, wenskaart_pakket=quote.package if vast and quote else None),
                  rsvp_aan=bool((content.get("sections") or {}).get("rsvp")),
                  login_url=f"{reverse('accounts:login')}?doel=bewaren&next={reverse('studio:step', args=[inv.uid, 'bestellen'])}"),

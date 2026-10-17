@@ -1,0 +1,21 @@
+{% extends "beheer/base.html" %}{% load vl %}
+{% block title %}Kortingscodes{% endblock %}
+{% block content %}
+<div class="app-head"><div><p class="eyebrow">Beheer</p><h1>Kortingscodes</h1></div><div class="btn-row"><a class="btn btn--secondary btn--sm" href="{% url 'beheer:discount_new' %}">Nieuwe code</a></div></div>
+<p class="notice">Een code verlaagt alleen het bedrag van een nieuwe bestelling. De prijzen zelf, en bestaande bestellingen, veranderen niet. Het te betalen bedrag blijft minimaal {{ min_total|euro }}. Codes stapelen niet.</p>
+<section class="panel">
+  {% if rows %}
+  <div class="data-table-wrap"><table class="data-table data-table--cards">
+    <thead><tr><th>Code</th><th>Korting</th><th>Periode</th><th class="num">Gebruikt</th><th>Bereik</th><th>Status</th></tr></thead>
+    <tbody>{% for c, status, used in rows %}<tr>
+      <td data-label="Code"><a href="{% url 'beheer:discount_edit' c.pk %}"><strong>{{ c.code }}</strong></a>{% if c.note %}<br><span class="small muted">{{ c.note }}</span>{% endif %}</td>
+      <td data-label="Korting">{{ c.value_display }}</td>
+      <td data-label="Periode">{% if c.starts_at or c.ends_at %}{{ c.starts_at|date:"j-n-Y"|default:"…" }} t/m {{ c.ends_at|date:"j-n-Y"|default:"…" }}{% else %}altijd{% endif %}</td>
+      <td data-label="Gebruikt" class="num">{{ used }}{% if c.max_redemptions %} / {{ c.max_redemptions }}{% endif %}</td>
+      <td data-label="Bereik">{% if c.occasions or c.tiers %}{% for o in c.occasions %}{{ o }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if c.occasions and c.tiers %} · {% endif %}{{ c.tiers|join:", " }}{% else %}hele collectie{% endif %}</td>
+      <td data-label="Status"><span class="badge badge--{% if status == 'actief' %}live{% elif status == 'gepland' %}draft{% elif status == 'verlopen' %}expired{% elif status == 'opgebruikt' %}warning{% else %}cancelled{% endif %}">{{ status }}</span></td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="muted">Nog geen kortingscodes.</p>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "beheer/base.html" %}{% load vl %}
+{% block title %}{% if code %}Kortingscode {{ code.code }}{% else %}Nieuwe kortingscode{% endif %}{% endblock %}
+{% block content %}
+<div class="app-head"><div><p class="eyebrow"><a href="{% url 'beheer:discounts' %}">Kortingscodes</a></p><h1>{% if code %}{{ code.code }}{% else %}Nieuwe kortingscode{% endif %}</h1></div>{% if code %}<span class="badge badge--{% if code.status == 'actief' %}live{% elif code.status == 'gepland' %}draft{% elif code.status == 'verlopen' %}expired{% elif code.status == 'opgebruikt' %}warning{% else %}cancelled{% endif %}">{{ code.status }}</span>{% endif %}</div>
+{% if form.used %}<p class="notice notice--warning"><strong>Deze code is al gebruikt</strong>De korting en het bereik zijn vergrendeld, zodat de geschiedenis klopt. Je kunt de code uitzetten, de periode en het maximum aanpassen. Voor een andere korting maak je een nieuwe code.</p>{% endif %}
+<form method="post" class="panel form container--narrow" data-once novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors.0 }}</div>{% endif %}
+  {% for field in form %}
+  <div class="field">
+    {% if field.field.widget.input_type == "checkbox" %}<label class="check">{{ field }}<span>{{ field.label }}</span></label>
+    {% elif field.name == "occasions" or field.name == "tiers" or field.name == "templates" %}<fieldset><legend class="label">{{ field.label }}</legend>{% if field.help_text %}<p class="hint">{{ field.help_text }}</p>{% endif %}<div class="section-toggles">{% for c in field %}<label class="check section-toggle">{{ c.tag }}<span>{{ c.choice_label }}</span></label>{% endfor %}</div></fieldset>
+    {% else %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{% if field.help_text %}<p class="hint">{{ field.help_text }}</p>{% endif %}{{ field }}{% endif %}
+    {% for e in field.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+  </div>
+  {% endfor %}
+  <div class="btn-row"><button class="btn btn--primary" type="submit">Opslaan</button><a class="btn btn--ghost" href="{% url 'beheer:discounts' %}">Annuleren</a></div>
+</form>
+{% if code %}
+<section class="panel">
+  <h2>Gebruik</h2>
+  {% if redemptions %}
+  <div class="data-table-wrap"><table class="data-table data-table--cards">
+    <thead><tr><th>Bestelling</th><th>Klant</th><th>Status</th><th class="num">Korting</th><th>Datum</th></tr></thead>
+    <tbody>{% for r in redemptions %}<tr>
+      <td data-label="Bestelling"><a href="{% url 'beheer:order' r.order.uid %}">{{ r.order.number }}</a></td>
+      <td data-label="Klant">{{ r.customer.email }}</td>
+      <td data-label="Status">{{ r.get_state_display }}{% if r.released_reason %}<br><span class="small muted">{{ r.released_reason }}{% if r.released_by %} ({{ r.released_by.email }}){% endif %}</span>{% endif %}{% if r.note %}<br><span class="small muted">{{ r.note }}</span>{% endif %}</td>
+      <td data-label="Korting" class="num">{{ r.amount_cents|euro }}</td>
+      <td data-label="Datum">{{ r.created_at|date:"j-n-Y H:i" }}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="muted small">Nog niet gebruikt.</p>{% endif %}
+</section>
+{% endif %}
+{% endblock %}
