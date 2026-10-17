@@ -71,7 +71,7 @@ class IndelingEnTabel(VaylideTestCase):
         slugs = set(Template.objects.values_list("slug", flat=True))
         self.assertEqual(set(prijzen.INDELING), slugs, "elk ontwerp in de catalogus heeft precies één indeling (en niets anders)")
         tellers = {t: sum(1 for i in prijzen.INDELING.values() if i == t) for t in prijzen.TIERS}
-        self.assertEqual(tellers, {BASIS: 32, LUXE: 16, SPECIAL: 10})
+        self.assertEqual(tellers, {BASIS: 32, LUXE: 21, SPECIAL: 10})
 
     def test_elke_special_vlag_is_een_special_of_bewust_luxe(self):
         vlag = {t.slug for t in Template.objects.filter(special=True)}

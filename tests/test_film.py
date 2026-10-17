@@ -132,8 +132,10 @@ class FilmDesignsTests(TestCase):
                 with Image.open(folder / data["film"][key]) as image:
                     self.assertEqual(image.size, (720, 1280), (data["slug"], key))
             for key in ("src", "webm"):
+                if key not in data["film"]:      # de WebM-reserve is optioneel (de vijf filmkaarten van docs/INTROKAARTEN.md hebben alleen een MP4)
+                    continue
                 self.assertLess((folder / data["film"][key]).stat().st_size, 3 * 1024 * 1024, (data["slug"], key))
-        self.assertEqual(found, ["rozenboog"])
+        self.assertEqual(found, ["bloesemmeer", "bloesemwaaier", "gouden-poort", "kerstsprookje", "rozenboog", "zijden-gordijn"])
 
 
 class RozenboogTests(VisibleDesignTestCase):

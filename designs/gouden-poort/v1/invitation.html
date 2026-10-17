@@ -1,0 +1,184 @@
+{% extends "invitations/base_invitation.html" %}{% load static %}
+{# Gouden poort v1 — Gouden deuren met een fijn sterpatroon. De opening is een film (blok "film" in manifest.json). De film eindigt op het laatste beeld;
+   de kop hieronder toont precies dat beeld (end.webp), met de namen in de lucht; datum, tijd en plek staan vrij in het licht op een sluier die de film
+   laat overgaan in de uitnodiging. Tussen de onderdelen staan uitsneden uit de film (cut-*.webp, gal-*.webp).
+   Gegenereerd uit het gedeelde sjabloon in tools/introkaarten (zelfde opbouw als Rozenboog). Wijzig een uitgebrachte versie niet: maak een v2. #}
+{% block preload %}<link rel="preload" href="{% static 'fonts/gilda-display-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+{% if v.opening_enabled %}<link rel="preload" href="{% static v.film.poster %}" as="image">{% endif %}
+<link rel="preload" href="{% static v.film.end %}" as="image">{% endblock %}
+
+{% block cover %}
+<section class="cover fk-cover" data-cover data-duration="22000" data-film-fade="1000" aria-label="Openingsscherm">
+  <div class="fk-frame fk-frame--cover" data-film-frame>
+    {# preload="none": invite.js zet het laden aan als de film mag spelen; bij 'minder beweging' en in het kleine voorbeeld wordt niets opgehaald. #}
+    <video class="fk-film" data-cover-film muted playsinline preload="none" disablepictureinpicture disableremoteplayback
+           poster="{% static v.film.poster %}" aria-hidden="true" tabindex="-1">
+      {# Met het exacte codecprofiel: een browser die het niet kan afspelen, slaat de bron over zonder hem te downloaden. #}
+      <source src="{% static v.film.src %}" type='video/mp4; codecs="avc1.64001F"'>
+      {% if v.film.webm %}<source src="{% static v.film.webm %}" type='video/webm; codecs="vp9"'>{% endif %}
+    </video>
+    <div class="fk-label">
+      <p class="fk-label__to">{% if v.card_kind == "wenskaart" %}Een wenskaart voor {% else %}Een uitnodiging voor {% endif %}{% if v.formal %}u{% else %}jou{% endif %}</p>
+      <p class="fk-label__names fk-label__names--{{ v.names_size }}">{{ v.title }}</p>
+      <svg class="fk-label__rule" viewBox="0 0 160 16" aria-hidden="true" focusable="false"><path d="M4 8h58M98 8h58" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><path d="M80 2c4 3 4 9 0 12-4-3-4-9 0-12Zm-9 6c3-3 7-3 9 0-2 3-6 3-9 0Zm18 0c-3-3-7-3-9 0 2 3 6 3 9 0Z" fill="currentColor"/></svg>
+      <a href="#uitnodiging" class="fk-open fx-pulse" data-open data-fx-origin>Open de uitnodiging</a>
+      {% if v.show.music %}<button type="button" class="fk-open-music" data-open data-open-music>Openen met muziek</button>{% endif %}
+    </div>
+  </div>
+  <button type="button" class="fk-skip" data-cover-skip hidden>Overslaan</button>
+</section>
+{% endblock %}
+
+{% block content %}
+<header class="fk-hero">
+  <div class="fk-frame fk-frame--hero" data-film-target style="background-image: url('{% static v.film.end %}')">
+    <div class="fk-sky{% if v.title|length > 40 or v.kicker|length > 34 %} fk-sky--dense{% endif %}">
+      <p class="fk-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
+      <h1 class="fk-names fk-names--{{ v.names_size }} fx-names" data-fx-reveal-origin>
+        {% if v.is_couple %}<span class="fk-names__one">{{ v.names.0 }}</span><span class="fk-names__amp" aria-label="en">&amp;</span><span class="fk-names__two">{{ v.names.1 }}</span>
+        {% else %}<span class="fk-names__one">{{ v.names.0 }}</span>{% endif %}
+      </h1>
+    </div>
+    {% if v.date or v.time_display or v.venue %}
+    <div class="fk-card{% if v.venue|length > 48 %} fk-card--dense{% endif %}">
+      <svg class="fk-card__sprig" viewBox="0 0 240 48" aria-hidden="true" focusable="false" data-fx-draw><path d="M8 24H100M140 24H232" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M120 12L132 24L120 36L108 24Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="120" cy="24" r="2.6" fill="currentColor"/></svg>
+      {% if v.date %}
+      <p class="fk-date fx-intro" style="--fx-d:5">
+        <span class="fk-date__weekday">{{ v.weekday }}</span>
+        <span class="fk-date__day">{{ v.day }}</span>
+        <span class="fk-date__month">{{ v.month_name }} {{ v.year }}</span>
+      </p>
+      {% endif %}
+      {% if v.time_display or v.venue %}<p class="fk-meta fx-intro" style="--fx-d:6">{% if v.time_display %}<span class="fk-meta__time">{{ v.time_display }}</span>{% endif %}{% if v.venue %}<span class="fk-meta__venue">{{ v.venue }}</span>{% endif %}{% include "invitations/partials/time_note.html" %}</p>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</header>
+
+<div class="fk-body">
+<section class="fk-sheet fk-welcome" data-reveal aria-label="Welkom">
+  <svg class="fk-welcome__sprig" viewBox="0 0 240 48" aria-hidden="true" focusable="false" data-fx-draw><path d="M8 24H100M140 24H232" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M120 12L132 24L120 36L108 24Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="120" cy="24" r="2.6" fill="currentColor"/></svg>
+  <p class="fk-welcome__tagline">{{ v.tagline|capfirst }}</p>
+  {% for p in v.welcome %}<p>{{ p|linebreaksbr }}</p>{% endfor %}
+</section>
+
+<figure class="fk-cut fk-cut--a" data-reveal aria-hidden="true"><img src="{% static 'designs/gouden-poort/v1/cut-a.webp' %}" alt="" width="640" height="380" loading="lazy" decoding="async"></figure>
+
+{% if v.hero and not v.is_demo %}
+<figure class="fk-portrait" data-reveal><div class="ph fk-portrait__img fx-kb">{% include "invitations/partials/photo.html" with photo=v.hero sizes="(min-width: 700px) 440px, 84vw" %}</div></figure>
+{% endif %}
+
+{% if v.show.countdown %}
+<section class="fk-sheet fk-countdown" data-reveal aria-labelledby="fk-cd-title">
+  <h2 id="fk-cd-title" class="fk-h2">{% if v.is_past %}Dank je wel{% else %}Nog even geduld{% endif %}</h2>
+  {% include "invitations/partials/countdown.html" %}
+  {% include "invitations/partials/calendar_buttons.html" %}
+</section>
+{% endif %}
+
+<figure class="fk-cut fk-cut--b" data-reveal aria-hidden="true"><img src="{% static 'designs/gouden-poort/v1/cut-b.webp' %}" alt="" width="640" height="400" loading="lazy" decoding="async"></figure>
+
+{% if v.show.story %}
+<section class="fk-sheet fk-story" data-reveal aria-labelledby="fk-story-title">
+  <h2 id="fk-story-title" class="fk-h2">{{ v.story_title }}</h2>
+  <div class="fk-story__text">{% for p in v.story %}<p>{{ p|linebreaksbr }}</p>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if v.show.program %}
+<section class="fk-sheet fk-program" data-reveal aria-labelledby="fk-program-title">
+  <h2 id="fk-program-title" class="fk-h2">Programma</h2>
+  <ol class="fk-timeline">
+    {% for item in v.program %}
+    <li class="fk-timeline__item">
+      {% if item.time %}<span class="fk-timeline__time">{{ item.time }}</span>{% endif %}
+      <div class="fk-timeline__body">
+        <h3 class="fk-timeline__title">{{ item.title }}</h3>
+        {% if item.description %}<p>{{ item.description }}</p>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+<figure class="fk-cut fk-cut--c" data-reveal aria-hidden="true"><img src="{% static 'designs/gouden-poort/v1/cut-c.webp' %}" alt="" width="460" height="500" loading="lazy" decoding="async"></figure>
+
+{% if v.show.location %}
+<section class="fk-sheet fk-location" data-reveal aria-labelledby="fk-location-title">
+  <h2 id="fk-location-title" class="fk-h2">Locatie</h2>
+  {% if v.venue %}<p class="fk-location__venue">{{ v.venue }}</p>{% endif %}
+  {% if v.address_lines %}<address class="fk-location__address">{% for line in v.address_lines %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</address>{% endif %}
+  {% if v.date_display %}<p class="fk-location__when">{{ v.date_display|capfirst }}{% if v.time_display %}, {{ v.time_display }}{% endif %}</p>{% endif %}
+  {% if v.route_url %}<a class="inv-btn inv-btn--primary" href="{{ v.route_url }}" target="_blank" rel="noopener">Route plannen</a>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.dresscode %}
+<section class="fk-sheet fk-dresscode" data-reveal aria-labelledby="fk-dress-title">
+  <h2 id="fk-dress-title" class="fk-h2">Dresscode</h2>
+  {% for p in v.dresscode_text %}<p>{{ p|linebreaksbr }}</p>{% endfor %}
+  {% if v.dresscode_colors %}<ul class="fk-swatches" aria-label="Kleuren voor de dresscode">
+    {% for c in v.dresscode_colors %}<li class="fk-swatch" style="background:{{ c }}"><span class="visually-hidden">Kleur {{ c }}</span></li>{% endfor %}
+  </ul>{% endif %}
+</section>
+{% endif %}
+
+{% if v.show.practical %}
+<section class="fk-sheet fk-practical" data-reveal aria-labelledby="fk-practical-title">
+  <h2 id="fk-practical-title" class="fk-h2">Goed om te weten</h2>
+  <dl class="fk-practical__list">
+    {% for item in v.practical %}<div class="fk-practical__item">{% if item.title %}<dt>{{ item.title }}</dt>{% endif %}<dd>{{ item.text|linebreaksbr }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+<figure class="fk-cut fk-cut-d" data-reveal aria-hidden="true"><img src="{% static 'designs/gouden-poort/v1/cut-d.webp' %}" alt="" width="520" height="190" loading="lazy" decoding="async"></figure>
+
+{% if v.show.gallery %}
+<section class="fk-sheet fk-gallery" data-reveal aria-labelledby="fk-gallery-title">
+  <h2 id="fk-gallery-title" class="fk-h2">Momenten</h2>
+  {% if v.is_demo %}
+  <ul class="fk-gallery__grid fk-gallery__grid--stills" aria-label="Voorbeeldbeelden uit de film">
+    <li class="fk-gallery__item fk-gallery__item--still"><figure class="ph"><img src="{% static 'designs/gouden-poort/v1/gal-1.webp' %}" alt="" loading="lazy" decoding="async"></figure></li>
+    <li class="fk-gallery__item fk-gallery__item--still"><figure class="ph"><img src="{% static 'designs/gouden-poort/v1/gal-2.webp' %}" alt="" loading="lazy" decoding="async"></figure></li>
+    <li class="fk-gallery__item fk-gallery__item--still"><figure class="ph"><img src="{% static 'designs/gouden-poort/v1/gal-3.webp' %}" alt="" loading="lazy" decoding="async"></figure></li>
+    <li class="fk-gallery__item fk-gallery__item--still"><figure class="ph"><img src="{% static 'designs/gouden-poort/v1/gal-4.webp' %}" alt="" loading="lazy" decoding="async"></figure></li>
+  </ul>
+  {% else %}
+  <ul class="fk-gallery__grid">
+    {% for photo in v.gallery %}<li class="fk-gallery__item fk-gallery__item--{{ photo.orientation }}"><figure class="ph">{% include "invitations/partials/photo.html" with photo=photo sizes="(min-width: 900px) 280px, 42vw" %}{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure></li>{% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if v.show.rsvp %}
+<section class="fk-sheet fk-rsvp" id="aanmelden" data-reveal aria-labelledby="fk-rsvp-title">
+  <h2 id="fk-rsvp-title" class="fk-h2">{% if v.formal %}Komt u ook?{% else %}Kom je ook?{% endif %}</h2>
+  {% include "invitations/partials/rsvp.html" %}
+</section>
+{% endif %}
+
+{% if v.show.contact %}
+<section class="fk-sheet fk-contact" data-reveal aria-labelledby="fk-contact-title">
+  <h2 id="fk-contact-title" class="fk-h2">Vragen?</h2>
+  {% if v.contact.note %}<p>{{ v.contact.note }}</p>{% endif %}
+  <p class="fk-contact__name">{{ v.contact.name }}</p>
+  <p class="fk-contact__links">
+    {% if v.contact.tel %}<a class="inv-link" href="tel:{{ v.contact.tel }}">{{ v.contact.phone }}</a>{% endif %}
+    {% if v.contact.tel and v.contact.email %}<span aria-hidden="true"> · </span>{% endif %}
+    {% if v.contact.email %}<a class="inv-link" href="mailto:{{ v.contact.email }}">{{ v.contact.email }}</a>{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="fk-closing" data-reveal aria-label="Afsluiting">
+  <img class="fk-closing__band" src="{% static 'designs/gouden-poort/v1/band.webp' %}" alt="" width="720" height="560" loading="lazy" decoding="async">
+  {% if v.show.closing %}{% for p in v.closing %}<p class="fk-closing__text">{{ p|linebreaksbr }}</p>{% endfor %}{% endif %}
+  <p class="fk-closing__names" aria-hidden="true">{{ v.title }}</p>
+  {% include "invitations/partials/share_buttons.html" %}
+</section>
+</div>
+{% endblock %}

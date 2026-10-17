@@ -1,0 +1,92 @@
+{
+  "slug": "bloesemwaaier",
+  "added_at": "2026-10-18T09:00:00Z",
+  "version": 1,
+  "name": "Bloesemwaaier",
+  "tagline": "Een bloesemwaaier trekt weg en onthult een lantaarntuin bij zonsondergang",
+  "description": "Je ziet eerst een grote ivoren waaier met kersenbloesem en een gouden kwast. Na een tik klapt hij dicht en trekt weg: daarachter ligt een tuin met gloeiende lantaarns, een houten brug over het water en een waterval, bij een ondergaande zon. Daarna staan jullie namen in de lucht en loopt de uitnodiging door met aftellen, programma, locatie en aanmelden, in roze en goud. De opening is over te slaan en rustig bij minder beweging. De film is een gegenereerde scène zonder personen.",
+  "style_notes": "Ivoren waaier met bloesem, lantaarns, houten brug over het water, zonsondergang; verfijnd en sfeervol",
+  "occasions": [
+    "bruiloft",
+    "verloving",
+    "jubileum",
+    "verjaardag"
+  ],
+  "sort_order": 52,
+  "opening": "film",
+  "opening_label": "Een waaier die wegtrekt voor een lantaarntuin (film)",
+  "palettes": [
+    {
+      "key": "zonsondergang",
+      "name": "Zonsondergang",
+      "swatch": [
+        "#FFFAF4",
+        "#D2A45C",
+        "#40281F"
+      ],
+      "vars": {
+        "--fk-page": "#F8ECE3",
+        "--fk-page-2": "#FDF5EE",
+        "--fk-dusk": "#EFCFB8",
+        "--fk-paper": "#FFFAF4",
+        "--fk-paper-2": "#F8E9DC",
+        "--fk-paper-rgb": "255, 250, 244",
+        "--fk-ink": "#40281F",
+        "--fk-muted": "#6B4A3B",
+        "--fk-accent": "#9B4A2E",
+        "--fk-gold": "#D2A45C",
+        "--fk-gold-line": "#9A6A2C",
+        "--fk-sky-ink": "#43271C",
+        "--fk-sky-muted": "#6A4030",
+        "--fk-glow": "255, 244, 232",
+        "--fk-veil": "250, 234, 224",
+        "--fk-date-1": "#BE6A3C",
+        "--fk-date-2": "#9B4A2E",
+        "--fk-date-3": "#753320",
+        "--fx-1": "#FFE6EA",
+        "--fx-2": "#F8C2CC",
+        "--fx-3": "#F2A9A0",
+        "--fx-4": "#FFF4E2",
+        "--fx-bg": "#40281F",
+        "--fk-accent-ink": "#FFFFFF",
+        "--fk-field-bg": "#FFFFFF",
+        "--fk-field-ink": "#1F1A1A",
+        "--fk-shadow": "92, 58, 30"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "bloesem",
+    "knal": "bloesem",
+    "viering": "blaadjes",
+    "namen": "schrijf",
+    "onthul": "zacht",
+    "extra": [
+      "kenburns",
+      "tik"
+    ]
+  },
+  "film": {
+    "src": "opening.mp4",
+    "poster": "poster.webp",
+    "end": "end.webp",
+    "seconds": 10.0,
+    "kaartbeeld": "kop"
+  },
+  "changelog": "Eerste versie: opening met een film van de eigenaar (gegenereerde scène zonder personen), een tik start hem; de kop toont het laatste beeld met de namen in de lucht en de datum in het licht eronder. Verborgen voor klanten tot de rechten op de film zijn bevestigd.",
+  "envelope_mode": "built_in",
+  "hidden": true
+}

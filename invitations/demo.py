@@ -32,6 +32,8 @@ DEFAULT_DEMO_OCCASION = {
     "kerstcoupe": "kerst",
     "kerstbal": "kerst",
     "kerstmagie": "kerst",
+    "kerstsprookje": "kerst",
+    "bloesemmeer": "verjaardag",
 }
 
 DESIGN_IMAGES = {
@@ -39,6 +41,12 @@ DESIGN_IMAGES = {
     "avondgoud": ["goud-lichtjes", "kaarslicht", "bloemblaadjes", "zee-horizon", "duinen-ochtend"],
     "puur-moment": ["duinen-ochtend", "zee-horizon", "duinen-staand", "waterverf-lavendel", "bloemblaadjes"],
     "rozenboog": ["zee-horizon", "rozen", "kaarslicht", "bloemblaadjes", "duinen-ochtend"],
+    # Filmkaarten: de kop en de uitsneden zijn stukken uit de openingsfilm; deze beelden gebruikt alleen een klant die zelf foto's toevoegt (het voorbeeld toont stills uit de film).
+    "zijden-gordijn": ["zijde-goud", "rozen", "kaarslicht", "bloemblaadjes", "waterverf-bloesem"],
+    "bloesemmeer": ["bloesemtak", "waterverf-bloesem", "bloemblaadjes", "zee-horizon", "duinen-staand"],
+    "bloesemwaaier": ["bloesemtak", "kaarslicht", "waterverf-bloesem", "bloemblaadjes", "zee-horizon"],
+    "kerstsprookje": ["kerst-lichtjes", "kerst-boom", "kerst-kaarsen", "kerst-winterbos", "goud-lichtjes"],
+    "gouden-poort": ["zijde-goud", "goud-lichtjes", "kaarslicht", "rozen", "bloemblaadjes"],
     # Atelier-ontwerpen: eerste beeld is de kop, de rest de fotogalerij.
     "eucalyptus": ["eucalyptus", "bloemblaadjes", "zee-horizon", "duinen-staand", "waterverf-bloesem"],
     "gatsby": ["zijde-goud", "goud-lichtjes", "kaarslicht", "stadslicht", "zee-horizon"],

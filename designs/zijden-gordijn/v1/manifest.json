@@ -1,0 +1,91 @@
+{
+  "slug": "zijden-gordijn",
+  "added_at": "2026-10-18T09:00:00Z",
+  "version": 1,
+  "name": "Zijden gordijn",
+  "tagline": "Zijden gordijnen vol bloemen schuiven open naar een kasteel in het avondlicht",
+  "description": "Je ziet eerst gesloten ivoren zijden gordijnen met witte rozen en gouden borduursel. Na een tik schuiven ze open en kijk je door naar een terras met een fontein, kaarsen en een kasteel in het licht van de ondergaande zon. Daarna staan jullie namen in de lucht en loopt de uitnodiging door met aftellen, programma, locatie en aanmelden, in ivoor en goud. De opening is over te slaan en rustig bij minder beweging. De film is een gegenereerde scène zonder personen.",
+  "style_notes": "Ivoren zijde, witte rozen, gouden borduursel, een kasteel bij zonsondergang; romantisch en tijdloos",
+  "occasions": [
+    "bruiloft",
+    "verloving",
+    "jubileum"
+  ],
+  "sort_order": 50,
+  "opening": "film",
+  "opening_label": "Zijden gordijnen die opengaan naar een kasteel (film)",
+  "palettes": [
+    {
+      "key": "ivoor-goud",
+      "name": "Ivoor en goud",
+      "swatch": [
+        "#FFFBF3",
+        "#C9A45C",
+        "#3A2E22"
+      ],
+      "vars": {
+        "--fk-page": "#F7EFE2",
+        "--fk-page-2": "#FBF6EC",
+        "--fk-dusk": "#EBD9BD",
+        "--fk-paper": "#FFFBF3",
+        "--fk-paper-2": "#F6ECDC",
+        "--fk-paper-rgb": "255, 251, 243",
+        "--fk-ink": "#3A2E22",
+        "--fk-muted": "#66543F",
+        "--fk-accent": "#8B5E2B",
+        "--fk-gold": "#C9A45C",
+        "--fk-gold-line": "#9A7330",
+        "--fk-sky-ink": "#3E2F20",
+        "--fk-sky-muted": "#5B4630",
+        "--fk-glow": "255, 248, 236",
+        "--fk-veil": "244, 234, 218",
+        "--fk-date-1": "#B98A3E",
+        "--fk-date-2": "#8B5E2B",
+        "--fk-date-3": "#6A4519",
+        "--fx-1": "#FFFBF0",
+        "--fx-2": "#F3D9A8",
+        "--fx-3": "#E2C07A",
+        "--fx-4": "#FFFFFF",
+        "--fx-bg": "#3A2E22",
+        "--fk-accent-ink": "#FFFFFF",
+        "--fk-field-bg": "#FFFFFF",
+        "--fk-field-ink": "#1F1A1A",
+        "--fk-shadow": "92, 58, 30"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "goudstof",
+    "knal": "blaadjes",
+    "viering": "blaadjes",
+    "namen": "schrijf",
+    "onthul": "zacht",
+    "extra": [
+      "kenburns",
+      "tik"
+    ]
+  },
+  "film": {
+    "src": "opening.mp4",
+    "poster": "poster.webp",
+    "end": "end.webp",
+    "seconds": 10.0,
+    "kaartbeeld": "kop"
+  },
+  "changelog": "Eerste versie: opening met een film van de eigenaar (gegenereerde scène zonder personen), een tik start hem; de kop toont het laatste beeld met de namen in de lucht en de datum in het licht eronder. Verborgen voor klanten tot de rechten op de film zijn bevestigd.",
+  "envelope_mode": "built_in",
+  "hidden": true
+}

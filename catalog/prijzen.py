@@ -65,6 +65,8 @@ INDELING = {
     "kerstmagie": LUXE,
     # Rozenboog: eigen film, bewust Luxe op besluit van de eigenaar (16 oktober 2026); staat verborgen (groep C) tot de filmrechten bevestigd zijn
     "rozenboog": LUXE,
+    # Zijden gordijn, Bloesemmeer, Bloesemwaaier, Kerstsprookje en Gouden poort: eigen openingsfilm, voorlopig Luxe zoals Rozenboog en de kerstfilms (voorstel; de eigenaar bevestigt)
+    **{slug: LUXE for slug in ("zijden-gordijn", "bloesemmeer", "bloesemwaaier", "kerstsprookje", "gouden-poort")},
     # Basis
     **{slug: BASIS for slug in (
         "ballonfeest", "borrel", "confetti", "congres", "door-de-jaren", "eucalyptus", "gala", "gatsby", "glitter", "gouden-jaren", "ja-woord",

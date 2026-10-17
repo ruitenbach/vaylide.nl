@@ -1349,3 +1349,10 @@ Echt uitgevoerd op een lokale testomgeving (SQLite, testmodus, testbetaling en n
 - Beheerschermen bekeken met Chromium (Playwright) op 360, 390, 768 en 1366 pixels als Eigenaar en als gewone beheerder: geen horizontale scroll, geen paginafouten behalve de bedoelde 400 op de foutmelding-pagina; de gewone beheerder krijgt 403 op de wijzigpagina.
 - `e2e/toegankelijkheid.cjs` en `e2e/controle2.cjs` zijn voor deze schermen **niet** gedraaid.
 - Niet gedaan: Mollie-testbetaling op staging, controle op productie, rechten van het productieaccount (alleen het commando `controleer_rechten` is klaar).
+
+## Vijf filmkaarten (18 oktober 2026, lokaal, niet op staging)
+
+Zijden gordijn, Bloesemmeer, Bloesemwaaier, Kerstsprookje en Gouden poort (`docs/INTROKAARTEN.md`). Echt uitgevoerd op een lokale testomgeving (SQLite, testmodus):
+- `manage.py test tests`: 1377 tests; geslaagd op drie na die ik zag: twee tests in `test_voorwaarden_nieuw` (invulvelden in privacy en voorwaarden) die ook op de stand van vóór deze wijziging falen (gemeten voor ik begon: 1367 tests, dezelfde twee), en `test_film.test_every_film_design`, dat alleen Rozenboog verwachtte en nu is aangepast. Daarna slagen `tests.test_film` en `tests.test_introkaarten` (10 nieuwe tests: manifest, verborgen, Luxe en prijs, media, tekstkleuren, voorbeeld alleen voor beheerders, CSP).
+- Chromium (Playwright), voorbeeld met de kaarten tijdelijk actief in de lokale database: opening (tik, film, eindbeeld) en directe link naar de aanmelding op 360, 390, 768 en 1366 pixels voor alle vijf: geen horizontale scroll en geen paginafouten (40 doorlopen). Gezien (schermafbeeldingen) op 390 px: het openingsscherm en de kop van alle vijf, en de hele pagina van Kerstsprookje.
+- Niet gedaan: `e2e/toegankelijkheid.cjs` (axe) is niet gedraaid; contrast is alleen met de tekstkleurtest gecontroleerd. Niet getest op echte telefoons, Safari of Firefox. De volledige pagina's van de andere vier kaarten zijn niet bekeken. Niet op staging gezet of bekeken.

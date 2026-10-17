@@ -1,0 +1,91 @@
+{
+  "slug": "gouden-poort",
+  "added_at": "2026-10-18T09:00:00Z",
+  "version": 1,
+  "name": "Gouden poort",
+  "tagline": "Gouden deuren gaan open naar een paleistuin met fonteinen in het avondlicht",
+  "description": "Je ziet eerst gouden deuren met een fijn, stralend sterpatroon. Na een tik gaan ze open en kijk je door een hoge boog naar een paleis met een gouden koepel, palmen, bloemen, lantaarns en een lange waterpartij in het licht van de avondzon. Daarna staan jullie namen in de lucht en loopt de uitnodiging door met aftellen, programma, locatie en aanmelden, in champagne en goud. De opening is over te slaan en rustig bij minder beweging. De film is een gegenereerde scène zonder personen.",
+  "style_notes": "Gouden deuren met sterpatroon, paleis met koepel, palmen en fonteinen, avondzon; weelderig en feestelijk",
+  "occasions": [
+    "bruiloft",
+    "verloving",
+    "jubileum",
+    "verjaardag"
+  ],
+  "sort_order": 54,
+  "opening": "film",
+  "opening_label": "Gouden deuren die opengaan naar een paleistuin (film)",
+  "palettes": [
+    {
+      "key": "champagne-goud",
+      "name": "Champagne en goud",
+      "swatch": [
+        "#FFFAEE",
+        "#C9A24A",
+        "#35291A"
+      ],
+      "vars": {
+        "--fk-page": "#F6ECD8",
+        "--fk-page-2": "#FBF3E2",
+        "--fk-dusk": "#E8D2A8",
+        "--fk-paper": "#FFFAEE",
+        "--fk-paper-2": "#F4E7CC",
+        "--fk-paper-rgb": "255, 250, 238",
+        "--fk-ink": "#35291A",
+        "--fk-muted": "#5F4D32",
+        "--fk-accent": "#7A5518",
+        "--fk-gold": "#C9A24A",
+        "--fk-gold-line": "#8F6A1E",
+        "--fk-sky-ink": "#3A2A12",
+        "--fk-sky-muted": "#5A4220",
+        "--fk-glow": "255, 246, 226",
+        "--fk-veil": "246, 236, 214",
+        "--fk-date-1": "#B58A2E",
+        "--fk-date-2": "#7A5518",
+        "--fk-date-3": "#5C3F0E",
+        "--fx-1": "#FFF4D0",
+        "--fx-2": "#F0D082",
+        "--fx-3": "#DDB255",
+        "--fx-4": "#FFFFFF",
+        "--fx-bg": "#35291A",
+        "--fk-accent-ink": "#FFFFFF",
+        "--fk-field-bg": "#FFFFFF",
+        "--fk-field-ink": "#1F1A1A",
+        "--fk-shadow": "92, 58, 30"
+      }
+    }
+  ],
+  "sections": [
+    "countdown",
+    "story",
+    "gallery",
+    "program",
+    "location",
+    "dresscode",
+    "practical",
+    "rsvp",
+    "contact",
+    "closing",
+    "music"
+  ],
+  "effects": {
+    "sfeer": "goudstof",
+    "knal": "vonken",
+    "viering": "vonken",
+    "namen": "folie",
+    "onthul": "zacht",
+    "extra": [
+      "tik"
+    ]
+  },
+  "film": {
+    "src": "opening.mp4",
+    "poster": "poster.webp",
+    "end": "end.webp",
+    "seconds": 10.0,
+    "kaartbeeld": "kop"
+  },
+  "changelog": "Eerste versie: opening met een film van de eigenaar (gegenereerde scène zonder personen), een tik start hem; de kop toont het laatste beeld met de namen in de lucht en de datum in het licht eronder. Verborgen voor klanten tot de rechten op de film zijn bevestigd.",
+  "envelope_mode": "built_in",
+  "hidden": true
+}

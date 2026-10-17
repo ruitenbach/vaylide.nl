@@ -33,6 +33,7 @@ C = (
     "borrel", "congres", "lijnenspel",                                  # kaartbeeld met leeg vlak; nog niet premium genoeg
     "kerstmagie",                                                       # verborgen tot de rechten op de film zijn bevestigd (docs/KERSTFILMKAARTEN.md)
     "rozenboog",                                                        # eigen film; verborgen tot de commerciële filmrechten bevestigd zijn
+    "zijden-gordijn", "bloesemmeer", "bloesemwaaier", "kerstsprookje", "gouden-poort",   # vijf filmkaarten (docs/INTROKAARTEN.md); verborgen tot de rechten bevestigd zijn
 )
 
 # Specials: bijzondere ontwerpen onder Specials, met een eigen meerprijs (catalog/specials.py). Winterlicht is bewust geen special.
