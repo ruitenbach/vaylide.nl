@@ -446,6 +446,19 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
 .design-card__name { font-weight: 600; font-size: 1rem; }
 .design-card__link:hover .design-card__name { color: var(--accent-text); }
 .design-card__meta { font-size: .88rem; color: var(--muted); }
+/* Aanbieding: een rustig prijskaartje met de actieprijs; geen banner of label over het beeld. */
+.aanbod-chip { display: inline-flex; align-items: center; gap: .3rem; padding: .12rem .55rem .12rem .4rem; border: 1px solid color-mix(in srgb, var(--accent-text) 45%, transparent); border-radius: 999px; font-size: .74rem; font-weight: 600; letter-spacing: .04em; color: var(--accent-text); line-height: 1.4; white-space: nowrap; }
+.aanbod-chip .icon { flex: none; }
+.prijs-oud { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; font-weight: 400; }
+.design-card__aanbod { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .6rem; margin-top: .35rem; }
+.design-card__prijs { font-size: .92rem; font-weight: 600; color: var(--ink); }
+.design-card__prijs .prijs-oud { font-size: .84rem; margin-right: .15rem; }
+.detail-prijs--aanbieding { align-items: center; }
+.detail-prijs--aanbieding[hidden] { display: none; }
+.detail-prijs--aanbieding .detail-prijs__bedrag { gap: .55rem; }
+.detail-prijs__einde { flex-basis: 100%; }
+.prijs-aanbieding { display: block; font-size: .72rem; font-weight: 600; letter-spacing: .04em; color: var(--accent-text); }
+.kaart-keuze__prijs .prijs-oud { white-space: nowrap; }
 @media (max-width: 560px) {
   .grid--trio .design-card__visual { border-radius: var(--radius); margin-bottom: .6rem; }
   .grid--trio .design-card__name { font-size: .86rem; line-height: 1.3; }

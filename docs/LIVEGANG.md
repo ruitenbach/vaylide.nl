@@ -59,6 +59,12 @@ Korte lijst met wat de eigenaar nog moet aanleveren: `docs/INVULLIJST.md`.
 - [ ] De uitnodiging openen op je eigen telefoons (iPhone en Android) en in WhatsApp delen, om de linkvoorvertoning te zien.
 - [ ] Vergelijk de ontwerpen alsnog met de schermopname en de referentiesites (zie `docs/AANPAK.md`).
 
+## 6a. Automatische aanbiedingen (alleen als ze live gaan)
+
+- [ ] Juridische bevestiging van de referentieprijsregels voor digitale kaarten (zie `docs/AANBIEDINGEN.md`), en van de btw-verwerking.
+- [ ] Prijshistorie gecontroleerd (`manage.py sync_prijshistorie`; alleen met bewijs `--sinds`).
+- [ ] Alleen met uitdrukkelijk akkoord van de eigenaar: `VIERLIEF_AANBIEDINGEN=1` op productie.
+
 ## 6. Kortingscodes (alleen als ze live gaan)
 
 - [ ] De boekhouder bevestigt de behandeling: korting op het bedrag inclusief btw, btw-deel proportioneel (zie `docs/KORTINGSCODES.md`).

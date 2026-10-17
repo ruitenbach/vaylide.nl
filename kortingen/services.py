@@ -24,6 +24,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from catalog import prijzen
+from catalog.models import format_euro
 from .models import DiscountCode, DiscountRedemption, normalize_code
 
 LINE_PREFIX = "korting:"
@@ -45,6 +46,7 @@ class DiscountResult:
     discount_cents: int
     capped: bool = False
     note: str = ""
+    used: bool = True       # False: een lopende aanbieding is voordeliger; de code wordt dan niet gebruikt (en dus ook niet gereserveerd)
 
 
 def enabled() -> bool:
@@ -168,6 +170,23 @@ def evaluate(raw: str, *, subtotal_cents: int, template_version, occasion: str, 
     return check_code(find_code(raw), subtotal_cents=subtotal_cents, template_version=template_version, occasion=occasion, customer=customer, now=now)
 
 
+def toepassen(quote, result: DiscountResult) -> DiscountResult:
+    """Code en automatische aanbieding stapelen niet: alleen de voordeligste geldt (bij gelijk de aanbieding, zodat er geen code verbruikt wordt).
+    Staat er al een aanbieding in de offerte, dan vervangt de code die alleen als hij méér korting geeft. Zet `result.used` en een korte uitleg."""
+    from . import aanbiedingen
+
+    offer = quote.offer
+    if offer is not None:
+        if result.discount_cents <= offer.discount_cents:
+            result.used = False
+            result.note = f"De aanbieding {offer.name} is voordeliger dan je code, dus die gebruiken we. Je betaalt {format_euro(offer.price_cents)}."
+            return result
+        aanbiedingen.remove_from_quote(quote)
+        result.note = (result.note + " " if result.note else "") + f"Je kortingscode is voordeliger dan de aanbieding {offer.name}, dus die gebruiken we."
+    apply_to_quote(quote, result)
+    return result
+
+
 def apply_to_quote(quote, result: DiscountResult) -> None:
     """Zet de korting als negatieve regel in de offerte. De prijsregels zelf blijven ongemoeid."""
     from orders.pricing import QuoteLine
@@ -184,9 +203,8 @@ def prepare(raw: str, quote, *, template_version, occasion: str, customer, now=N
         raise DiscountError("uit", "Kortingscodes zijn op dit moment niet beschikbaar.")
     code = find_code(raw)
     code = DiscountCode.objects.select_for_update().get(pk=code.pk)
-    result = check_code(code, subtotal_cents=quote.total_cents, template_version=template_version, occasion=occasion, customer=customer, now=now)
-    apply_to_quote(quote, result)
-    return result
+    result = check_code(code, subtotal_cents=quote.subtotal_cents, template_version=template_version, occasion=occasion, customer=customer, now=now)
+    return toepassen(quote, result)
 
 
 def reserve(order, result: DiscountResult, customer, *, now=None) -> DiscountRedemption:

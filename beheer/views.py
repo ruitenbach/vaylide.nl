@@ -12,6 +12,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from catalog.models import AddOn, Package, Template, TemplateVersion
 from core.ai import ai_configured
@@ -658,3 +659,59 @@ def discount_edit(request, pk=None):
         return redirect("beheer:discount_edit", pk=saved.pk)
     redemptions = code.redemptions.select_related("order", "customer", "released_by").order_by("-created_at")[:50] if code else []
     return render(request, "beheer/discount_edit.html", {"form": form, "code": code, "redemptions": redemptions})
+
+
+# ------------------------------------------------------------ aanbiedingen
+
+def _offers_on():
+    if not settings.OFFERS_ENABLED:
+        raise Http404()
+
+
+@staff_required
+def offers(request):
+    _offers_on()
+    from kortingen.models import Offer
+
+    now = timezone.now()
+    rows = [(o, o.status(now), o.orders.count()) for o in Offer.objects.prefetch_related("templates")]
+    return render(request, "beheer/offers.html", {"rows": rows, "min_total": settings.DISCOUNT_MIN_TOTAL_CENTS, "dagen": settings.AANBIEDING_REFERENTIE_DAGEN})
+
+
+@staff_required
+def offer_edit(request, pk=None):
+    _offers_on()
+    from kortingen.aanbiedingen import reference_overview
+    from kortingen.forms import OfferForm
+    from kortingen.models import Offer
+
+    offer = get_object_or_404(Offer, pk=pk) if pk else None
+    form = OfferForm(request.POST or None, instance=offer)
+    if request.method == "POST" and form.is_valid():
+        saved = form.save()
+        messages.success(request, f"Aanbieding {saved.name} opgeslagen. Bestaande bestellingen veranderen niet.")
+        return redirect("beheer:offer_edit", pk=saved.pk)
+    return render(request, "beheer/offer_edit.html", {
+        "form": form, "offer": offer, "referentie": reference_overview(offer) if offer else None,
+        "orders": offer.orders.select_related("customer").order_by("-created_at")[:50] if offer else [], "dagen": settings.AANBIEDING_REFERENTIE_DAGEN,
+    })
+
+
+@staff_required
+@require_POST
+def offer_stop(request, pk):
+    """Zet een lopende aanbieding per direct uit: het einde wordt nu (zodat de geschiedenis klopt) en nieuwe bestellingen krijgen geen korting meer."""
+    _offers_on()
+    from kortingen.models import Offer
+
+    offer = get_object_or_404(Offer, pk=pk)
+    now = timezone.now()
+    if offer.starts_at <= now <= offer.ends_at:
+        offer.ends_at = now
+        offer.save(update_fields=["ends_at", "updated_at"])
+        messages.success(request, f"Aanbieding {offer.name} is gestopt. Bestellingen die al zijn aangemaakt behouden hun bedrag.")
+    elif now < offer.starts_at:
+        offer.is_active = False
+        offer.save(update_fields=["is_active", "updated_at"])
+        messages.success(request, f"Aanbieding {offer.name} is uitgezet.")
+    return redirect("beheer:offer_edit", pk=offer.pk)

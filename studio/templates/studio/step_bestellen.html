@@ -11,6 +11,7 @@
 <form method="post" class="form checkout" data-once novalidate>
   {% csrf_token %}
   <input type="hidden" name="actie" value="herberekenen" data-checkout-action>
+  {% if quote %}<input type="hidden" name="verwacht" value="{{ quote.total_cents }}">{% endif %}
   {% if quote %}
   <input type="hidden" name="package" value="{{ quote.package.code }}">
   <section class="studio-block" aria-labelledby="pakket-titel">
@@ -86,12 +87,12 @@
     </div>
     {% endif %}
     <table class="bon__tabel">
-      <tbody>{% for line in quote.lines %}<tr{% if line.is_discount %} class="bon__korting"{% endif %}><td>{{ line.description }}{% if line.reason %}<span class="bon__reden">{{ line.reason }}</span>{% endif %}{% if line.is_discount %} <button type="submit" class="link-plain small" name="actie" value="code-verwijderen" formnovalidate>Verwijderen<span class="visually-hidden"> (kortingscode)</span></button>{% endif %}</td><td class="num">{{ line.total_display }}</td></tr>{% endfor %}</tbody>
+      <tbody>{% for line in quote.lines %}<tr{% if line.is_discount %} class="bon__korting{% if line.is_offer %} bon__korting--aanbieding{% endif %}"{% endif %}><td>{{ line.description }}{% if line.reason %}<span class="bon__reden">{{ line.reason }}</span>{% endif %}{% if line.is_code_discount %} <button type="submit" class="link-plain small" name="actie" value="code-verwijderen" formnovalidate>Verwijderen<span class="visually-hidden"> (kortingscode)</span></button>{% endif %}</td><td class="num">{{ line.total_display }}</td></tr>{% endfor %}</tbody>
       <tfoot><tr><th>Totaal <span class="bon__btw">incl. btw</span></th><th class="num">{{ quote.total_display }}</th></tr></tfoot>
     </table>
     {% if korting_aan %}
     {% if korting_melding %}<p class="small muted korting__melding" role="status">{{ korting_melding }}</p>{% endif %}
-    {% if not quote.has_discount %}
+    {% if not quote.has_code %}
     <details class="korting"{% if korting_open or korting_fout %} open{% endif %}>
       <summary class="korting__vraag">Heb je een kortingscode?</summary>
       <div class="korting__veld">

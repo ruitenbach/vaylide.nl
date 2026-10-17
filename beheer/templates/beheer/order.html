@@ -26,9 +26,10 @@
     </section>
     {% if order.discount_cents %}
     <section class="panel">
-      <h2>Kortingscode</h2>
+      <h2>{% if order.discount_offer_text %}Aanbieding{% else %}Kortingscode{% endif %}</h2>
       <dl class="kv">
-        <dt>Code</dt><dd>{% if order.discount_code %}<a href="{% url 'beheer:discount_edit' order.discount_code.pk %}">{{ order.discount_code_text }}</a>{% else %}{{ order.discount_code_text }}{% endif %}</dd>
+        {% if order.discount_offer_text %}<dt>Aanbieding</dt><dd>{% if order.discount_offer_id and aanbod_aan %}<a href="{% url 'beheer:offer_edit' order.discount_offer_id %}">{{ order.discount_offer_text }}</a>{% else %}{{ order.discount_offer_text }}{% endif %}</dd>
+        {% else %}<dt>Code</dt><dd>{% if order.discount_code %}<a href="{% url 'beheer:discount_edit' order.discount_code.pk %}">{{ order.discount_code_text }}</a>{% else %}{{ order.discount_code_text }}{% endif %}</dd>{% endif %}
         <dt>Bedrag voor korting</dt><dd>{{ order.subtotal_cents|euro }}</dd>
         <dt>Korting</dt><dd>&minus; {{ order.discount_cents|euro }}</dd>
         <dt>Betaald bedrag</dt><dd>{{ order.total_display }}</dd>

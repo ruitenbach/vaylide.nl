@@ -36,6 +36,17 @@ class CheckoutError(ValueError):
     pass
 
 
+class PriceChanged(CheckoutError):
+    """Het bedrag is veranderd tussen het tonen en het bestellen (bijvoorbeeld een aanbieding die net verliep). Er is niets besteld of betaald."""
+
+    def __init__(self, was_cents: int, now_cents: int):
+        from catalog.models import format_euro
+
+        self.was_cents, self.now_cents = was_cents, now_cents
+        super().__init__(f"Het bedrag is gewijzigd van {format_euro(was_cents)} naar {format_euro(now_cents)}, omdat een aanbieding of kortingscode is gestart of verlopen. "
+                         "Er is niets betaald. Controleer het bedrag en kies nog een keer Bestellen en betalen.")
+
+
 def invitation_is_paid(invitation: Invitation) -> bool:
     return invitation.orders.filter(kind=Order.Kind.INVITATION, status=Order.Status.PAID).exists()
 
@@ -65,7 +76,8 @@ def refresh_open_payments(invitation: Invitation, limit: int = 3) -> None:
 
 
 def start_checkout(invitation: Invitation, *, user, package_code: str, optional_codes: list[str], terms_accepted: bool,
-                   delivery_consent: bool = False, service_consent: bool = False, discount_code: str = "") -> Payment:
+                   delivery_consent: bool = False, service_consent: bool = False, discount_code: str = "",
+                   expected_total_cents: int | None = None) -> Payment:
     if not terms_accepted:
         raise CheckoutError("Ga akkoord met de voorwaarden om te bestellen.")
     refresh_open_payments(invitation)
@@ -103,6 +115,11 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
                 discount = kortingen.prepare(discount_code, quote, template_version=invitation.template_version, occasion=invitation.occasion, customer=user)
             except kortingen.DiscountError as exc:
                 raise CheckoutError(exc.message) from exc
+        if discount is not None and not discount.used:
+            discount = None     # een voordeligere aanbieding geldt; de code is niet verbruikt
+        if expected_total_cents is not None and expected_total_cents != quote.total_cents:
+            # De klant zag een ander bedrag (een aanbieding of kortingscode is intussen gestart of verlopen): nooit stilletjes een ander bedrag afschrijven.
+            raise PriceChanged(expected_total_cents, quote.total_cents)
         version = snapshot(invitation, source=Source.CUSTOMER, user=user, note="Besteld")
         order = _create_order(
             kind=Order.Kind.INVITATION,
@@ -116,10 +133,12 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
             max_gallery_photos=quote.max_gallery_photos,
             availability_months=quote.availability_months,
             total_cents=quote.total_cents,
-            subtotal_cents=quote.subtotal_cents if discount else None,
-            discount_cents=discount.discount_cents if discount else 0,
+            subtotal_cents=quote.subtotal_cents if quote.has_discount else None,
+            discount_cents=quote.discount_cents,
             discount_code=discount.code if discount else None,
             discount_code_text=discount.code.code if discount else "",
+            discount_offer=quote.offer.offer if quote.offer is not None else None,
+            discount_offer_text=quote.offer.offer.name if quote.offer is not None else "",
             terms_accepted_at=timezone.now(),
             terms_version=terms_version_now(),
             delivery_consent_at=timezone.now() if delivery_consent else None,

@@ -748,7 +748,7 @@ class BeheerKortingscodes(KortingBasis):
         klant = Client()
         klant.force_login(self.klant)
         self.assertIn(klant.get("/beheer/kortingscodes/").status_code, (302, 403, 404))
-        self.assertContains(self.c.get("/beheer/"), "Kortingscodes")
+        self.assertContains(self.c.get("/beheer/"), "Kortingen")
         with override_settings(DISCOUNTS_ENABLED=False):
             self.assertEqual(self.c.get("/beheer/kortingscodes/").status_code, 404)
             self.assertEqual(self.c.post("/beheer/kortingscodes/nieuw/", {"code": "X1234", "kind": "percent", "percent": "10", "max_per_customer": "1"}).status_code, 404)

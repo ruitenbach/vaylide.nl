@@ -469,6 +469,7 @@ html:has(body.studio-page) { scrollbar-gutter: stable; }
 .korting__veld .input { flex: 1 1 auto; min-width: 0; text-transform: uppercase; letter-spacing: .06em; }
 .korting__melding { margin: .6rem 0 0; }
 .bon__korting td { color: var(--ink-2); }
+.bon__korting--aanbieding td:first-child { font-style: normal; }
 .bon__korting .link-plain { display: inline; margin: 0 0 0 .4rem; }
 .betaal-hint { margin: .4rem 0 0; text-align: right; }
 

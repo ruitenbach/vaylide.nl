@@ -295,6 +295,10 @@ PRICING_V2_ACTIVATION = env("VIERLIEF_ACTIVERINGSDATUM", "")
 # werkt zoals voorheen). Het te betalen bedrag wordt nooit lager dan DISCOUNT_MIN_TOTAL_CENTS (besluit van de eigenaar, 17 oktober 2026: € 1,00);
 # een reservering van een code blijft DISCOUNT_RESERVATION_MINUTES staan, daarna telt hij niet meer mee voor het maximum.
 DISCOUNTS_ENABLED = env_bool("VIERLIEF_KORTINGSCODES", False)
+# Automatische aanbiedingen (app kortingen) staan los van de kortingscodes en zijn standaard uit. De referentie voor een doorgestreepte prijs is de
+# laagste prijs in de AANBIEDING_REFERENTIE_DAGEN dagen vóór de aanbieding (Besluit prijsaanduiding producten, art. 5a); zie docs/AANBIEDINGEN.md.
+OFFERS_ENABLED = env_bool("VIERLIEF_AANBIEDINGEN", False)
+AANBIEDING_REFERENTIE_DAGEN = int(env("VIERLIEF_AANBIEDING_REFERENTIE_DAGEN", "30"))
 DISCOUNT_MIN_TOTAL_CENTS = int(env("VIERLIEF_KORTING_MINIMUM_CENTEN", "100"))
 DISCOUNT_RESERVATION_MINUTES = int(env("VIERLIEF_KORTING_RESERVERING_MINUTEN", "120"))
 VAT_RATE_PERCENT = int(env("VIERLIEF_BTW_PERCENTAGE", "21"))

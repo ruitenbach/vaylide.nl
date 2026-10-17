@@ -4,6 +4,7 @@ Zelf getekend; geen iconenbibliotheek nodig. Gebruik in templates: {% icon "zoek
 """
 
 ICONS = {
+    "prijskaartje": '<path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1.5 1.5 0 0 1 0 2.1l-6.4 6.4a1.5 1.5 0 0 1-2.1 0L3.5 12.2Z"/><circle cx="8" cy="8" r="1.3"/>',
     "zoeken": '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>',
     "tas": '<path d="M5.5 8.5h13l-1 11.5h-11l-1-11.5Z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/>',
     "pijl": '<path d="M5 12h14"/><path d="m13.5 6.5 5.5 5.5-5.5 5.5"/>',

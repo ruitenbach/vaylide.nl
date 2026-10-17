@@ -1,4 +1,4 @@
-"""Kortingscodes en hun gebruik.
+"""Kortingscodes en automatische aanbiedingen, en de prijshistorie die een doorgestreepte referentieprijs onderbouwt.
 
 Een code verlaagt alleen het definitieve bestelbedrag (zie kortingen.services). Het gebruik wordt per bestelling vastgelegd in een
 DiscountRedemption: eerst gereserveerd (bij het aanmaken van de bestelling), definitief bij de bevestigde betaling, of vrijgegeven.
@@ -112,3 +112,81 @@ class DiscountRedemption(models.Model):
 
     def __str__(self) -> str:
         return f"{self.code} · {self.order.number}"
+
+
+class Offer(models.Model):
+    """Een automatische aanbieding (zonder code) op één of meer ontwerpen of de hele collectie. De einddatum is verplicht. Een aanbieding verlaagt
+    alleen het definitieve bestelbedrag, via dezelfde offerteregel als een kortingscode (zie kortingen.aanbiedingen). Gebruik wordt niet geteld."""
+
+    class Kind(models.TextChoices):
+        PERCENT = "percent", "Percentage"
+        FIXED = "fixed", "Vast bedrag"
+
+    name = models.CharField("naam", max_length=60, help_text="Staat op de bon, bijvoorbeeld Herfstaanbieding.")
+    kind = models.CharField("soort", max_length=8, choices=Kind.choices, default=Kind.PERCENT)
+    percent = models.PositiveSmallIntegerField("percentage", null=True, blank=True, help_text="Tussen 1 en 90.")
+    amount_cents = models.PositiveIntegerField("bedrag (centen)", null=True, blank=True)
+    starts_at = models.DateTimeField("geldig vanaf")
+    ends_at = models.DateTimeField("geldig tot en met", help_text="Verplicht. Geldt tot het einde van deze dag.")
+    whole_collection = models.BooleanField("hele collectie", default=False)
+    templates = models.ManyToManyField("catalog.Template", verbose_name="ontwerpen", blank=True, related_name="offers")
+    occasions = models.JSONField("gelegenheden", default=list, blank=True)
+    tiers = models.JSONField("indelingen", default=list, blank=True)
+    show_reference = models.BooleanField(
+        "doorgestreepte prijs tonen als dat mag", default=True,
+        help_text="Alleen als de prijshistorie aantoont dat de referentieprijs klopt. Anders zie je alleen de actieprijs.")
+    is_active = models.BooleanField("actief", default=True)
+    note = models.CharField("interne notitie", max_length=300, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "aanbieding"
+        verbose_name_plural = "aanbiedingen"
+        ordering = ["-starts_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=(Q(kind="percent", percent__gte=1, percent__lte=90) | Q(kind="fixed", amount_cents__gte=1)),
+                name="aanbieding_waarde_geldig",
+            ),
+            models.CheckConstraint(condition=Q(ends_at__gt=models.F("starts_at")), name="aanbieding_einde_na_begin"),
+        ]
+
+    def __str__(self) -> str:
+        return self.name
+
+    @property
+    def value_display(self) -> str:
+        return f"{self.percent}%" if self.kind == self.Kind.PERCENT else format_euro(self.amount_cents or 0)
+
+    @property
+    def has_orders(self) -> bool:
+        return self.orders.exists()
+
+    def status(self, now=None) -> str:
+        now = now or timezone.now()
+        if not self.is_active:
+            return "uitgezet"
+        if now < self.starts_at:
+            return "gepland"
+        if now > self.ends_at:
+            return "verlopen"
+        return "actief"
+
+
+class PriceStand(models.Model):
+    """Prijshistorie: welk gewoon bedrag gold vanaf wanneer voor een ontwerp en prijsrij. Onderbouwt de referentieprijs (laagste prijs in de
+    30 dagen vóór een prijsverlaging). Een rij zonder `until` is de huidige stand."""
+
+    key = models.CharField("sleutel", max_length=80, db_index=True)    # '<ontwerp>:<prijsrij>'
+    price_cents = models.PositiveIntegerField()
+    since = models.DateTimeField()
+    until = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "prijsstand"
+        verbose_name_plural = "prijshistorie"
+        ordering = ["key", "since"]
+
+    def __str__(self) -> str:
+        return f"{self.key} {self.price_cents} vanaf {self.since:%Y-%m-%d}"

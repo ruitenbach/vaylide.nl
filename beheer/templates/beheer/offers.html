@@ -1,0 +1,22 @@
+{% extends "beheer/base.html" %}{% load vl %}
+{% block title %}Aanbiedingen{% endblock %}
+{% block content %}
+<div class="app-head"><div><p class="eyebrow">Beheer</p><h1>Kortingen</h1></div><div class="btn-row"><a class="btn btn--secondary btn--sm" href="{% url 'beheer:offer_new' %}">Nieuwe aanbieding</a></div></div>
+{% include "beheer/_kortingen_tabs.html" with actief="aanbiedingen" %}
+<p class="notice">Een aanbieding verlaagt automatisch het bedrag van een nieuwe bestelling, zonder code. De vaste prijzen veranderen niet. Aanbieding en kortingscode stapelen niet: de voordeligste geldt. Het te betalen bedrag blijft minimaal {{ min_total|euro }}. Een doorgestreepte prijs verschijnt alleen als de prijshistorie aantoont dat die klopt ({{ dagen }} dagen).</p>
+<section class="panel">
+  {% if rows %}
+  <div class="data-table-wrap"><table class="data-table data-table--cards">
+    <thead><tr><th>Aanbieding</th><th>Korting</th><th>Periode</th><th>Bereik</th><th class="num">Bestellingen</th><th>Status</th></tr></thead>
+    <tbody>{% for o, status, orders in rows %}<tr>
+      <td data-label="Aanbieding"><a href="{% url 'beheer:offer_edit' o.pk %}"><strong>{{ o.name }}</strong></a>{% if o.note %}<br><span class="small muted">{{ o.note }}</span>{% endif %}</td>
+      <td data-label="Korting">{{ o.value_display }}</td>
+      <td data-label="Periode">{{ o.starts_at|date:"j-n-Y" }} t/m {{ o.ends_at|date:"j-n-Y" }}</td>
+      <td data-label="Bereik">{% if o.whole_collection %}hele collectie{% else %}{{ o.templates.all|length }} ontwerp{{ o.templates.all|length|pluralize:",en" }}{% endif %}{% if o.occasions %} · {{ o.occasions|join:", " }}{% endif %}{% if o.tiers %} · {{ o.tiers|join:", " }}{% endif %}</td>
+      <td data-label="Bestellingen" class="num">{{ orders }}</td>
+      <td data-label="Status"><span class="badge badge--{% if status == 'actief' %}live{% elif status == 'gepland' %}draft{% elif status == 'verlopen' %}expired{% else %}cancelled{% endif %}">{{ status }}</span></td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="muted">Nog geen aanbiedingen.</p>{% endif %}
+</section>
+{% endblock %}

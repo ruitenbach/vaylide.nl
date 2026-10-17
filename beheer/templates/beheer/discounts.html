@@ -1,7 +1,8 @@
 {% extends "beheer/base.html" %}{% load vl %}
 {% block title %}Kortingscodes{% endblock %}
 {% block content %}
-<div class="app-head"><div><p class="eyebrow">Beheer</p><h1>Kortingscodes</h1></div><div class="btn-row"><a class="btn btn--secondary btn--sm" href="{% url 'beheer:discount_new' %}">Nieuwe code</a></div></div>
+<div class="app-head"><div><p class="eyebrow">Beheer</p><h1>Kortingen</h1></div><div class="btn-row"><a class="btn btn--secondary btn--sm" href="{% url 'beheer:discount_new' %}">Nieuwe code</a></div></div>
+{% include "beheer/_kortingen_tabs.html" with actief="codes" %}
 <p class="notice">Een code verlaagt alleen het bedrag van een nieuwe bestelling. De prijzen zelf, en bestaande bestellingen, veranderen niet. Het te betalen bedrag blijft minimaal {{ min_total|euro }}. Codes stapelen niet.</p>
 <section class="panel">
   {% if rows %}

@@ -62,6 +62,9 @@ class Order(models.Model):
     discount_cents = models.PositiveIntegerField("korting (centen)", default=0)
     discount_code = models.ForeignKey("kortingen.DiscountCode", null=True, blank=True, on_delete=models.SET_NULL, related_name="orders")
     discount_code_text = models.CharField("kortingscode", max_length=40, blank=True)
+    # Automatische aanbieding (app kortingen): dezelfde velden discount_cents/subtotal_cents; hier welke aanbieding, als tekst vastgelegd.
+    discount_offer = models.ForeignKey("kortingen.Offer", null=True, blank=True, on_delete=models.PROTECT, related_name="orders")
+    discount_offer_text = models.CharField("aanbieding", max_length=60, blank=True)
     currency = models.CharField(max_length=3, default="EUR")
     status = models.CharField(max_length=12, choices=Status.choices, default=Status.PENDING)
     fulfilment_status = models.CharField(
