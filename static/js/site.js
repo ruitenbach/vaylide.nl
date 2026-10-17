@@ -195,6 +195,18 @@
     });
   });
 
+  // Beheer: per lijst met selectievakjes alles aan- of uitvinken (knoppen alleen met JavaScript).
+  document.querySelectorAll("[data-check-section]").forEach(function (section) {
+    var actions = section.querySelector("[data-check-actions]");
+    if (!actions) return;
+    actions.hidden = false;
+    function zet(waarde) {
+      section.querySelectorAll("input[type=checkbox]").forEach(function (box) { if (!box.disabled) box.checked = waarde; });
+    }
+    actions.querySelector("[data-check-all]").addEventListener("click", function () { zet(true); });
+    actions.querySelector("[data-check-none]").addEventListener("click", function () { zet(false); });
+  });
+
   /* Voorwaarden afdrukken of opslaan als pdf (knop alleen met JavaScript) */
   document.querySelectorAll("[data-print]").forEach(function (button) {
     button.hidden = false;

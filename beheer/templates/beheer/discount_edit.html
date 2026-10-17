@@ -8,8 +8,8 @@
   {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors.0 }}</div>{% endif %}
   {% for field in form %}
   <div class="field">
-    {% if field.field.widget.input_type == "checkbox" %}<label class="check">{{ field }}<span>{{ field.label }}</span></label>
-    {% elif field.name == "occasions" or field.name == "tiers" or field.name == "templates" %}<fieldset><legend class="label">{{ field.label }}</legend>{% if field.help_text %}<p class="hint">{{ field.help_text }}</p>{% endif %}<div class="section-toggles">{% for c in field %}<label class="check section-toggle">{{ c.tag }}<span>{{ c.choice_label }}</span></label>{% endfor %}</div></fieldset>
+    {% if field.name == "occasions" or field.name == "tiers" or field.name == "templates" %}<fieldset data-check-section><legend class="label">{{ field.label }}</legend>{% if field.help_text %}<p class="hint">{{ field.help_text }}</p>{% endif %}<div class="btn-row section-actions" data-check-actions hidden><button class="btn btn--ghost btn--sm" type="button" data-check-all aria-label="Alles aanvinken: {{ field.label|lower }}">Alles aanvinken</button><button class="btn btn--ghost btn--sm" type="button" data-check-none aria-label="Alles uitvinken: {{ field.label|lower }}">Alles uitvinken</button></div><div class="section-toggles">{% for c in field %}<label class="check section-toggle">{{ c.tag }}<span>{{ c.choice_label }}</span></label>{% endfor %}</div></fieldset>
+    {% elif field.field.widget.input_type == "checkbox" %}<label class="check">{{ field }}<span>{{ field.label }}</span></label>
     {% else %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{% if field.help_text %}<p class="hint">{{ field.help_text }}</p>{% endif %}{{ field }}{% endif %}
     {% for e in field.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
   </div>

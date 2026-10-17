@@ -62,6 +62,8 @@ Zie de bestelstap: onder het overzicht staat een bescheiden tekstregel "Heb je e
 
 Beheer → Kortingscodes (alleen met de schakelaar aan): overzicht met status (gepland, actief, verlopen, opgebruikt, uitgezet), aanmaken en wijzigen (percentage of vast bedrag, periode, maximum, maximum per klant, minimum bestelbedrag, gelegenheden, indelingen, ontwerpen; een leeg codeveld maakt een willekeurige code zonder verwarrende tekens), en per code de bestellingen die hem gebruikten. Na het eerste gebruik zijn code, soort, waarde en bereik vergrendeld; uitzetten, periode en maximum kunnen nog. Een code verdwijnt nooit (alleen uitzetten).
 
+In het formulier heeft elke lijst met selectievakjes (gelegenheden, indelingen, ontwerpen) de knoppen "Alles aanvinken" en "Alles uitvinken". Ze werken alleen binnen hun eigen lijst, verschijnen alleen met JavaScript en veranderen de filterlogica niet.
+
 ## Niet gedaan
 
 Geen stapelen, geen tegoeden, geen automatische acties, geen gratis bestellingen, niets op staging of productie.

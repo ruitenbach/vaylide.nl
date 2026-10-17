@@ -755,6 +755,17 @@ class BeheerKortingscodes(KortingBasis):
             self.assertNotContains(self.c.get("/beheer/"), "Kortingscodes")
         self.assertEqual(DiscountCode.objects.count(), 0)
 
+    def test_formulier_heeft_selectieknoppen_per_sectie_en_js_zet_ze_aan(self):
+        page = self.c.get("/beheer/kortingscodes/nieuw/").content.decode()
+        self.assertEqual(page.count("data-check-section"), 3)
+        self.assertEqual(page.count("data-check-all"), 3)
+        self.assertEqual(page.count("data-check-none"), 3)
+        for tekst in ("Alleen voor deze gelegenheden", "Alleen voor deze indelingen", "Alleen voor deze ontwerpen"):
+            self.assertIn(tekst, page)
+        self.assertIn("data-check-actions hidden", page)   # zonder JavaScript blijft het formulier ongewijzigd
+        js = open("static/js/site.js", encoding="utf-8").read()
+        self.assertIn("data-check-section", js)
+
     def test_bestelling_in_beheer_toont_korting_en_btw(self):
         maak_code("ZOMER10")
         payment = self.bestel()
