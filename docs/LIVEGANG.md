@@ -70,5 +70,6 @@ Korte lijst met wat de eigenaar nog moet aanleveren: `docs/INVULLIJST.md`.
 - [ ] De boekhouder bevestigt de behandeling: korting op het bedrag inclusief btw, btw-deel proportioneel (zie `docs/KORTINGSCODES.md`, onder "Btw", met vijf open vragen). De KOR is uitgesloten: de onderneming rekent 21% btw (eigenaar, 17 oktober 2026).
 - [ ] Proef met een Mollie-testsleutel op staging: bestelling met korting, mislukte en afgebroken betaling, terugbetaling in Mollie, en het bedrag bij Mollie gelijk aan de bon en de mail. Minimumbedrag per betaalmethode in Mollie nagaan (we rekenen met minimaal € 1,00).
 - [ ] Proef op PostgreSQL (gelijktijdige bestellingen op de laatste plek van een code).
+- [x] Bekend en geaccepteerd door de eigenaar (17 oktober 2026): een late, alsnog geslaagde betaling kan het maximum aantal keer of het maximum per klant overschrijden (zie `docs/KORTINGSCODES.md`). Het gedrag is niet aangepast.
 - [ ] Juridisch: een korte regel over kortingscodes (niet combineerbaar, niet inwisselbaar voor geld) in de voorwaarden, als de eigenaar dat wil.
 - [ ] Alleen met uitdrukkelijk akkoord van de eigenaar: `VIERLIEF_KORTINGSCODES=1` op productie.
