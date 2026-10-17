@@ -22,6 +22,7 @@ from core.voorwaarden import DELIVERY_CONSENT, SERVICE_CONSENT, current as terms
 from invitations.content import publish_issues
 from invitations.models import Invitation, Source
 from invitations.services import snapshot
+from kortingen import services as kortingen
 from processing.jobs import enqueue
 
 from .models import Order, OrderLine, Payment, PaymentEvent
@@ -64,7 +65,7 @@ def refresh_open_payments(invitation: Invitation, limit: int = 3) -> None:
 
 
 def start_checkout(invitation: Invitation, *, user, package_code: str, optional_codes: list[str], terms_accepted: bool,
-                   delivery_consent: bool = False, service_consent: bool = False) -> Payment:
+                   delivery_consent: bool = False, service_consent: bool = False, discount_code: str = "") -> Payment:
     if not terms_accepted:
         raise CheckoutError("Ga akkoord met de voorwaarden om te bestellen.")
     refresh_open_payments(invitation)
@@ -91,10 +92,17 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
             if package is None:
                 raise CheckoutError("Kies een pakket.")
             quote = build_quote(invitation.draft_content, package, optional_codes, template_version=invitation.template_version)
-        # Eerdere, onbetaalde bestellingen voor deze uitnodiging vervallen.
-        Order.objects.filter(invitation=invitation, kind=Order.Kind.INVITATION, status__in=[Order.Status.PENDING, Order.Status.FAILED]).update(
-            status=Order.Status.CANCELLED
-        )
+        # Eerdere, onbetaalde bestellingen voor deze uitnodiging vervallen (en geven hun gereserveerde kortingscode vrij).
+        old = Order.objects.filter(invitation=invitation, kind=Order.Kind.INVITATION, status__in=[Order.Status.PENDING, Order.Status.FAILED])
+        kortingen.release_reserved(list(old.values_list("pk", flat=True)), "vervangen door een nieuwe bestelling")
+        old.update(status=Order.Status.CANCELLED)
+        discount = None
+        if discount_code and discount_code.strip():
+            # Altijd opnieuw gecontroleerd en onder een slot; de klant stuurt alleen de code mee, nooit een bedrag.
+            try:
+                discount = kortingen.prepare(discount_code, quote, template_version=invitation.template_version, occasion=invitation.occasion, customer=user)
+            except kortingen.DiscountError as exc:
+                raise CheckoutError(exc.message) from exc
         version = snapshot(invitation, source=Source.CUSTOMER, user=user, note="Besteld")
         order = _create_order(
             kind=Order.Kind.INVITATION,
@@ -108,6 +116,10 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
             max_gallery_photos=quote.max_gallery_photos,
             availability_months=quote.availability_months,
             total_cents=quote.total_cents,
+            subtotal_cents=quote.subtotal_cents if discount else None,
+            discount_cents=discount.discount_cents if discount else 0,
+            discount_code=discount.code if discount else None,
+            discount_code_text=discount.code.code if discount else "",
             terms_accepted_at=timezone.now(),
             terms_version=terms_version_now(),
             delivery_consent_at=timezone.now() if delivery_consent else None,
@@ -116,6 +128,8 @@ def start_checkout(invitation: Invitation, *, user, package_code: str, optional_
             service_consent_text=SERVICE_CONSENT if service_consent else "",
             test_mode=settings.TEST_MODE,
         )
+        if discount:
+            kortingen.reserve(order, discount, user)
         for line in quote.lines:
             OrderLine.objects.create(
                 order=order,
@@ -154,9 +168,25 @@ def create_custom_order(custom_request, *, user, delivery_consent: bool = False,
     return order
 
 
+def _check_discounted_order(order: Order) -> None:
+    """Een bestelling met kortingscode: het bedrag voor Mollie moet exact de som van de regels zijn, positief en boven de ondergrens, en de
+    reservering van de code moet (nog) kloppen. Faalt dit, dan volgt er geen betaling."""
+    lines_total = sum(line.total_cents for line in order.lines.all())
+    if lines_total != order.total_cents or order.total_cents < kortingen.min_total_cents() or (order.subtotal_cents or 0) - order.discount_cents != order.total_cents:
+        log.error("Bedrag van %s klopt niet met de regels (%s tegen %s).", order.number, lines_total, order.total_cents)
+        raise CheckoutError("Het bedrag van deze bestelling klopt niet. Er is niet betaald; neem contact met ons op.")
+    try:
+        with transaction.atomic():
+            kortingen.ensure_reserved(order)
+    except kortingen.DiscountError as exc:
+        raise CheckoutError(f"{exc.message} Open je uitnodiging en bestel opnieuw; je ontwerp is bewaard.") from exc
+
+
 def create_payment(order: Order) -> Payment:
     if order.status == Order.Status.PAID:
         raise CheckoutError("Deze bestelling is al betaald.")
+    if order.discount_cents:
+        _check_discounted_order(order)
     try:
         provider = get_provider()
     except ProviderError as exc:
@@ -216,9 +246,10 @@ def apply_remote_status(payment: Payment, remote: RemoteStatus, *, source: str) 
                     order.status = Order.Status.PAID
                     order.paid_at = p.paid_at
                     order.save()
+                    korting_tekst = kortingen.confirm(order)    # de reservering van een kortingscode wordt definitief, in dezelfde transactie
                     kind = "fulfil_order" if order.kind == Order.Kind.INVITATION else "fulfil_custom_order"
                     enqueue(kind, {"order_id": order.pk}, unique_key=f"{kind}:{order.pk}", order=order, invitation=order.invitation)
-                    event.outcome = "Betaald; verwerking gestart."
+                    event.outcome = ("Betaald; verwerking gestart." + korting_tekst)[:200]
                 else:
                     event.outcome = "Betaald (bestelling was al betaald)."
         elif remote.status in (Payment.Status.FAILED, Payment.Status.CANCELED, Payment.Status.EXPIRED):
@@ -230,6 +261,8 @@ def apply_remote_status(payment: Payment, remote: RemoteStatus, *, source: str) 
                     Order.Status.EXPIRED if remote.status == Payment.Status.EXPIRED else Order.Status.PENDING
                 )
                 order.save()
+                if order.status in (Order.Status.FAILED, Order.Status.EXPIRED):
+                    kortingen.release_reserved([order], "betaling mislukt of verlopen")
             event.outcome = f"Status bijgewerkt: {p.get_status_display().lower()}."
         else:
             p.status = remote.status

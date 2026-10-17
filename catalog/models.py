@@ -14,6 +14,8 @@ from .occasions import OCCASION_CHOICES
 def format_euro(cents: int | None) -> str:
     if cents is None:
         return "—"
+    if cents < 0:    # een kortingsregel op de bon: '− € 2,50'
+        return "\u2212 " + format_euro(-cents)
     euros, rest = divmod(int(cents), 100)
     whole = f"{euros:,}".replace(",", ".")
     from django.conf import settings

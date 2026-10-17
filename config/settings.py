@@ -125,6 +125,7 @@ INSTALLED_APPS = [
     "catalog",
     "invitations",
     "orders",
+    "kortingen",
     "wishes",
     "processing",
     "studio",
@@ -289,6 +290,14 @@ PRICING_V2_SINCE = env("VIERLIEF_PRICING_V2_SINCE", "")
 # conceptmeldingen vervallen). VIERLIEF_ACTIVERINGSDATUM: de datum waarop de nieuwe prijzen ingaan (YYYY-MM-DD), zoals in artikel 6 genoemd.
 TEXTS_DEFINITIVE = env_bool("VIERLIEF_TEKSTEN_DEFINITIEF", False)
 PRICING_V2_ACTIVATION = env("VIERLIEF_ACTIVERINGSDATUM", "")
+
+# Kortingscodes (app kortingen). Staat standaard UIT: dan is er geen invoerveld, geen Beheeronderdeel en negeert de bestelling elke code (alles
+# werkt zoals voorheen). Het te betalen bedrag wordt nooit lager dan DISCOUNT_MIN_TOTAL_CENTS (besluit van de eigenaar, 17 oktober 2026: € 1,00);
+# een reservering van een code blijft DISCOUNT_RESERVATION_MINUTES staan, daarna telt hij niet meer mee voor het maximum.
+DISCOUNTS_ENABLED = env_bool("VIERLIEF_KORTINGSCODES", False)
+DISCOUNT_MIN_TOTAL_CENTS = int(env("VIERLIEF_KORTING_MINIMUM_CENTEN", "100"))
+DISCOUNT_RESERVATION_MINUTES = int(env("VIERLIEF_KORTING_RESERVERING_MINUTEN", "120"))
+VAT_RATE_PERCENT = int(env("VIERLIEF_BTW_PERCENTAGE", "21"))
 
 PAYMENT_PROVIDER = env("VIERLIEF_PAYMENT_PROVIDER", "test" if TEST_MODE else "mollie").lower()
 MOLLIE_API_KEY = env("MOLLIE_API_KEY")

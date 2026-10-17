@@ -36,6 +36,10 @@ class QuoteLine:
     def total_display(self) -> str:
         return format_euro(self.total_cents)
 
+    @property
+    def is_discount(self) -> bool:
+        return self.code.startswith("korting:")
+
 
 @dataclass
 class Quote:
@@ -45,10 +49,17 @@ class Quote:
     max_gallery_photos: int = 0
     availability_months: int = 0
     selected_optional: list[str] = field(default_factory=list)
+    discount_cents: int = 0     # kortingscode (app kortingen): staat als negatieve regel in `lines`
+    discount_code: str = ""
 
     @property
     def total_cents(self) -> int:
         return sum(line.total_cents for line in self.lines)
+
+    @property
+    def subtotal_cents(self) -> int:
+        """Het bedrag vóór korting."""
+        return self.total_cents + self.discount_cents
 
     @property
     def total_display(self) -> str:
@@ -57,6 +68,10 @@ class Quote:
     @property
     def required_addon_lines(self) -> list[QuoteLine]:
         return [line for line in self.lines if line.reason]
+
+    @property
+    def has_discount(self) -> bool:
+        return self.discount_cents > 0
 
 
 def optional_addons() -> list[AddOn]:
