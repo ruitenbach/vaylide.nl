@@ -521,3 +521,8 @@ body { --fk-sky-l: 22%; --fk-sky-r: 8%; --fk-sky-t: 7%; --fk-sky-h: 25%; }
 .fk-frame--hero > .fx-slot { z-index: 0; }
 html.inv-bloesemwaaier { --fx-density: 0.8; }
 /* premium-laag einde */
+
+/* knop-ruimte begin */
+/* De pauze- en muziekknop zweven in de hoeken van het scherm. Op de eerste schermhoogte staat de plaatsregel op dezelfde hoogte; houd die regel tussen de knoppen. */
+@media (max-width: 480px) { .fk-meta { padding-inline: 4.25rem; } }
+/* knop-ruimte einde */

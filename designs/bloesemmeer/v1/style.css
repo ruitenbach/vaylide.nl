@@ -512,3 +512,8 @@ body { --fk-sky-l: 12%; --fk-sky-r: 12%; --fk-sky-t: 7%; --fk-sky-h: 26%; }
 /* Bloesemblaadjes over het beeld van de kop: een eigen laag (zelfde sfeer als de pagina, loopt alleen terwijl de kop in beeld is), boven de
    nevel en het water, onder de namen en de datum (z-index 1). */
 .fk-frame--hero > .fx-slot { z-index: 0; }
+
+/* knop-ruimte begin */
+/* De pauze- en muziekknop zweven in de hoeken van het scherm. Op de eerste schermhoogte staat de plaatsregel op dezelfde hoogte; houd die regel tussen de knoppen. */
+@media (max-width: 480px) { .fk-meta { padding-inline: 4.25rem; } }
+/* knop-ruimte einde */

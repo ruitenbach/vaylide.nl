@@ -451,3 +451,8 @@ html.inv-rozenboog::before { filter: blur(38px) saturate(1.02); }
 .rb-gallery__item--still:nth-child(even) img { border-radius: 80px 80px 4px 4px / 70px 70px 4px 4px; }
 .rb-gallery { width: min(100%, 36rem); }
 @media (min-width: 720px) { .rb-gallery__grid--stills { columns: 2 150px; } }
+
+/* knop-ruimte begin */
+/* De pauze- en muziekknop zweven in de hoeken van het scherm. Op de eerste schermhoogte staat de plaatsregel op dezelfde hoogte; houd die regel tussen de knoppen. */
+@media (max-width: 480px) { .rb-meta { padding-inline: 4.25rem; } }
+/* knop-ruimte einde */

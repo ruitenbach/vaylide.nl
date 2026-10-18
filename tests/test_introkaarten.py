@@ -254,3 +254,20 @@ class PremiumLaagTests(VaylideTestCase):
         for slug in KAARTEN:
             self.assertEqual(collectie.groep(slug), "C", slug)
             self.assertFalse(Template.objects.get(slug=slug).is_active, slug)
+
+
+class KnopRuimteTests(VaylideTestCase):
+    """De pauze- en muziekknop zweven in de hoeken; de plaatsregel in de kop blijft daartussen (alleen op smalle schermen)."""
+
+    ONTWERPEN = {"zijden-gordijn": "fk", "bloesemmeer": "fk", "bloesemwaaier": "fk", "kerstsprookje": "fk", "gouden-poort": "fk", "rozenboog": "rb"}
+
+    def test_de_plaatsregel_blijft_tussen_de_knoppen(self):
+        for slug, voorvoegsel in self.ONTWERPEN.items():
+            css = (Path(settings.BASE_DIR) / "designs" / slug / "v1" / "style.css").read_text(encoding="utf-8")
+            self.assertEqual(css.count("/* knop-ruimte begin */"), 1, slug)
+            self.assertIn("@media (max-width: 480px) { .%s-meta { padding-inline: 4.25rem; } }" % voorvoegsel, css, slug)
+
+    def test_het_sjabloon_heeft_dezelfde_regel(self):
+        css = (Path(settings.BASE_DIR) / "tools" / "introkaarten" / "sjabloon" / "style.css").read_text(encoding="utf-8")
+        self.assertEqual(css.count("/* knop-ruimte begin */"), 1)
+        self.assertIn(".fk-meta { padding-inline: 4.25rem; }", css)

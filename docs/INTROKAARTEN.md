@@ -84,3 +84,7 @@ Nodig per film, van de eigenaar: met welke dienst en op wiens account de film is
 ## Controle van de films (18 oktober 2026)
 
 Zie `docs/CONTROLES.md`, "Vijf filmkaarten". Kort: de testbrowser van deze omgeving kan geen H.264 afspelen; het afspelen is daar daarom met de WebM gecontroleerd, de MP4 is met `ffprobe` en `ffmpeg` gecontroleerd (geldig, volledig decodeerbaar, `+faststart`, geen geluid) maar niet in een echte browser afgespeeld. Bij het eerste onderzoek bleek dat de film in die browser stil werd overgeslagen omdat er geen bruikbare bron was; dat is verholpen met de WebM-bron.
+
+## Knoppen en plaatsregel op mobiel (18 oktober 2026)
+
+De pauze- en muziekknop zweven in de hoeken van het scherm. Het blok `knop-ruimte` onderaan `style.css` (en in het sjabloon) houdt de regel met tijd en plaats op schermen tot 480 px tussen de knoppen. Zie `docs/CONTROLES.md`. Dezelfde regel staat ook in `designs/rozenboog/v1/style.css` (`.rb-meta`).
