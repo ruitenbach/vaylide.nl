@@ -148,3 +148,35 @@ Uitdrukkelijk akkoord van de eigenaar (18 oktober 2026, 20:58): de vijf kaarten 
 4. Nieuw, afzonderlijk akkoord voor activeren.
 
 **Terugvalplan:** de vorige productiedeploy (691ca1c) weer live zetten via Render.
+
+## Rechtenregistratie bijgewerkt: herkomstketen (18 oktober 2026, 21:17)
+
+**Verklaring van de eigenaar** (bericht van 18 oktober 2026, 21:17, vervangt de eerdere, onvolledige verklaring van 20:50 en 20:58): de oorspronkelijke afbeeldingen van alle vijf kaarten zijn door ChatGPT gegenereerd; de eigenaar heeft ze daarna zelf met zijn eigen **Runway Pro-account** omgezet naar video's. Herkomstketen voor alle vijf: ChatGPT/OpenAI → eigen Runway Pro-account → Vaylide. Per film is dit dezelfde verklaring; een verschil per film is niet opgegeven.
+
+| Kaart | Herkomstketen (verklaard door de eigenaar) | Herkomst aantoonbaar met bewijsstuk |
+|---|---|---|
+| Zijden gordijn | ChatGPT-afbeelding → Runway Pro → Vaylide | Nee, alleen verklaring |
+| Bloesemmeer | idem | Nee, alleen verklaring |
+| Bloesemwaaier | idem | Nee, alleen verklaring |
+| Kerstsprookje | idem | Nee, alleen verklaring |
+| Gouden poort | idem | Nee, alleen verklaring |
+
+**Voorwaarden: wat ik heb kunnen nagaan.** De officiële pagina's van OpenAI en Runway zijn vanuit de cloudomgeving niet te openen (DNS-fout); ik heb ze dus niet zelf gelezen. Wat ik wel zag zijn zoekresultaten, deels als samenvatting van de officiële Runway-helppagina's en deels van secundaire bronnen:
+- **Runway** (helppagina "Usage rights" en "Can I use the content I made in Runway for commercial purposes", zoals de zoekmachine ze samenvat): op elk plan (Free, Standard, Pro, Max, Unlimited) behoudt de gebruiker het eigendom en alle rechten op wat hij uploadt en genereert; de inhoud mag volgens die pagina's worden gebruikt zonder niet-commerciële beperkingen van Runway; vermelding van Runway is niet verplicht. Een Pro-plan valt daar dus onder.
+- **OpenAI** (alleen secundaire bronnen, niet de eigen voorwaarden): "you own all Input and Output" en OpenAI draagt zijn rechten op de uitvoer over aan de gebruiker; commercieel gebruik van beelden is volgens die bronnen toegestaan, binnen het gebruiksbeleid. Eigendom is contractueel en geen garantie dat een beeld auteursrechtelijk beschermd is of vrij van rechten van derden.
+- Beide partijen regelen alleen hun eigen deel: bij beeld naar video blijft de gebruiker zelf verantwoordelijk voor rechten op wat hij als invoer gebruikt. Dat is hier een eigen ChatGPT-beeld.
+
+**Aanwijzingen voor extern bronmateriaal of afzonderlijke beperkingen.** Onderzocht in de code en de bestanden:
+- Geen concrete aanwijzing gevonden: alle beelden op de kaarten (kop, uitsneden, galerij, eindbeeld) zijn stills uit de eigen films; er is geen stockfoto, geen geluidsspoor en geen extern adres in de kaarten; de gebruikte lettertypen zijn OFL op de eigen server (zie punt 14 in `docs/OVERDRACHT.md`).
+- In drie stilstaande beelden per film (op miniatuurformaat) geen zichtbaar watermerk, logo of tekst. Dat is een steekproef, geen volledige beeldcontrole.
+- De scènes zijn algemeen (gordijn met kasteel, bloesemmeer, waaier en pagode, kerststad, gouden poort met paleis). Er staan geen gezichten, merken of namen in. Het paleis van Gouden poort doet denken aan een bekend bouwwerk; dat is geen rechtenprobleem, maar wel een beeld dat de eigenaar kan willen nalopen.
+
+**Onderscheid: aantoonbaar risico of ontbrekend bewijs**
+- *Aantoonbaar risico (concrete aanwijzing, onverklaard):* de bronbestanden (de originele mp4's) dragen een AIGC-label met een `ContentProducer`-code die ik niet tot Runway of OpenAI kan herleiden (zie "Rechten per videobestand"). Het past niet vanzelf bij de herkomstketen. Het is geen bewijs van een beperking, maar het is wel een feit dat nog een verklaring nodig heeft (bijvoorbeeld een tussenstap via een andere dienst of een export). De bestanden op de website zijn opnieuw gecodeerd en dragen dit label niet meer.
+- *Ontbrekende administratieve bewijsstukken:* (1) per film de generatie in het Runway-account (datum, plan Pro op dat moment, naam of prompt), (2) de ChatGPT-afbeelding waaruit de film is gemaakt, met datum, (3) een bewaarde kopie, met datum, van de Runway-pagina "Usage rights" en de OpenAI-voorwaarden zoals ze golden.
+
+**Eindoordeel (alleen resterende blokkades voor publicatie)**
+Volgens de voorwaarden zoals ik ze kon nagaan is commercieel gebruik van eigen Runway-generaties en ChatGPT-uitvoer in beginsel toegestaan, en de herkomstketen is door de eigenaar verklaard. De blokkade is daarmee **niet opgeheven**; wat resteert is dit:
+1. Eén onverklaard feit: de `ContentProducer`-code in de bronbestanden (zie hierboven).
+2. De bewijsstukken onder "ontbrekende administratieve bewijsstukken": zonder die stukken berust de herkomst op de verklaring alleen.
+De tabel "Rechten per videobestand" blijft daarom op "Nee" staan; zij wordt bijgewerkt zodra de eigenaar de punten 1 en 2 aanlevert. Daarnaast blijven de technische en commerciële voorwaarden voor publieke vrijgave uit "Productie-uitrol met verborgen kaarten" gelden (Safari/iOS en telefoontest, bevestiging van Luxe, nieuw akkoord voor activeren). Dit is geen juridisch advies.
