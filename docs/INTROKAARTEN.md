@@ -92,3 +92,22 @@ De pauze- en muziekknop zweven in de hoeken van het scherm. Het blok `knop-ruimt
 ## Link Aanmelden in de kop (18 oktober 2026)
 
 Een kleine link `Aanmelden` (`.fk-aanmeld`, bij Rozenboog `.rb-aanmeld`) staat rechtsboven in de kop en wijst naar `#aanmelden`. Hij verschijnt alleen als aanmelden kan (`v.show.rsvp and not v.rsvp.closed_reason`) en pas na de film, omdat de uitnodiging tot dan inert is. Stijl: blok `aanmeld-link` in `style.css` en het sjabloon. Zie `docs/CONTROLES.md`.
+
+## Afronding van de ontwikkelronde van de vijf filmkaarten (18 oktober 2026)
+
+Stand: ontwikkelcommit `42e1dca` staat op de stagingtak `claude/vaylide-master-collectie` en is daar live (deploy van 20:22 UTC). De ontwikkelbranch `claude/project-thread-m2kme8` heeft daarna alleen documentatie erbij. Productie is niet aangeraakt.
+
+**Echt uitgevoerd en geslaagd**
+- Tests: `manage.py test tests` (1391 tests) na de laatste codewijziging; alleen de twee bekende falers door de lokale `.env` (`VIERLIEF_CONTACT_EMAIL`, tests `test_voorwaarden_nieuw`), die niets met deze kaarten te maken hebben. Na afronding opnieuw de tests voor de kaarten, collectie, prijsstructuur, film en effecten: 108 tests, geslaagd.
+- axe (`e2e/toegankelijkheid.cjs`, dicht en open): 0 bevindingen voor alle zes kaarten (de vijf plus Rozenboog).
+- Chromium: film, eindbeeld, effectlaag, pauzeknop, minder beweging, vier schermbreedtes, knoppen naast de plaatsregel, link Aanmelden (plaatsing, toetsenbord, inert tijdens de film), vloeiendheid met vertraagde processor. Details per onderdeel: eerdere secties in dit document.
+- Staging, alleen-lezen: deploy live, geen fouten of waarschuwingen in de logs, `/healthz` 200, geen migraties; stagingdatabase: 63 ontwerpen waarvan 47 actief, de vijf kaarten inactief, geen medewerkersaccount.
+
+**Bewust overgeslagen (besluit van de eigenaar, 18 oktober 2026)**
+- Handmatige controle op de eigen telefoon op staging (Safari, Android Chrome); daarvoor is geen tijdelijk beheeraccount aangemaakt.
+- Browsercontrole op de stagingsite zelf: de cloudomgeving bereikt die niet; niet verder uitgezocht.
+- Safari en Firefox in de testomgeving, echte telefoons, de MP4 op echte apparaten (testbrowser heeft geen H.264; WebM en `ffprobe` zijn gebruikt).
+
+**Verborgen en niet bestelbaar**: groep C in `catalog/collectie.py`; in de stagingdatabase `is_active = false` voor alle vijf (gelezen op 18 oktober 2026, na de laatste deploy); tests: 404 voor bezoekers en klanten, niet in collectie, zoeken en sitemap, niet te kiezen in de bestelroute (ook niet voor beheerders), geen wijziging in prijzen. Prijzen, betalingen en bestaande ontwerpen zijn niet gewijzigd.
+
+**Nog open, bij de eigenaar**: de commerciële gebruiksrechten per film (zie "Rechten per videobestand": voor alle vijf nog niet bevestigd) en de controle op echte telefoons. Geen publieke activatie, verkoop of productie-uitrol zonder nieuw akkoord.

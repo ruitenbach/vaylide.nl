@@ -1404,3 +1404,7 @@ Op verzoek van de eigenaar: bij Zijden gordijn, Bloesemmeer, Bloesemwaaier, Kers
 - **Niet beschikbaar:** drie tests in `tests/test_introkaarten.py` (`AanmeldLinkTests`): aanwezig bij open aanmelden in de kop en wijzend naar `#aanmelden`; afwezig bij voorbije deadline en bij aanmelden uitgezet (op echte gepubliceerde uitnodigingen met het ontwerp); stijl en sjabloon aanwezig.
 - **axe** (`e2e/toegankelijkheid.cjs`, dicht en open): 0 bevindingen voor alle zes. **Tests:** `manage.py test tests`: 1391 tests, alleen de twee bekende falers door de lokale `.env`. Een bestaande laagtest is aangepast om alleen de premium laag te beoordelen (niet de latere blokken).
 - **Niet gedaan:** staging, Safari, Firefox en echte telefoons.
+
+## Vijf filmkaarten: afronding en overgeslagen controles (18 oktober 2026)
+
+Samenvatting van wat echt is uitgevoerd, wat bewust is overgeslagen en de stand op staging: zie `docs/INTROKAARTEN.md`, "Afronding van de ontwikkelronde". Op staging is alleen gelezen (deploy, logs, gezondheid, tellingen in de database), niet in een browser gecontroleerd.
