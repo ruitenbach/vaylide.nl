@@ -180,3 +180,38 @@ Volgens de voorwaarden zoals ik ze kon nagaan is commercieel gebruik van eigen R
 1. Eén onverklaard feit: de `ContentProducer`-code in de bronbestanden (zie hierboven).
 2. De bewijsstukken onder "ontbrekende administratieve bewijsstukken": zonder die stukken berust de herkomst op de verklaring alleen.
 De tabel "Rechten per videobestand" blijft daarom op "Nee" staan; zij wordt bijgewerkt zodra de eigenaar de punten 1 en 2 aanlevert. Daarnaast blijven de technische en commerciële voorwaarden voor publieke vrijgave uit "Productie-uitrol met verborgen kaarten" gelden (Safari/iOS en telefoontest, bevestiging van Luxe, nieuw akkoord voor activeren). Dit is geen juridisch advies.
+
+## Definitieve rechtenstatus (18 oktober 2026, 21:21)
+
+Dit vervangt de eindoordelen van 20:50 en 21:17 waar die afwijken. Er is niets in code, ontwerpen of deployments veranderd.
+
+**Officiële bronnen, door de eigenaar aangeleverd en door hem rechtstreeks laten controleren** (ik kon beide adressen vanuit de cloudomgeving niet openen en heb ze dus zelf niet gelezen; mijn eigen zoekresultaten gaven dezelfde strekking, zie hierboven):
+- Runway, "Usage rights": https://help.runwayml.com/hc/en-us/articles/18927776141715-Usage-rights
+- OpenAI, gebruiksvoorwaarden: https://openai.com/nl-NL/policies/terms-of-use/
+
+**1. Algemene commerciële gebruiksrechten (volgens de voorwaarden):** door de eigenaar rechtstreeks gecontroleerd aan de officiële bronnen; commercieel gebruik van eigen uitvoer is in beginsel toegestaan. Niet door mij onafhankelijk gelezen. Geen juridisch advies.
+
+**2. Herkomst, bevestigd door de eigenaar (18 oktober 2026, 21:21, herhaald):**
+- De vijf oorspronkelijke afbeeldingen zijn met ChatGPT gegenereerd.
+- De eigenaar maakte de vijf video's zelf via zijn eigen Runway Pro-account.
+- Voor zover hem bekend is geen extern stockmateriaal gebruikt.
+Mijn eigen controle van de bestanden en de code (zie "Rechtenregistratie bijgewerkt") vond geen aanwijzing voor stockmateriaal, geluid, extern adres of een zichtbaar watermerk (steekproef).
+
+**3. Nog niet onafhankelijk geverifieerd:**
+- De herkomstketen zelf: er is geen export of overzicht uit de accounts bijgevoegd.
+- De generatiegegevens per film (datum, plan op dat moment, prompt of naam, bronafbeelding uit ChatGPT): **niet beschikbaar in het dossier**; hieronder geregistreerd als ontbrekend. Alleen de bestandsnamen van vier bronbestanden bevatten het begin van de prompt.
+- De afwijkende AIGC-producentcode: **openstaand herkomstonderzoek**, niet beschouwd als bewijs dat commerciële rechten ontbreken. Alle vijf de bronbestanden dragen dezelfde `ContentProducer` en `ContentPropagator` (`001191330106MA2CFLDG4R10001`) en een eigen `ProduceID`. De opbouw van het label lijkt op de Chinese norm voor impliciete AI-labels (niet geverifieerd). Wie het label op het bestand zet, is niet vastgesteld. Een eenvoudige manier om dit later af te sluiten, zonder dat het nu nodig is: een van de generaties opnieuw uit het Runway-account downloaden en kijken of dat bestand hetzelfde label draagt.
+
+**Originele bestanden bewaard** (ongewijzigd in de gedeelde projectmap `/mnt/project-files/`; de bestanden op de website zijn opnieuw gecodeerd en dragen het label niet):
+
+| Kaart | Bronbestand | Grootte (bytes) | SHA-256 |
+|---|---|---|---|
+| Zijden gordijn | `uploads/hearth/17f76c22-da85-44c6-8dcb-6fa212ad4acc` | 28177231 | `1123cc42cc134bf2fd2dbfc16e4cfa16b91f14d42cce7157f5dde8d385078278` |
+| Bloesemmeer | `One_continuous_cinematic_vertical_10_second_nature_reveal__absolutely_no_architecture_or_wedding_dec.mp4` (er staat een identieke kopie met " 2" in de naam naast) | 29120096 | `3c6c7a95f4a8df32f4d1ed79a0d1d51314522e948cef18b6f757609486a3284e` |
+| Bloesemwaaier | `Premium_cinematic_vertical_wedding_reveal__one_uninterrupted_locked_off_shot__Start_exactly_with_the.mp4` (ook als `uploads/hearth/c3f63281-e0b5-4f57-9b14-6687a2880e24`) | 25051384 | `8090250b44d87c890bc73fd0baf43a0a93fe165cd42c406af3f3e5696139a621` |
+| Kerstsprookje | `Premium_magical_Christmas_cinematic_vertical_10_second_reveal__At_first_the_ENTIRE_portrait_frame_is.mp4` | 36971633 | `18fa37066579aad87892578c7964432c69c88fcbb7664c8b530bbe8aff7709c0` |
+| Gouden poort | `uploads/hearth/d81b1a19-cfc5-4870-b3b4-1498f550588a` | 26081875 | `821993e4ddcd27c18507da4b1114e498f17639b5df17a29872b215a59fbd1071` |
+
+**Aanvullend bewijs:** op verzoek van de eigenaar nu niet gevraagd; er is geen concreet, relevant risico dat dat nodig maakt. De bewaarde generatiegegevens blijven wel een open gat in het dossier.
+
+**Resterende blokkades voor publicatie, na deze status:** de openstaande vraag naar de producentcode is een onderzoekspunt; of dat nog een blokkade is, beslist de eigenaar. Verder gelden alleen de eerder vastgelegde technische en commerciële voorwaarden (Safari/iOS en telefoontest inclusief de MP4, bevestiging van Luxe, nieuw akkoord om te activeren). De tabel "Rechten per videobestand" blijft daarom nog op "Nee" tot de eigenaar de rechtenstatus als voldoende aanvaardt; dit is zijn besluit, niet een bevinding over ontbrekende rechten.
