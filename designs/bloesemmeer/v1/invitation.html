@@ -33,6 +33,12 @@
 {% block content %}
 <header class="fk-hero">
   <div class="fk-frame fk-frame--hero" data-film-target style="background-image: url('{% static v.film.end %}')">
+    {# Filmische toevoeging (alleen als beweging mag): licht op het water, zachte nevel op twee dieptes. Decoratief, achter de tekst, zonder JavaScript. #}
+    <div class="fk-fx" aria-hidden="true">
+      <span class="fk-mist fk-mist--far"></span><span class="fk-mist fk-mist--near"></span>
+      <span class="fk-water"><span class="fk-water__glint fk-water__glint--a"></span><span class="fk-water__glint fk-water__glint--b"></span><span class="fk-water__glint fk-water__glint--c"></span><span class="fk-water__sun"></span></span>
+    </div>
+    {% if v.effects %}<div class="fx-slot" data-fx-slot="page" aria-hidden="true"></div>{% endif %}
     <div class="fk-sky{% if v.title|length > 40 or v.kicker|length > 34 %} fk-sky--dense{% endif %}">
       <p class="fk-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
       <h1 class="fk-names fk-names--{{ v.names_size }} fx-names" data-fx-reveal-origin>

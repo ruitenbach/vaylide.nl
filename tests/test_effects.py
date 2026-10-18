@@ -49,6 +49,16 @@ class EffectChoicesTests(TestCase):
         self.assertEqual(effect_view(None), {})
         self.assertEqual(effect_view({"sfeer": "onbekend"}), {})
 
+    def test_scrollwind_is_an_optional_extra_that_only_adds_a_class(self):
+        config = {"sfeer": "bloesem", "knal": "bloesem", "viering": "bloesem", "namen": "zacht", "onthul": "zacht", "extra": ["scrollwind"]}
+        self.assertEqual(effects_errors(config), [])
+        self.assertEqual(effect_view(config)["classes"], "fx fx-namen-zacht fx-onthul-zacht fx-scrollwind")
+        # Zonder de keuze reageert geen enkel ontwerp op scrollen: bestaande kaarten blijven zoals ze zijn.
+        for path in (Path(settings.BASE_DIR) / "designs").glob("*/v*/manifest.json"):
+            extra = json.loads(path.read_text(encoding="utf-8")).get("effects", {}).get("extra", [])
+            if "scrollwind" in extra:
+                self.assertEqual(path.parts[-3], "bloesemmeer")
+
     def test_same_options_for_burst_and_celebration(self):
         self.assertEqual(EFFECT_OPTIONS["knal"], EFFECT_OPTIONS["viering"])
         self.assertIn("geen", EFFECT_OPTIONS["sfeer"])

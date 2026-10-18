@@ -24,6 +24,10 @@ Een wand van kersenbloesem opent naar een bergmeer met een waterval in het zonli
 
 Je ziet eerst een wand van roze kersenbloesem. Na een tik gaat die langzaam open en kijk je uit over een helder meer met een waterval tussen de bergen, terwijl de zon opkomt achter de takken. Daarna staan jullie namen in de lucht en loopt de uitnodiging door met aftellen, programma, locatie en aanmelden, in zachtroze en goud. De opening is over te slaan en rustig bij minder beweging. De film is een gegenereerde scène zonder personen en zonder gebouwen.
 
+## 6a. Premium laag (voorbeeld, 18 oktober 2026, ter goedkeuring)
+
+Licht op het water, nevel op twee dieptes, bloesemblaadjes over de kop en scrollreactie van de blaadjes; zie `docs/INTROKAARTEN.md`. Alleen op deze kaart; de andere vier wachten op akkoord van de eigenaar.
+
 ## 7. Pagina na de opening
 
 Opbouw zoals Rozenboog: kop met het laatste beeld van de film, namen in de lucht, daarna aftellen, verhaal, programma, locatie en aanmelden, met uitsneden uit de film tussen de onderdelen. Effecten (uit `catalog/effects.py`): sfeer: bloesem, knal: bloesem, viering: bloesem, namen: zacht, onthul: zacht, extra: kenburns, tik.
@@ -54,6 +58,7 @@ Gegenereerd door `tools/introkaarten/maak_introkaarten.py` uit het gedeelde sjab
 
 ## 12. Wat nog moet gebeuren
 
+- [ ] Akkoord van de eigenaar op de premium laag, daarna eventueel naar de andere vier kaarten.
 - [ ] Rechten van de film bevestigen (dienst, account, commercieel gebruik).
 - [ ] MP4 afspelen op echte telefoons (iOS Safari, Android Chrome), Safari en Firefox.
 - [ ] Besluit van de eigenaar over zichtbaar maken.

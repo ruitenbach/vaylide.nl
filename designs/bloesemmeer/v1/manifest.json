@@ -43,9 +43,9 @@
         "--fk-date-1": "#C8506F",
         "--fk-date-2": "#A23E62",
         "--fk-date-3": "#7E2C49",
-        "--fx-1": "#FFE3E8",
-        "--fx-2": "#F8BCCB",
-        "--fx-3": "#F4A3B8",
+        "--fx-1": "#FFD3DD",
+        "--fx-2": "#EC86A2",
+        "--fx-3": "#F29DB5",
         "--fx-4": "#FFFFFF",
         "--fx-bg": "#43292F",
         "--fk-accent-ink": "#FFFFFF",
@@ -76,7 +76,8 @@
     "onthul": "zacht",
     "extra": [
       "kenburns",
-      "tik"
+      "tik",
+      "scrollwind"
     ]
   },
   "film": {

@@ -25,7 +25,8 @@
     knal: html.getAttribute("data-fx-knal") || "geen",
     viering: html.getAttribute("data-fx-viering") || "geen",
     tik: html.hasAttribute("data-fx-tik"),
-    kantel: html.classList.contains("fx-kantel")
+    kantel: html.classList.contains("fx-kantel"),
+    scrollwind: html.classList.contains("fx-scrollwind")
   };
   var reduceQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
   var fineQuery = window.matchMedia ? window.matchMedia("(hover: hover) and (pointer: fine)") : null;
@@ -651,6 +652,7 @@
       p.t += dt;
       p.x += (p.vx + (c.dir === "any" ? 0 : wind * (0.4 + p.size / 40))) * dt;
       p.y += p.vy * dt;
+      if (scene.shift) p.y -= scene.shift * (0.04 + p.size / 260);
       p.rot += p.spin * dt;
       p.flip += p.fs * dt;
       if (p.fade < 1) p.fade = Math.min(1, p.fade + dt * 0.8);
@@ -960,6 +962,9 @@
     this.fresh = true;
     this.fade = 1;
     this.wind = 0;
+    this.sdy = 0;
+    this.sv = 0;
+    this.shift = 0;
     this.t = 0;
     this.active = false;
     this.visible = true;
@@ -981,6 +986,13 @@
     if (this.stage.resize() || !this.pal) this.refresh();
     this.t += dt;
     this.wind = Math.sin(this.t * 0.23) * 10 + Math.sin(this.t * 0.07) * 6;
+    if (settings.scrollwind) {
+      /* Scrollen duwt de deeltjes zacht opzij en verschuift ze licht mee: grote blaadjes iets meer dan kleine (diepte). */
+      this.sv += (this.sdy / dt - this.sv) * 0.12;
+      this.wind += clamp(this.sv * 0.02, -16, 16);
+      this.shift = this.sdy;
+      this.sdy = 0;
+    }
     var due = true, i;
     for (i = 0; i < this.systems.length; i++) {
       this.systems[i].step(this, dt);
@@ -1248,6 +1260,15 @@
   var lastTime = 0;
   var slowFrames = 0;
   var tilt = { els: [], tx: 0, ty: 0, x: 0, y: 0, active: false };
+
+  if (settings.scrollwind) {
+    var lastScrollY = window.pageYOffset || 0;
+    window.addEventListener("scroll", function () {
+      var y = window.pageYOffset || 0, d = clamp(y - lastScrollY, -400, 400);
+      lastScrollY = y;
+      for (var i = 0; i < scenes.length; i++) scenes[i].sdy += d;
+    }, { passive: true });
+  }
 
   function wake() {
     if (running) return;

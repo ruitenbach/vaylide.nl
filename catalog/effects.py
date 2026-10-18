@@ -28,6 +28,7 @@ EFFECT_EXTRAS = {
     "stralen": "Draaiende lichtstralen achter de kop",
     "disco": "Draaiende lichtspikkels achter de kop",
     "aura": "Zachte kleurvlekken die langzaam over de achtergrond bewegen",
+    "scrollwind": "Zwevende deeltjes waaien en schuiven licht mee met het scrollen",
 }
 
 EFFECT_LABELS = {

@@ -40,6 +40,20 @@ De bronfilms staan niet in Git (alleen in de gedeelde projectmap). De herkomst: 
 
 De kaarten delen één opbouw. Een wijziging aan het sjabloon of de gegevens in `maak_introkaarten.py` en opnieuw genereren overschrijft de bestanden in `designs/<slug>/v1/`. Een kaart die al in gebruik is, wijzig je niet: maak een v2 (zie `docs/HANDLEIDING.md`).
 
+## Premium laag, voorbeeld op Bloesemmeer (18 oktober 2026, ter goedkeuring)
+
+Op verzoek van de eigenaar is eerst alleen **Bloesemmeer** verfijnd, om te beoordelen voor de andere vier hetzelfde krijgen. De openingsfilm, het ontwerp en de bestaande animaties zijn niet aangepast. Wat er bij is gekomen (alleen in `designs/bloesemmeer/v1/`, behalve de keuze `scrollwind`):
+
+- **Licht op het water**: drie lagen kleine, langgerekte lichtjes met eigen maat, tempo en fase, plus een smalle zonnebaan die langzaam in- en uitademt (`.fk-water`), over het water van het eindbeeld.
+- **Nevel op twee dieptes** (`.fk-mist`): zachte, langzaam verschuivende banden bij de dalen en bij de waterval.
+- **Diepte bij het scrollen**: nevel en water schuiven iets sneller omhoog dan het beeld (scrollgestuurde CSS-animatie, alleen waar de browser die kent).
+- **Bloesemblaadjes over de kop**: de bestaande sfeer *Bloesem* valt nu ook over het beeld van de kop (een eigen laag die alleen loopt terwijl de kop in beeld is), achter de namen en de datum. De kleuren `--fx-1` tot `--fx-3` zijn iets dieper roze, zodat de blaadjes op de lichte lucht te zien zijn.
+- **Blaadjes reageren op scrollen** (`scrollwind`, nieuwe optionele keuze in `catalog/effects.py` en `effects.js`): scrollen duwt de blaadjes zacht opzij (hoogstens 16 px/s) en verschuift ze licht mee, grote blaadjes iets meer dan kleine. Alleen ontwerpen die `scrollwind` kiezen merken er iets van; alle andere ontwerpen zijn ongewijzigd.
+
+Alles is decoratief (`aria-hidden`, niet aanklikbaar), staat achter de tekst, beweegt alleen onder `.fx-motion` (dus niet bij 'minder beweging' of na stilzetten met de knop *Beweging*) en gebruikt alleen `transform` en `opacity` (geen filter of overvloeimodus). Zichtbaar na het openen van de uitnodiging, met een rustige inblending. De kaart blijft verborgen en niet bestelbaar.
+
+Uitrollen naar de andere vier kaarten (eigen beeld per kaart, dus eigen plaatsing): pas na akkoord van de eigenaar. Let op: `tools/introkaarten/maak_introkaarten.py` kent deze laag niet; opnieuw genereren van Bloesemmeer overschrijft hem.
+
 ## Rechten per videobestand (18 oktober 2026)
 
 **Voor geen van de vijf films zijn de commerciële gebruiksrechten aantoonbaar bevestigd.** De kaarten blijven daarom verborgen (groep C) en alleen voor beheerders te bekijken, voor interne beoordeling.

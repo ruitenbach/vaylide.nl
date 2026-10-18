@@ -134,7 +134,7 @@ class IntrokaartWeergaveTests(VaylideTestCase):
         for slug in KAARTEN:
             css = (ontwerp(slug) / "style.css").read_text(encoding="utf-8")
             gebruikt = set(re.findall(r"var\((--fk-[a-z0-9-]+)", css))
-            beschikbaar = set(manifest(slug)["palettes"][0]["vars"]) | {"--fk-surround", "--fk-grain", "--fk-glass", "--fk-sky-l", "--fk-sky-r", "--fk-sky-t", "--fk-sky-h"}
+            beschikbaar = set(manifest(slug)["palettes"][0]["vars"]) | {"--fk-surround", "--fk-grain", "--fk-glass", "--fk-sky-l", "--fk-sky-r", "--fk-sky-t", "--fk-sky-h", "--fk-dz"}
             self.assertEqual(gebruikt - beschikbaar, set(), slug)
             self.assertNotRegex(css, r"__[A-Z]+__", slug)
 
@@ -184,3 +184,41 @@ class IntrokaartNietOpenbaarTests(VaylideTestCase):
                     self.assertEqual(antwoord["Cache-Control"], "private, no-store", slug)
                 else:
                     self.assertEqual(antwoord.status_code, 404, f"{slug} ({gebruiker})")
+
+
+class BloesemmeerPremiumLaagTests(VaylideTestCase):
+    """Voorbeeld van de premium laag (18 oktober 2026): alleen Bloesemmeer, alleen decoratief, alleen onder .fx-motion."""
+
+    def test_alleen_bloesemmeer_heeft_de_laag_en_de_scrollreactie(self):
+        for slug in KAARTEN:
+            html = (ontwerp(slug) / "invitation.html").read_text(encoding="utf-8")
+            css = (ontwerp(slug) / "style.css").read_text(encoding="utf-8")
+            extra = manifest(slug)["effects"]["extra"]
+            eigen = slug == "bloesemmeer"
+            self.assertEqual("fk-fx" in html, eigen, slug)
+            self.assertEqual(".fk-water" in css, eigen, slug)
+            self.assertEqual("scrollwind" in extra, eigen, slug)
+
+    def test_de_laag_is_decoratief_en_staat_achter_de_tekst(self):
+        html = (ontwerp("bloesemmeer") / "invitation.html").read_text(encoding="utf-8")
+        css = (ontwerp("bloesemmeer") / "style.css").read_text(encoding="utf-8")
+        self.assertRegex(html, r'<div class="fk-fx" aria-hidden="true">')
+        self.assertNotIn("tabindex", html[html.index("fk-fx"):html.index("fk-sky")])
+        premium = css[css.index("Premium laag voor Bloesemmeer"):]
+        # Alleen zichtbaar en bewegend onder .fx-motion, nooit aanklikbaar, onder de namen en de datum (z-index 1).
+        self.assertIn(".fk-fx { display: none; }", premium)
+        self.assertIn(".fx-motion .fk-fx { display: block;", premium)
+        self.assertIn("pointer-events: none", premium)
+        self.assertIn("z-index: 0", premium)
+        # De afkorting 'animation' zet de speelstand terug: de laatste regel van de laag zet hem voor alle lagen opnieuw.
+        self.assertIn(".fx-motion .fk-fx :is(.fk-mist, .fk-water, .fk-water__glint, .fk-water__sun) { animation-play-state: var(--fx-play, running); }", premium)
+        self.assertLess(premium.rindex("animation-play-state: var(--fx-play, running); }"), premium.index("Bloesemblaadjes over het beeld"))
+        for onderdeel in re.findall(r"\.fk-(?:mist|water)[^{]*\{[^}]*\banimation:", premium):
+            self.assertNotIn("filter: blur", onderdeel)
+        # Geen zware technieken: geen filter en geen overvloeimodus op bewegende lagen.
+        self.assertNotIn("mix-blend-mode", premium)
+        self.assertNotIn("filter:", premium)
+
+    def test_de_kaart_blijft_verborgen(self):
+        self.assertEqual(collectie.groep("bloesemmeer"), "C")
+        self.assertFalse(Template.objects.get(slug="bloesemmeer").is_active)

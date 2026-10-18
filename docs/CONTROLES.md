@@ -1363,3 +1363,13 @@ Zijden gordijn, Bloesemmeer, Bloesemwaaier, Kerstsprookje en Gouden poort (`docs
 - **Niet geraakt:** bestaande ontwerpen, prijzen, bestellingen en betaalroute: geen bestaand ontwerpbestand, geen prijsbedrag en niets in `orders/` of de betaalkoppeling gewijzigd (alleen toevoegingen en aantallen in `catalog/collectie.py`, `catalog/prijzen.py`, `invitations/demo.py`). `tests/test_introkaarten.py` toont dat de kaarten niet in de collectie, de sitemap, de zoekresultaten en de ontwerppagina staan, dat een bestelling op een van deze kaarten niets aanmaakt (ook niet voor beheerders) en dat het voorbeeld alleen voor beheerders werkt (404 voor bezoekers en klanten, `private, no-store`).
 - Gezien (schermafbeeldingen, 390 px): per kaart voor het openen, tijdens de film, direct na de film en de uitnodigingsinformatie.
 - Niet gedaan: niet getest op echte telefoons, Safari of Firefox; niet op staging gezet of bekeken. Rechten: niet aantoonbaar (zie `docs/INTROKAARTEN.md`).
+
+## Premium laag op Bloesemmeer (18 oktober 2026, lokaal, niet op staging)
+
+Voorbeeld van licht op het water, nevel op twee dieptes, bloesemblaadjes over de kop en scrollreactie (`docs/INTROKAARTEN.md`). Echt uitgevoerd (Chromium, mobiel 390 × 844, kaart via het beheerdersvoorbeeld):
+- `manage.py test tests`: 1384 tests; alleen de twee bekende falers door de lokale `.env` (`VIERLIEF_CONTACT_EMAIL`, zie hierboven). Nieuw: 3 tests voor de laag (alleen Bloesemmeer, decoratief en achter de tekst, speelstand voor alle lagen) en 1 voor `scrollwind` (alleen Bloesemmeer kiest het).
+- axe (`e2e/toegankelijkheid.cjs`, dicht en open): 0 bevindingen.
+- Beweging: de laag verschijnt na het openen en is weg bij 'minder beweging' en na stilzetten met de knop *Beweging*; de speelstand van alle lagen volgt `--fx-play` (gemeten: alle vier `paused`). Geen paginafouten.
+- Vloeiendheid: 300 beelden tijdens scrollen met de processor 4 keer vertraagd (Playwright, geen echte telefoon): gemiddeld 16,7 ms per beeld, geen beeld boven 17 ms, met en zonder de laag vergelijkbaar. Dit zegt niets over een echte telefoon met batterij; dat is niet gemeten.
+- Gezien: schermafbeeldingen voor en na, en een opname van 43 seconden (openen, kop, scrollen, terug).
+- Niet gedaan: echte telefoons, Safari (scrollgestuurde diepte werkt alleen in browsers die dat kennen), Firefox; de andere vier kaarten hebben de laag niet.
