@@ -6,7 +6,7 @@ Gebruik (vanuit de hoofdmap van het project):
 
 De bronmap bevat curtains.mp4, blossom.mp4, fan.mp4, christmas.mp4 en palace.mp4 (720x1280, 10 s, zonder geluid; de namen staan in BRON hieronder).
 Per kaart komt in designs/<slug>/v1/ te staan: manifest.json, invitation.html, style.css (uit het sjabloon in tools/introkaarten/sjabloon, met de gegevens
-hieronder), opening.mp4 (opnieuw gecodeerd), poster.webp (eerste beeld), end.webp (laatste beeld, gelijk aan het laatste beeld van de film), de uitsneden
+hieronder), opening.mp4 en opening.webm (opnieuw gecodeerd), poster.webp (eerste beeld), end.webp (laatste beeld, gelijk aan het laatste beeld van de film), de uitsneden
 cut-*.webp, band.webp en gal-*.webp uit de film zelf, en static/img/designs/<slug>.webp (kaartbeeld voor de collectie, 800x1000).
 Vereist: ffmpeg en Pillow. De films zelf staan niet in Git; in Git staat alleen het resultaat.
 """
@@ -55,7 +55,7 @@ KAARTEN = [
                     "--fx-1": "#FFFBF0", "--fx-2": "#F3D9A8", "--fx-3": "#E2C07A", "--fx-4": "#FFFFFF", "--fx-bg": "#3A2E22", **KLEUR_LICHT},
     },
     {
-        "slug": "bloesemmeer", "naam": "Bloesemmeer", "sort_order": 51,
+        "slug": "bloesemmeer", "naam": "Bloesemmeer", "sort_order": 51, "webm_crf": 42,
         "tagline": "Een wand van kersenbloesem opent naar een bergmeer met een waterval in het zonlicht",
         "beschrijving": "Een wand van roze kersenbloesem.",
         "omschrijving": "Je ziet eerst een wand van roze kersenbloesem. Na een tik gaat die langzaam open en kijk je uit over een helder meer met een waterval tussen de bergen, terwijl de zon opkomt achter de takken. Daarna staan jullie namen in de lucht en loopt de uitnodiging door met aftellen, programma, locatie en aanmelden, in zachtroze en goud. De opening is over te slaan en rustig bij minder beweging. De film is een gegenereerde scène zonder personen en zonder gebouwen.",
@@ -89,7 +89,7 @@ KAARTEN = [
                     "--fx-1": "#FFE6EA", "--fx-2": "#F8C2CC", "--fx-3": "#F2A9A0", "--fx-4": "#FFF4E2", "--fx-bg": "#40281F", **KLEUR_LICHT},
     },
     {
-        "slug": "kerstsprookje", "naam": "Kerstsprookje", "sort_order": 53,
+        "slug": "kerstsprookje", "naam": "Kerstsprookje", "sort_order": 53, "webm_crf": 43,
         "tagline": "Een muur van besneeuwde dennen schuift open naar een kerstplein vol lichtjes",
         "beschrijving": "Besneeuwde dennen vol gouden ballen en lichtjes.",
         "omschrijving": "Je ziet eerst een muur van besneeuwde dennentakken met gouden ballen, sterren en lichtjes. Na een tik schuift hij open en sta je op een kerstplein onder een sterrenhemel, met een hoge verlichte kerstboom, een draaimolen, cadeaus en een glanzende, natte straat vol goudlicht. Daarna staan jullie namen in de lucht en loopt de kerstkaart door met aftellen, programma, locatie en aanmelden, in nachtblauw en goud. De opening is over te slaan en rustig bij minder beweging. De film is een gegenereerde scène zonder personen.",
@@ -149,6 +149,9 @@ def maak_media(kaart: dict, bron: Path, map_: Path, uitsneden: dict):
         # De film: opnieuw gecodeerd voor het web (H.264, geen geluid, vooraan de index), en precies het eerste en laatste beeld als stills.
         ffmpeg("-i", str(bron), "-an", "-c:v", "libx264", "-profile:v", "high", "-level", "3.1", "-pix_fmt", "yuv420p", "-preset", "slow", "-crf", "30",
                "-movflags", "+faststart", str(map_ / "opening.mp4"))
+        # Reserve voor browsers zonder H.264 (zoals bij Rozenboog en Kerstmagie): VP9 in WebM, ook zonder geluid.
+        ffmpeg("-i", str(bron), "-an", "-map_metadata", "-1", "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", str(kaart.get("webm_crf", 38)), "-row-mt", "1", "-cpu-used", "2", "-pix_fmt", "yuv420p",
+               str(map_ / "opening.webm"))
         frame(bron, 0.0, tmp / "eerste.png")
         frame(bron, 9.9, tmp / "laatste.png")
         # Het laatste beeld van de gecodeerde film is de eindstill (zo sluit de kop exact aan op de film).
@@ -189,7 +192,7 @@ def maak_tekst(kaart: dict, map_: Path):
         "palettes": [{"key": sleutel, "name": naam, "swatch": swatch, "vars": kaart["kleuren"]}],
         "sections": ["countdown", "story", "gallery", "program", "location", "dresscode", "practical", "rsvp", "contact", "closing", "music"],
         "effects": kaart["effecten"],
-        "film": {"src": "opening.mp4", "poster": "poster.webp", "end": "end.webp", "seconds": 10.0, "kaartbeeld": "kop"},
+        "film": {"src": "opening.mp4", "webm": "opening.webm", "poster": "poster.webp", "end": "end.webp", "seconds": 10.0, "kaartbeeld": "kop"},
         "changelog": "Eerste versie: opening met een film van de eigenaar (gegenereerde scène zonder personen), een tik start hem; de kop toont het laatste beeld met de namen in de lucht en de datum in het licht eronder. Verborgen voor klanten tot de rechten op de film zijn bevestigd.",
         "envelope_mode": "built_in", "hidden": True,
     }

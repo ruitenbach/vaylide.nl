@@ -18,7 +18,7 @@ from .helpers import VaylideTestCase
 KAARTEN = {  # slug: gelegenheid van het voorbeeld
     "zijden-gordijn": "bruiloft", "bloesemmeer": "verjaardag", "bloesemwaaier": "bruiloft", "kerstsprookje": "kerst", "gouden-poort": "bruiloft",
 }
-MEDIA_LIMIETEN = {"opening.mp4": 3_500_000, "poster.webp": 300_000, "end.webp": 300_000, "band.webp": 150_000,
+MEDIA_LIMIETEN = {"opening.mp4": 3_500_000, "opening.webm": 3 * 1024 * 1024 - 1, "poster.webp": 300_000, "end.webp": 300_000, "band.webp": 150_000,
                   **{f"cut-{n}.webp": 120_000 for n in "abcd"}, **{f"gal-{n}.webp": 100_000 for n in "1234"}}
 
 
@@ -44,6 +44,7 @@ class IntrokaartOntwerpTests(VaylideTestCase):
             template = Template.objects.get(slug=slug)
             self.assertFalse(template.is_active, slug)
             self.assertEqual(template.current_version.film["src"].rsplit("/", 1)[-1], "opening.mp4", slug)
+            self.assertEqual(template.current_version.film["webm"].rsplit("/", 1)[-1], "opening.webm", f"{slug}: reserve voor browsers zonder H.264")
 
     def test_de_kaarten_zijn_per_gelegenheid_te_koop_met_de_bestaande_luxe_prijs(self):
         # Geen nieuwe prijs: de Luxe-cel van de gelegenheid, en alleen voor de gelegenheden uit het manifest.
@@ -136,3 +137,50 @@ class IntrokaartWeergaveTests(VaylideTestCase):
             beschikbaar = set(manifest(slug)["palettes"][0]["vars"]) | {"--fk-surround", "--fk-grain", "--fk-glass", "--fk-sky-l", "--fk-sky-r", "--fk-sky-t", "--fk-sky-h"}
             self.assertEqual(gebruikt - beschikbaar, set(), slug)
             self.assertNotRegex(css, r"__[A-Z]+__", slug)
+
+
+class IntrokaartNietOpenbaarTests(VaylideTestCase):
+    """Eindcontrole: de vijf kaarten komen nergens openbaar voor en zijn niet te bestellen; beheerders kunnen alleen het voorbeeld bekijken."""
+
+    def setUp(self):
+        self.staff = self.make_staff()
+        self.klant = self.make_customer()
+
+    def clients(self):
+        for gebruiker in (None, self.klant, self.staff):
+            client = Client()
+            if gebruiker is not None:
+                client.force_login(gebruiker)
+            yield gebruiker, client
+
+    def test_niet_in_de_collectie_de_ontwerppagina_de_zoekresultaten_en_de_sitemap(self):
+        for gebruiker, client in self.clients():
+            collectie_pagina = client.get("/ontwerpen/").content.decode()
+            sitemap = client.get("/sitemap.xml").content.decode()
+            for slug, gelegenheid in KAARTEN.items():
+                self.assertNotIn(f"/ontwerpen/{slug}/", collectie_pagina, slug)
+                self.assertNotIn(slug, sitemap, slug)
+                self.assertEqual(client.get(f"/ontwerpen/{slug}/").status_code, 404, slug)
+                zoek = client.get("/zoeken/", {"q": Template.objects.get(slug=slug).name}).content.decode()
+                self.assertNotIn(f"/ontwerpen/{slug}/", zoek, slug)
+                self.assertNotIn(f"/voorbeeld/{slug}/", zoek, slug)
+
+    def test_niet_te_kiezen_in_de_bestelroute_ook_niet_voor_beheerders(self):
+        from invitations.models import Invitation
+
+        for gebruiker, client in self.clients():
+            voor = Invitation.objects.count()
+            for slug, gelegenheid in KAARTEN.items():
+                self.assertNotContains(client.get("/maken/", {"gelegenheid": gelegenheid}), Template.objects.get(slug=slug).name, msg_prefix=slug)
+                client.post("/maken/", {"occasion": gelegenheid, "template": slug})
+            self.assertEqual(Invitation.objects.count(), voor, f"er is een uitnodiging aangemaakt op een verborgen kaart ({gebruiker})")
+
+    def test_voorbeeld_alleen_voor_beheerders_en_nooit_gecachet(self):
+        for slug, gelegenheid in KAARTEN.items():
+            for gebruiker, client in self.clients():
+                antwoord = client.get(f"/voorbeeld/{slug}/", {"gelegenheid": gelegenheid})
+                if gebruiker is self.staff:
+                    self.assertEqual(antwoord.status_code, 200, slug)
+                    self.assertEqual(antwoord["Cache-Control"], "private, no-store", slug)
+                else:
+                    self.assertEqual(antwoord.status_code, 404, f"{slug} ({gebruiker})")

@@ -126,7 +126,7 @@ body {
 .fk-open:focus-visible { outline: 3px solid var(--fk-accent); outline-offset: 4px; }
 .fk-open-music {
   min-height: 44px; padding: .45rem 1.1rem; border-radius: 999px; cursor: pointer;
-  border: 1px solid color-mix(in srgb, var(--fk-accent) 55%, transparent); background: transparent; color: var(--fk-accent);
+  border: 1px solid color-mix(in srgb, var(--fk-accent) 55%, transparent); background: transparent; color: var(--fk-ink);
   font-family: "Figtree", sans-serif; font-size: .9rem; font-weight: 600;
 }
 .fk-skip {
