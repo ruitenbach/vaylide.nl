@@ -215,3 +215,24 @@ Mijn eigen controle van de bestanden en de code (zie "Rechtenregistratie bijgewe
 **Aanvullend bewijs:** op verzoek van de eigenaar nu niet gevraagd; er is geen concreet, relevant risico dat dat nodig maakt. De bewaarde generatiegegevens blijven wel een open gat in het dossier.
 
 **Resterende blokkades voor publicatie, na deze status:** de openstaande vraag naar de producentcode is een onderzoekspunt; of dat nog een blokkade is, beslist de eigenaar. Verder gelden alleen de eerder vastgelegde technische en commerciële voorwaarden (Safari/iOS en telefoontest inclusief de MP4, bevestiging van Luxe, nieuw akkoord om te activeren). De tabel "Rechten per videobestand" blijft daarom nog op "Nee" tot de eigenaar de rechtenstatus als voldoende aanvaardt; dit is zijn besluit, niet een bevinding over ontbrekende rechten.
+
+## Laatste technische vrijgavecontrole (18 oktober 2026, 21:40)
+
+Uitgevoerd op verzoek van de eigenaar (18 oktober 2026, 21:33), na zijn goedkeuring van de rechtenregistratie (de afwijkende `ContentProducer`-code blijft een administratief aandachtspunt en is op zichzelf geen blokkade) en zijn voorkeur om alle vijf onder de bestaande indeling **Luxe** te houden, zonder prijswijzigingen. Geen code, ontwerpen of deployments gewijzigd; de kaarten blijven verborgen en niet bestelbaar tot een afzonderlijk akkoord.
+
+**Echt uitgevoerd (lokale testserver met de kaarten daar zichtbaar gezet, Chromium met Playwright):**
+- Film, alle vijf, 390 × 844 (touch), 1366 × 768 en met een traag netwerk (1,6 Mbps, 150 ms): de film start 0,24 tot 0,29 seconde na de tik, speelt de volle 10 seconden, de uitnodiging opent daarna, geen scriptfouten, geen horizontale overloop.
+- Terugval, alle vijf: bij geblokkeerde videobestanden en bij een geweigerde `play()` opent de uitnodiging na ongeveer 1,1 seconde (de kaart met stilstaand beeld), zonder fouten. Met 'minder beweging' opent de kaart direct zonder film.
+- Link Aanmelden, alle vijf, op 390 en 1366: zichtbaar na de film, raakbaar, bereikbaar met het toetsenbord, wijst naar `#aanmelden` en brengt het formulier in beeld; ook aanwezig met 'minder beweging'; de pagina is na de film niet meer inert.
+- Pauzeknop en effecten, alle vijf, op 390 en 1366: de effectlaag tekent deeltjes (zichtbare pixels op het canvas), de pauzeknop zet de beweging stil (`fx-motion` uit, laag verborgen) en een tweede tik hervat; geen scriptfouten.
+- Beschermde productie, alleen-lezen databasequery's op de productiedatabase na de uitrol: 63 ontwerpen, actieve ontwerpen 49 met dezelfde lijst (controlesom gelijk aan die van vóór de uitrol), alle vijf inactief, 27 prijsregels met dezelfde controlesom, pakketten, extra's en kortingscodes gelijk, 2 bestellingen met dezelfde laatste wijziging; geen fouten of waarschuwingen in de productielogboeken sinds de uitrol. Tests: 71 tests voor de kaarten, de collectie en de prijsstructuur geslaagd (404 voor bezoekers, niet in collectie, zoeken en sitemap, niet te kiezen in de bestelroute, prijzen ongewijzigd). De volledige suite (1391 tests) slaagde eerder, op de twee bekende falers door de lokale `.env` na.
+- MP4 (H.264) statisch gecontroleerd met `ffprobe` en een controle van de bestandsopbouw, alle vijf: High-profiel niveau 3.1 (`avc1.64001F`, gelijk aan de `type`-aanduiding in de pagina), `yuv420p`, 720 × 1280, 30 beelden per seconde, 1,1 tot 1,6 Mbps, geen geluidsspoor, `moov` vóór `mdat` (begint te spelen zonder eerst alles te laden). De pagina zet de film op `muted` en `playsinline` en start hem na een tik.
+
+**Niet uitgevoerd, en dus niet bevestigd:**
+- iPhone Safari: er is geen echte iPhone en geen WebKit in de testomgeving (alleen Chromium). De MP4 is in geen enkele browser daadwerkelijk afgespeeld (de testbrowser heeft geen H.264; de film is met de WebM-versie getest). De H.264-gegevens hierboven zijn een bestandscontrole, geen afspeeltest, en een Chromium-test is niet gelijk aan een echte iPhone.
+- Firefox, Android Chrome op echte toestellen, Low Power Mode op iOS.
+- De publieke site (vaylide.nl) en de stagingsite zijn vanuit de cloudomgeving niet bereikbaar.
+
+**Restrisico:** de MP4 op een echte iPhone, plus het gedrag van de tik-start onder Low Power Mode. Gevolgen zijn beperkt: de terugval is getest (zonder film opent de uitnodiging binnen ongeveer 1,1 seconde met het stilstaande beeld) en activeren is omkeerbaar in Beheer → Ontwerpen. Een echte controle is pas mogelijk als de kaarten zichtbaar zijn of met een tijdelijk beheeraccount (dat de eigenaar niet wil).
+
+**Advies:** GO voor publieke activatie, onder de voorwaarde dat de eigenaar het restrisico aanvaardt en na het activeren direct de film op een eigen iPhone en Android controleert; bij een probleem zet hij het ontwerp in Beheer weer uit. Afzonderlijk akkoord van de eigenaar blijft nodig; er is niets zichtbaar of bestelbaar gemaakt.
