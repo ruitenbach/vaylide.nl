@@ -33,6 +33,31 @@
 {% block content %}
 <header class="fk-hero">
   <div class="fk-frame fk-frame--hero" data-film-target style="background-image: url('{% static v.film.end %}')">
+{# premium-laag begin #}
+    {# Premium laag (zie docs/INTROKAARTEN.md): decoratief, achter de tekst, alleen als beweging mag. Gemaakt door tools/introkaarten/premium_laag.py. #}
+    <div class="fk-fx" aria-hidden="true">
+      <span class="fk-mist fk-mist--far"></span>
+      <span class="fk-mist fk-mist--near"></span>
+      <span class="fk-water"><span class="fk-water__glint fk-water__glint--a"></span><span class="fk-water__glint fk-water__glint--b"></span><span class="fk-water__glint fk-water__glint--c"></span></span>
+      <span class="fk-glow" style="--x:30%;--y:44%;--s:30%;--gc:255,196,110;--t:7s;--d:0s"></span>
+      <span class="fk-glow" style="--x:50%;--y:62%;--s:20%;--gc:255,226,170;--t:5s;--d:-2s"></span>
+      <span class="fk-glow" style="--x:25%;--y:83%;--s:9%;--gc:255,190,100;--t:3.4s;--d:-1s"></span>
+      <span class="fk-glow" style="--x:70%;--y:83%;--s:9%;--gc:255,190,100;--t:4.1s;--d:-2.5s"></span>
+      <span class="fk-glow" style="--x:86%;--y:87%;--s:8%;--gc:255,190,100;--t:3.8s;--d:-0.5s"></span>
+      <span class="fk-glow" style="--x:61%;--y:52%;--s:8%;--gc:255,214,140;--t:6s;--d:-3s"></span>
+      <span class="fk-glow" style="--x:72%;--y:52%;--s:8%;--gc:255,214,140;--t:5.4s;--d:-1.2s"></span>
+      <span class="fk-glow" style="--x:80%;--y:53%;--s:7%;--gc:255,214,140;--t:6.6s;--d:-4s"></span>
+      <span class="fk-twinkle" style="--x:46%;--y:55%;--s:1.4cqw;--t:5.2s;--d:0s"></span>
+      <span class="fk-twinkle" style="--x:54%;--y:58%;--s:1.2cqw;--t:6.1s;--d:-2.2s"></span>
+      <span class="fk-twinkle" style="--x:50%;--y:50%;--s:1.1cqw;--t:5.6s;--d:-4s"></span>
+      <span class="fk-twinkle" style="--x:62%;--y:46%;--s:1.3cqw;--t:7s;--d:-1s"></span>
+      <span class="fk-twinkle" style="--x:36%;--y:89%;--s:1.2cqw;--t:6.4s;--d:-3s"></span>
+      <span class="fk-twinkle" style="--x:56%;--y:92%;--s:1.4cqw;--t:5.8s;--d:-0.6s"></span>
+      <span class="fk-twinkle" style="--x:63%;--y:86%;--s:1.1cqw;--t:6.8s;--d:-5s"></span>
+      <span class="fk-twinkle" style="--x:28%;--y:78%;--s:1.1cqw;--t:7.2s;--d:-2s"></span>
+    </div>
+    {% if v.effects %}<div class="fx-slot" data-fx-slot="page" aria-hidden="true"></div>{% endif %}
+    {# premium-laag einde #}
     <div class="fk-sky{% if v.title|length > 40 or v.kicker|length > 34 %} fk-sky--dense{% endif %}">
       <p class="fk-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
       <h1 class="fk-names fk-names--{{ v.names_size }} fx-names" data-fx-reveal-origin>

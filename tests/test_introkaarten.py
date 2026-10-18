@@ -186,39 +186,71 @@ class IntrokaartNietOpenbaarTests(VaylideTestCase):
                     self.assertEqual(antwoord.status_code, 404, f"{slug} ({gebruiker})")
 
 
-class BloesemmeerPremiumLaagTests(VaylideTestCase):
-    """Voorbeeld van de premium laag (18 oktober 2026): alleen Bloesemmeer, alleen decoratief, alleen onder .fx-motion."""
+class PremiumLaagTests(VaylideTestCase):
+    """Premium laag (18 oktober 2026): Bloesemmeer met de hand (voorbeeld), de andere vier met tools/introkaarten/premium_laag.py.
+    Alleen decoratief, alleen onder .fx-motion, achter de tekst."""
 
-    def test_alleen_bloesemmeer_heeft_de_laag_en_de_scrollreactie(self):
+    GENERATOR = ("zijden-gordijn", "bloesemwaaier", "kerstsprookje", "gouden-poort")
+
+    def bestanden(self, slug):
+        return ((ontwerp(slug) / "invitation.html").read_text(encoding="utf-8"), (ontwerp(slug) / "style.css").read_text(encoding="utf-8"))
+
+    def test_alle_vijf_hebben_de_laag_en_de_scrollreactie(self):
         for slug in KAARTEN:
-            html = (ontwerp(slug) / "invitation.html").read_text(encoding="utf-8")
-            css = (ontwerp(slug) / "style.css").read_text(encoding="utf-8")
-            extra = manifest(slug)["effects"]["extra"]
-            eigen = slug == "bloesemmeer"
-            self.assertEqual("fk-fx" in html, eigen, slug)
-            self.assertEqual(".fk-water" in css, eigen, slug)
-            self.assertEqual("scrollwind" in extra, eigen, slug)
+            html, css = self.bestanden(slug)
+            self.assertIn('<div class="fk-fx" aria-hidden="true">', html, slug)
+            self.assertIn('<div class="fx-slot" data-fx-slot="page" aria-hidden="true">', html, f"{slug}: eigen deeltjeslaag in de kop")
+            self.assertIn(".fk-water", css, slug)
+            self.assertIn("scrollwind", manifest(slug)["effects"]["extra"], slug)
+            self.assertNotIn("tabindex", html[html.index("fk-fx"):html.index("fk-sky")], slug)
 
     def test_de_laag_is_decoratief_en_staat_achter_de_tekst(self):
-        html = (ontwerp("bloesemmeer") / "invitation.html").read_text(encoding="utf-8")
-        css = (ontwerp("bloesemmeer") / "style.css").read_text(encoding="utf-8")
-        self.assertRegex(html, r'<div class="fk-fx" aria-hidden="true">')
-        self.assertNotIn("tabindex", html[html.index("fk-fx"):html.index("fk-sky")])
-        premium = css[css.index("Premium laag voor Bloesemmeer"):]
-        # Alleen zichtbaar en bewegend onder .fx-motion, nooit aanklikbaar, onder de namen en de datum (z-index 1).
-        self.assertIn(".fk-fx { display: none; }", premium)
-        self.assertIn(".fx-motion .fk-fx { display: block;", premium)
-        self.assertIn("pointer-events: none", premium)
-        self.assertIn("z-index: 0", premium)
-        # De afkorting 'animation' zet de speelstand terug: de laatste regel van de laag zet hem voor alle lagen opnieuw.
-        self.assertIn(".fx-motion .fk-fx :is(.fk-mist, .fk-water, .fk-water__glint, .fk-water__sun) { animation-play-state: var(--fx-play, running); }", premium)
-        self.assertLess(premium.rindex("animation-play-state: var(--fx-play, running); }"), premium.index("Bloesemblaadjes over het beeld"))
-        for onderdeel in re.findall(r"\.fk-(?:mist|water)[^{]*\{[^}]*\banimation:", premium):
-            self.assertNotIn("filter: blur", onderdeel)
-        # Geen zware technieken: geen filter en geen overvloeimodus op bewegende lagen.
-        self.assertNotIn("mix-blend-mode", premium)
-        self.assertNotIn("filter:", premium)
+        for slug in KAARTEN:
+            _, css = self.bestanden(slug)
+            premium = css[css.index("Premium laag"):]
+            self.assertIn(".fk-fx { display: none; }", premium, slug)
+            self.assertIn(".fx-motion .fk-fx { display: block;", premium, slug)
+            self.assertIn("pointer-events: none", premium, slug)
+            # 'animation' zet de speelstand terug: een laatste regel zet hem voor alle lagen (ook ::before) opnieuw, zodat de pauzeknop werkt.
+            self.assertRegex(premium, r"\.fx-motion \.fk-fx[^{]*\{[^}]*animation-play-state: var\(--fx-play, running\);", slug)
+            # Geen zware technieken op bewegende lagen.
+            self.assertNotIn("mix-blend-mode", premium, slug)
+            self.assertNotIn("filter:", premium, slug)
 
-    def test_de_kaart_blijft_verborgen(self):
-        self.assertEqual(collectie.groep("bloesemmeer"), "C")
-        self.assertFalse(Template.objects.get(slug="bloesemmeer").is_active)
+    def test_eigen_identiteit_per_kaart_geen_rozen_of_bloesem_bij_kerst_en_spaarzaam_bij_de_poort(self):
+        sfeer = {slug: manifest(slug)["effects"]["sfeer"] for slug in KAARTEN}
+        self.assertEqual(sfeer["kerstsprookje"], "sneeuw")
+        self.assertEqual(sfeer["bloesemmeer"], sfeer["bloesemwaaier"], "bloesemkaarten")
+        self.assertEqual({sfeer["zijden-gordijn"], sfeer["gouden-poort"]}, {"blaadjes"})
+        dichtheid = {}
+        for slug in self.GENERATOR:
+            m = re.search(r"--fx-density: ([\d.]+)", self.bestanden(slug)[1])
+            self.assertIsNotNone(m, slug)
+            dichtheid[slug] = float(m.group(1))
+        self.assertLessEqual(dichtheid["gouden-poort"], 0.2, "heel spaarzame blaadjes")
+        self.assertLessEqual(dichtheid["zijden-gordijn"], 0.35, "enkele rozenblaadjes")
+        self.assertEqual(len(set(dichtheid.values())), 4, "elke kaart heeft een eigen dichtheid")
+        # De lichtplekken verschillen per kaart (eigen beeld).
+        plekken = {slug: re.findall(r'class="fk-glow" style="--x:([\d.]+)%;--y:([\d.]+)%', self.bestanden(slug)[0]) for slug in self.GENERATOR}
+        self.assertEqual(len({tuple(v) for v in plekken.values()}), 4)
+        self.assertIn("fk-sheen", self.bestanden("gouden-poort")[0], "architectuur: lichtbaan over de bogen")
+        self.assertNotIn("fk-sheen", self.bestanden("zijden-gordijn")[0])
+
+    def test_de_generator_is_herhaalbaar(self):
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location("premium_laag", Path(settings.BASE_DIR) / "tools" / "introkaarten" / "premium_laag.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        for slug in self.GENERATOR:
+            k = dict(module.KAARTEN[slug], slug=slug)
+            html, css = self.bestanden(slug)
+            self.assertIn(module.html_blok(k).strip(), html, slug)
+            self.assertIn(module.css_blok(k).strip(), css, slug)
+            self.assertEqual(html.count(module.BEGIN_HTML), 1, slug)
+            self.assertEqual(css.count(module.BEGIN_CSS), 1, slug)
+
+    def test_de_kaarten_blijven_verborgen(self):
+        for slug in KAARTEN:
+            self.assertEqual(collectie.groep(slug), "C", slug)
+            self.assertFalse(Template.objects.get(slug=slug).is_active, slug)

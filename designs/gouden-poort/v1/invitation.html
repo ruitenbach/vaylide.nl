@@ -33,6 +33,27 @@
 {% block content %}
 <header class="fk-hero">
   <div class="fk-frame fk-frame--hero" data-film-target style="background-image: url('{% static v.film.end %}')">
+{# premium-laag begin #}
+    {# Premium laag (zie docs/INTROKAARTEN.md): decoratief, achter de tekst, alleen als beweging mag. Gemaakt door tools/introkaarten/premium_laag.py. #}
+    <div class="fk-fx" aria-hidden="true">
+      <span class="fk-mist fk-mist--far"></span>
+      <span class="fk-sheen"></span>
+      <span class="fk-water"><span class="fk-water__glint fk-water__glint--a"></span><span class="fk-water__glint fk-water__glint--b"></span><span class="fk-water__glint fk-water__glint--c"></span></span>
+      <span class="fk-glow" style="--x:69%;--y:33%;--s:22%;--gc:255,206,120;--t:7s;--d:0s"></span>
+      <span class="fk-glow" style="--x:51%;--y:27%;--s:14%;--gc:255,222,150;--t:6.2s;--d:-2s"></span>
+      <span class="fk-glow" style="--x:15%;--y:48%;--s:8%;--gc:255,190,100;--t:4.6s;--d:-1s"></span>
+      <span class="fk-glow" style="--x:86%;--y:48%;--s:8%;--gc:255,190,100;--t:5.2s;--d:-2.6s"></span>
+      <span class="fk-glow" style="--x:13%;--y:70%;--s:9%;--gc:255,190,100;--t:5.8s;--d:-3.4s"></span>
+      <span class="fk-glow" style="--x:88%;--y:72%;--s:9%;--gc:255,190,100;--t:4.4s;--d:-0.8s"></span>
+      <span class="fk-twinkle" style="--x:51%;--y:23%;--s:1.2cqw;--t:6.4s;--d:0s"></span>
+      <span class="fk-twinkle" style="--x:60%;--y:31%;--s:1.1cqw;--t:7.2s;--d:-3s"></span>
+      <span class="fk-twinkle" style="--x:44%;--y:31%;--s:1.1cqw;--t:6.8s;--d:-1.6s"></span>
+      <span class="fk-twinkle" style="--x:24%;--y:14%;--s:1.1cqw;--t:7.6s;--d:-4s"></span>
+      <span class="fk-twinkle" style="--x:78%;--y:12%;--s:1.1cqw;--t:7s;--d:-2.2s"></span>
+      <span class="fk-twinkle" style="--x:50%;--y:72%;--s:1.2cqw;--t:6.2s;--d:-3.6s"></span>
+    </div>
+    {% if v.effects %}<div class="fx-slot" data-fx-slot="page" aria-hidden="true"></div>{% endif %}
+    {# premium-laag einde #}
     <div class="fk-sky{% if v.title|length > 40 or v.kicker|length > 34 %} fk-sky--dense{% endif %}">
       <p class="fk-kicker fx-intro" style="--fx-d:1">{{ v.kicker }}</p>
       <h1 class="fk-names fk-names--{{ v.names_size }} fx-names" data-fx-reveal-origin>

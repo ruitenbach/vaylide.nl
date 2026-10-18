@@ -42,9 +42,9 @@
         "--fk-date-1": "#B98A3E",
         "--fk-date-2": "#8B5E2B",
         "--fk-date-3": "#6A4519",
-        "--fx-1": "#FFFBF0",
-        "--fx-2": "#F3D9A8",
-        "--fx-3": "#E2C07A",
+        "--fx-1": "#F8DEDA",
+        "--fx-2": "#E9A7AB",
+        "--fx-3": "#D88C97",
         "--fx-4": "#FFFFFF",
         "--fx-bg": "#3A2E22",
         "--fk-accent-ink": "#FFFFFF",
@@ -68,14 +68,15 @@
     "music"
   ],
   "effects": {
-    "sfeer": "goudstof",
+    "sfeer": "blaadjes",
     "knal": "blaadjes",
     "viering": "blaadjes",
     "namen": "schrijf",
     "onthul": "zacht",
     "extra": [
       "kenburns",
-      "tik"
+      "tik",
+      "scrollwind"
     ]
   },
   "film": {

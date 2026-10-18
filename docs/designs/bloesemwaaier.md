@@ -24,6 +24,10 @@ Een bloesemwaaier trekt weg en onthult een lantaarntuin bij zonsondergang. Eén 
 
 Je ziet eerst een grote ivoren waaier met kersenbloesem en een gouden kwast. Na een tik klapt hij dicht en trekt weg: daarachter ligt een tuin met gloeiende lantaarns, een houten brug over het water en een waterval, bij een ondergaande zon. Daarna staan jullie namen in de lucht en loopt de uitnodiging door met aftellen, programma, locatie en aanmelden, in roze en goud. De opening is over te slaan en rustig bij minder beweging. De film is een gegenereerde scène zonder personen.
 
+## 6a. Premium laag (18 oktober 2026, ter beoordeling)
+
+lantaarnschitteringen, lichte nevel, dwarrelende bloesem; zie `docs/INTROKAARTEN.md` en `tools/introkaarten/premium_laag.py` (de plekken staan daar). Bloesemmeer is het voorbeeld waarop dit is gebaseerd.
+
 ## 7. Pagina na de opening
 
 Opbouw zoals Rozenboog: kop met het laatste beeld van de film, namen in de lucht, daarna aftellen, verhaal, programma, locatie en aanmelden, met uitsneden uit de film tussen de onderdelen. Effecten (uit `catalog/effects.py`): sfeer: bloesem, knal: bloesem, viering: blaadjes, namen: schrijf, onthul: zacht, extra: kenburns, tik.

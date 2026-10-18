@@ -52,7 +52,18 @@ Op verzoek van de eigenaar is eerst alleen **Bloesemmeer** verfijnd, om te beoor
 
 Alles is decoratief (`aria-hidden`, niet aanklikbaar), staat achter de tekst, beweegt alleen onder `.fx-motion` (dus niet bij 'minder beweging' of na stilzetten met de knop *Beweging*) en gebruikt alleen `transform` en `opacity` (geen filter of overvloeimodus). Zichtbaar na het openen van de uitnodiging, met een rustige inblending. De kaart blijft verborgen en niet bestelbaar.
 
-Uitrollen naar de andere vier kaarten (eigen beeld per kaart, dus eigen plaatsing): pas na akkoord van de eigenaar. Let op: `tools/introkaarten/maak_introkaarten.py` kent deze laag niet; opnieuw genereren van Bloesemmeer overschrijft hem.
+### Doorgetrokken naar de andere vier kaarten (18 oktober 2026, ter beoordeling)
+
+Na akkoord op de aanpak kregen de andere vier kaarten dezelfde techniek, met een eigen identiteit; Bloesemmeer is daarbij niet meer aangeraakt. De plekken zijn percentages van het eindbeeld en staan in `tools/introkaarten/premium_laag.py` (herhaalbaar: `python tools/introkaarten/premium_laag.py [slug …]`, daarna `manage.py sync_designs --update-manifest`; vervangt alleen wat tussen de markeringen `premium-laag begin/einde` staat).
+
+| Kaart | Identiteit | Blaadjes of sneeuw (sfeer, `--fx-density`) |
+|---|---|---|
+| Zijden gordijn | warme zonsondergang op het terras: ademende gloed van zon, fontein, kaarsen en ramen, zachte glinstering op het terras, lichte nevel | enkele rozenblaadjes (*Bloemblaadjes*, roze en ivoor, 0,3) |
+| Bloesemwaaier | lantaarntuin: negen lantaarns en de zon die zacht ademen, nevel bij de waterval, lichtjes en zonnebaan op het water | dwarrelende bloesem (*Bloesem*, 0,8) |
+| Kerstsprookje | kerstplein: warme gouden lichtpuntjes in de boom, lantaarns en carrousel, lichte winternevel, glans op het ijs; geen bloesem of rozen | fijne sneeuw (*Sneeuw*, 0,6) |
+| Gouden poort | architectuur en luxe: een lichtbaan die eens per 18 seconden over de gouden bogen en de koepel trekt, glans op de lantaarns en de waterpartij, enkele lichtpuntjes op de koepel | heel spaarzame champagnekleurige blaadjes (*Bloemblaadjes*, 0,18) |
+
+Nieuw in de gedeelde `effects.js`, beide opt-in en zonder invloed op andere ontwerpen: `scrollwind` (zie hierboven) en de stijlvariabele `--fx-density` (0 tot 1: minder deeltjes dan de standaard van de sfeer). De kleuren `--fx-1` tot `--fx-3` zijn bij Zijden gordijn en Gouden poort aangepast (roze en ivoor, champagne), zodat de blaadjes bij de kaart passen.
 
 ## Rechten per videobestand (18 oktober 2026)
 

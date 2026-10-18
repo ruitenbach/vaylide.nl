@@ -43,9 +43,9 @@
         "--fk-date-1": "#B58A2E",
         "--fk-date-2": "#7A5518",
         "--fk-date-3": "#5C3F0E",
-        "--fx-1": "#FFF4D0",
-        "--fx-2": "#F0D082",
-        "--fx-3": "#DDB255",
+        "--fx-1": "#FFF7E0",
+        "--fx-2": "#F2E0B4",
+        "--fx-3": "#E5C887",
         "--fx-4": "#FFFFFF",
         "--fx-bg": "#35291A",
         "--fk-accent-ink": "#FFFFFF",
@@ -69,13 +69,14 @@
     "music"
   ],
   "effects": {
-    "sfeer": "goudstof",
+    "sfeer": "blaadjes",
     "knal": "vonken",
     "viering": "vonken",
     "namen": "folie",
     "onthul": "zacht",
     "extra": [
-      "tik"
+      "tik",
+      "scrollwind"
     ]
   },
   "film": {

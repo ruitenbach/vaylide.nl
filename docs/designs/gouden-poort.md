@@ -24,6 +24,10 @@ Gouden deuren gaan open naar een paleistuin met fonteinen in het avondlicht. Eé
 
 Je ziet eerst gouden deuren met een fijn, stralend sterpatroon. Na een tik gaan ze open en kijk je door een hoge boog naar een paleis met een gouden koepel, palmen, bloemen, lantaarns en een lange waterpartij in het licht van de avondzon. Daarna staan jullie namen in de lucht en loopt de uitnodiging door met aftellen, programma, locatie en aanmelden, in champagne en goud. De opening is over te slaan en rustig bij minder beweging. De film is een gegenereerde scène zonder personen.
 
+## 6a. Premium laag (18 oktober 2026, ter beoordeling)
+
+gouden reflecties en een lichtbaan over de architectuur, heel spaarzame blaadjes; zie `docs/INTROKAARTEN.md` en `tools/introkaarten/premium_laag.py` (de plekken staan daar). Bloesemmeer is het voorbeeld waarop dit is gebaseerd.
+
 ## 7. Pagina na de opening
 
 Opbouw zoals Rozenboog: kop met het laatste beeld van de film, namen in de lucht, daarna aftellen, verhaal, programma, locatie en aanmelden, met uitsneden uit de film tussen de onderdelen. Effecten (uit `catalog/effects.py`): sfeer: goudstof, knal: vonken, viering: vonken, namen: folie, onthul: zacht, extra: tik.

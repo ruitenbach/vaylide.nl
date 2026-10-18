@@ -613,7 +613,7 @@
   DriftSystem.prototype.target = function (scene) {
     var c = this.cfg;
     var n = c.density * scene.stage.w * scene.stage.h / 100000;
-    return Math.round(clamp(n, c.min, c.max) * scene.quality);
+    return Math.round(clamp(n, c.min, c.max) * scene.quality * scene.density);
   };
   DriftSystem.prototype.spawn = function (scene, p, initial) {
     var c = this.cfg, st = scene.stage;
@@ -958,6 +958,9 @@
     this.stage = new Stage(slot, slot.classList.contains("fx-slot--page"), slot.getAttribute("data-fx-slot") === "cover" ? 1.5 : 1);
     this.systems = (cfg.type === "multi" ? cfg.layers : [cfg]).map(makeSystem).filter(Boolean);
     this.quality = lowPower ? 0.7 : 1;
+    /* Een ontwerp kan met --fx-density (0 tot 1, in de stijl) minder deeltjes vragen: "enkele blaadjes" in plaats van een bui. */
+    var dens = parseFloat(window.getComputedStyle(slot).getPropertyValue("--fx-density"));
+    this.density = dens > 0 && dens < 1 ? dens : 1;
     this.acc = 1;
     this.fresh = true;
     this.fade = 1;

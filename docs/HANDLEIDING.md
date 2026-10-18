@@ -205,6 +205,8 @@ Elk ontwerp heeft bewegende effecten: zwevende deeltjes (sfeer), een knal op het
 | `onthul`: secties bij het scrollen | `omhoog`, `zacht`, `zoom`, `kanteling`, `wissel` (afwisselend van links en rechts) |
 | `extra` (lijst) | `kenburns` (foto's zoomen langzaam in), `kantel` (het openingsscherm kantelt mee met de muis), `tik` (een vonkje bij een tik), `stralen` (draaiende lichtstralen), `disco` (draaiende lichtspikkels), `aura` (zachte kleurvlekken die bewegen), `scrollwind` (zwevende deeltjes waaien en schuiven licht mee met het scrollen; alleen met de canvas-sfeer, niet bij 'minder beweging') |
 
+Minder deeltjes dan de standaard van een sfeer: zet in de stijl van het ontwerp `html.inv-<slug> { --fx-density: 0.3; }` (0 tot 1; zonder waarde 1). Bijvoorbeeld voor "enkele blaadjes".
+
 Een onbekende keuze geeft bij het inlezen een duidelijke melding. Op de ontwerppagina van de website staat automatisch een zin over de effecten, en de kaarten in de collectie noemen de sfeer.
 
 **Kleuren.** De deeltjes nemen de kleuren van de kleurvariant over via `--fx-1` tot en met `--fx-4` en `--fx-bg` (bij Atelier: accent, `c2`, `c3`; eigen ontwerpen zetten ze in hun `style.css`). Een kleur die bijna gelijk is aan de achtergrond, maakt het script lichter of donkerder. Bij `folie` heeft de lichtstreep een eigen kleur (`--fx-shine`) met minstens 3:1 contrast op de achtergrond; de Atelier-generator berekent die per kleurvariant en de tests controleren het.

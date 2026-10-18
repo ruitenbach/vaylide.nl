@@ -24,6 +24,10 @@ Een muur van besneeuwde dennen schuift open naar een kerstplein vol lichtjes. E√
 
 Je ziet eerst een muur van besneeuwde dennentakken met gouden ballen, sterren en lichtjes. Na een tik schuift hij open en sta je op een kerstplein onder een sterrenhemel, met een hoge verlichte kerstboom, een draaimolen, cadeaus en een glanzende, natte straat vol goudlicht. Daarna staan jullie namen in de lucht en loopt de kerstkaart door met aftellen, programma, locatie en aanmelden, in nachtblauw en goud. De opening is over te slaan en rustig bij minder beweging. De film is een gegenereerde sc√®ne zonder personen.
 
+## 6a. Premium laag (18 oktober 2026, ter beoordeling)
+
+fijne sneeuw, gouden lichtpuntjes, subtiele diepte (geen rozen of bloesem); zie `docs/INTROKAARTEN.md` en `tools/introkaarten/premium_laag.py` (de plekken staan daar). Bloesemmeer is het voorbeeld waarop dit is gebaseerd.
+
 ## 7. Pagina na de opening
 
 Opbouw zoals Rozenboog: kop met het laatste beeld van de film, namen in de lucht, daarna aftellen, verhaal, programma, locatie en aanmelden, met uitsneden uit de film tussen de onderdelen. Effecten (uit `catalog/effects.py`): sfeer: sneeuw, knal: sterren, viering: sterren, namen: gloed, onthul: zacht, extra: tik.

@@ -1373,3 +1373,13 @@ Voorbeeld van licht op het water, nevel op twee dieptes, bloesemblaadjes over de
 - Vloeiendheid: 300 beelden tijdens scrollen met de processor 4 keer vertraagd (Playwright, geen echte telefoon): gemiddeld 16,7 ms per beeld, geen beeld boven 17 ms, met en zonder de laag vergelijkbaar. Dit zegt niets over een echte telefoon met batterij; dat is niet gemeten.
 - Gezien: schermafbeeldingen voor en na, en een opname van 43 seconden (openen, kop, scrollen, terug).
 - Niet gedaan: echte telefoons, Safari (scrollgestuurde diepte werkt alleen in browsers die dat kennen), Firefox; de andere vier kaarten hebben de laag niet.
+
+## Premium laag op de andere vier kaarten (18 oktober 2026, lokaal, niet op staging)
+
+Zijden gordijn, Bloesemwaaier, Kerstsprookje en Gouden poort (`docs/INTROKAARTEN.md`, `tools/introkaarten/premium_laag.py`). Echt uitgevoerd (Chromium, kaarten via het beheerdersvoorbeeld):
+- **Vier schermbreedtes** (360 × 740, 390 × 844, 768 × 1024, 1366 × 768), na het openen: 16 doorlopen, geen horizontale scroll, geen paginafouten, laag aanwezig. Gezien: 390 px en 1366 px voor alle vier, en de hele uitnodiging op 390 px.
+- **axe** (`e2e/toegankelijkheid.cjs`, dicht en open): 0 bevindingen voor alle vier.
+- **Minder beweging** (emulatie): laag onzichtbaar, geen deeltjes getekend, alle vier. **Knop *Beweging*** (pauze): laag weg en deeltjes gewist, bij hervatten terug, alle vier.
+- **Vloeiendheid** (processor 4 keer vertraagd, 300 beelden tijdens scrollen, Playwright): gemiddeld 16,9 tot 18,1 ms per beeld. Kerstsprookje haalde in twee van drie metingen een p95 van 33 ms (1 beeld van 300 boven 40 ms) tegen 16,8 ms zonder effecten; daarom is de dichtheid daar teruggebracht naar 0,6. Niet gemeten op een echte telefoon, en niet op batterijverbruik.
+- **Tests:** `manage.py test tests`: 1386 tests, alleen de twee bekende falers door de lokale `.env`; nieuw: vijf tests voor de laag (alle vijf, decoratief en achter de tekst, eigen identiteit per kaart, generator herhaalbaar, verborgen).
+- **Niet gedaan:** Safari en Firefox zijn in deze omgeving niet te testen (alleen Chromium is geïnstalleerd). Uit de code: de scrollgestuurde diepte is een `@supports`-verbetering (Chromium, nieuwe Safari); `translate`, `aspect-ratio`, `cqw` en maskers worden door Safari 16+ en Firefox 110+ ondersteund, maar dat is niet bekeken. Echte telefoons niet getest. Films niet gewijzigd.

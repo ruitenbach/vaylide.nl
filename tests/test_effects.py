@@ -57,7 +57,7 @@ class EffectChoicesTests(TestCase):
         for path in (Path(settings.BASE_DIR) / "designs").glob("*/v*/manifest.json"):
             extra = json.loads(path.read_text(encoding="utf-8")).get("effects", {}).get("extra", [])
             if "scrollwind" in extra:
-                self.assertEqual(path.parts[-3], "bloesemmeer")
+                self.assertIn(path.parts[-3], {"bloesemmeer", "zijden-gordijn", "bloesemwaaier", "kerstsprookje", "gouden-poort"})
 
     def test_same_options_for_burst_and_celebration(self):
         self.assertEqual(EFFECT_OPTIONS["knal"], EFFECT_OPTIONS["viering"])

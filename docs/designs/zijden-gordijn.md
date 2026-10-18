@@ -24,6 +24,10 @@ Zijden gordijnen vol bloemen schuiven open naar een kasteel in het avondlicht. E
 
 Je ziet eerst gesloten ivoren zijden gordijnen met witte rozen en gouden borduursel. Na een tik schuiven ze open en kijk je door naar een terras met een fontein, kaarsen en een kasteel in het licht van de ondergaande zon. Daarna staan jullie namen in de lucht en loopt de uitnodiging door met aftellen, programma, locatie en aanmelden, in ivoor en goud. De opening is over te slaan en rustig bij minder beweging. De film is een gegenereerde scène zonder personen.
 
+## 6a. Premium laag (18 oktober 2026, ter beoordeling)
+
+enkele rozenblaadjes, warme lichtreflecties; zie `docs/INTROKAARTEN.md` en `tools/introkaarten/premium_laag.py` (de plekken staan daar). Bloesemmeer is het voorbeeld waarop dit is gebaseerd.
+
 ## 7. Pagina na de opening
 
 Opbouw zoals Rozenboog: kop met het laatste beeld van de film, namen in de lucht, daarna aftellen, verhaal, programma, locatie en aanmelden, met uitsneden uit de film tussen de onderdelen. Effecten (uit `catalog/effects.py`): sfeer: goudstof, knal: blaadjes, viering: blaadjes, namen: schrijf, onthul: zacht, extra: kenburns, tik.

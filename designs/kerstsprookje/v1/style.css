@@ -446,3 +446,71 @@ html.inv-kerstsprookje::before { filter: blur(38px) saturate(1.02); }
 
 /* ---------- Eigen instellingen van dit ontwerp (tools/introkaarten/maak_introkaarten.py) ---------- */
 body { --fk-sky-l: 14%; --fk-sky-r: 10%; --fk-sky-t: 9%; --fk-sky-h: 22%; }
+
+/* premium-laag begin */
+/* ---------- Premium laag (voorbeeld Bloesemmeer, doorgetrokken op 18 oktober 2026; eigen plekken en kleuren per kaart) ----------
+   Decoratief en achter de tekst (z-index 0; namen en datum liggen op 1), niet aanklikbaar, alleen onder .fx-motion (dus niet bij 'minder
+   beweging' of na stilzetten met de knop Beweging). Alleen transform en opacity bewegen. Plekken zijn percentages van end.webp. */
+.fk-fx { display: none; }
+.fx-motion .fk-fx { display: block; position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; opacity: 0; transition: opacity 3.2s ease .6s; }
+.fx-motion.is-open .fk-fx, .fx-motion.is-opening-reduced .fk-fx { opacity: 1; }
+
+.fk-mist { position: absolute; left: -25%; right: -25%; border-radius: 50%; will-change: transform; }
+.fk-mist--far { top: 40%; height: 16%; background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(150,176,226, 0.22), rgba(150,176,226, 0) 70%); animation: fk-mist-far 46s ease-in-out infinite alternate; }
+.fk-mist--near { top: 58%; height: 16%; background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(214,200,170, 0.2), rgba(214,200,170, 0) 70%); animation: fk-mist-near 34s ease-in-out infinite alternate; }
+@keyframes fk-mist-far  { from { transform: translateX(-4%); } to { transform: translateX(5%); } }
+@keyframes fk-mist-near { from { transform: translateX(5%); } to { transform: translateX(-5%); } }
+
+.fk-water {
+  position: absolute; left: 0%; right: 0%; top: 66%; height: 30%; overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 70%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 70%, transparent);
+}
+.fk-water__glint { position: absolute; inset: 0 -12%; opacity: .3; will-change: opacity, transform; }
+.fk-water__glint--a {
+  background-size: 173px 97px;
+  background-image: radial-gradient(ellipse 22px 2.7px at 18% 24%, rgba(255,226,160, .95), transparent), radial-gradient(ellipse 15px 2.1px at 63% 68%, rgba(255,226,160, .9), transparent), radial-gradient(ellipse 18px 2.4px at 88% 40%, rgba(255,226,160, .85), transparent);
+  animation: fk-glint 5.2s ease-in-out infinite alternate, fk-glint-sway 19s ease-in-out infinite alternate;
+}
+.fk-water__glint--b {
+  background-size: 131px 71px;
+  background-image: radial-gradient(ellipse 16px 2.2px at 30% 52%, rgba(255,226,160, .9), transparent), radial-gradient(ellipse 21px 2.5px at 76% 20%, rgba(255,226,160, .85), transparent);
+  animation: fk-glint 7.1s ease-in-out -2.4s infinite alternate, fk-glint-sway 25s ease-in-out -9s infinite alternate-reverse;
+}
+.fk-water__glint--c {
+  background-size: 229px 123px;
+  background-image: radial-gradient(ellipse 27px 3px at 44% 36%, rgba(255,226,160, .95), transparent), radial-gradient(ellipse 19px 2.4px at 12% 80%, rgba(255,226,160, .8), transparent);
+  animation: fk-glint 9.3s ease-in-out -5s infinite alternate, fk-glint-sway 31s ease-in-out -14s infinite alternate;
+}
+@keyframes fk-glint { from { opacity: .15; } to { opacity: .95; } }
+@keyframes fk-glint-sway { from { transform: translateX(-9px); } to { transform: translateX(9px); } }
+
+/* Warme lichtjes: lantaarns, ramen, kaarsen, de zon. Zacht ademend, nooit tegelijk. */
+.fk-glow {
+  position: absolute; left: var(--x); top: var(--y); width: var(--s, 12%); aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; opacity: .2; will-change: opacity, transform;
+  background: radial-gradient(circle, rgba(var(--gc, 255,200,100), .6), rgba(var(--gc, 255,200,100), 0) 66%);
+  animation: fk-glow var(--t, 6s) ease-in-out var(--d, 0s) infinite alternate;
+}
+@keyframes fk-glow { from { opacity: .16; transform: scale(.9); } to { opacity: .8; transform: scale(1.08); } }
+/* Een enkel lichtpuntje dat even oplicht en weer verdwijnt (geen glitter: weinig, klein, ver uit elkaar in tijd). */
+.fk-twinkle {
+  position: absolute; left: var(--x); top: var(--y); width: var(--s, 1.2cqw); aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; opacity: 0; will-change: opacity, transform;
+  background: radial-gradient(circle, rgba(255, 252, 240, 1) 0 22%, rgba(255,200,100, .75) 42%, rgba(255,200,100, 0) 72%);
+  animation: fk-twinkle var(--t, 5s) ease-in-out var(--d, 0s) infinite;
+}
+@keyframes fk-twinkle { 0%, 100% { opacity: 0; transform: scale(.5); } 46%, 54% { opacity: .95; transform: scale(1.15); } }
+
+/* Diepte bij het scrollen: nevel en water schuiven iets sneller omhoog dan het beeld (alleen waar de browser scrollgestuurde animaties kent). */
+@supports (animation-timeline: scroll()) {
+  .fx-motion .fk-mist--far { animation: fk-mist-far 46s ease-in-out infinite alternate, fk-depth linear both; animation-timeline: auto, scroll(root block); animation-range: normal, 0 100svh; --fk-dz: -10px; }
+  .fx-motion .fk-mist--near { animation: fk-mist-near 34s ease-in-out infinite alternate, fk-depth linear both; animation-timeline: auto, scroll(root block); animation-range: normal, 0 100svh; --fk-dz: -26px; }
+  .fx-motion .fk-water { animation: fk-depth linear both; animation-timeline: scroll(root block); animation-range: 0 100svh; --fk-dz: -38px; }
+}
+@keyframes fk-depth { from { translate: 0 0; } to { translate: 0 var(--fk-dz, 0px); } }
+/* De afkorting 'animation' zet de speelstand terug op 'lopend'; daarom staat hij hier nog eens, voor alle lagen (ook de pseudo-elementen). */
+.fx-motion .fk-fx *, .fx-motion .fk-fx *::before { animation-play-state: var(--fx-play, running); }
+
+/* Blaadjes en sneeuw over het beeld van de kop: een eigen laag, zelfde sfeer als de pagina, loopt alleen terwijl de kop in beeld is, boven
+   de nevel, onder de namen en de datum. Minder deeltjes dan de pagina (--fx-density). */
+.fk-frame--hero > .fx-slot { z-index: 0; }
+html.inv-kerstsprookje { --fx-density: 0.6; }
+/* premium-laag einde */
