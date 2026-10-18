@@ -111,3 +111,20 @@ Stand: ontwikkelcommit `42e1dca` staat op de stagingtak `claude/vaylide-master-c
 **Verborgen en niet bestelbaar**: groep C in `catalog/collectie.py`; in de stagingdatabase `is_active = false` voor alle vijf (gelezen op 18 oktober 2026, na de laatste deploy); tests: 404 voor bezoekers en klanten, niet in collectie, zoeken en sitemap, niet te kiezen in de bestelroute (ook niet voor beheerders), geen wijziging in prijzen. Prijzen, betalingen en bestaande ontwerpen zijn niet gewijzigd.
 
 **Nog open, bij de eigenaar**: de commerciële gebruiksrechten per film (zie "Rechten per videobestand": voor alle vijf nog niet bevestigd) en de controle op echte telefoons. Geen publieke activatie, verkoop of productie-uitrol zonder nieuw akkoord.
+
+## Herkomst en Runway-voorwaarden (18 oktober 2026, 20:50)
+
+**Verklaring van de eigenaar** (bericht van 18 oktober 2026, 20:50): alle vijf openingsvideo's zijn door hemzelf gemaakt met zijn eigen Runway-account. Dit is een mondelinge verklaring; er is nog geen bewijs uit het account bijgevoegd (plan, datum van de generatie, exportoverzicht).
+
+**Wat ik wel en niet kon controleren**
+- De officiële voorwaarden van Runway waren niet te openen: de cloudomgeving bereikte runwayml.com en de helppagina's niet (DNS-fout). Ik claim dus niet de voorwaarden zelf gelezen te hebben.
+- Wat wel te vinden was (zoekresultaten, alleen secundaire bronnen en deels tegenstrijdig): Runway claimt geen eigendom van uitvoer; volgens sommige bronnen is commercieel gebruik alleen toegestaan met een betaald abonnement en is de uitvoer van het gratis plan watermerk en bedoeld voor persoonlijk gebruik, volgens andere beperkt Runway commercieel gebruik niet. Dat is geen basis voor een rechtenbesluit.
+- De bestanden zelf dragen een `AIGC`-label met een `ContentProducer`-code die ik niet tot Runway kan herleiden (zie "Rechten per videobestand"). Dat past niet vanzelf bij de verklaring van de eigenaar en is niet uitgelegd. Het is geen bewijs tegen de verklaring, maar het is wel een open vraag.
+
+**Besluit:** commercieel gebruik is **niet voldoende bevestigd**; de rechtenblokkade is daarom **niet opgeheven**. Alle vijf blijven "Nee" in de tabel hierboven; de kaarten blijven verborgen (groep C).
+
+**Wat de blokkade kan opheffen** (door de eigenaar aan te leveren):
+1. Uit het Runway-account: per film het abonnement (plan) op het moment van genereren en het overzicht van de generatie (naam of prompt, datum), bijvoorbeeld als schermafbeelding.
+2. De versie en datum van de Runway-voorwaarden die toen golden, met de passage over commercieel gebruik van uitvoer (of een bevestiging dat het plan commercieel gebruik toestaat).
+3. Een verklaring waarom de bestanden een `ContentProducer`-code dragen die niet van Runway lijkt te zijn (bijvoorbeeld omdat de film via een andere dienst of een export is gelopen).
+Daarna werk ik de tabel per film bij.
