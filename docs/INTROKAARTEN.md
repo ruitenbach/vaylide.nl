@@ -128,3 +128,23 @@ Stand: ontwikkelcommit `42e1dca` staat op de stagingtak `claude/vaylide-master-c
 2. De versie en datum van de Runway-voorwaarden die toen golden, met de passage over commercieel gebruik van uitvoer (of een bevestiging dat het plan commercieel gebruik toestaat).
 3. Een verklaring waarom de bestanden een `ContentProducer`-code dragen die niet van Runway lijkt te zijn (bijvoorbeeld omdat de film via een andere dienst of een export is gelopen).
 Daarna werk ik de tabel per film bij.
+
+## Productie-uitrol met verborgen kaarten (18 oktober 2026, 23:00)
+
+Uitdrukkelijk akkoord van de eigenaar (18 oktober 2026, 20:58): de vijf kaarten verborgen naar productie, los van de definitieve rechtencontrole. **Geen toestemming om ze zichtbaar of bestelbaar te maken.**
+
+**Uitgevoerd:** gewone fast-forward (zonder force) van `claude/kerstkaarten-website-design-51mn9k` van 691ca1c naar 42e1dca, de eerder geteste commit. Web (`vaylide`) en taken (`vaylide-taken`) deployen van dezelfde branch.
+
+**Echt gecontroleerd (Render-logboeken en alleen-lezen databasequery's, voor en na):**
+- Web: deploy live, `/healthz` 200, geen foutmeldingen of waarschuwingen sinds de uitrol, "No migrations to apply". Taken: build geslaagd, run na de uitrol geslaagd.
+- Productiedatabase: ontwerpen 58 → 63 (de vijf nieuwe), **actieve ontwerpen 49 → 49 met dezelfde lijst** (vergelijking via controlesom), de vijf nieuwe alle `is_active = false`, prijsregels 27 → 27 met dezelfde controlesom, pakketten en extra's gelijk, bestellingen 2 → 2 (laatste wijziging ongewijzigd), kortingscodes 1 → 1 met dezelfde controlesom.
+
+**Niet gecontroleerd:** de publieke site (vaylide.nl) is vanuit de cloudomgeving niet bereikbaar; het 404-gedrag voor bezoekers en het ontbreken in zoeken en sitemap rusten dus op de tests en op `is_active = false`, niet op een live aanvraag. Eenmalig te controleren door de eigenaar of via een omgeving met toegang.
+
+**Voorwaarden voor publieke vrijgave (nog open):**
+1. Commerciële gebruiksrechten per film bevestigd (zie "Herkomst en Runway-voorwaarden"; de eigenaar wijst naar de Runway-pagina "Usage rights", die ik niet kon openen).
+2. Controle op Safari/iOS en echte telefoons, inclusief de MP4 (H.264), die nergens is afgespeeld.
+3. Bevestiging van Luxe als indeling door de eigenaar.
+4. Nieuw, afzonderlijk akkoord voor activeren.
+
+**Terugvalplan:** de vorige productiedeploy (691ca1c) weer live zetten via Render.
