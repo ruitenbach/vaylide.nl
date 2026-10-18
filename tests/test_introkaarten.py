@@ -207,7 +207,7 @@ class PremiumLaagTests(VaylideTestCase):
     def test_de_laag_is_decoratief_en_staat_achter_de_tekst(self):
         for slug in KAARTEN:
             _, css = self.bestanden(slug)
-            premium = css[css.index("Premium laag"):]
+            premium = css[css.index("Premium laag"):].split("/* knop-ruimte begin */")[0]    # de latere blokken (knop-ruimte, aanmeld-link) horen niet bij de laag
             self.assertIn(".fk-fx { display: none; }", premium, slug)
             self.assertIn(".fx-motion .fk-fx { display: block;", premium, slug)
             self.assertIn("pointer-events: none", premium, slug)
@@ -271,3 +271,64 @@ class KnopRuimteTests(VaylideTestCase):
         css = (Path(settings.BASE_DIR) / "tools" / "introkaarten" / "sjabloon" / "style.css").read_text(encoding="utf-8")
         self.assertEqual(css.count("/* knop-ruimte begin */"), 1)
         self.assertIn(".fk-meta { padding-inline: 4.25rem; }", css)
+
+
+class AanmeldLinkTests(VaylideTestCase):
+    """Subtiele link 'Aanmelden' bovenin de kop: alleen als aanmelden kan, en verwijst naar #aanmelden."""
+
+    ONTWERPEN = {"zijden-gordijn": "fk", "bloesemmeer": "fk", "bloesemwaaier": "fk", "kerstsprookje": "fk", "gouden-poort": "fk", "rozenboog": "rb"}
+
+    def pagina(self, slug, **wijzigingen):
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        from catalog.models import TemplateVersion
+        from invitations.services import publish_draft, save_draft
+
+        self.teller = getattr(self, "teller", 0) + 1
+        owner = self.make_customer(email=f"klant{self.teller}@example.com")
+        inv = self.published(owner=owner)
+        content = dict(inv.draft_content)
+        if wijzigingen.get("deadline_voorbij"):
+            content["rsvp"] = dict(content["rsvp"], deadline=(timezone.localdate() - timedelta(days=1)).isoformat())
+        if wijzigingen.get("rsvp_uit"):
+            content["sections"] = dict(content.get("sections") or {}, rsvp=False)
+        inv = save_draft(inv, expected_rev=None, content=content, user=owner)
+        publish_draft(inv, user=owner, source="customer", expected_rev=None)
+        inv.refresh_from_db()
+        tv = TemplateVersion.objects.get(template__slug=slug, number=1)
+        pv = inv.published_version
+        pv.template_version = tv
+        pv.save(update_fields=["template_version"])
+        return Client().get(inv.public_path)
+
+    def test_de_link_staat_in_de_kop_en_wijst_naar_de_aanmeldsectie(self):
+        for slug, voorvoegsel in self.ONTWERPEN.items():
+            pagina = self.pagina(slug)
+            html = pagina.content.decode()
+            self.assertEqual(pagina.status_code, 200, slug)
+            self.assertIn('class="%s-aanmeld fx-intro"' % voorvoegsel, html, slug)
+            self.assertIn('href="#aanmelden">Aanmelden</a>', html, slug)
+            self.assertIn('id="aanmelden"', html, slug)
+            kop = html.split("</header>")[0]
+            self.assertIn("-aanmeld ", kop, slug)
+
+    def test_geen_link_als_aanmelden_dicht_is_of_uit_staat(self):
+        for slug in self.ONTWERPEN:
+            dicht = self.pagina(slug, deadline_voorbij=True).content.decode()
+            self.assertIn("Aanmelden kon tot en met", dicht, slug)
+            self.assertNotIn("-aanmeld ", dicht, slug)
+            uit = self.pagina(slug, rsvp_uit=True).content.decode()
+            self.assertNotIn("-aanmeld ", uit, slug)
+            self.assertNotIn('id="aanmelden"', uit, slug)
+
+    def test_stijl_en_sjabloon(self):
+        for slug, voorvoegsel in list(self.ONTWERPEN.items()) + [("sjabloon", "fk")]:
+            pad = Path(settings.BASE_DIR) / ("tools/introkaarten/sjabloon" if slug == "sjabloon" else f"designs/{slug}/v1")
+            css = (pad / "style.css").read_text(encoding="utf-8")
+            html = (pad / "invitation.html").read_text(encoding="utf-8")
+            self.assertEqual(css.count("/* aanmeld-link begin */"), 1, slug)
+            self.assertIn(".%s-aanmeld:focus-visible" % voorvoegsel, css, slug)
+            self.assertEqual(html.count("-aanmeld "), 1, slug)
+            self.assertIn("{% if v.show.rsvp and not v.rsvp.closed_reason %}", html, slug)

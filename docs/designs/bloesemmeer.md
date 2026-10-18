@@ -56,6 +56,7 @@ Gegenereerd door `tools/introkaarten/maak_introkaarten.py` uit het gedeelde sjab
 - Kaart gebouwd en verborgen opgenomen, 18 oktober 2026.
 - WebM als extra bron toegevoegd; afspelen, eindscène en overgang gecontroleerd in Chromium (mobiel en desktop, 6 scenario's), axe zonder bevindingen (`docs/CONTROLES.md`).
 - Knoppen en plaatsregel op mobiel: blok `knop-ruimte` in `style.css` houdt de plaatsregel tussen de pauze- en muziekknop (18 oktober 2026; `docs/CONTROLES.md`).
+- Link 'Aanmelden' rechtsboven in de kop, naar `#aanmelden`, alleen als aanmelden kan (blok `aanmeld-link`, 18 oktober 2026; `docs/CONTROLES.md`).
 
 ## 12. Wat nog moet gebeuren
 

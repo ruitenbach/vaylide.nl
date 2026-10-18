@@ -519,3 +519,17 @@ html.inv-zijden-gordijn { --fx-density: 0.3; }
 /* De pauze- en muziekknop zweven in de hoeken van het scherm. Op de eerste schermhoogte staat de plaatsregel op dezelfde hoogte; houd die regel tussen de knoppen. */
 @media (max-width: 480px) { .fk-meta { padding-inline: 4.25rem; } }
 /* knop-ruimte einde */
+
+/* aanmeld-link begin */
+/* Subtiele link naar #aanmelden, bovenin de kop; zichtbaar zodra de film voorbij is (tot dan is de uitnodiging inert). Alleen als aanmelden kan (zie invitation.html). */
+.fk-aanmeld {
+  position: absolute; z-index: 3; top: .35rem; right: max(.75rem, calc(50% - 28.125vh + .75rem)); right: max(.75rem, calc(50% - 28.125svh + .75rem));
+  display: inline-flex; align-items: center; min-height: 1.75rem; padding: .15rem .85rem; border-radius: 999px;
+  font-family: "Figtree", sans-serif; font-size: .76rem; font-weight: 600; letter-spacing: .08em; line-height: 1.2; text-decoration: none;
+  color: var(--fk-ink, inherit); background: rgba(var(--fk-veil), .78); border: 1px solid var(--fk-gold-line);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.fk-aanmeld::after { content: ""; position: absolute; inset: -8px; }
+.fk-aanmeld:hover { background: rgb(var(--fk-veil)); }
+.fk-aanmeld:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+/* aanmeld-link einde */

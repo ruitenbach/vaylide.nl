@@ -88,3 +88,7 @@ Zie `docs/CONTROLES.md`, "Vijf filmkaarten". Kort: de testbrowser van deze omgev
 ## Knoppen en plaatsregel op mobiel (18 oktober 2026)
 
 De pauze- en muziekknop zweven in de hoeken van het scherm. Het blok `knop-ruimte` onderaan `style.css` (en in het sjabloon) houdt de regel met tijd en plaats op schermen tot 480 px tussen de knoppen. Zie `docs/CONTROLES.md`. Dezelfde regel staat ook in `designs/rozenboog/v1/style.css` (`.rb-meta`).
+
+## Link Aanmelden in de kop (18 oktober 2026)
+
+Een kleine link `Aanmelden` (`.fk-aanmeld`, bij Rozenboog `.rb-aanmeld`) staat rechtsboven in de kop en wijst naar `#aanmelden`. Hij verschijnt alleen als aanmelden kan (`v.show.rsvp and not v.rsvp.closed_reason`) en pas na de film, omdat de uitnodiging tot dan inert is. Stijl: blok `aanmeld-link` in `style.css` en het sjabloon. Zie `docs/CONTROLES.md`.

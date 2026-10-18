@@ -1394,3 +1394,13 @@ Aanleiding: op het eerste scherm stonden de pauzeknop (links) en de muziekknop (
 - **axe** (`e2e/toegankelijkheid.cjs`, dicht en open): 0 bevindingen voor alle zes.
 - **Tests:** `manage.py test tests`: 1386 tests, alleen de twee bekende falers door de lokale `.env`; nieuw: twee tests in `tests/test_introkaarten.py` (`KnopRuimteTests`).
 - **Niet gedaan:** staging niet gecontroleerd (de cloudomgeving bereikt die niet), geen Safari of Firefox, geen echte telefoons.
+
+## Link Aanmelden in de kop (18 oktober 2026, lokaal, niet op staging)
+
+Op verzoek van de eigenaar: bij Zijden gordijn, Bloesemmeer, Bloesemwaaier, Kerstsprookje, Gouden poort en Rozenboog staat bovenin de kop een kleine, ronde link 'Aanmelden' naar `#aanmelden` (de bestaande sectie). Markup: een `<a class="fk-aanmeld fx-intro">` (bij Rozenboog `rb-aanmeld`) als laatste kind van `<header>`, alleen als `v.show.rsvp and not v.rsvp.closed_reason` (dus niet als aanmelden uit staat, de deadline voorbij is, de dag geweest is of het maximum bereikt is). Stijl: blok `aanmeld-link` onderaan `style.css` (eigen lettertype, kleuren, gouden lijn en sluier van de kaart; geen nieuwe tokens); ook in `tools/introkaarten/sjabloon`. Films, effecten en de aanmeldfunctie zijn niet aangeraakt. Echt uitgevoerd (Chromium, beheerdersvoorbeeld):
+- **Pas na de film:** de link staat in de uitnodiging, die tijdens de film `inert` is; gemeten dat de link dan onzichtbaar en niet focusbaar is, en na het openen zichtbaar (alle zes).
+- **Plaatsing** op 360 × 740, 390 × 844, 768 × 1024 en 1366 × 768, alle zes: 24 metingen, de link staat steeds binnen beeld en raakt geen tekst van de kop (marge 4 px). Eerst bij Gouden poort te dicht op de kopregel: daarom een slankere link (28 px hoog, het aanraakvlak is met een onzichtbare rand 44 px).
+- **Toetsenbord:** eerste Tab-stop na het openen, zichtbare focusrand (2 px), Enter brengt naar de aanmeldsectie. **Minder beweging** (emulatie): link meteen zichtbaar, geen animatie, werkt hetzelfde.
+- **Niet beschikbaar:** drie tests in `tests/test_introkaarten.py` (`AanmeldLinkTests`): aanwezig bij open aanmelden in de kop en wijzend naar `#aanmelden`; afwezig bij voorbije deadline en bij aanmelden uitgezet (op echte gepubliceerde uitnodigingen met het ontwerp); stijl en sjabloon aanwezig.
+- **axe** (`e2e/toegankelijkheid.cjs`, dicht en open): 0 bevindingen voor alle zes. **Tests:** `manage.py test tests`: 1391 tests, alleen de twee bekende falers door de lokale `.env`. Een bestaande laagtest is aangepast om alleen de premium laag te beoordelen (niet de latere blokken).
+- **Niet gedaan:** staging, Safari, Firefox en echte telefoons.
