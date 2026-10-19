@@ -145,3 +145,13 @@ class WebsiteTests(VaylideTestCase):
         html = Client().get("/ontwerpen/", {"categorie": "specials"}).content.decode()
         for slug in ("midnight-emeraude", "rose-royale", "golden-noel"):
             self.assertIn(f"img/designs/{slug}.webp", html, slug)
+
+
+class PakketlabelKaartTests(VaylideTestCase):
+    def test_label_staat_op_eigen_regel_boven_de_naam(self):
+        css = (settings.BASE_DIR / "static" / "css" / "vierlief.css").read_text(encoding="utf-8")
+        regel = next(r for r in css.splitlines() if r.startswith(".design-card__special {"))
+        self.assertIn("display: block", regel)
+        self.assertNotIn("inline", regel)
+        naam = next(r for r in css.splitlines() if r.startswith(".design-card__name { display: block"))
+        self.assertIn("overflow-wrap", naam)

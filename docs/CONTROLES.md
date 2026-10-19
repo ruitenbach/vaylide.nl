@@ -1408,3 +1408,10 @@ Op verzoek van de eigenaar: bij Zijden gordijn, Bloesemmeer, Bloesemwaaier, Kers
 ## Vijf filmkaarten: afronding en overgeslagen controles (18 oktober 2026)
 
 Samenvatting van wat echt is uitgevoerd, wat bewust is overgeslagen en de stand op staging: zie `docs/INTROKAARTEN.md`, "Afronding van de ontwikkelronde". Op staging is alleen gelezen (deploy, logs, gezondheid, tellingen in de database), niet in een browser gecontroleerd.
+
+## Pakketlabel op de ontwerpkaarten (19 oktober 2026)
+
+Het label Special stond bij sommige kaarten naast de naam en bij andere erboven, afhankelijk van de lengte van de naam. Nu staat het in de gedeelde kaartstijl (`.design-card__special` in `static/css/vierlief.css`) altijd op een eigen regel boven de naam, ook op desktop; lange namen breken af onder het label. Er bestaat in deze code alleen het label Special (geen Luxe of Basis op de kaart).
+
+- **Uitgevoerd:** echte Chromium-screenshots voor en na op 360, 390 en 1366 px (pagina Ontwerpen, 11 specials); gemeten dat het label op alle kaarten boven de naam staat (voor: 6 van 11 naast de naam op 360 px, 9 van 11 op 390 px, alle 11 op 1366 px). Test in `tests/test_collectie.py`.
+- **Niet gedaan:** Safari, Firefox en echte telefoons.
