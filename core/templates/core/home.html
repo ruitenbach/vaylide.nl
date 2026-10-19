@@ -108,7 +108,7 @@
         <div class="phone-demo">
           <div class="phone">
             {# Bloesemmeer: is het ontwerp actief (zoals op productie), dan laadt de telefoon het werkende voorbeeld en dient het beeld als terugval. Is het niet actief, dan is er alleen het beeld, zonder link die een 404 geeft. #}
-            <div class="phone__screen"{% if bloesem_live %} data-lazy-frame="{% url 'invitations:demo' 'bloesemmeer' %}?embed=1" data-frame-title="Werkend voorbeeld van de kaart Bloesemmeer (fictief evenement)"{% endif %}>
+            <div class="phone__screen"{% if bloesem_live %} data-vast-horizontaal data-lazy-frame="{% url 'invitations:demo' 'bloesemmeer' %}?embed=1" data-frame-title="Werkend voorbeeld van de kaart Bloesemmeer (fictief evenement)"{% endif %}>
               <img class="phone__poster" src="{% static 'img/site/telefoon-bloesemmeer.webp' %}" alt="{% if not bloesem_live %}De kaart Bloesemmeer: een wand van kersenbloesem met de uitnodiging in het midden (voorbeeld){% endif %}" width="540" height="1152" loading="lazy" decoding="async">
               {% if bloesem_live %}<a class="phone__fallback" href="{% url 'invitations:demo' 'bloesemmeer' %}">Open het werkende voorbeeld</a>{% endif %}
             </div>
