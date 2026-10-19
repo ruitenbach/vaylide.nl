@@ -136,3 +136,7 @@ In een logische volgorde. Punt 2 alleen met akkoord van de eigenaar.
 ## Prijzenbeheer, fase A (17 oktober 2026, lokaal, niet gepusht)
 
 Beheer → Prijzen en acties: de 27 verkoopprijzen in de database (`catalog.PriceRule`), met bevestigingsstap, logboek, terugdraaien, rollen Eigenaar en Hoofdbeheerder en het btw-tarief op nieuwe bestellingen. Achter `VIERLIEF_PRIJZENBEHEER` (standaard uit; dan geldt alleen `catalog/prijzen.py`). Alles staat in `docs/PRIJZENBEHEER.md`. Open: Mollie-testbetaling op staging, `controleer_prijsbron` en `controleer_rechten` op staging en productie, afzonderlijk akkoord voor deploy en voor de vlag. Geplande prijswijzigingen zijn bewust niet gebouwd.
+
+## Homepage: drie inhoudelijke aanpassingen (19 oktober 2026, ter beoordeling)
+
+Zelfde opzet en kleuren; de hero (envelop en gouden kaart) is ongewijzigd. (1) De knop "Bekijk het voorbeeld" in de hero opent de filmische kerstkaart (`/voorbeeld/kerstkaart/`: gouden deurklopper op een chocoladehuis), zolang die actief is; anders blijft hij naar het oude voorbeeld verwijzen. (2) De telefoon bij "Alles in één link" toont Bloesemmeer: is het ontwerp actief (zoals op productie), dan laadt het werkende voorbeeld en is `static/img/site/telefoon-bloesemmeer.webp` de terugval; is het niet actief, dan is er alleen het beeld. (3) "Jullie verhaal verdient iets bijzonders" toont de kaart Gouden Avond die deels uit de echte, geopende Signature Ivory-envelop (met lakzegel) steekt (`op-maat-gouden-avond*.webp`; maken: zie `tools/merkbeelden/maatwerk-op-maat.md`).
