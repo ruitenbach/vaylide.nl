@@ -24,7 +24,30 @@
     var frame = document.createElement("iframe");
     frame.setAttribute("data-lazy", "");
     frame.title = holder.getAttribute("data-frame-title") || "";
-    frame.addEventListener("load", function () { holder.classList.add("is-loaded"); });
+    // Telefoon op de homepage: de kaart in de telefoon mag bij een schuine veeg niet zijwaarts schuiven (de kaart is een paar pixels breder dan het scherm).
+    // De aanpassing staat er zodra het echte document er is, nog vóór het voorbeeld zichtbaar wordt.
+    var vast = holder.hasAttribute("data-vast-horizontaal");
+    var vastDoen = function () {
+      try {
+        var doc = frame.contentDocument;
+        if (!doc || !doc.documentElement || !doc.body || doc.location.href === "about:blank") return false;
+        [doc.documentElement, doc.body].forEach(function (el) {
+          el.style.setProperty("overflow-x", "hidden", "important");
+          el.style.setProperty("touch-action", "pan-y", "important");
+        });
+        return true;
+      } catch (e) { return true; /* ander domein: niets aanpassen */ }
+    };
+    frame.addEventListener("load", function () {
+      if (vast) vastDoen();
+      holder.classList.add("is-loaded");
+    });
+    if (vast) {
+      var pogingen = 0;
+      var wacht = window.setInterval(function () {
+        if (vastDoen() || ++pogingen > 400) window.clearInterval(wacht);
+      }, 25);
+    }
     frame.src = holder.getAttribute("data-lazy-frame");
     holder.appendChild(frame);
   }

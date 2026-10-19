@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.contrib.staticfiles import finders
 from django.test import TestCase
 
@@ -39,6 +41,20 @@ class TelefoonBloesemmeerTests(TestCase):
         self.assertIn('data-lazy-frame="/voorbeeld/bloesemmeer/?embed=1"', html)
         self.assertIn("img/site/telefoon-bloesemmeer.webp", html)
         self.assertEqual(self.client.get("/voorbeeld/bloesemmeer/").status_code, 200)
+
+    def test_alleen_de_telefoon_op_de_homepage_houdt_het_voorbeeld_vast_tegen_zijwaarts_schuiven(self):
+        from catalog.models import Template
+
+        Template.objects.filter(slug="bloesemmeer").update(is_active=True)
+        html = self.client.get("/").content.decode()
+        self.assertEqual(html.count("data-vast-horizontaal"), 1)
+        self.assertIn("data-vast-horizontaal", html.split('data-lazy-frame="/voorbeeld/bloesemmeer/')[0].rsplit("<div", 1)[1])
+        js = Path(finders.find("js/site.js")).read_text(encoding="utf-8")
+        self.assertIn('data-vast-horizontaal', js)
+        self.assertIn("pan-y", js)
+        # Het afzonderlijke ontwerp en de andere telefoons krijgen niets extra's.
+        for pad in ("/kerstkaarten/", "/trouwkaarten/"):
+            self.assertNotIn("data-vast-horizontaal", self.client.get(pad).content.decode())
 
     def test_zolang_bloesemmeer_verborgen_is_geen_werkend_voorbeeld_en_geen_link_naar_een_404(self):
         html = self.client.get("/").content.decode()
