@@ -1404,3 +1404,10 @@ Op verzoek van de eigenaar: bij Zijden gordijn, Bloesemmeer, Bloesemwaaier, Kers
 - **Niet beschikbaar:** drie tests in `tests/test_introkaarten.py` (`AanmeldLinkTests`): aanwezig bij open aanmelden in de kop en wijzend naar `#aanmelden`; afwezig bij voorbije deadline en bij aanmelden uitgezet (op echte gepubliceerde uitnodigingen met het ontwerp); stijl en sjabloon aanwezig.
 - **axe** (`e2e/toegankelijkheid.cjs`, dicht en open): 0 bevindingen voor alle zes. **Tests:** `manage.py test tests`: 1391 tests, alleen de twee bekende falers door de lokale `.env`. Een bestaande laagtest is aangepast om alleen de premium laag te beoordelen (niet de latere blokken).
 - **Niet gedaan:** staging, Safari, Firefox en echte telefoons.
+
+## Pakketlabel op de ontwerpkaarten (19 oktober 2026)
+
+Het label Special stond bij sommige kaarten naast de naam en bij andere erboven, afhankelijk van de lengte van de naam. Nu staat het in de gedeelde kaartstijl (`.design-card__special` in `static/css/vierlief.css`) altijd op een eigen regel boven de naam, ook op desktop; lange namen breken af onder het label. Er bestaat in deze code alleen het label Special (geen Luxe of Basis op de kaart).
+
+- **Uitgevoerd:** echte Chromium-screenshots voor en na op 360, 390 en 1366 px (pagina Ontwerpen, 11 specials); gemeten dat het label op alle kaarten boven de naam staat (voor: 6 van 11 naast de naam op 360 px, 9 van 11 op 390 px, alle 11 op 1366 px). Test in `tests/test_collectie.py`.
+- **Niet gedaan:** Safari, Firefox en echte telefoons.
