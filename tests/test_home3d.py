@@ -17,7 +17,7 @@ class Home3DTests(VaylideTestCase):
         self.assertIn("Een bijzondere dag verdient een", html)
         self.assertIn("Bekijk de ontwerpen", html)
         self.assertIn("Maak jouw uitnodiging", html)
-        self.assertIn("/voorbeeld/liefde-op-papier/", html)
+        self.assertIn("/voorbeeld/kerstkaart/", html)  # 'Bekijk het voorbeeld' opent de filmische kerstkaart
 
     def test_motion_respects_reduced_motion(self):
         js = (settings.BASE_DIR / "static/js/hero3d.js").read_text(encoding="utf-8")

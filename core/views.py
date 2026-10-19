@@ -85,6 +85,8 @@ def home(request):
         request,
         "core/home.html",
         {
+            "bloesem_live": "bloesemmeer" in by_slug,
+            "kerstkaart_live": "kerstkaart" in by_slug,
             "kerst_cards": _design_cards(kerst),
             "kerst_note": OCCASION_TILE_NOTES.get("kerst", ""),
             "home_faq": home_faq,

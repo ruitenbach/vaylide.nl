@@ -29,7 +29,7 @@ class HomeTests(VaylideTestCase):
         self.assertIn('class="zenv__knop" aria-expanded="false" aria-controls="envelop-kaart"', html)
         self.assertIn('id="envelop-kaart"', html)
         self.assertIn("img/merk/vaylide-logo.webp", html)  # het hele logo op de envelop
-        self.assertIn("/voorbeeld/liefde-op-papier/?gelegenheid=bruiloft&amp;kleur=salie", html)
+        self.assertIn('href="/voorbeeld/kerstkaart/"', html)  # de knop opent de kerstkaart met de gouden deurklopper
         self.assertIn('class="goudkaart"', html)
         js = (settings.BASE_DIR / "static/js/hero3d.js").read_text(encoding="utf-8")
         # Openen werkt ook bij 'minder beweging': de knop wordt gekoppeld voordat het script stopt.

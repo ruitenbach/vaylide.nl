@@ -492,17 +492,22 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
 .feature-list dd { margin: 0; color: var(--ink-2); }
 
 /* 'Jullie verhaal verdient iets bijzonders' (op maat) */
-.unique-card { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; border-radius: var(--radius-xl); background: var(--ivory-2); min-height: 17rem; }
-.unique-card__text { position: relative; z-index: 2; padding: clamp(1.75rem, 5vw, 3.25rem); }
-.unique-card__text h2 { margin-bottom: .75rem; }
-.unique-card__text p { color: var(--ink-2); max-width: 26rem; margin-bottom: 1.6rem; }
-.unique-card__media { align-self: stretch; position: relative; min-height: 26rem; }
-.unique-card__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 82% 50%; }
-.unique-card__media::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, var(--ivory-2) 0%, rgba(245, 238, 230, 0) 10%); pointer-events: none; }
+/* "Jullie verhaal verdient iets bijzonders": warme crème kaart, kop met gouden cursieve regel, goudverloop op de knop (referentie van de eigenaar, 19 oktober 2026). */
+.unique-card { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; border-radius: var(--radius-xl); min-height: 30rem;
+  background: radial-gradient(90% 120% at 82% 40%, #F4E7D2 0%, rgba(244, 231, 210, 0) 70%), linear-gradient(115deg, #FFF9F0 0%, #FBF2E4 55%, #F3E6D1 100%); box-shadow: 0 30px 60px -44px rgba(96, 68, 30, .55); }
+.unique-card__text { position: relative; z-index: 2; padding: clamp(1.75rem, 5vw, 4rem); }
+.unique-card__eyebrow { display: flex; align-items: center; gap: .9rem; margin: 0 0 clamp(1.5rem, 4vw, 3.25rem); font-size: .72rem; font-weight: 600; letter-spacing: .32em; color: var(--accent-text); }
+.unique-card__eyebrow::after { content: ""; width: 4.5rem; height: 1px; background: var(--gold); }
+.unique-card__text h2 { margin-bottom: 1.5rem; font-size: clamp(2rem, 3.5vw, 3.3rem); line-height: 1.06; letter-spacing: -.01em; }
+.unique-card__text h2 em { color: var(--accent); font-style: italic; }
+.unique-card__text p:not(.unique-card__eyebrow) { color: var(--ink-2); max-width: 28rem; margin-bottom: 2rem; font-size: clamp(1rem, 1.25vw, 1.12rem); line-height: 1.6; }
+.unique-card__text .btn--primary { background: linear-gradient(180deg, #9D7644 0%, #7F5C2F 100%); box-shadow: 0 10px 20px -12px rgba(95, 69, 36, .8); }
+.unique-card__media { align-self: stretch; position: relative; min-height: 30rem; }
+.unique-card__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 30% 60%; }
 @media (max-width: 720px) {
-  .unique-card { grid-template-columns: 1fr; }
-  .unique-card__media { order: -1; min-height: 0; aspect-ratio: 35 / 32; }
-  .unique-card__media::before { background: linear-gradient(0deg, var(--ivory-2) 0%, rgba(245, 238, 230, 0) 22%); }
+  .unique-card { grid-template-columns: 1fr; min-height: 0; }
+  .unique-card__text { padding-bottom: 0; }
+  .unique-card__media { min-height: 0; aspect-ratio: 35 / 36; }
 }
 
 /* Filters en keuzes */

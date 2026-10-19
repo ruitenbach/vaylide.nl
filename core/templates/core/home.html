@@ -40,8 +40,10 @@
       </div>
       {# De envelop met het Vaylide-logo; bij een tik (of hover op de computer) vouwt de klep soepel open en glijdt de uitnodiging eruit. #}
       {% url 'invitations:demo' 'liefde-op-papier' as demo_url %}
+      {% url 'invitations:demo' 'kerstkaart' as kerst_demo_url %}
       {% static 'img/site/kaart-voorbeeld.webp' as kaart_src %}
-      {% include "partials/envelop.html" with id="envelop" kaart=kaart_src kaart_alt="Voorbeelduitnodiging: de bruiloft van Sanne en Daan (fictief)" kaart_w=500 kaart_h=800 link_url=demo_url|add:"?gelegenheid=bruiloft&kleur=salie" link_label="Bekijk het voorbeeld" knop="Open de envelop met een voorbeelduitnodiging" %}
+      {# De knop 'Bekijk het voorbeeld' opent de filmische kerstkaart (gouden deurklopper op een chocoladehuis), zolang die openbaar is; anders blijft hij naar het oude voorbeeld verwijzen. #}
+      {% if kerstkaart_live %}{% include "partials/envelop.html" with id="envelop" kaart=kaart_src kaart_alt="Voorbeelduitnodiging: de bruiloft van Sanne en Daan (fictief)" kaart_w=500 kaart_h=800 link_url=kerst_demo_url link_label="Bekijk het voorbeeld" knop="Open de envelop met een voorbeelduitnodiging" %}{% else %}{% include "partials/envelop.html" with id="envelop" kaart=kaart_src kaart_alt="Voorbeelduitnodiging: de bruiloft van Sanne en Daan (fictief)" kaart_w=500 kaart_h=800 link_url=demo_url|add:"?gelegenheid=bruiloft&kleur=salie" link_label="Bekijk het voorbeeld" knop="Open de envelop met een voorbeelduitnodiging" %}{% endif %}
       <span class="card-stage__shadow" aria-hidden="true"></span>
     </div>
   </div>
@@ -105,9 +107,10 @@
       <div class="feature-panel__inner">
         <div class="phone-demo">
           <div class="phone">
-            <div class="phone__screen" data-lazy-frame="{% url 'invitations:demo' 'liefde-op-papier' %}?gelegenheid=bruiloft&amp;kleur=blush&amp;embed=1" data-frame-title="Werkend voorbeeld van een uitnodiging (fictief evenement)">
-              <img class="phone__poster" src="{% static 'img/site/telefoon-voorbeeld.webp' %}" alt="" width="540" height="1152" loading="lazy" decoding="async">
-              <a class="phone__fallback" href="{% url 'invitations:demo' 'liefde-op-papier' %}?gelegenheid=bruiloft&amp;kleur=blush">Open het werkende voorbeeld</a>
+            {# Bloesemmeer: is het ontwerp actief (zoals op productie), dan laadt de telefoon het werkende voorbeeld en dient het beeld als terugval. Is het niet actief, dan is er alleen het beeld, zonder link die een 404 geeft. #}
+            <div class="phone__screen"{% if bloesem_live %} data-lazy-frame="{% url 'invitations:demo' 'bloesemmeer' %}?embed=1" data-frame-title="Werkend voorbeeld van de kaart Bloesemmeer (fictief evenement)"{% endif %}>
+              <img class="phone__poster" src="{% static 'img/site/telefoon-bloesemmeer.webp' %}" alt="{% if not bloesem_live %}De kaart Bloesemmeer: een wand van kersenbloesem met de uitnodiging in het midden (voorbeeld){% endif %}" width="540" height="1152" loading="lazy" decoding="async">
+              {% if bloesem_live %}<a class="phone__fallback" href="{% url 'invitations:demo' 'bloesemmeer' %}">Open het werkende voorbeeld</a>{% endif %}
             </div>
           </div>
         </div>
@@ -141,11 +144,12 @@
   <div class="container">
     <div class="unique-card">
       <div class="unique-card__text">
-        <h2 id="uniek-titel">Jullie verhaal verdient iets bijzonders</h2>
+        <p class="unique-card__eyebrow" aria-hidden="true">VAYLIDE</p>
+        <h2 id="uniek-titel">Jullie verhaal verdient<br> <em>iets bijzonders</em></h2>
         <p>Soms maken juist de kleine details het verschil. Een favoriete quote, een mooie herinnering, een eigen foto of een persoonlijke boodschap maakt jullie uitnodiging écht van jullie.</p>
         <a class="btn btn--primary" href="{% url 'core:contact' %}?onderwerp=maatwerk">Vertel jullie wens {% icon "pijl" %}</a>
       </div>
-      <div class="unique-card__media"><picture><source media="(max-width: 720px)" srcset="{% static 'img/site/op-maat-mobiel.webp' %}"><img src="{% static 'img/site/op-maat.webp' %}" srcset="{% static 'img/site/op-maat-700.webp' %} 700w, {% static 'img/site/op-maat.webp' %} 1200w" sizes="38rem" alt="Voorbeeld van een persoonlijke uitnodiging in een envelop met monogramzegel (S&amp;D), een fotokader en een eigen quote" width="1100" height="800" loading="lazy" decoding="async"></picture></div>
+      <div class="unique-card__media"><picture><source media="(max-width: 720px)" srcset="{% static 'img/site/op-maat-gouden-avond-mobiel.webp' %}"><img src="{% static 'img/site/op-maat-gouden-avond.webp' %}" srcset="{% static 'img/site/op-maat-gouden-avond-700.webp' %} 700w, {% static 'img/site/op-maat-gouden-avond.webp' %} 1100w" sizes="(min-width: 721px) 36rem, 100vw" alt="De kaart Gouden Avond, een dansend bruidspaar in een balzaal bij zonsondergang (fictief), die deels uit een geopende envelop steekt" width="1100" height="1000" loading="lazy" decoding="async"></picture></div>
     </div>
   </div>
 </section>
