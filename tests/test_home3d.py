@@ -25,3 +25,22 @@ class Home3DTests(VaylideTestCase):
         self.assertIn("IntersectionObserver", js)  # stopt als de kop uit beeld is
         css = (settings.BASE_DIR / "static/css/vierlief.css").read_text(encoding="utf-8")
         self.assertRegex(css, r"@media \(prefers-reduced-motion: no-preference\) \{\s*\.card-stage \{ animation: card-zweef")
+
+
+class HeroVoorbeeldknopRozenboogTests(VaylideTestCase):
+    """De kaart in de hero is de Rozenboog; de knop opent dezelfde kaart zodra die actief is."""
+
+    def test_knop_opent_rozenboog_als_die_actief_is(self):
+        from catalog.models import Template
+        Template.objects.filter(slug="rozenboog").update(is_active=True)
+        html = Client().get("/").content.decode()
+        self.assertIn("kaart-rozenboog", html)
+        self.assertIn('href="/voorbeeld/rozenboog/?gelegenheid=bruiloft"', html)
+        self.assertEqual(Client().get("/voorbeeld/rozenboog/?gelegenheid=bruiloft").status_code, 200)
+
+    def test_knop_valt_terug_als_rozenboog_niet_actief_is(self):
+        from catalog.models import Template
+        Template.objects.filter(slug="rozenboog").update(is_active=False)
+        html = Client().get("/").content.decode()
+        self.assertNotIn("/voorbeeld/rozenboog/", html)
+        self.assertIn("/voorbeeld/kerstkaart/", html)
