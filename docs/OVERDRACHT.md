@@ -144,3 +144,7 @@ Zelfde opzet en kleuren; de hero (envelop en gouden kaart) is ongewijzigd. (1) D
 ## Telefoon in "Alles in één link": niet zijwaarts schuiven (19 oktober 2026, ter beoordeling)
 
 Op een telefoon schoof de Bloesemmeer-kaart in de telefoon zijwaarts bij een schuine veeg. Oorzaak: de kaart is in het voorbeeld ongeveer 11 px breder dan het scherm (de kaartlagen zijn bewust iets groter voor de beweging), waardoor het voorbeeld zelf horizontaal kon schuiven. Oplossing alleen voor deze telefoon: `data-vast-horizontaal` op de telefoon in `home.html`; `static/js/site.js` zet zodra het echte voorbeelddocument er is (nog vóór het zichtbaar wordt, ook als het laden langzaam gaat) `overflow-x: hidden` en `touch-action: pan-y` op het voorbeeld. Het afzonderlijke Bloesemmeer-ontwerp en de andere telefoons blijven ongewijzigd. Test: `tests/test_maatwerkbeeld.py`.
+
+## Hero: de kaart uit de envelop is Rozenboog (20 oktober 2026, ter beoordeling)
+
+De kaart die uit de envelop in de hero komt, is nu de echte Rozenboog-kaart (`static/img/site/kaart-rozenboog.webp`, het midden van `static/img/designs/rozenboog.webp` op het formaat 500×800). Layout, envelop, gouden kaart, kleuren en animaties zijn niet gewijzigd. De knop "Bekijk het voorbeeld" verwijst nog naar de Kerstkaart (zie `kerstkaart_live` in `core/views.py`): beeld en bestemming horen dus niet bij elkaar. Besluit open: de knop naar `/voorbeeld/rozenboog/` laten wijzen.

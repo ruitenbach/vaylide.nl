@@ -41,9 +41,9 @@
       {# De envelop met het Vaylide-logo; bij een tik (of hover op de computer) vouwt de klep soepel open en glijdt de uitnodiging eruit. #}
       {% url 'invitations:demo' 'liefde-op-papier' as demo_url %}
       {% url 'invitations:demo' 'kerstkaart' as kerst_demo_url %}
-      {% static 'img/site/kaart-voorbeeld.webp' as kaart_src %}
+      {% static 'img/site/kaart-rozenboog.webp' as kaart_src %}
       {# De knop 'Bekijk het voorbeeld' opent de filmische kerstkaart (gouden deurklopper op een chocoladehuis), zolang die openbaar is; anders blijft hij naar het oude voorbeeld verwijzen. #}
-      {% if kerstkaart_live %}{% include "partials/envelop.html" with id="envelop" kaart=kaart_src kaart_alt="Voorbeelduitnodiging: de bruiloft van Sanne en Daan (fictief)" kaart_w=500 kaart_h=800 link_url=kerst_demo_url link_label="Bekijk het voorbeeld" knop="Open de envelop met een voorbeelduitnodiging" %}{% else %}{% include "partials/envelop.html" with id="envelop" kaart=kaart_src kaart_alt="Voorbeelduitnodiging: de bruiloft van Sanne en Daan (fictief)" kaart_w=500 kaart_h=800 link_url=demo_url|add:"?gelegenheid=bruiloft&kleur=salie" link_label="Bekijk het voorbeeld" knop="Open de envelop met een voorbeelduitnodiging" %}{% endif %}
+      {% if kerstkaart_live %}{% include "partials/envelop.html" with id="envelop" kaart=kaart_src kaart_alt="Voorbeelduitnodiging: de kaart Rozenboog, een bruiloft van Sanne en Daan voor een rozenboog bij zonsondergang (fictief)" kaart_w=500 kaart_h=800 link_url=kerst_demo_url link_label="Bekijk het voorbeeld" knop="Open de envelop met een voorbeelduitnodiging" %}{% else %}{% include "partials/envelop.html" with id="envelop" kaart=kaart_src kaart_alt="Voorbeelduitnodiging: de kaart Rozenboog, een bruiloft van Sanne en Daan voor een rozenboog bij zonsondergang (fictief)" kaart_w=500 kaart_h=800 link_url=demo_url|add:"?gelegenheid=bruiloft&kleur=salie" link_label="Bekijk het voorbeeld" knop="Open de envelop met een voorbeelduitnodiging" %}{% endif %}
       <span class="card-stage__shadow" aria-hidden="true"></span>
     </div>
   </div>
