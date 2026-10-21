@@ -259,3 +259,9 @@ class KopTypografieTests(VaylideTestCase):
         css = (settings.BASE_DIR / "static/css/vierlief.css").read_text()
         self.assertIn(".hero--carrousel .hero__checksrij { grid-column: 1 / -1;", css)
         self.assertIn(".hero--carrousel .hero__checks { justify-content: center;", css)
+
+    def test_linker_kop_heeft_een_entree_die_minder_beweging_respecteert(self):
+        css = (settings.BASE_DIR / "static/css/vierlief.css").read_text()
+        self.assertIn("@keyframes hero-kop-in", css)
+        blok = css.split("@media (prefers-reduced-motion: no-preference) {\n  .hero--carrousel .hero__kop .eyebrow")[1]
+        self.assertIn("hero-kop-in", blok.split("}\n")[0] + blok.split("}\n")[1])

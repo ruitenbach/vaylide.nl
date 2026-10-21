@@ -40,3 +40,6 @@ Controle op een echte iPhone (Safari) en een Android-telefoon. Chromium-metingen
 
 ## Voordelenrij (22 oktober 2026)
 Op desktop (vanaf 1200 px) staat de rij met vijf voordelen over de volledige hero-breedte (`grid-column: 1 / -1`) en is als geheel gecentreerd, niet meer onder het linker tekstblok. Gecontroleerd op 390, 768, 1200, 1366 en 1920 px: geen horizontale scroll, elke regel exact gecentreerd.
+
+## Krachtiger linker kop (22 oktober 2026)
+Tekst ongewijzigd. Desktop: kolom `clamp(24rem, 33vw, 30rem)` (was 21rem), kop `clamp(2.3rem, 3.1vw, 3.1rem)` (was ~2.1rem), "bijzondere" 1.7em in Pinyon Script. Mobiel: kop `clamp(1.95rem, 8.9vw, 2.3rem)`, de regel "Bijzondere momenten" blijft op één regel (gecontroleerd op 360 en 390 px). Entree (`hero-kop-in`, alleen zonder 'minder beweging'): fade, 1,1 rem omhoog en scale .985→1; eyebrow, kop, "bijzondere" en knop komen na elkaar (0,1 / 0,3 / 0,75 / 1,05 s).
