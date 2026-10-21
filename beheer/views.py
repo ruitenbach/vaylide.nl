@@ -481,14 +481,33 @@ def templates(request):
         row["template_version__template"]: row["n"]
         for row in Invitation.objects.values("template_version__template").annotate(n=Count("id"))
     }
-    from catalog import collectie
+    from catalog import collectie, prijzen
+    from catalog.assets import PLACEHOLDER, design_image_path
 
-    rows = [(t, usage.get(t.pk, 0)) for t in items]
-    uitgelicht = [t for t, _ in rows if t.homepage_uitgelicht]
+    alle = list(items)
+    uitgelicht = [t for t in alle if t.homepage_uitgelicht]
     geldig = [t for t in uitgelicht if collectie.homepage_geschikt(t)]
     homepage = {"aantal": len(uitgelicht), "geldig": len(geldig), "minimum": collectie.HOMEPAGE_MINIMUM, "actief": len(geldig) >= collectie.HOMEPAGE_MINIMUM,
                 "ongeschikt": {t.pk for t in uitgelicht if not collectie.homepage_geschikt(t)}}
-    return render(request, "beheer/templates.html", {"rows": rows, "homepage": homepage})
+
+    # Filters (alleen kijken in Beheer): onbekende waarden worden genegeerd.
+    zichtbaar = request.GET.get("zichtbaar", "")
+    indeling = request.GET.get("indeling", "")
+    uitgelicht_filter = request.GET.get("uitgelicht", "")
+    if zichtbaar in ("ja", "nee"):
+        alle = [t for t in alle if t.is_active == (zichtbaar == "ja")]
+    if indeling in prijzen.TIERS:
+        alle = [t for t in alle if prijzen.tier(t) == indeling]
+    if uitgelicht_filter in ("ja", "nee"):
+        alle = [t for t in alle if t.homepage_uitgelicht == (uitgelicht_filter == "ja")]
+
+    rows = [{"t": t, "used": usage.get(t.pk, 0), "indeling": prijzen.TIER_NAAM.get(prijzen.tier(t), ""),
+             "beeld": (design_image_path(t.slug) if design_image_path(t.slug) != PLACEHOLDER else "")} for t in alle]
+    return render(request, "beheer/templates.html", {
+        "rows": rows, "homepage": homepage, "totaal": len(items),
+        "filters": {"zichtbaar": zichtbaar, "indeling": indeling, "uitgelicht": uitgelicht_filter},
+        "tiers": [(k, prijzen.TIER_NAAM[k]) for k in prijzen.TIERS],
+    })
 
 
 @staff_required

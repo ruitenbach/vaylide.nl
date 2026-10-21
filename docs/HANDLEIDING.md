@@ -68,6 +68,7 @@ Overzicht van klanten met hun uitnodigingen, bestellingen en aanvragen. **Anonim
 ## Ontwerpen, prijzen en instellingen
 
 - **Ontwerpen**: naam, teksten, gelegenheden, volgorde, zichtbaar of verborgen, en welke versie nieuwe klanten krijgen. Een verborgen ontwerp blijft werken voor bestaande uitnodigingen.
+  De lijst toont per ontwerp een kleine preview (60×96, het bestaande kaartbeeld; zonder beeld staat er "geen afbeelding"), de indeling (Basis, Luxe of Special), zichtbaar, uitgelicht op homepage en de volgorde. Met de filters bovenaan kies je zichtbaar, indeling of uitgelicht. Naam en preview openen het bewerkscherm. Alleen kijken: de lijst verandert niets aan de publieke site.
 - **Prijzen**: pakketten (prijs, inbegrepen functies, maximaal aantal foto's, maanden online, punten op de prijzenpagina) en losse opties. Een prijswijziging geldt alleen voor nieuwe bestellingen; bestaande bestellingen houden hun eigen regels en bedragen. Gebruikt een klant een functie die niet in het pakket zit, dan telt de bestelling automatisch de goedkoopste passende optie mee.
 - **Instellingen**:
   - "Voorlopige prijzen" tonen (aan laten tot je prijzen definitief zijn);
