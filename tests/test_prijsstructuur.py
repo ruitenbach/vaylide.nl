@@ -422,6 +422,13 @@ class BestaandeBestellingen(VaylideTestCase):
 
 
 class Pagina(NieuwePrijzen):
+    def test_trouwkaarten_toont_de_pakketprijzen_zonder_looptijd(self):
+        html = Client().get("/digitale-trouwkaarten/").content.decode()
+        kaarten = html.split('class="trouw-prijzen"', 1)[1].split("trouw-prijzen__voet", 1)[0]
+        self.assertIn("eenmalig", kaarten)
+        self.assertIn("€", kaarten)
+        self.assertNotIn("maanden online", kaarten)
+
     def test_looptijd_staat_niet_in_de_prijsregel_maar_wel_op_prijzen_en_in_bestellen(self):
         html = Client().get("/prijzen/").content.decode()
         self.assertIn("12 maanden online", html)
