@@ -9,7 +9,7 @@
   var stage = root.querySelector(".cv__stage"), ring = root.querySelector(".cv__ring");
   var cards = Array.prototype.slice.call(ring.children), N = cards.length;
   if (!N) return;
-  var naamEl = root.querySelector(".cv__naam"), subEl = root.querySelector(".cv__sub"), dotsEl = root.querySelector(".cv__dots");
+  var naamEl = root.querySelector(".cv__naam"), subEl = root.querySelector(".cv__sub"), dotsEl = root.querySelector(".cv__dots"), tellerEl = root.querySelector(".cv__teller");
   var statusEl = root.querySelector(".cv__status"), openEl = root.querySelector('[data-cv="open"]');
   var reduceMq = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
   var flat = !(window.CSS && CSS.supports && CSS.supports("transform-style", "preserve-3d"));
@@ -31,10 +31,10 @@
   function wrapO(o) { return ((o + N / 2) % N + N) % N - N / 2; }
 
   function meet() {
-    var w = stage.clientWidth, groot = w >= 900;
+    var w = stage.clientWidth, groot = w >= 900 || (w >= 640 && window.matchMedia("(min-width: 1200px)").matches);
     // Mobiel: kleinere middelste kaart en buurkaarten die duidelijk half in beeld staan, zodat veegbaar meteen te zien is.
-    var cw = groot ? Math.min(300, w * 0.22) : Math.min(190, w * 0.47);
-    geo = { cw: cw, stap: groot ? 21 : 30, R: groot ? Math.max(560, w * 0.56) : cw * 1.9, k: groot ? 0.1 : 0.1, dim: groot ? 0.18 : 0.1 };
+    var cw = groot ? Math.min(300, w * 0.27) : Math.min(190, w * 0.47);
+    geo = { cw: cw, stap: groot ? 23 : 30, R: groot ? Math.max(520, w * 0.52) : cw * 1.9, k: groot ? 0.1 : 0.1, dim: groot ? 0.18 : 0.1 };
     root.style.setProperty("--cw", cw + "px");
     root.style.setProperty("--stage-h", Math.round(cw * 1.25 + 34) + "px");
     root.classList.toggle("cv--plat", flat);
@@ -69,6 +69,7 @@
       k.querySelector("a").tabIndex = is ? 0 : -1;
     });
     dots.forEach(function (d, i) { if (i === s) d.setAttribute("aria-current", "true"); else d.removeAttribute("aria-current"); });
+    if (tellerEl) tellerEl.textContent = (s < 9 ? "0" : "") + (s + 1) + " / " + (N < 10 ? "0" : "") + N;
     statusEl.textContent = c.getAttribute("data-naam") + ", ontwerp " + (s + 1) + " van " + N;
   }
   function vlak() { if (!raf) raf = requestAnimationFrame(function () { raf = 0; teken(); }); }

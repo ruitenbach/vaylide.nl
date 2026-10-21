@@ -30,3 +30,10 @@ Staging (`vaylide-staging`) volgt nu `claude/envelop-collectie`. Om de carrousel
 
 ## Nog te doen vóór productie
 Controle op een echte iPhone (Safari) en een Android-telefoon. Chromium-metingen zijn geen echt apparaat.
+
+## Kop en indeling (21 oktober 2026, akkoord van de eigenaar)
+- Kop: "Bijzondere momenten verdienen een *bijzondere* uitnodiging." Alleen "bijzondere" staat in Pinyon Script (`static/fonts/pinyon-script-latin-400-normal.woff2`, OFL-licentie ernaast), op een eigen regel in het warme goud van de huisstijl; de rest in de serif. Pinyon Script is een tijdelijk alternatief voor Cochocib Script Latin Pro: dat lettertype ontbreekt en er is geen weblicentiebewijs. Bij levering van de webfont en licentie wordt alleen het lettertype vervangen.
+- Boven de kaarten staat één knop, "Maak jouw uitnodiging". "Bekijk dit ontwerp" en "Ontdek de collectie" staan bij de geselecteerde kaart.
+- Vanaf 1200 px breed staat links de kop met knop en rechts de carrousel (grid in `static/css/vierlief.css`); daaronder staat de tekst boven de kaarten.
+- Teller "01 / 12" (`.cv__teller`) in plaats van bolletjes; de pijlen, toetsen en het vegen blijven de bediening. De kaartmaat en spreiding in `static/js/carrousel.js` zijn op deze breedte afgestemd.
+- Vijf voordelen onder de carrousel, de derde is "Eigen foto's en muziek toevoegen".

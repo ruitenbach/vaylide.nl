@@ -18,13 +18,11 @@
   {# Carrousel: de vaste kop en knoppen, daaronder de draaibare kaarten. De wereld en de fonkelingen hierboven blijven erachter. De uitgelichte ontwerpen komen uit Beheer. #}
   <div class="container hero__kop">
     <p class="eyebrow">Digitale uitnodigingen</p>
-    <h1 id="hero-titel">Een bijzondere dag verdient een <em>bijzondere</em> uitnodiging.</h1>
-    <p class="lead">Stijlvolle, persoonlijke en interactieve digitale uitnodigingen voor al jouw bijzondere momenten.</p>
+    <h1 id="hero-titel">Bijzondere momenten<br class="hero__br"> verdienen een<br class="hero__br"> <em>bijzondere</em> uitnodiging.</h1>
   </div>
   <div class="container hero__knoppen">
     <div class="btn-row btn-row--center">
       <a class="btn btn--primary btn--lg" href="{% url 'studio:start' %}">Maak jouw uitnodiging {% icon "pijl" %}</a>
-      <a class="btn btn--secondary btn--lg" href="{% url 'core:designs' %}">Bekijk de ontwerpen</a>
     </div>
   </div>
   <div class="hero__carrousel" data-carrousel>
@@ -42,6 +40,7 @@
         <button class="cv__nav" type="button" data-cv="next" aria-label="Volgend ontwerp">›</button>
       </div>
       <div class="cv__dots"></div>
+      <p class="cv__teller" aria-hidden="true"></p>
       <p class="cv__status" role="status" aria-live="polite"></p>
     </div>
   </div>

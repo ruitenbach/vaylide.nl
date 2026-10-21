@@ -106,8 +106,11 @@ class CarrouselHomepageTests(VaylideTestCase):
         self.html = home_html()
 
     def test_vaste_teksten_knoppen_en_fonkelingen_blijven(self):
-        for tekst in ("Een bijzondere dag verdient een", "bijzondere", "Bekijk de ontwerpen", "Maak jouw uitnodiging", "Bekijk dit ontwerp", "Ontdek de collectie"):
+        for tekst in ("Maak jouw uitnodiging", "Bekijk dit ontwerp", "Ontdek de collectie", "<em>bijzondere</em>"):
             self.assertIn(tekst, self.html)
+        kop = self.html.split('id="hero-titel">', 1)[1].split("</h1>", 1)[0]
+        zichtbaar = re.sub(r"<[^>]+>", "", kop).split()
+        self.assertEqual(" ".join(zichtbaar), "Bijzondere momenten verdienen een bijzondere uitnodiging.")
         self.assertIn("data-hero3d", self.html)
         self.assertIn('<canvas class="hero__sparkles"></canvas>', self.html)
         self.assertIn("js/hero3d.js", self.html)
@@ -233,3 +236,21 @@ class VoordelenTests(VaylideTestCase):
             posities = [lijst.index(tekst) for tekst in verwacht]
             self.assertEqual(posities, sorted(posities))
             self.assertEqual(lijst.count('<li>'), 5)
+
+
+class KopTypografieTests(VaylideTestCase):
+    def test_pinyon_script_alleen_voor_het_woord_bijzondere_met_eigen_bestand(self):
+        css = (settings.BASE_DIR / "static/css/vierlief.css").read_text()
+        self.assertIn('url("../fonts/pinyon-script-latin-400-normal.woff2")', css)
+        self.assertIn(".hero--carrousel .hero__kop h1 em { display: block; font-family: \"Pinyon Script\"", css)
+        self.assertTrue((settings.BASE_DIR / "static/fonts/pinyon-script-latin-400-normal.woff2").exists())
+        self.assertTrue((settings.BASE_DIR / "static/fonts/OFL-pinyon-script.txt").exists())
+
+    def test_teller_in_plaats_van_zichtbare_bolletjes(self):
+        lichten_uit(SPECIAL + LUXE)
+        html = home_html()
+        self.assertIn('class="cv__teller" aria-hidden="true"', html)
+        css = (settings.BASE_DIR / "static/css/vierlief.css").read_text()
+        self.assertIn(".hero--carrousel .cv__dots { display: none; }", css)
+        js = (settings.BASE_DIR / "static/js/carrousel.js").read_text()
+        self.assertIn('" / "', js)
