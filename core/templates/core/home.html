@@ -6,14 +6,47 @@
 {% block body_class %}page-home{% endblock %}
 {% block preload %}<link rel="preload" href="{% static 'fonts/playfair-display-latin-wght-italic.woff2' %}" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="{% static 'img/site/hero.webp' %}" imagesrcset="{% static 'img/site/hero-900.webp' %} 900w, {% static 'img/site/hero.webp' %} 1800w" imagesizes="(max-width: 860px) 100vw, 60vw" fetchpriority="high">{% endblock %}
-{% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% if carrousel %}<script src="{% static 'js/carrousel.js' %}" defer></script>{% endif %}{% endblock %}
 {% block content %}
 {# De 3D-wereld vult de hele kop, ook achter de tekst: zachte lichten, de foto met vervloeiende randen en sterretjes. #}
-<section class="hero hero--wereld" aria-labelledby="hero-titel" data-hero3d>
+<section class="hero hero--wereld{% if carrousel %} hero--carrousel{% endif %}" aria-labelledby="hero-titel" data-hero3d>
   <div class="hero__wereld" aria-hidden="true">
     <span class="hero__licht hero__licht--1"></span><span class="hero__licht hero__licht--2"></span><span class="hero__licht hero__licht--3"></span>
     <canvas class="hero__sparkles"></canvas>
   </div>
+  {% if carrousel %}
+  {# Carrousel: de vaste kop en knoppen, daaronder de draaibare kaarten. De wereld en de fonkelingen hierboven blijven erachter. De uitgelichte ontwerpen komen uit Beheer. #}
+  <div class="container hero__kop">
+    <p class="eyebrow">Digitale uitnodigingen</p>
+    <h1 id="hero-titel">Een bijzondere dag verdient een <em>bijzondere</em> uitnodiging.</h1>
+    <p class="lead">Stijlvolle, persoonlijke en interactieve digitale uitnodigingen voor al jouw bijzondere momenten.</p>
+  </div>
+  <div class="container hero__knoppen">
+    <div class="btn-row btn-row--center">
+      <a class="btn btn--primary btn--lg" href="{% url 'studio:start' %}">Maak jouw uitnodiging {% icon "pijl" %}</a>
+      <a class="btn btn--secondary btn--lg" href="{% url 'core:designs' %}">Bekijk de ontwerpen</a>
+    </div>
+  </div>
+  <div class="hero__carrousel" data-carrousel>
+    <div class="cv__stage" tabindex="0" role="group" aria-roledescription="carrousel" aria-label="Uitgelichte VAYLIDE-ontwerpen. Gebruik de pijltjestoetsen om te bladeren.">
+      <ol class="cv__ring">{% for c in carrousel %}<li class="cv__card" data-naam="{{ c.template.name }}" data-sub="{{ c.tier }} · {{ c.gelegenheden }}" data-href="{{ c.detail_url }}"><span class="cv__float" style="--d:{{ forloop.counter0|add:7 }}s;--dl:-{{ forloop.counter0 }}.{{ forloop.counter0|add:3 }}s"><a href="{{ c.detail_url }}" tabindex="-1"><img src="{{ c.image }}" width="800" height="1000" alt="Digitale uitnodiging {{ c.template.name }}" draggable="false"{% if forloop.counter > 3 %} loading="lazy"{% endif %} decoding="async"></a></span></li>{% endfor %}</ol>
+    </div>
+    <div class="cv__info">
+      <p class="cv__naam" aria-hidden="true"></p>
+      <p class="cv__sub"></p>
+      <p class="cv__hint" aria-hidden="true"></p>
+      <div class="cv__acties">
+        <button class="cv__nav" type="button" data-cv="prev" aria-label="Vorig ontwerp">‹</button>
+        <a class="btn btn--primary" data-cv="open" href="{{ carrousel.0.detail_url }}">Bekijk dit ontwerp</a>
+        <a class="btn btn--secondary" href="{% url 'core:designs' %}">Ontdek de collectie</a>
+        <button class="cv__nav" type="button" data-cv="next" aria-label="Volgend ontwerp">›</button>
+      </div>
+      <div class="cv__dots"></div>
+      <p class="cv__status" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+  <div class="container hero__checksrij"><ul class="hero__checks">{% for item in checks %}<li>{% icon "vink" %}{{ item }}</li>{% endfor %}</ul></div>
+  {% else %}
   <div class="container hero__inner">
     <div class="hero__text">
       <p class="eyebrow">Digitale uitnodigingen</p>
@@ -26,8 +59,10 @@
       <ul class="hero__checks">{% for item in checks %}<li>{% icon "vink" %}{{ item }}</li>{% endfor %}</ul>
     </div>
   </div>
+  {% endif %}
   <div class="hero__media">
     <img class="hero__foto" src="{% static 'img/site/hero.webp' %}" srcset="{% static 'img/site/hero-900.webp' %} 900w, {% static 'img/site/hero.webp' %} 1800w" sizes="(max-width: 860px) 100vw, 60vw" alt="" width="1800" height="1100" fetchpriority="high" decoding="async">
+    {% if not carrousel %}
     <div class="card-stage">
       {# Een gouden kaart met reliëf, schuin achter de envelop. #}
       <div class="goudkaart" aria-hidden="true">
@@ -47,6 +82,7 @@
       {% if rozenboog_live %}{% include "partials/envelop.html" with id="envelop" kaart=kaart_src kaart_alt="Voorbeelduitnodiging: de kaart Rozenboog, een bruiloft van Sanne en Daan voor een rozenboog bij zonsondergang (fictief)" kaart_w=500 kaart_h=800 link_url=rozenboog_demo_url|add:"?gelegenheid=bruiloft" link_label="Bekijk het voorbeeld" knop="Open de envelop met een voorbeelduitnodiging" %}{% elif kerstkaart_live %}{% include "partials/envelop.html" with id="envelop" kaart=kaart_src kaart_alt="Voorbeelduitnodiging: de kaart Rozenboog, een bruiloft van Sanne en Daan voor een rozenboog bij zonsondergang (fictief)" kaart_w=500 kaart_h=800 link_url=kerst_demo_url link_label="Bekijk het voorbeeld" knop="Open de envelop met een voorbeelduitnodiging" %}{% else %}{% include "partials/envelop.html" with id="envelop" kaart=kaart_src kaart_alt="Voorbeelduitnodiging: de kaart Rozenboog, een bruiloft van Sanne en Daan voor een rozenboog bij zonsondergang (fictief)" kaart_w=500 kaart_h=800 link_url=demo_url|add:"?gelegenheid=bruiloft&kleur=salie" link_label="Bekijk het voorbeeld" knop="Open de envelop met een voorbeelduitnodiging" %}{% endif %}
       <span class="card-stage__shadow" aria-hidden="true"></span>
     </div>
+    {% endif %}
   </div>
 </section>
 

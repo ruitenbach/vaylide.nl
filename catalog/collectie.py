@@ -97,3 +97,24 @@ def pas_toe(template_model) -> int:
             template_model.objects.filter(pk=template.pk).update(**wijzigingen)
             aangepast += 1
     return aangepast
+
+
+# Homepage-carrousel: minder dan dit aantal geldige uitgelichte ontwerpen en de homepage toont de vorige presentatie (envelop in de kop).
+HOMEPAGE_MINIMUM = 5
+
+
+def homepage_geschikt(template) -> bool:
+    """Mag dit ontwerp in de homepage-carrousel? Zichtbaar en bestelbaar (dus ook openbaar), met een huidige versie, en Luxe of Special."""
+    from . import prijzen
+
+    return bool(template.is_active and template.current_version_id and prijzen.tier(template) in (prijzen.LUXE, prijzen.SPECIAL))
+
+
+def homepage_ontwerpen(template_model) -> list:
+    """De uitgelichte ontwerpen voor de carrousel, in de volgorde van Beheer. Een ontwerp dat niet (meer) geschikt is, wordt overgeslagen.
+
+    Geeft een lege lijst als er minder dan HOMEPAGE_MINIMUM geschikte zijn: dan blijft de bestaande homepagepresentatie staan."""
+    kandidaten = template_model.objects.filter(homepage_uitgelicht=True, is_active=True, current_version__isnull=False)
+    kandidaten = kandidaten.select_related("current_version").order_by("homepage_volgorde", "sort_order", "name")
+    geschikt = [t for t in kandidaten if homepage_geschikt(t)]
+    return geschikt if len(geschikt) >= HOMEPAGE_MINIMUM else []

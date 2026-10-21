@@ -77,6 +77,9 @@ Overzicht van klanten met hun uitnodigingen, bestellingen en aanvragen. **Anonim
   - een overzicht van welke koppelingen actief zijn en welke in testmodus staan.
 - **Contact**: berichten uit het contactformulier.
 
+## Ontwerpen uitlichten op de homepage
+Bij een ontwerp bewerken (Beheer, Ontwerpen) staat "uitlichten op homepage" met een volgorde. Alleen actieve Luxe- en Special-ontwerpen verschijnen; bij minder dan vijf blijft de oude homepage staan. Zie `docs/HOMEPAGE-CARROUSEL.md`.
+
 ## Kortingen: codes en automatische aanbiedingen
 
 Beheer → Kortingen heeft twee tabbladen. Automatische aanbiedingen (`VIERLIEF_AANBIEDINGEN=1`, standaard uit): zonder code, voor ontwerpen of de hele collectie, einddatum verplicht, "Nu stoppen" per direct. Zie `docs/AANBIEDINGEN.md`.

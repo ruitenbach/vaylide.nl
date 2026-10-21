@@ -40,6 +40,14 @@ class Template(models.Model):
         help_text="Bijzonder ontwerp: staat onder Specials, niet tussen de gewone kaarten, en heeft een eigen meerprijs "
                   "(extra optie met functie 'special' en code special-<code>). Zonder die optie is het niet te bestellen.",
     )
+    homepage_uitgelicht = models.BooleanField(
+        "uitlichten op homepage", default=False,
+        help_text="Toont dit ontwerp in de draaibare kaartencarrousel bovenaan de homepage. Alleen zichtbare Luxe- en Special-ontwerpen verschijnen er echt in.",
+    )
+    homepage_volgorde = models.PositiveIntegerField(
+        "volgorde op homepage", default=100,
+        help_text="Lage nummers eerst. De eerste kaart staat bij het openen in het midden.",
+    )
     current_version = models.ForeignKey(
         "TemplateVersion",
         verbose_name="versie voor nieuwe uitnodigingen",

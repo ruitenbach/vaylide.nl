@@ -1411,3 +1411,12 @@ Het label Special stond bij sommige kaarten naast de naam en bij andere erboven,
 
 - **Uitgevoerd:** echte Chromium-screenshots voor en na op 360, 390 en 1366 px (pagina Ontwerpen, 11 specials); gemeten dat het label op alle kaarten boven de naam staat (voor: 6 van 11 naast de naam op 360 px, 9 van 11 op 390 px, alle 11 op 1366 px). Test in `tests/test_collectie.py`.
 - **Niet gedaan:** Safari, Firefox en echte telefoons.
+
+## Homepage-carrousel (21 oktober 2026, lokaal, branch `claude/homepage-carrousel`)
+Echt uitgevoerd:
+- `manage.py test tests`: 1421 tests; alleen de 2 bekende fouten in `tests.test_voorwaarden_nieuw` (bedrijfsgegevens uit de omgeving). Nieuw: `tests/test_homepage_carrousel.py` (22 tests): selectie en volgorde, Basis/inactief/verborgen/zonder versie overgeslagen, minder dan vijf geeft de oude hero, vaste teksten, fonkelingen, links naar bestaande ontwerppagina's, alleen-lezen veiligheid van de scripts, migratie, Beheer alleen voor beheerders.
+- Migratie op een kopie met 63 ontwerpen en 64 versies: bestaande kolommen en versies identiek, nieuwe kolommen op standaardwaarde.
+- Zonder uitgelichte ontwerpen is de homepage-HTML gelijk aan productie op witregels na; `/ontwerpen/`, `/prijzen/`, `/digitale-kerstkaarten/` en een ontwerppagina zijn byte-identiek.
+- Chromium (Playwright) op 360, 390, 768 en 1366 breed: alle zes knoppen zichtbaar en klikbaar, geen horizontale paginascroll (ook na vegen), zijkaart selecteert, middelste kaart en knop openen `/ontwerpen/<slug>/`, toetsenbord (pijltjes, Home, End), 'minder beweging', zonder JavaScript.
+- Meting op 390 breed met 4x vertraagde processor (Chromium zonder echte GPU): huidige homepage ca. 35 beelden per seconde, nieuwe homepage met stille carrousel ca. 46, met draaiende carrousel ca. 37 tot 40; LCP ca. 0,2 s en CLS 0 voor beide. Dit is geen echt apparaat.
+Niet uitgevoerd: echte iPhone/Safari, Android, axe en `e2e/toegankelijkheid.cjs` op de nieuwe homepage.
