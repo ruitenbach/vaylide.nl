@@ -223,3 +223,13 @@ class BeheerHomepageTests(VaylideTestCase):
     def test_lijst_meldt_dat_de_carrousel_aanstaat(self):
         lichten_uit(SPECIAL)
         self.assertIn("De carrousel staat aan met 5 ontwerpen", self.als(self.staff).get(reverse("beheer:templates")).content.decode())
+
+
+class VoordelenTests(VaylideTestCase):
+    def test_vijf_voordelen_in_de_juiste_volgorde(self):
+        verwacht = ["Snel en eenvoudig", "Stijlvolle ontwerpen", "Eigen foto's en muziek toevoegen", "Automatisch online", "RSVP & gastenlijst"]
+        for html in [Client().get("/").content.decode()]:
+            lijst = html.split('class="hero__checks"', 1)[1].split("</ul>", 1)[0].replace("&#x27;", "'").replace("&amp;", "&")
+            posities = [lijst.index(tekst) for tekst in verwacht]
+            self.assertEqual(posities, sorted(posities))
+            self.assertEqual(lijst.count('<li>'), 5)

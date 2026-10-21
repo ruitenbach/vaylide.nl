@@ -1420,3 +1420,9 @@ Echt uitgevoerd:
 - Chromium (Playwright) op 360, 390, 768 en 1366 breed: alle zes knoppen zichtbaar en klikbaar, geen horizontale paginascroll (ook na vegen), zijkaart selecteert, middelste kaart en knop openen `/ontwerpen/<slug>/`, toetsenbord (pijltjes, Home, End), 'minder beweging', zonder JavaScript.
 - Meting op 390 breed met 4x vertraagde processor (Chromium zonder echte GPU): huidige homepage ca. 35 beelden per seconde, nieuwe homepage met stille carrousel ca. 46, met draaiende carrousel ca. 37 tot 40; LCP ca. 0,2 s en CLS 0 voor beide. Dit is geen echt apparaat.
 Niet uitgevoerd: echte iPhone/Safari, Android, axe en `e2e/toegankelijkheid.cjs` op de nieuwe homepage.
+
+## Vijfde voordeel onder de heroknoppen (21 oktober 2026, lokaal, branch `claude/homepage-carrousel`)
+"Eigen foto's en muziek toevoegen" staat als derde van vijf voordelen (`HERO_CHECKS` in `core/content.py`); stijl, iconen en afstanden zijn ongewijzigd. Echt uitgevoerd:
+- `tests/test_eigen_fotos_alle_ontwerpen.py`: voor elk actief ontwerp (eerste gelegenheid van het ontwerp) een foto en een MP3 uploaden via de Studio, kiezen als hoofdfoto, galerijfoto en eigen muziek, en terugzien in de live kaart. Geslaagd voor alle actieve ontwerpen. Bij ontwerpen met een eigen track (zoals Kerststad) kiest de klant "eigen muziek" en bevestigt de rechten; dat is de bestaande stap.
+- `tests.test_homepage_carrousel`: vijf voordelen in de juiste volgorde.
+- Chromium op 360, 390, 768 en 1366: vijf voordelen, geen item buiten beeld, geen horizontale paginascroll; 3 regels op 360 en 390, 2 op 768, 1 op 1366.
