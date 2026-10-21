@@ -1433,3 +1433,6 @@ Echt uitgevoerd:
 - axe-core 4.10.2 (WCAG 2.0/2.1 A en AA plus best practices) op 360, 390, 768, 1199, 1200, 1366 en 1920 breed: één melding, "region" op de testbalk (niet de carrousel); geen JavaScript-fouten; Pinyon Script geladen; geen horizontale paginascroll.
 - Op mobiel staat 26 px tussen "uitnodiging." en de bovenkant van de kaarten (was 11 px); de eerste kaart begint op 366 px.
 Niet uitgevoerd: echte iPhone/Safari en Android.
+
+## Prijsregel zonder termijn (21 oktober 2026, lokaal, branch `claude/homepage-carrousel`)
+Op de ontwerppagina staat de prijsregel nu als "Special € 89,95 incl. btw, eenmalig" (zonder "12 maanden online"). Bedragen, indelingen, btw en looptijd zijn ongewijzigd. De looptijd blijft vindbaar op Prijzen ("12 maanden online" bij "Wat altijd geldt"), in de bestelstap vóór het betalen ("blijft 12 maanden online vanaf de aankoopdatum ... Er is geen automatische verlenging") en in artikel 6 van de voorwaarden. Echt uitgevoerd: `tests.test_prijsstructuur` (ook een nieuwe test voor de zichtbaarheid van de looptijd), `tests.test_kerstmagie`, `tests.test_info`, de volledige set, en een Chromium-controle van de prijsregel op 390 en 1366 breed (geen horizontale scroll).
