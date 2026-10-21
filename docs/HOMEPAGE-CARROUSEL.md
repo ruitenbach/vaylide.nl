@@ -43,3 +43,6 @@ Op desktop (vanaf 1200 px) staat de rij met vijf voordelen over de volledige her
 
 ## Krachtiger linker kop (22 oktober 2026)
 Tekst ongewijzigd. Desktop: kolom `clamp(24rem, 33vw, 30rem)` (was 21rem), kop `clamp(2.3rem, 3.1vw, 3.1rem)` (was ~2.1rem), "bijzondere" 1.7em in Pinyon Script. Mobiel: kop `clamp(1.95rem, 8.9vw, 2.3rem)`, de regel "Bijzondere momenten" blijft op één regel (gecontroleerd op 360 en 390 px). Entree (`hero-kop-in`, alleen zonder 'minder beweging'): fade, 1,1 rem omhoog en scale .985→1; eyebrow, kop, "bijzondere" en knop komen na elkaar (0,1 / 0,3 / 0,75 / 1,05 s).
+
+## Mobiele bediening (22 oktober 2026)
+Tot 767 px staat de bediening onder de kaarten in een vast raster (breedte max. 19 rem, gecentreerd): naam, ondertitel, hint, 'Bekijk dit ontwerp' (46 px), 'Ontdek de collectie' (44 px), en op één regel de pijltjes (44 px) met de teller, daaronder 'Maak jouw uitnodiging' op dezelfde breedte. Alleen CSS (`.cv__acties` is `display: contents`); de markup, desktop en de 3D-kaarten zijn niet gewijzigd. De teller telt het werkelijke aantal kaarten (`N`). Gecontroleerd op 360, 390 en 430 px: geen horizontale scroll, pijltjes wisselen de kaart en teller, de links gaan naar het ontwerp, de collectie en `/maken/`.

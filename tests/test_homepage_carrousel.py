@@ -265,3 +265,10 @@ class KopTypografieTests(VaylideTestCase):
         self.assertIn("@keyframes hero-kop-in", css)
         blok = css.split("@media (prefers-reduced-motion: no-preference) {\n  .hero--carrousel .hero__kop .eyebrow")[1]
         self.assertIn("hero-kop-in", blok.split("}\n")[0] + blok.split("}\n")[1])
+
+    def test_mobiele_bediening_heeft_vaste_volgorde_en_teller_telt_alle_kaarten(self):
+        css = (settings.BASE_DIR / "static/css/vierlief.css").read_text()
+        self.assertIn(".hero--carrousel .cv__acties { display: contents; }", css)
+        self.assertIn(".hero--carrousel .cv__teller { grid-column: 2; grid-row: 6;", css)
+        js = (settings.BASE_DIR / "static/js/carrousel.js").read_text()
+        self.assertIn('" / " + (N < 10 ? "0" : "") + N', js)
