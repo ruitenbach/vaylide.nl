@@ -4,18 +4,31 @@
 <div class="app-head"><div><p class="eyebrow">Beheer</p><h1>Ontwerpen</h1></div></div>
 <p class="notice"><strong>Hoe versies werken</strong>Elke uitnodiging gebruikt een vaste ontwerpversie. Een nieuwe versie (bijvoorbeeld v2) verandert bestaande uitnodigingen niet. Je kiest hieronder welke versie nieuwe klanten krijgen; bestaande uitnodigingen zet je per stuk over in het concept. Zie <code>docs/HANDLEIDING.md</code> voor het toevoegen van een ontwerp.</p>
 <p class="notice"><strong>Homepage-carrousel</strong>{% if homepage.actief %}De carrousel staat aan met {{ homepage.geldig }} ontwerpen.{% else %}De carrousel staat uit: er zijn {{ homepage.geldig }} geldige uitgelichte ontwerpen, minimaal {{ homepage.minimum }} nodig. De homepage toont nu de vorige presentatie.{% endif %} Zet bij een Luxe- of Special-ontwerp "Uitlichten op homepage" aan en kies de volgorde (open het ontwerp).</p>
+<form method="get" class="toolbar panel" aria-label="Ontwerpen filteren">
+  <label class="field"><span class="label">Zichtbaar</span><select class="input" name="zichtbaar"><option value="">Alle</option><option value="ja"{% if filters.zichtbaar == "ja" %} selected{% endif %}>Zichtbaar</option><option value="nee"{% if filters.zichtbaar == "nee" %} selected{% endif %}>Niet zichtbaar</option></select></label>
+  <label class="field"><span class="label">Indeling</span><select class="input" name="indeling"><option value="">Alle</option>{% for k, l in tiers %}<option value="{{ k }}"{% if filters.indeling == k %} selected{% endif %}>{{ l }}</option>{% endfor %}</select></label>
+  <label class="field"><span class="label">Uitgelicht op homepage</span><select class="input" name="uitgelicht"><option value="">Alle</option><option value="ja"{% if filters.uitgelicht == "ja" %} selected{% endif %}>Uitgelicht</option><option value="nee"{% if filters.uitgelicht == "nee" %} selected{% endif %}>Niet uitgelicht</option></select></label>
+  <button class="btn btn--secondary btn--sm" type="submit">Filteren</button>
+  {% if filters.zichtbaar or filters.indeling or filters.uitgelicht %}<a class="btn btn--ghost btn--sm" href="{% url 'beheer:templates' %}">Alles tonen</a>{% endif %}
+</form>
 <section class="panel">
+  <p class="small muted">{{ rows|length }} van {{ totaal }} ontwerpen</p>
+  {% if rows %}
   <div class="data-table-wrap"><table class="data-table data-table--cards">
-    <thead><tr><th>Ontwerp</th><th>Gelegenheden</th><th>Versies</th><th>Voor nieuwe klanten</th><th class="num">In gebruik</th><th>Zichtbaar</th><th>Homepage</th></tr></thead>
-    <tbody>{% for t, used in rows %}<tr>
-      <td data-label="Ontwerp"><a href="{% url 'beheer:template_edit' t.pk %}"><strong>{{ t.name }}</strong></a><br><span class="small muted">{{ t.slug }}</span></td>
-      <td data-label="Gelegenheden">{{ t.occasion_labels|join:", " }}</td>
+    <thead><tr><th>Preview</th><th>Naam</th><th>Gelegenheid</th><th>Indeling</th><th>Versies</th><th>Voor nieuwe klanten</th><th class="num">In gebruik</th><th>Zichtbaar</th><th>Uitgelicht op homepage</th><th class="num">Volgorde</th></tr></thead>
+    <tbody>{% for r in rows %}{% with t=r.t %}<tr>
+      <td data-label="Preview">{% if r.beeld %}<a class="ontwerp-thumb" href="{% url 'beheer:template_edit' t.pk %}" aria-label="Bewerk {{ t.name }}"><img src="{% static r.beeld %}" alt="" width="60" height="96" loading="lazy"></a>{% else %}<a class="ontwerp-thumb ontwerp-thumb--leeg" href="{% url 'beheer:template_edit' t.pk %}" aria-label="Bewerk {{ t.name }}">geen afbeelding</a>{% endif %}</td>
+      <td data-label="Naam"><a href="{% url 'beheer:template_edit' t.pk %}"><strong>{{ t.name }}</strong></a><br><span class="small muted">{{ t.slug }}</span></td>
+      <td data-label="Gelegenheid">{{ t.occasion_labels|join:", " }}</td>
+      <td data-label="Indeling">{% if r.indeling %}{{ r.indeling }}{% else %}<span class="muted">geen</span>{% endif %}</td>
       <td data-label="Versies">{% for v in t.versions.all %}v{{ v.number }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
       <td data-label="Voor nieuwe klanten">{{ t.current_version }}</td>
-      <td data-label="In gebruik" class="num">{{ used }}</td>
+      <td data-label="In gebruik" class="num">{{ r.used }}</td>
       <td data-label="Zichtbaar">{{ t.is_active|yesno:"ja,nee" }}</td>
-      <td data-label="Homepage">{% if t.homepage_uitgelicht %}{{ t.homepage_volgorde }}{% if t.pk in homepage.ongeschikt %} <span class="small muted">(wordt overgeslagen)</span>{% endif %}{% else %}<span class="muted">·</span>{% endif %}</td>
-    </tr>{% endfor %}</tbody>
+      <td data-label="Uitgelicht op homepage">{% if t.homepage_uitgelicht %}ja{% if t.pk in homepage.ongeschikt %} <span class="small muted">(wordt overgeslagen)</span>{% endif %}{% else %}<span class="muted">nee</span>{% endif %}</td>
+      <td data-label="Volgorde" class="num">{% if t.homepage_uitgelicht %}{{ t.homepage_volgorde }}{% else %}<span class="muted">·</span>{% endif %}</td>
+    </tr>{% endwith %}{% endfor %}</tbody>
   </table></div>
+  {% else %}<p class="muted">Geen ontwerpen met deze filters.</p>{% endif %}
 </section>
 {% endblock %}
