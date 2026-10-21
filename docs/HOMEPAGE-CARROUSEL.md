@@ -37,3 +37,6 @@ Controle op een echte iPhone (Safari) en een Android-telefoon. Chromium-metingen
 - Vanaf 1200 px breed staat links de kop met knop en rechts de carrousel (grid in `static/css/vierlief.css`); daaronder staat de tekst boven de kaarten.
 - Teller "01 / 12" (`.cv__teller`) in plaats van bolletjes; de pijlen, toetsen en het vegen blijven de bediening. De kaartmaat en spreiding in `static/js/carrousel.js` zijn op deze breedte afgestemd.
 - Vijf voordelen onder de carrousel, de derde is "Eigen foto's en muziek toevoegen".
+
+## Voordelenrij (22 oktober 2026)
+Op desktop (vanaf 1200 px) staat de rij met vijf voordelen over de volledige hero-breedte (`grid-column: 1 / -1`) en is als geheel gecentreerd, niet meer onder het linker tekstblok. Gecontroleerd op 390, 768, 1200, 1366 en 1920 px: geen horizontale scroll, elke regel exact gecentreerd.

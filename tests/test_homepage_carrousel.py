@@ -254,3 +254,8 @@ class KopTypografieTests(VaylideTestCase):
         self.assertIn(".hero--carrousel .cv__dots { display: none; }", css)
         js = (settings.BASE_DIR / "static/js/carrousel.js").read_text()
         self.assertIn('" / "', js)
+
+    def test_voordelenrij_staat_op_desktop_over_de_hele_hero_gecentreerd(self):
+        css = (settings.BASE_DIR / "static/css/vierlief.css").read_text()
+        self.assertIn(".hero--carrousel .hero__checksrij { grid-column: 1 / -1;", css)
+        self.assertIn(".hero--carrousel .hero__checks { justify-content: center;", css)
