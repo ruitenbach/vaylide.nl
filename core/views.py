@@ -12,7 +12,7 @@ from django.views.decorators.http import require_http_methods
 from catalog.assets import design_image_url
 from types import SimpleNamespace
 
-from catalog import prijzen, wenskaart
+from catalog import collectie, prijzen, wenskaart
 from catalog.models import AddOn, Package, Template, format_euro
 from catalog.specials import is_special, special_prijszin
 from catalog.occasions import OCCASION_CHOICES, OCCASION_LABELS, collectie_volgorde, occasion_config
@@ -81,10 +81,13 @@ def home(request):
     kerst = [by_slug[s] for s in HOME_KERST if s in by_slug]
     faq_by_question = dict(FAQ)
     home_faq = [(q, faq_by_question[q]) for q in HOME_FAQ_QUESTIONS if q in faq_by_question] + list(HOME_FAQ_EXTRA)
+    carrousel = [dict(c, tier=prijzen.TIER_NAAM.get(prijzen.tier(c["template"]), ""), gelegenheden=", ".join(c["template"].occasion_labels[:3]))
+                 for c in _design_cards(collectie.homepage_ontwerpen(Template))]
     return render(
         request,
         "core/home.html",
         {
+            "carrousel": carrousel,
             "bloesem_live": "bloesemmeer" in by_slug,
             "kerstkaart_live": "kerstkaart" in by_slug,
             "rozenboog_live": "rozenboog" in by_slug,

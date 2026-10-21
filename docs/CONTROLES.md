@@ -1411,3 +1411,31 @@ Het label Special stond bij sommige kaarten naast de naam en bij andere erboven,
 
 - **Uitgevoerd:** echte Chromium-screenshots voor en na op 360, 390 en 1366 px (pagina Ontwerpen, 11 specials); gemeten dat het label op alle kaarten boven de naam staat (voor: 6 van 11 naast de naam op 360 px, 9 van 11 op 390 px, alle 11 op 1366 px). Test in `tests/test_collectie.py`.
 - **Niet gedaan:** Safari, Firefox en echte telefoons.
+
+## Homepage-carrousel (21 oktober 2026, lokaal, branch `claude/homepage-carrousel`)
+Echt uitgevoerd:
+- `manage.py test tests`: 1421 tests; alleen de 2 bekende fouten in `tests.test_voorwaarden_nieuw` (bedrijfsgegevens uit de omgeving). Nieuw: `tests/test_homepage_carrousel.py` (22 tests): selectie en volgorde, Basis/inactief/verborgen/zonder versie overgeslagen, minder dan vijf geeft de oude hero, vaste teksten, fonkelingen, links naar bestaande ontwerppagina's, alleen-lezen veiligheid van de scripts, migratie, Beheer alleen voor beheerders.
+- Migratie op een kopie met 63 ontwerpen en 64 versies: bestaande kolommen en versies identiek, nieuwe kolommen op standaardwaarde.
+- Zonder uitgelichte ontwerpen is de homepage-HTML gelijk aan productie op witregels na; `/ontwerpen/`, `/prijzen/`, `/digitale-kerstkaarten/` en een ontwerppagina zijn byte-identiek.
+- Chromium (Playwright) op 360, 390, 768 en 1366 breed: alle zes knoppen zichtbaar en klikbaar, geen horizontale paginascroll (ook na vegen), zijkaart selecteert, middelste kaart en knop openen `/ontwerpen/<slug>/`, toetsenbord (pijltjes, Home, End), 'minder beweging', zonder JavaScript.
+- Meting op 390 breed met 4x vertraagde processor (Chromium zonder echte GPU): huidige homepage ca. 35 beelden per seconde, nieuwe homepage met stille carrousel ca. 46, met draaiende carrousel ca. 37 tot 40; LCP ca. 0,2 s en CLS 0 voor beide. Dit is geen echt apparaat.
+Niet uitgevoerd: echte iPhone/Safari, Android, axe en `e2e/toegankelijkheid.cjs` op de nieuwe homepage.
+
+## Vijfde voordeel onder de heroknoppen (21 oktober 2026, lokaal, branch `claude/homepage-carrousel`)
+"Eigen foto's en muziek toevoegen" staat als derde van vijf voordelen (`HERO_CHECKS` in `core/content.py`); stijl, iconen en afstanden zijn ongewijzigd. Echt uitgevoerd:
+- `tests/test_eigen_fotos_alle_ontwerpen.py`: voor elk actief ontwerp (eerste gelegenheid van het ontwerp) een foto en een MP3 uploaden via de Studio, kiezen als hoofdfoto, galerijfoto en eigen muziek, en terugzien in de live kaart. Geslaagd voor alle actieve ontwerpen. Bij ontwerpen met een eigen track (zoals Kerststad) kiest de klant "eigen muziek" en bevestigt de rechten; dat is de bestaande stap.
+- `tests.test_homepage_carrousel`: vijf voordelen in de juiste volgorde.
+- Chromium op 360, 390, 768 en 1366: vijf voordelen, geen item buiten beeld, geen horizontale paginascroll; 3 regels op 360 en 390, 2 op 768, 1 op 1366.
+
+## Homepage-kop links, carrousel rechts (21 oktober 2026, lokaal, branch `claude/homepage-carrousel`)
+Echt uitgevoerd:
+- `tests.test_homepage_carrousel`: 25 tests, onder meer de zichtbare koptekst, Pinyon Script met eigen bestand en licentie, de teller.
+- axe-core 4.10.2 (WCAG 2.0/2.1 A en AA plus best practices) op 360, 390, 768, 1199, 1200, 1366 en 1920 breed: één melding, "region" op de testbalk (niet de carrousel); geen JavaScript-fouten; Pinyon Script geladen; geen horizontale paginascroll.
+- Op mobiel staat 26 px tussen "uitnodiging." en de bovenkant van de kaarten (was 11 px); de eerste kaart begint op 366 px.
+Niet uitgevoerd: echte iPhone/Safari en Android.
+
+## Prijsregel zonder termijn (21 oktober 2026, lokaal, branch `claude/homepage-carrousel`)
+Op de ontwerppagina staat de prijsregel nu als "Special € 89,95 incl. btw, eenmalig" (zonder "12 maanden online"). Bedragen, indelingen, btw en looptijd zijn ongewijzigd. De looptijd blijft vindbaar op Prijzen ("12 maanden online" bij "Wat altijd geldt"), in de bestelstap vóór het betalen ("blijft 12 maanden online vanaf de aankoopdatum ... Er is geen automatische verlenging") en in artikel 6 van de voorwaarden. Echt uitgevoerd: `tests.test_prijsstructuur` (ook een nieuwe test voor de zichtbaarheid van de looptijd), `tests.test_kerstmagie`, `tests.test_info`, de volledige set, en een Chromium-controle van de prijsregel op 390 en 1366 breed (geen horizontale scroll).
+
+## Pakketprijzen op Digitale trouwkaarten zonder termijn (21 oktober 2026, lokaal, branch `claude/homepage-carrousel`)
+Onder de drie pakketprijzen op `/digitale-trouwkaarten/` staat "12 maanden online" niet meer; bedragen, "eenmalig", beschrijvingen en opmaak zijn gelijk. Gecontroleerd op andere pakket- en prijsoverzichten: alleen deze pagina toonde de termijn onder de prijzen. De looptijd staat nog op Prijzen ("Wat altijd geldt"), in de bestelstap vóór het betalen en in artikel 6 van de voorwaarden; ook de kenmerkenlijsten bij Prijzen en de tekst in de veelgestelde vragen noemen hem (bewust niet gewijzigd). Echt uitgevoerd: `tests.test_prijsstructuur` (nieuwe test voor deze pagina), de volledige set en een Chromium-controle op 390 en 1366 breed (geen horizontale scroll).

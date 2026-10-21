@@ -422,17 +422,36 @@ class BestaandeBestellingen(VaylideTestCase):
 
 
 class Pagina(NieuwePrijzen):
+    def test_trouwkaarten_toont_de_pakketprijzen_zonder_looptijd(self):
+        html = Client().get("/digitale-trouwkaarten/").content.decode()
+        kaarten = html.split('class="trouw-prijzen"', 1)[1].split("trouw-prijzen__voet", 1)[0]
+        self.assertIn("eenmalig", kaarten)
+        self.assertIn("€", kaarten)
+        self.assertNotIn("maanden online", kaarten)
+
+    def test_looptijd_staat_niet_in_de_prijsregel_maar_wel_op_prijzen_en_in_bestellen(self):
+        html = Client().get("/prijzen/").content.decode()
+        self.assertIn("12 maanden online", html)
+        owner = self.make_customer("looptijd@example.com")
+        inv = self.make_invitation(owner=owner, template="liefde-op-papier", occasion="bruiloft")
+        c = Client()
+        c.force_login(owner)
+        html = c.get(reverse("studio:step", args=[inv.uid, "bestellen"])).content.decode()
+        self.assertIn("12 maanden online vanaf de aankoopdatum", html)
+        self.assertIn("Er is geen automatische verlenging", html)
+
     def test_ontwerppagina_toont_indeling_en_prijs_per_gelegenheid(self):
         c = Client()
         html = c.get("/ontwerpen/liefde-op-papier/?gelegenheid=bruiloft").content.decode()
         self.assertIn("Luxe € 59,95", html)
-        self.assertIn("12 maanden online", html)
+        self.assertIn("incl. btw, eenmalig", html)
+        self.assertNotIn("maanden online", html)   # de looptijd staat niet in de prijsregel; wel in Bestellen, op Prijzen en in de voorwaarden
         self.assertIn('data-prijs-wenskaart="Luxe € 19,95"', html)
         html = c.get("/ontwerpen/liefde-op-papier/?gelegenheid=verjaardag").content.decode()
         self.assertIn("Luxe € 34,95", html)
         html = c.get("/ontwerpen/monogram/?gelegenheid=bruiloft").content.decode()
         self.assertIn("Basis € 29,95", html)
-        self.assertIn("12 maanden online", html)
+        self.assertNotIn("maanden online", html)
         self.assertNotIn("6 maanden", html)
 
     def test_prijzenpagina_toont_alleen_wat_echt_te_kiezen_is(self):

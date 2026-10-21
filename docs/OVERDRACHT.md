@@ -148,3 +148,6 @@ Op een telefoon schoof de Bloesemmeer-kaart in de telefoon zijwaarts bij een sch
 ## Hero: de kaart uit de envelop is Rozenboog (20 oktober 2026, ter beoordeling)
 
 De kaart die uit de envelop in de hero komt, is nu de echte Rozenboog-kaart (`static/img/site/kaart-rozenboog.webp`, het midden van `static/img/designs/rozenboog.webp` op het formaat 500×800). Layout, envelop, gouden kaart, kleuren en animaties zijn niet gewijzigd. De knop "Bekijk het voorbeeld" opent nu dezelfde kaart: `/voorbeeld/rozenboog/?gelegenheid=bruiloft` zodra Rozenboog actief is (`rozenboog_live` in `core/views.py`); is hij niet actief (verborgen, dan is de route een 404), dan valt de knop terug op de Kerstkaart en daarna op het oude voorbeeld. Getest in `tests/test_home3d.py`.
+
+## Homepage-carrousel (21 oktober 2026, branch `claude/homepage-carrousel`, PR ter beoordeling)
+Draaibare 3D-carrousel met uitgelichte Luxe- en Special-ontwerpen, te kiezen in Beheer; bij minder dan vijf geschikte ontwerpen blijft de envelop-hero. Niet gemerged, niet op staging, niets geactiveerd. Zie `docs/HOMEPAGE-CARROUSEL.md`. Open: echte iPhone- en Androidcontrole, keuze van de staging-branch.

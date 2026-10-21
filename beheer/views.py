@@ -481,8 +481,14 @@ def templates(request):
         row["template_version__template"]: row["n"]
         for row in Invitation.objects.values("template_version__template").annotate(n=Count("id"))
     }
+    from catalog import collectie
+
     rows = [(t, usage.get(t.pk, 0)) for t in items]
-    return render(request, "beheer/templates.html", {"rows": rows})
+    uitgelicht = [t for t, _ in rows if t.homepage_uitgelicht]
+    geldig = [t for t in uitgelicht if collectie.homepage_geschikt(t)]
+    homepage = {"aantal": len(uitgelicht), "geldig": len(geldig), "minimum": collectie.HOMEPAGE_MINIMUM, "actief": len(geldig) >= collectie.HOMEPAGE_MINIMUM,
+                "ongeschikt": {t.pk for t in uitgelicht if not collectie.homepage_geschikt(t)}}
+    return render(request, "beheer/templates.html", {"rows": rows, "homepage": homepage})
 
 
 @staff_required
@@ -494,7 +500,9 @@ def template_edit(request, pk):
         messages.success(request, "Ontwerp opgeslagen. Bestaande uitnodigingen blijven hun eigen ontwerpversie gebruiken.")
         return redirect("beheer:templates")
     usage = Invitation.objects.filter(template_version__template=template).values("template_version__number").annotate(n=Count("id"))
-    return render(request, "beheer/template_edit.html", {"form": form, "template": template, "usage": usage})
+    from catalog import collectie
+
+    return render(request, "beheer/template_edit.html", {"form": form, "template": template, "usage": usage, "homepage_geschikt": collectie.homepage_geschikt(template)})
 
 
 # ---------------------------------------------------------------- prijzen

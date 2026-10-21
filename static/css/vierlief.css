@@ -5,6 +5,7 @@
 
 @font-face { font-family: "Playfair Display"; src: url("../fonts/playfair-display-latin-wght-normal.woff2") format("woff2"); font-weight: 400 900; font-display: swap; }
 @font-face { font-family: "Playfair Display"; src: url("../fonts/playfair-display-latin-wght-italic.woff2") format("woff2"); font-weight: 400 900; font-style: italic; font-display: swap; }
+@font-face { font-family: "Pinyon Script"; src: url("../fonts/pinyon-script-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 @font-face { font-family: "DM Sans"; src: url("../fonts/dm-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 100 1000; font-display: swap; }
 
 :root {
@@ -1928,3 +1929,121 @@ a[href] img[src^="/static/"] { pointer-events: none; }
   .prijs-maat { flex-direction: column; align-items: stretch; text-align: center; }
 }
 @media (max-width: 860px) { .prijs-noot__streep { display: none; } }
+
+/* ---------- Homepage-carrousel: draaibare 3D-kaarten in de kop (de bestaande wereld en fonkelingen blijven erachter; de oude kop staat zonder .hero--carrousel) ---------- */
+.hero--carrousel { display: flex; flex-direction: column; align-items: stretch; }
+.hero--carrousel .hero__kop { position: relative; z-index: 3; text-align: center; padding-top: clamp(1.2rem, 2vw, 1.8rem); pointer-events: none; }
+.hero--carrousel .hero__kop > * { pointer-events: auto; }
+.hero--carrousel .hero__kop h1 { max-width: 42rem; margin-inline: auto; font-size: clamp(1.9rem, 3.4vw, 2.8rem); margin-bottom: .7rem; text-wrap: balance; }
+.hero--carrousel .hero__kop .lead { margin-inline: auto; max-width: 36rem; margin-bottom: 1.1rem; }
+.hero--carrousel .hero__knoppen { position: relative; z-index: 3; text-align: center; margin-bottom: 1.6rem; }
+.hero--carrousel .hero__knoppen .btn-row { justify-content: center; }
+.hero--carrousel .hero__media { left: 0; }
+.hero--carrousel .hero__carrousel { position: relative; z-index: 3; width: 100%; max-width: 78rem; margin: 0 auto; padding-inline: var(--gutter); }
+.hero--carrousel .hero__checksrij { position: relative; z-index: 3; padding-bottom: 4.5rem; }
+.hero--carrousel .hero__checks { justify-content: center; margin-top: 1.2rem; }
+.cv__stage { position: relative; height: var(--stage-h, 24rem); touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.cv__stage:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 6px; border-radius: 12px; }
+.cv__stage.is-drag { cursor: grabbing; }
+.cv__stage::after { content: ""; position: absolute; left: 50%; bottom: -2%; width: min(64%, 46rem); height: 11%; translate: -50% 0; border-radius: 50%; background: radial-gradient(closest-side, rgba(122, 82, 28, .34), transparent); filter: blur(12px); pointer-events: none; }
+.cv__ring { position: absolute; inset: 0; perspective: 1600px; perspective-origin: calc(50% + var(--po, 0) * 5%) 38%; list-style: none; margin: 0; padding: 0; }   /* het perspectief staat op de ring zelf (geen preserve-3d): zo blijven de zijkaarten klikbaar */
+.cv__card { position: absolute; left: 50%; top: 0; width: var(--cw, 15rem); aspect-ratio: 4 / 5; margin-left: calc(var(--cw, 15rem) / -2); will-change: transform, opacity; backface-visibility: hidden; }
+.cv__card a { display: block; position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden; background: var(--paper); box-shadow: 0 0 0 1px rgba(255, 236, 190, .9), 0 0 0 3px rgba(214, 178, 108, .35), 0 10px 14px -8px rgba(110, 66, 14, .38); -webkit-user-drag: none; }
+.cv__float { display: block; width: 100%; height: 100%; position: relative; }
+.cv__float::before { content: ""; position: absolute; left: -2%; right: -2%; bottom: -15%; height: 15%; background: radial-gradient(closest-side, rgba(96, 58, 14, .5) 0%, rgba(96, 58, 14, .22) 55%, transparent 100%) 50% 40% / 74% 46% no-repeat, radial-gradient(closest-side, rgba(110, 70, 22, .2), transparent) 50% 50% / 100% 100% no-repeat; filter: blur(10px); transform-origin: 50% 50%; }
+.cv__float a { transition: transform .6s cubic-bezier(.2, .7, .2, 1), box-shadow .6s; }
+/* Zweven: rustig, alleen verticaal, per kaart een eigen tempo en beginpunt (--d, --dl). Alleen onder .fx-zweef, dat het script zet als beweging is toegestaan en de ring in beeld is. */
+@keyframes cv-zweef { 0%, 100% { transform: translate3d(0, 3px, 0); } 50% { transform: translate3d(0, -5px, 0); } }
+@keyframes cv-schaduw { 0%, 100% { transform: translateY(0) scale(1, 1); opacity: 1; } 50% { transform: translateY(3px) scale(.88, .86); opacity: .66; } }
+.fx-zweef .cv__float { animation: cv-zweef var(--d, 8s) ease-in-out var(--dl, 0s) infinite; }
+.fx-zweef .cv__float::before { animation: cv-schaduw var(--d, 8s) ease-in-out var(--dl, 0s) infinite; }
+.fx-zweef.is-rust .cv__float, .fx-zweef.is-rust .cv__float::before { animation-play-state: paused; }
+.cv__card.is-weg { visibility: hidden; }
+.cv__card.is-weg .cv__float, .cv__card.is-weg .cv__float::before { animation: none; }
+/* Hover: de kaart komt subtiel naar voren (+4%), alleen met een echte muis en nooit tijdens het slepen. */
+@media (hover: hover) and (pointer: fine) {
+  .cv__stage:not(.is-drag) .cv__card:hover a { transform: scale(1.04); box-shadow: 0 0 0 1.5px var(--gold), 0 0 0 5px rgba(214, 178, 108, .4), 0 16px 24px -10px rgba(110, 66, 14, .5); }
+}
+.cv__stage.is-drag .cv__card a { transition: none; }
+.cv__card img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; pointer-events: none; }
+.cv__card.is-sel a { box-shadow: 0 0 0 1.5px var(--gold), 0 0 0 5px rgba(214, 178, 108, .45), 0 12px 18px -8px rgba(110, 66, 14, .45); }
+.cv__card a:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 4px; }
+.cv__dim { position: absolute; inset: 0; border-radius: 16px; background: #3A2A14; opacity: 0; pointer-events: none; }
+.cv__info { text-align: center; margin-top: 1.1rem; }
+.cv__naam { font-family: var(--font-display); font-size: 1.7rem; margin: 0 auto; line-height: 1.2; }
+.cv__sub { color: var(--muted); font-size: .92rem; margin: .15rem auto .9rem; }
+.cv__acties { display: flex; justify-content: center; align-items: center; gap: .7rem; flex-wrap: wrap; }
+.cv__nav { width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid var(--line-strong); background: var(--paper); color: var(--ink); font-size: 1.3rem; cursor: pointer; display: grid; place-items: center; }
+.cv__nav:hover { border-color: var(--accent); }
+.cv__nav:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 3px; }
+.cv__dots { display: flex; justify-content: center; flex-wrap: wrap; gap: .1rem; margin-top: .7rem; }
+.cv__dots button { width: 24px; height: 24px; border: 0; background: none; padding: 0; cursor: pointer; display: grid; place-items: center; }
+.cv__dots button::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--line-strong); transition: transform .3s, background .3s; }
+.cv__dots button[aria-current="true"]::before { background: var(--accent); transform: scale(1.5); }
+.cv__status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.cv--plat .cv__stage, html:not(.js) .cv__stage { height: auto; touch-action: pan-x pan-y; cursor: auto; overflow-x: auto; scroll-snap-type: x mandatory; padding: .5rem 1rem 1.5rem; }
+.cv--plat .cv__ring, html:not(.js) .cv__ring { position: static; display: flex; gap: 1rem; transform: none; }
+.cv--plat .cv__card, html:not(.js) .cv__card { position: static; flex: 0 0 var(--cw, 11rem); margin: 0; scroll-snap-align: center; transform: none !important; opacity: 1 !important; }
+.cv--plat .cv__dim, .cv--plat .cv__stage::after, .cv--plat .cv__float::before, html:not(.js) .cv__stage::after, html:not(.js) .cv__float::before { display: none; }
+.hero__carrousel { --cw: 11.9rem; --stage-h: 16.8rem; }
+@media (min-width: 900px) { .hero__carrousel { --cw: 18.75rem; --stage-h: 25.5rem; } }
+html:not(.js) .cv__info .cv__nav, html:not(.js) .cv__dots { display: none; }
+html:not(.js) .hero__carrousel { --cw: 11rem; }
+@media (prefers-reduced-motion: reduce) { .cv__float, .cv__float::before { animation: none !important; } .cv__float a { transition: none; } }
+@media (max-width: 860px) { .hero--carrousel .hero__media { position: absolute; inset: 0; left: 0; height: auto; margin: 0; order: 0; } }
+@media (max-width: 767px) {
+  .hero--carrousel .hero__kop { order: 1; padding-top: 1.4rem; }
+  .hero--carrousel .hero__carrousel { order: 2; padding-inline: 0; }
+  .hero--carrousel .hero__knoppen { order: 3; margin-top: .6rem; }
+  .hero--carrousel .hero__checksrij { order: 4; padding-bottom: 3.5rem; }
+  .hero--carrousel .hero__kop .lead { margin-bottom: .4rem; }
+  .hero--carrousel .hero__kop h1 { font-size: 1.95rem; }
+  .cv__naam { font-size: 1.45rem; }
+  .cv__dots { display: none; }
+}
+
+.cv__hint { margin: -.35rem auto .7rem; min-height: 1.3em; font-size: .82rem; letter-spacing: .02em; color: var(--accent-text); opacity: 0; transition: opacity .8s; }
+.cv__hint.is-aan { opacity: .9; }
+.cv__hint span { display: inline-block; }
+@media (max-width: 767px) { .cv__hint { margin-top: -.5rem; } }
+@media (prefers-reduced-motion: reduce) { .cv__hint { transition: none; } }
+
+/* Rustiger kop, desktop: links de compacte kop met één knop, rechts de carrousel (de tekst staat niet boven de kaarten). Mobiel en tablet blijven gestapeld. */
+@media (min-width: 1200px) {
+  .hero--carrousel {
+    display: grid; align-items: center; column-gap: clamp(1rem, 2vw, 2rem);
+    grid-template-columns: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter))) 21rem minmax(0, 1fr) 0;
+    grid-template-rows: auto auto auto; padding-top: 2rem;
+  }
+  .hero--carrousel .hero__media { grid-column: 1 / -1; grid-row: 1 / -1; }
+  .hero--carrousel .hero__kop { grid-column: 2; grid-row: 1; align-self: end; text-align: left; padding: 0 0 0; max-width: none; margin: 0; }
+  .hero--carrousel .hero__kop h1 { margin-inline: 0; max-width: none; font-size: clamp(2rem, 2.8vw, 2.6rem); margin-bottom: 1.4rem; }
+  .hero--carrousel .hero__knoppen { grid-column: 2; grid-row: 2; align-self: start; text-align: left; margin: 0; padding: 0; max-width: none; }
+  .hero--carrousel .hero__knoppen .btn-row { justify-content: flex-start; }
+  .hero--carrousel .hero__carrousel { grid-column: 3; grid-row: 1 / 3; max-width: none; padding-inline: 0; margin: 0; }
+  .hero--carrousel .hero__checksrij { grid-column: 2 / 4; grid-row: 3; padding-top: .5rem; max-width: none; padding-inline: 0; margin: 0; }
+  .hero--carrousel .hero__checks { justify-content: flex-start; }
+  .hero--carrousel .cv__info { margin-top: .6rem; }
+}
+
+/* Teller in plaats van bolletjes: een stille "01 / 12" onder de knoppen (de pijlen, toetsen en vegen blijven de bediening). */
+.hero--carrousel .cv__dots { display: none; }
+.cv__teller { margin: .9rem 0 0; font-size: .8rem; letter-spacing: .24em; color: var(--accent-text); opacity: .8; font-variant-numeric: tabular-nums; }
+@media (min-width: 1200px) {
+  .hero--carrousel .hero__carrousel { padding-top: 3rem; }
+  .hero--carrousel .hero__kop .eyebrow { margin-bottom: 1.5rem; }
+  .hero--carrousel .hero__kop .eyebrow::after { content: ""; display: block; width: 2.6rem; height: 1px; margin-top: 1rem; background: var(--gold); }
+  .hero--carrousel .hero__kop h1 { font-size: clamp(1.75rem, 2.2vw, 2.1rem); line-height: 1.2; letter-spacing: -.012em; font-weight: 400; margin-bottom: 2rem; text-wrap: initial; }
+  .hero--carrousel .hero__kop h1 em { letter-spacing: -.005em; }
+}
+@media (max-width: 1199px) { .hero--carrousel .hero__kop .hero__br { display: none; } }
+@media (max-width: 767px) { .cv__teller { margin-top: .3rem; font-size: .74rem; } }
+
+/* Voorstel: alleen "bijzondere" in Pinyon Script (OFL, staat al in static/fonts; tijdelijk alternatief), op een eigen regel, de rest in de serif. */
+.hero--carrousel .hero__kop h1 em { display: block; font-family: "Pinyon Script", "Playfair Display", cursive; font-style: normal; font-weight: 400; font-size: 1.5em; line-height: 1.05; letter-spacing: 0; margin: .05em 0 .02em -.04em; color: var(--accent-text); }
+@media (min-width: 1200px) {
+  .hero--carrousel .hero__kop h1 { font-size: clamp(2rem, 2.5vw, 2.4rem); }
+  .hero--carrousel .hero__kop h1 em { font-size: 1.65em; letter-spacing: 0; }
+}
+@media (max-width: 767px) { .hero--carrousel .hero__kop h1 em { font-size: 1.55em; } }
+@media (max-width: 767px) { .hero--carrousel .hero__kop { padding-bottom: .9rem; } }

@@ -115,10 +115,10 @@
   // ---------- De kop op de homepage ----------
   var hero = document.querySelector("[data-hero3d]");
   if (hero) (function () {
-    var stage = hero.querySelector(".card-stage");
     var media = hero.querySelector(".hero__media");
+    var stage = hero.querySelector(".card-stage") || media;     // zonder envelop-podium (homepage met carrousel) draait de wereld en de fonkeling gewoon door
     var canvas = hero.querySelector(".hero__sparkles");
-    if (!stage || !media) return;
+    if (!media) return;
     var MAX_TILT = 12; // graden
     var target = { rx: 0, ry: 0, gx: 30, gy: 20, px: 0, py: 0 };
     var now = { rx: 0, ry: 0, gx: 30, gy: 20, px: 0, py: 0 };

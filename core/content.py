@@ -11,7 +11,7 @@ STEPS_SHORT = [
     ("versturen", "Delen maar", "Na je betaling een eigen link en QR-code."),
 ]
 
-HERO_CHECKS = ["Snel en eenvoudig", "Stijlvolle ontwerpen", "Automatisch online", "RSVP & gastenlijst"]
+HERO_CHECKS = ["Snel en eenvoudig", "Stijlvolle ontwerpen", "Eigen foto's en muziek toevoegen", "Automatisch online", "RSVP & gastenlijst"]
 
 # Homepage: drie uitgelichte ontwerpen (codes), de kerstkaart eerst. Alleen lichte ontwerpen: geen donkere of zwarte
 # voorbeeldkaarten op de homepage. Ontbreekt er een, dan vullen de eerste uit de collectie aan.
