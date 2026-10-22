@@ -278,3 +278,8 @@ class KopTypografieTests(VaylideTestCase):
         self.assertIn("Maak jouw uitnodiging", home_html())
         css = (settings.BASE_DIR / "static/css/vierlief.css").read_text()
         self.assertIn(".hero--carrousel .hero__knoppen .btn--primary { background: transparent;", css)
+
+    def test_sterrencanvas_tekent_op_telefoons_op_1x_en_op_desktop_op_hoge_resolutie(self):
+        js = (settings.BASE_DIR / "static/js/hero3d.js").read_text()
+        self.assertIn('matchMedia("(pointer: coarse)").matches && window.innerWidth < 900', js)
+        self.assertIn("dpr = telefoon ? 1 : Math.min(window.devicePixelRatio || 1, 2);", js)
