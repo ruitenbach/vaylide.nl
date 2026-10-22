@@ -254,3 +254,27 @@ class KopTypografieTests(VaylideTestCase):
         self.assertIn(".hero--carrousel .cv__dots { display: none; }", css)
         js = (settings.BASE_DIR / "static/js/carrousel.js").read_text()
         self.assertIn('" / "', js)
+
+    def test_voordelenrij_staat_op_desktop_over_de_hele_hero_gecentreerd(self):
+        css = (settings.BASE_DIR / "static/css/vierlief.css").read_text()
+        self.assertIn(".hero--carrousel .hero__checksrij { grid-column: 1 / -1;", css)
+        self.assertIn(".hero--carrousel .hero__checks { justify-content: center;", css)
+
+    def test_linker_kop_heeft_een_entree_die_minder_beweging_respecteert(self):
+        css = (settings.BASE_DIR / "static/css/vierlief.css").read_text()
+        self.assertIn("@keyframes hero-kop-in", css)
+        blok = css.split("@media (prefers-reduced-motion: no-preference) {\n  .hero--carrousel .hero__kop .eyebrow")[1]
+        self.assertIn("hero-kop-in", blok.split("}\n")[0] + blok.split("}\n")[1])
+
+    def test_mobiele_bediening_heeft_vaste_volgorde_en_teller_telt_alle_kaarten(self):
+        css = (settings.BASE_DIR / "static/css/vierlief.css").read_text()
+        self.assertIn(".hero--carrousel .cv__acties { display: contents; }", css)
+        self.assertIn(".hero--carrousel .cv__teller { grid-column: 2; grid-row: 6;", css)
+        js = (settings.BASE_DIR / "static/js/carrousel.js").read_text()
+        self.assertIn('" / " + (N < 10 ? "0" : "") + N', js)
+
+    def test_maak_jouw_uitnodiging_blijft_op_mobiel_maar_is_rustiger(self):
+        lichten_uit(SPECIAL + LUXE)
+        self.assertIn("Maak jouw uitnodiging", home_html())
+        css = (settings.BASE_DIR / "static/css/vierlief.css").read_text()
+        self.assertIn(".hero--carrousel .hero__knoppen .btn--primary { background: transparent;", css)
