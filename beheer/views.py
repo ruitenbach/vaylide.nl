@@ -19,7 +19,8 @@ from core.ai import ai_configured
 from orders.stuck import stuck_orders
 from core.models import ContactMessage, SiteConfig
 from core.privacy import anonymize_user, delete_invitation
-from core.utils import ip_fingerprint, rate_limit
+from core import bruteforce
+from core.utils import client_ip
 from invitations.content import publish_issues
 from invitations.models import Invitation, InvitationVersion, Source
 from invitations.services import DraftConflict, PublishBlocked, availability_end, publish_draft, restore_version, save_draft
@@ -59,16 +60,26 @@ class StaffLoginView(auth_views.LoginView):
     redirect_authenticated_user = False
 
     def post(self, request, *args, **kwargs):
-        if not rate_limit(f"staff-login:{ip_fingerprint(request)}", 10, 900):
+        username = request.POST.get("username", "")
+        if bruteforce.is_blocked(request, username):
             form = self.get_form()
-            form.add_error(None, "Te veel inlogpogingen. Wacht een kwartier en probeer het opnieuw.")
-            return self.form_invalid(form)
+            form.add_error(None, bruteforce.MESSAGE)
+            response = self.form_invalid(form)
+            response.status_code = 429
+            return response
         return super().post(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        # Alleen echte mislukkingen tellen mee; de blokkade zelf (429 hierboven) niet nog een keer.
+        if not any(error == bruteforce.MESSAGE for error in form.non_field_errors()):
+            bruteforce.register_failure(self.request, self.request.POST.get("username", ""))
+        return super().form_invalid(form)
 
     def form_valid(self, form):
         if not form.get_user().is_staff:
             form.add_error(None, "Dit account heeft geen toegang tot het beheer.")
             return self.form_invalid(form)
+        bruteforce.register_success(self.request.POST.get("username", ""))
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -623,6 +634,13 @@ def site_settings(request):
         ("AI-hulp", f"Claude ({settings.AI_MODEL})" if ai_configured() else "Testmodus (geen API-sleutel)", not ai_configured()),
         ("Publieke adres", settings.BASE_URL, settings.BASE_URL.startswith("http://")),
         ("Database", settings.DATABASES["default"]["ENGINE"].rsplit(".", 1)[-1], False),
+        # Controle van de proxy-instelling: open dit scherm vanaf je eigen apparaat. Is het getoonde adres je eigen publieke
+        # IP-adres, dan klopt VIERLIEF_TRUSTED_PROXY_HOPS. Een ander adres (of het adres van de hosting) betekent: aanpassen.
+        ("Jouw IP-adres zoals de site het ziet", client_ip(request), False),
+        ("Vertrouwde proxy's (VIERLIEF_TRUSTED_PROXY_HOPS)",
+         f"{settings.TRUSTED_PROXY_HOPS}; adressen in X-Forwarded-For: "
+         f"{len([p for p in request.META.get('HTTP_X_FORWARDED_FOR', '').split(',') if p.strip()])}",
+         settings.TRUSTED_PROXY_HOPS == 0 and not settings.DEBUG),
     ]
     return render(request, "beheer/settings.html", {"form": form, "integrations": integrations})
 

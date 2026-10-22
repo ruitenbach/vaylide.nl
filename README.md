@@ -65,7 +65,7 @@ Alle instellingen staan in omgevingsvariabelen. Kopieer `.env.example` naar `.en
 
 | Variabele | Betekenis |
 |---|---|
-| `VIERLIEF_MODE` | `test` (standaard) of `live`. In `live` weigert de app te starten zonder echte betaalprovider, SMTP en https-adres. |
+| `VIERLIEF_MODE` | `test` (standaard, alleen lokaal) of `live`. Op Render of met een https-adres in `VIERLIEF_BASE_URL` moet de waarde expliciet gezet zijn, anders start de app niet. In `live` weigert de app te starten zonder echte betaalprovider, SMTP en https-adres. |
 | `DJANGO_SECRET_KEY` | Lange willekeurige geheime sleutel (verplicht buiten ontwikkelmodus). |
 | `DJANGO_DEBUG` | Alleen `true` bij lokaal ontwikkelen. |
 | `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS` | Domeinnamen van de site. |

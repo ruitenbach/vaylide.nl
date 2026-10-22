@@ -41,7 +41,7 @@ Korte lijst met wat de eigenaar nog moet aanleveren: `docs/INVULLIJST.md`.
 - [ ] `VIERLIEF_MODE=live`. De app weigert dan te starten zonder echte betaalprovider, SMTP en een https-adres. De testbalk verdwijnt.
 - [ ] `DJANGO_DEBUG=false` en een nieuwe, lange `DJANGO_SECRET_KEY` (alleen in de omgevingsvariabelen van de host, niet in Git).
 - [ ] `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS` en `VIERLIEF_BASE_URL=https://...`.
-- [ ] `VIERLIEF_TRUSTED_PROXY_HOPS`: meestal 1 achter een reverse proxy of platform-loadbalancer.
+- [ ] `VIERLIEF_TRUSTED_PROXY_HOPS`: meestal 1 achter een reverse proxy of platform-loadbalancer. Controleer de waarde in Beheer → Instellingen ("Jouw IP-adres zoals de site het ziet" moet je eigen adres zijn); zie `docs/BEVEILIGING.md`.
 - [ ] `VIERLIEF_DJANGO_ADMIN_PATH`: een eigen, moeilijk te raden pad.
 - [ ] `VIERLIEF_CRON_TOKEN` als je de cron-aanroep gebruikt in plaats van een worker.
 - [ ] `python manage.py migrate`, `collectstatic` (zit in de Dockerfile) en `python manage.py createsuperuser` met een sterk wachtwoord.

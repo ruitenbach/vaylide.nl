@@ -58,6 +58,15 @@ def env_list(key: str, default: str = "") -> list[str]:
 VIERLIEF_MODE = env("VIERLIEF_MODE", "test").lower()
 if VIERLIEF_MODE not in {"test", "live"}:
     raise RuntimeError("VIERLIEF_MODE moet 'test' of 'live' zijn.")
+# Lokaal en in de tests is 'test' de standaard. Op een openbare hosting (Render, of een https-adres) is een
+# ontbrekende VIERLIEF_MODE een vergissing die anders stil in testmodus zou eindigen: dan weigert de site te starten.
+if "VIERLIEF_MODE" not in os.environ and (
+    env_bool("RENDER", False) or env("VIERLIEF_BASE_URL").lower().startswith("https://")
+):
+    raise RuntimeError(
+        "VIERLIEF_MODE ontbreekt. Zet de omgevingsvariabele expliciet op 'live' of 'test'; "
+        "op een openbare hosting is er bewust geen standaardwaarde."
+    )
 TEST_MODE = VIERLIEF_MODE == "test"
 
 DEBUG = env_bool("DJANGO_DEBUG", False)

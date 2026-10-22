@@ -293,6 +293,15 @@ Alles uitgevoerd op 16 oktober 2026, in Chromium (Playwright), op SQLite, in tes
 - **Bestaande ontwerpen vergeleken met de code van vóór deze ronde** (twee servers naast elkaar, 33 ontwerpen op 390 en 1366 pixels, met 'minder beweging'): het openingsscherm is bij alle 66 pagina's pixel voor pixel gelijk; de geopende hele pagina verschilt bij alle 66 alleen in de lopende aftelling (seconden en minuten); er zijn geen consolefouten. Daarmee is zichtbaar dat de gedeelde bestanden de bestaande ontwerpen niet veranderen. Niet vergeleken: het gedrag zelf van de effecten en het 'Direct naar de uitnodiging' op andere ontwerpen dan met de tests.
 - **Niet gedaan in deze ronde**: Safari/iPhone, Android, Firefox, schermlezers, Lighthouse, het afspelen van de MP4 (Chromium speelt hier de WebM), een volledige herhaling van `e2e/controle2.cjs` en `e2e/effecten.cjs` over alle ontwerpen.
 
+## Beveiliging fase 1 (22 oktober 2026, werkbranch, nog niet live)
+
+Gebouwd en getest op de productiecommit `cf5184d`. Zie `docs/BEVEILIGING.md`.
+
+- **Volledige suite** (`python manage.py test tests`, lokaal op SQLite): 1467 tests, alleen de 2 bekende fouten in `tests.test_voorwaarden_nieuw` (bedrijfsgegevens uit de omgeving, zie boven); alles van fase 1 slaagt.
+- **35 nieuwe tests** in `tests/test_beveiliging_fase1.py`: de modus (ontbreekt lokaal, op Render en bij een https-adres; ongeldig of leeg; live zonder echte koppelingen), het raden van links (60 missers, 429, geldige en verlopen links tellen niet, ander adres niet geblokkeerd, 300 gasten op één adres, vervalste `X-Forwarded-For`, aanmelden op een onbekende link), wachtwoord raden (Beheer en admin, juist wachtwoord na een blokkade, gedeelde tellers, aanval vanaf veel adressen op één account, geslaagde inlog zet de teller terug, klantenlogin onaangetast, vreemde invoer) en het client-IP (hops 0, 1 en 2, te korte keten, ongeldige waarden, poorten, IPv6, /64-netwerk, Beheer-scherm, systeemcontrole).
+- **Negatieve controle**: dezelfde 35 tests zonder de wijzigingen in `config/settings.py`, `core/utils.py`, `invitations/views.py` en `beheer/views.py` gedraaid: 14 mislukten, zoals bedoeld. Met de wijzigingen slagen ze allemaal.
+- **Niet gecontroleerd**: de echte keten van proxy's bij Render (hoeveel adressen er in `X-Forwarded-For` staan), een deploy op staging of productie, en PostgreSQL.
+
 ## Niet gecontroleerd
 
 - **Echte apparaten en andere browsers**: alleen Chromium is gebruikt, op telefoon- en computerformaat. Safari/WebKit (iPhone) en Firefox zijn niet getest. Test vóór de lancering op echte iPhones en Android-telefoons.

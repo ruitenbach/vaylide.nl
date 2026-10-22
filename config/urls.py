@@ -3,6 +3,8 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
+from core.admin_login import admin_login
+
 admin.site.site_header = "VAYLIDE systeembeheer"
 admin.site.site_title = "VAYLIDE"
 admin.site.index_title = "Noodtoegang tot de database (gebruik bij voorkeur /beheer/)"
@@ -16,6 +18,7 @@ urlpatterns = [
     path("maken/", include("studio.urls")),
     path("account/", include("portal.urls")),
     path("beheer/", include("beheer.urls")),
+    path(f"{settings.ADMIN_URL}login/", admin_login),  # vóór admin.site.urls: dezelfde adres, mét begrenzing
     path(settings.ADMIN_URL, admin.site.urls),
 ]
 

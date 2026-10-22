@@ -14,7 +14,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods, require_POST
 
 from catalog.models import Template
-from core.utils import form_age_seconds, ip_fingerprint, rate_limit, signed_timestamp, new_token, wants_json
+from core.utils import form_age_seconds, ip_fingerprint, rate_exceeded, rate_limit, signed_timestamp, new_token, wants_json
 
 from .content import event_times, referenced_assets
 from .demo import DEFAULT_DEMO_OCCASION, demo_content
@@ -90,6 +90,31 @@ def _live_invitation(slug) -> Invitation | None:
     )
 
 
+# Bescherming tegen systematisch raden van uitnodigingslinks: alleen een link die niet bestaat telt als misser.
+# Een bestaande link (ook een verlopen of offline gehaalde, die 410 geeft) telt nooit mee, dus gasten op een
+# gedeeld netwerk (zaal-wifi, kantoor) raken hun limiet niet kwijt aan elkaar. Pas bij PROBE_LIMIT missers per
+# PROBE_WINDOW seconden vanaf één adres krijgt dat adres tot het einde van het venster overal onder /u/ een 429.
+PROBE_LIMIT = 60
+PROBE_WINDOW = 600
+
+
+def _too_many(request):
+    response = render(request, "invitations/te_veel_pogingen.html", status=429)
+    response["Retry-After"] = str(PROBE_WINDOW)
+    return response
+
+
+def _lookup(request, slug):
+    """Zoekt de uitnodiging op. Geeft (uitnodiging of None, 429-antwoord of None)."""
+    key = f"slug-miss:{ip_fingerprint(request)}"
+    if rate_exceeded(key, PROBE_LIMIT, PROBE_WINDOW):
+        return None, _too_many(request)
+    invitation = _live_invitation(slug)
+    if invitation is None or not invitation.published_version_id:
+        rate_limit(key, PROBE_LIMIT, PROBE_WINDOW)
+    return invitation, None
+
+
 def _unavailable(request, status=410):
     return render(request, "invitations/unavailable.html", status=status)
 
@@ -151,7 +176,9 @@ def _fresh_rsvp_form(values=None, errors=None, existing_token=""):
 
 
 def public_invitation(request, slug):
-    invitation = _live_invitation(slug)
+    invitation, blocked = _lookup(request, slug)
+    if blocked is not None:
+        return blocked
     if invitation is None or not invitation.published_version_id:
         return _unavailable(request, status=404)
     if not invitation.is_publicly_visible:
@@ -204,7 +231,9 @@ def _success_texts(view, result):
 @sensitive_post_parameters()  # antwoorden van gasten nooit in foutmeldingen (mails aan de eigenaar)
 @require_POST
 def rsvp_submit(request, slug):
-    invitation = _live_invitation(slug)
+    invitation, blocked = _lookup(request, slug)
+    if blocked is not None:
+        return JsonResponse({"ok": False, "message": "Even rustig aan. Probeer het over een paar minuten opnieuw."}, status=429) if wants_json(request) else blocked
     if invitation is None or not invitation.is_publicly_visible:
         if wants_json(request):
             return JsonResponse({"ok": False, "message": "Deze uitnodiging is niet (meer) beschikbaar."}, status=410)
@@ -256,7 +285,9 @@ def rsvp_submit(request, slug):
 @sensitive_post_parameters()
 @require_http_methods(["GET", "POST"])
 def rsvp_edit(request, slug, token):
-    invitation = _live_invitation(slug)
+    invitation, blocked = _lookup(request, slug)
+    if blocked is not None:
+        return blocked
     if invitation is None or not invitation.is_publicly_visible:
         return _unavailable(request)
     guest = find_by_edit_token(invitation, token)
@@ -304,7 +335,9 @@ def rsvp_edit(request, slug, token):
 
 
 def public_ics(request, slug):
-    invitation = _live_invitation(slug)
+    invitation, blocked = _lookup(request, slug)
+    if blocked is not None:
+        return blocked
     if invitation is None or not invitation.is_publicly_visible:
         return _unavailable(request)
     content = invitation.published_version.content
