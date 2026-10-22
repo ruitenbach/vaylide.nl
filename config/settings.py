@@ -58,6 +58,15 @@ def env_list(key: str, default: str = "") -> list[str]:
 VIERLIEF_MODE = env("VIERLIEF_MODE", "test").lower()
 if VIERLIEF_MODE not in {"test", "live"}:
     raise RuntimeError("VIERLIEF_MODE moet 'test' of 'live' zijn.")
+# Lokaal en in de tests is 'test' de standaard. Op een openbare hosting (Render, of een https-adres) is een
+# ontbrekende VIERLIEF_MODE een vergissing die anders stil in testmodus zou eindigen: dan weigert de site te starten.
+if "VIERLIEF_MODE" not in os.environ and (
+    env_bool("RENDER", False) or env("VIERLIEF_BASE_URL").lower().startswith("https://")
+):
+    raise RuntimeError(
+        "VIERLIEF_MODE ontbreekt. Zet de omgevingsvariabele expliciet op 'live' of 'test'; "
+        "op een openbare hosting is er bewust geen standaardwaarde."
+    )
 TEST_MODE = VIERLIEF_MODE == "test"
 
 DEBUG = env_bool("DJANGO_DEBUG", False)
@@ -392,6 +401,11 @@ if not DEBUG:
 # Aantal vertrouwde proxy's vóór de applicatie (bijv. 1 bij Render/Fly/een load balancer).
 # Bij 0 wordt REMOTE_ADDR gebruikt. Nodig voor correcte limieten per IP-adres.
 TRUSTED_PROXY_HOPS = int(env("VIERLIEF_TRUSTED_PROXY_HOPS", "0"))
+# Blokkade van adressen die veel onbekende uitnodigingslinks proberen: standaard UIT tot de echte proxyketen op staging
+# is gemeten. Zonder blokkade blijft de waarschuwing bij uitzonderlijk veel onbekende links wel werken.
+LINK_BLOCK_ENABLED = env_bool("VIERLIEF_LINKBLOKKADE", False)
+# Meetscherm voor de proxyketen in Beheer → Instellingen (alleen staff, alleen in testmodus, standaard uit).
+IP_MEASURE = env_bool("VIERLIEF_IP_METING", False)
 
 ADMIN_URL = env("VIERLIEF_DJANGO_ADMIN_PATH", "systeembeheer/").strip("/") + "/"
 

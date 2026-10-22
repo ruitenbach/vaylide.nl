@@ -10,21 +10,25 @@ from django.conf import settings
 from django.core import signing
 from django.core.cache import cache
 
+from .ipinfo import client_ip, limit_network, warn_if_unreliable  # noqa: F401  (client_ip blijft hier importeerbaar)
+
 FORM_TS_SALT = "vierlief.form-ts"
 
 
-def client_ip(request) -> str:
-    hops = getattr(settings, "TRUSTED_PROXY_HOPS", 0)
-    if hops > 0:
-        forwarded = [p.strip() for p in request.META.get("HTTP_X_FORWARDED_FOR", "").split(",") if p.strip()]
-        if len(forwarded) >= hops:
-            return forwarded[-hops]
-    return request.META.get("REMOTE_ADDR", "") or "onbekend"
+def _fingerprint(ip: str) -> str:
+    return hmac.new(settings.SECRET_KEY.encode(), limit_network(ip).encode(), hashlib.sha256).hexdigest()[:24]
 
 
 def ip_fingerprint(request) -> str:
-    """Niet-omkeerbare verkorte hash van het IP-adres (alleen voor limieten)."""
-    return hmac.new(settings.SECRET_KEY.encode(), client_ip(request).encode(), hashlib.sha256).hexdigest()[:24]
+    """Niet-omkeerbare verkorte hash van het IP-adres (alleen voor limieten). Meldt een onbetrouwbaar adres in het log."""
+    status = warn_if_unreliable(request)
+    return _fingerprint(status.ip)
+
+
+def reliable_ip_fingerprint(request) -> str | None:
+    """Zoals ip_fingerprint, maar None als het adres niet betrouwbaar is: dan mag een limiet er niet op vertrouwen."""
+    status = warn_if_unreliable(request)
+    return _fingerprint(status.ip) if status.reliable else None
 
 
 def rate_limit(key: str, limit: int, window_seconds: int) -> bool:
@@ -39,6 +43,12 @@ def rate_limit(key: str, limit: int, window_seconds: int) -> bool:
         cache.set(bucket, 1, window_seconds + 5)
         return True
     return count <= limit
+
+
+def rate_exceeded(key: str, limit: int, window_seconds: int) -> bool:
+    """Is de limiet al bereikt? Telt niet mee (om te kijken zonder een poging te verbruiken)."""
+    bucket = f"rl:{key}:{int(time.time() // window_seconds)}"
+    return (cache.get(bucket) or 0) >= limit
 
 
 def signed_timestamp() -> str:

@@ -65,7 +65,7 @@ Alle instellingen staan in omgevingsvariabelen. Kopieer `.env.example` naar `.en
 
 | Variabele | Betekenis |
 |---|---|
-| `VIERLIEF_MODE` | `test` (standaard) of `live`. In `live` weigert de app te starten zonder echte betaalprovider, SMTP en https-adres. |
+| `VIERLIEF_MODE` | `test` (standaard, alleen lokaal) of `live`. Op Render of met een https-adres in `VIERLIEF_BASE_URL` moet de waarde expliciet gezet zijn, anders start de app niet. In `live` weigert de app te starten zonder echte betaalprovider, SMTP en https-adres. |
 | `DJANGO_SECRET_KEY` | Lange willekeurige geheime sleutel (verplicht buiten ontwikkelmodus). |
 | `DJANGO_DEBUG` | Alleen `true` bij lokaal ontwikkelen. |
 | `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS` | Domeinnamen van de site. |
@@ -76,7 +76,9 @@ Alle instellingen staan in omgevingsvariabelen. Kopieer `.env.example` naar `.en
 | `VIERLIEF_PAYMENT_PROVIDER` + `MOLLIE_API_KEY` | `test` of `mollie`. |
 | `ANTHROPIC_API_KEY`, `VIERLIEF_AI_MODEL`, `VIERLIEF_AI_ENABLED` | Optionele AI-hulp. Zonder sleutel werkt alles in testmodus. |
 | `VIERLIEF_JOBS_INLINE`, `VIERLIEF_CRON_TOKEN` | Achtergrondtaken (zie hieronder). |
-| `VIERLIEF_TRUSTED_PROXY_HOPS` | Aantal proxy's vóór de app (voor het juiste IP-adres bij misbruikbeperking). |
+| `VIERLIEF_TRUSTED_PROXY_HOPS` | Aantal proxy's vóór de app (voor het juiste IP-adres bij misbruikbeperking). Waarde uit een meting, niet raden. |
+| `VIERLIEF_LINKBLOKKADE` | `true` zet de blokkade van adressen met veel onbekende uitnodigingslinks aan (standaard uit; pas na meting van de proxyketen). |
+| `VIERLIEF_IP_METING` | `true` toont in testmodus een meetblok voor de proxyketen in Beheer → Instellingen (standaard uit). |
 | `VIERLIEF_DJANGO_ADMIN_PATH` | Pad van het noodbeheer (Django admin); kies iets dat niet makkelijk te raden is. |
 | `VIERLIEF_PREVIEW_PASSWORD`, `VIERLIEF_PREVIEW_USER` | Optioneel één wachtwoord voor de hele site, zolang een testversie online staat (zie [docs/ONLINE.md](docs/ONLINE.md)). |
 

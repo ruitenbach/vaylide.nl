@@ -1,0 +1,5 @@
+Er zijn uitzonderlijk veel onbekende uitnodigingslinks bezocht: meer dan {{ threshold }} in {{ minutes }} minuten.
+
+Dit kan iemand zijn die links probeert te raden, maar ook een bot of een kapotte koppeling. Er is niets geblokkeerd en geldige uitnodigingen werken gewoon. Je krijgt hooguit eens per 6 uur zo'n bericht.
+
+Meer uitleg staat in docs/BEVEILIGING.md.

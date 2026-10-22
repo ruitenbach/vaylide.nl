@@ -7,4 +7,5 @@ class CoreConfig(AppConfig):
     verbose_name = "Algemeen"
 
     def ready(self):
+        from . import checks  # noqa: F401  (beveiligingscontroles)
         from . import privacyverklaring  # noqa: F401  (registreert de controle vóór livegang)
