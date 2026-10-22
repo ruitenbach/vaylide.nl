@@ -272,3 +272,9 @@ class KopTypografieTests(VaylideTestCase):
         self.assertIn(".hero--carrousel .cv__teller { grid-column: 2; grid-row: 6;", css)
         js = (settings.BASE_DIR / "static/js/carrousel.js").read_text()
         self.assertIn('" / " + (N < 10 ? "0" : "") + N', js)
+
+    def test_maak_jouw_uitnodiging_blijft_op_mobiel_maar_is_rustiger(self):
+        lichten_uit(SPECIAL + LUXE)
+        self.assertIn("Maak jouw uitnodiging", home_html())
+        css = (settings.BASE_DIR / "static/css/vierlief.css").read_text()
+        self.assertIn(".hero--carrousel .hero__knoppen .btn--primary { background: transparent;", css)

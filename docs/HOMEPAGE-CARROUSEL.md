@@ -46,3 +46,5 @@ Tekst ongewijzigd. Desktop: kolom `clamp(24rem, 33vw, 30rem)` (was 21rem), kop `
 
 ## Mobiele bediening (22 oktober 2026)
 Tot 767 px staat de bediening onder de kaarten in een vast raster (breedte max. 19 rem, gecentreerd): naam, ondertitel, hint, 'Bekijk dit ontwerp' (46 px), 'Ontdek de collectie' (44 px), en op één regel de pijltjes (44 px) met de teller, daaronder 'Maak jouw uitnodiging' op dezelfde breedte. Alleen CSS (`.cv__acties` is `display: contents`); de markup, desktop en de 3D-kaarten zijn niet gewijzigd. De teller telt het werkelijke aantal kaarten (`N`). Gecontroleerd op 360, 390 en 430 px: geen horizontale scroll, pijltjes wisselen de kaart en teller, de links gaan naar het ontwerp, de collectie en `/maken/`.
+
+Mobiel (22 oktober 2026, vervolg): 'Maak jouw uitnodiging' blijft, maar is omlijnd (transparant) in plaats van gevuld, zodat 'Bekijk dit ontwerp' de enige gevulde knop onder de kaarten is.
