@@ -76,7 +76,9 @@ Alle instellingen staan in omgevingsvariabelen. Kopieer `.env.example` naar `.en
 | `VIERLIEF_PAYMENT_PROVIDER` + `MOLLIE_API_KEY` | `test` of `mollie`. |
 | `ANTHROPIC_API_KEY`, `VIERLIEF_AI_MODEL`, `VIERLIEF_AI_ENABLED` | Optionele AI-hulp. Zonder sleutel werkt alles in testmodus. |
 | `VIERLIEF_JOBS_INLINE`, `VIERLIEF_CRON_TOKEN` | Achtergrondtaken (zie hieronder). |
-| `VIERLIEF_TRUSTED_PROXY_HOPS` | Aantal proxy's vóór de app (voor het juiste IP-adres bij misbruikbeperking). |
+| `VIERLIEF_TRUSTED_PROXY_HOPS` | Aantal proxy's vóór de app (voor het juiste IP-adres bij misbruikbeperking). Waarde uit een meting, niet raden. |
+| `VIERLIEF_LINKBLOKKADE` | `true` zet de blokkade van adressen met veel onbekende uitnodigingslinks aan (standaard uit; pas na meting van de proxyketen). |
+| `VIERLIEF_IP_METING` | `true` toont in testmodus een meetblok voor de proxyketen in Beheer → Instellingen (standaard uit). |
 | `VIERLIEF_DJANGO_ADMIN_PATH` | Pad van het noodbeheer (Django admin); kies iets dat niet makkelijk te raden is. |
 | `VIERLIEF_PREVIEW_PASSWORD`, `VIERLIEF_PREVIEW_USER` | Optioneel één wachtwoord voor de hele site, zolang een testversie online staat (zie [docs/ONLINE.md](docs/ONLINE.md)). |
 

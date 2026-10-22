@@ -4,7 +4,8 @@ Klanten loggen in met een eenmalige code (zie accounts/) en vallen hier niet ond
 probeert. Twee tellers, alleen voor mislukte pogingen:
 - per IP-netwerk (een aanvaller vanaf één adres),
 - per gebruikersnaam (een aanvaller die veel adressen gebruikt tegen één account).
-Is een teller vol, dan wordt tot het einde van het venster ook een juist wachtwoord niet meer aangenomen.
+Is het IP-adres niet betrouwbaar vast te stellen (zie core/ipinfo.py), dan telt alleen de teller per gebruikersnaam;
+de IP-teller wordt dan nooit gedeeld door alle bezoekers. Is een teller vol, dan wordt tot het einde van het venster ook een juist wachtwoord niet meer aangenomen.
 Een geslaagde inlog zet de teller van die gebruikersnaam terug.
 """
 from __future__ import annotations
@@ -16,7 +17,7 @@ import time
 from django.conf import settings
 from django.core.cache import cache
 
-from .utils import ip_fingerprint, rate_exceeded, rate_limit
+from .utils import rate_exceeded, rate_limit, reliable_ip_fingerprint
 
 WINDOW = 900  # 15 minuten
 IP_FAILURES = 10
@@ -30,18 +31,22 @@ def _account_key(username: str) -> str:
     return f"staff-fail-user:{digest}"
 
 
-def _ip_key(request) -> str:
-    return f"staff-fail-ip:{ip_fingerprint(request)}"
+def _ip_key(request) -> str | None:
+    fingerprint = reliable_ip_fingerprint(request)
+    return f"staff-fail-ip:{fingerprint}" if fingerprint else None
 
 
 def is_blocked(request, username: str) -> bool:
-    return rate_exceeded(_ip_key(request), IP_FAILURES, WINDOW) or rate_exceeded(
-        _account_key(username), ACCOUNT_FAILURES, WINDOW
-    )
+    ip_key = _ip_key(request)
+    if ip_key and rate_exceeded(ip_key, IP_FAILURES, WINDOW):
+        return True
+    return rate_exceeded(_account_key(username), ACCOUNT_FAILURES, WINDOW)
 
 
 def register_failure(request, username: str) -> None:
-    rate_limit(_ip_key(request), IP_FAILURES, WINDOW)
+    ip_key = _ip_key(request)
+    if ip_key:
+        rate_limit(ip_key, IP_FAILURES, WINDOW)
     rate_limit(_account_key(username), ACCOUNT_FAILURES, WINDOW)
 
 

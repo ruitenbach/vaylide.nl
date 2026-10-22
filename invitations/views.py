@@ -14,8 +14,9 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods, require_POST
 
 from catalog.models import Template
-from core.utils import form_age_seconds, ip_fingerprint, rate_exceeded, rate_limit, signed_timestamp, new_token, wants_json
+from core.utils import form_age_seconds, ip_fingerprint, rate_exceeded, rate_limit, reliable_ip_fingerprint, signed_timestamp, new_token, wants_json
 
+from . import alarm
 from .content import event_times, referenced_assets
 from .demo import DEFAULT_DEMO_OCCASION, demo_content
 from .ics import build_ics
@@ -92,8 +93,10 @@ def _live_invitation(slug) -> Invitation | None:
 
 # Bescherming tegen systematisch raden van uitnodigingslinks: alleen een link die niet bestaat telt als misser.
 # Een bestaande link (ook een verlopen of offline gehaalde, die 410 geeft) telt nooit mee, dus gasten op een
-# gedeeld netwerk (zaal-wifi, kantoor) raken hun limiet niet kwijt aan elkaar. Pas bij PROBE_LIMIT missers per
-# PROBE_WINDOW seconden vanaf één adres krijgt dat adres tot het einde van het venster overal onder /u/ een 429.
+# gedeeld netwerk (zaal-wifi, kantoor) raken hun limiet niet kwijt aan elkaar.
+# - Altijd: een globale teller (invitations/alarm.py) meldt uitzonderlijk veel missers, zonder te blokkeren.
+# - Alleen met VIERLIEF_LINKBLOKKADE=true én een betrouwbaar IP-adres: pas bij PROBE_LIMIT missers per PROBE_WINDOW
+#   seconden vanaf één adres krijgt dat adres tot het einde van het venster overal onder /u/ een 429.
 PROBE_LIMIT = 60
 PROBE_WINDOW = 600
 
@@ -106,12 +109,17 @@ def _too_many(request):
 
 def _lookup(request, slug):
     """Zoekt de uitnodiging op. Geeft (uitnodiging of None, 429-antwoord of None)."""
-    key = f"slug-miss:{ip_fingerprint(request)}"
-    if rate_exceeded(key, PROBE_LIMIT, PROBE_WINDOW):
-        return None, _too_many(request)
+    key = None
+    if settings.LINK_BLOCK_ENABLED:
+        fingerprint = reliable_ip_fingerprint(request)
+        key = f"slug-miss:{fingerprint}" if fingerprint else None
+        if key and rate_exceeded(key, PROBE_LIMIT, PROBE_WINDOW):
+            return None, _too_many(request)
     invitation = _live_invitation(slug)
     if invitation is None or not invitation.published_version_id:
-        rate_limit(key, PROBE_LIMIT, PROBE_WINDOW)
+        alarm.register_miss()
+        if key:
+            rate_limit(key, PROBE_LIMIT, PROBE_WINDOW)
     return invitation, None
 
 

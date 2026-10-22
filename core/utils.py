@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import hashlib
 import hmac
-import ipaddress
 import secrets
 import time
 
@@ -11,57 +10,25 @@ from django.conf import settings
 from django.core import signing
 from django.core.cache import cache
 
+from .ipinfo import client_ip, limit_network, warn_if_unreliable  # noqa: F401  (client_ip blijft hier importeerbaar)
+
 FORM_TS_SALT = "vierlief.form-ts"
 
 
-def _valid_ip(value: str) -> str:
-    """Geeft het genormaliseerde IP-adres terug, of "" als het geen geldig adres is (bijv. een vervalste waarde)."""
-    value = value.strip()
-    if value.startswith("[") and "]" in value:  # [ipv6]:poort
-        value = value[1:value.index("]")]
-    elif value.count(":") == 1:  # ipv4:poort
-        value = value.split(":", 1)[0]
-    try:
-        address = ipaddress.ip_address(value)
-    except ValueError:
-        return ""
-    if isinstance(address, ipaddress.IPv6Address) and address.ipv4_mapped:
-        address = address.ipv4_mapped
-    return str(address)
-
-
-def client_ip(request) -> str:
-    """Het IP-adres van de bezoeker, alleen op basis van wat onze eigen proxy's hebben toegevoegd.
-
-    Een proxy voegt achteraan toe wat hij zelf zag; wat een bezoeker zelf in X-Forwarded-For zet, staat links en wordt
-    nooit gebruikt. Met TRUSTED_PROXY_HOPS=N tellen we N plaatsen van rechts. Klopt N niet met de werkelijke keten
-    of is de waarde geen geldig IP-adres, dan vallen we terug op REMOTE_ADDR (het adres van de proxy: niemand kan
-    zich daarmee een ander adres aanmeten, hooguit delen bezoekers dan een limiet).
-    """
-    hops = getattr(settings, "TRUSTED_PROXY_HOPS", 0)
-    if hops > 0:
-        forwarded = [p for p in request.META.get("HTTP_X_FORWARDED_FOR", "").split(",") if p.strip()]
-        if len(forwarded) >= hops:
-            candidate = _valid_ip(forwarded[-hops])
-            if candidate:
-                return candidate
-    return _valid_ip(request.META.get("REMOTE_ADDR", "")) or "onbekend"
-
-
-def _limit_network(ip: str) -> str:
-    """Voor limieten telt een heel IPv6-/64-netwerk als één bezoeker (anders is elk adres in zo'n netwerk 'nieuw')."""
-    try:
-        address = ipaddress.ip_address(ip)
-    except ValueError:
-        return ip
-    if isinstance(address, ipaddress.IPv6Address):
-        return str(ipaddress.ip_network(f"{address}/64", strict=False))
-    return ip
+def _fingerprint(ip: str) -> str:
+    return hmac.new(settings.SECRET_KEY.encode(), limit_network(ip).encode(), hashlib.sha256).hexdigest()[:24]
 
 
 def ip_fingerprint(request) -> str:
-    """Niet-omkeerbare verkorte hash van het IP-adres (alleen voor limieten)."""
-    return hmac.new(settings.SECRET_KEY.encode(), _limit_network(client_ip(request)).encode(), hashlib.sha256).hexdigest()[:24]
+    """Niet-omkeerbare verkorte hash van het IP-adres (alleen voor limieten). Meldt een onbetrouwbaar adres in het log."""
+    status = warn_if_unreliable(request)
+    return _fingerprint(status.ip)
+
+
+def reliable_ip_fingerprint(request) -> str | None:
+    """Zoals ip_fingerprint, maar None als het adres niet betrouwbaar is: dan mag een limiet er niet op vertrouwen."""
+    status = warn_if_unreliable(request)
+    return _fingerprint(status.ip) if status.reliable else None
 
 
 def rate_limit(key: str, limit: int, window_seconds: int) -> bool:

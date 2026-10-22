@@ -401,6 +401,11 @@ if not DEBUG:
 # Aantal vertrouwde proxy's vóór de applicatie (bijv. 1 bij Render/Fly/een load balancer).
 # Bij 0 wordt REMOTE_ADDR gebruikt. Nodig voor correcte limieten per IP-adres.
 TRUSTED_PROXY_HOPS = int(env("VIERLIEF_TRUSTED_PROXY_HOPS", "0"))
+# Blokkade van adressen die veel onbekende uitnodigingslinks proberen: standaard UIT tot de echte proxyketen op staging
+# is gemeten. Zonder blokkade blijft de waarschuwing bij uitzonderlijk veel onbekende links wel werken.
+LINK_BLOCK_ENABLED = env_bool("VIERLIEF_LINKBLOKKADE", False)
+# Meetscherm voor de proxyketen in Beheer → Instellingen (alleen staff, alleen in testmodus, standaard uit).
+IP_MEASURE = env_bool("VIERLIEF_IP_METING", False)
 
 ADMIN_URL = env("VIERLIEF_DJANGO_ADMIN_PATH", "systeembeheer/").strip("/") + "/"
 

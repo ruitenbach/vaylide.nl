@@ -20,7 +20,7 @@ from orders.stuck import stuck_orders
 from core.models import ContactMessage, SiteConfig
 from core.privacy import anonymize_user, delete_invitation
 from core import bruteforce
-from core.utils import client_ip
+from core import ipinfo
 from invitations.content import publish_issues
 from invitations.models import Invitation, InvitationVersion, Source
 from invitations.services import DraftConflict, PublishBlocked, availability_end, publish_draft, restore_version, save_draft
@@ -626,6 +626,9 @@ def site_settings(request):
         form.save()
         messages.success(request, "Instellingen opgeslagen.")
         return redirect("beheer:settings")
+    ip_status = ipinfo.assess(request)
+    ip_status_text = ("Betrouwbaar" if ip_status.reliable
+                      else f"ONBETROUWBAAR: {ipinfo.REASONS.get(ip_status.reason, ip_status.reason)}")
     integrations = [
         ("Modus", "Testmodus" if settings.TEST_MODE else "Live", settings.TEST_MODE),
         ("Betalingen", {"test": "Testbetalingen (gesimuleerd)", "mollie": "Mollie (testsleutel, geen echt geld)" if settings.MOLLIE_API_KEY.startswith("test_") else ("Mollie (live)" if settings.MOLLIE_API_KEY else "Mollie (sleutel ontbreekt)")}.get(settings.PAYMENT_PROVIDER, settings.PAYMENT_PROVIDER),
@@ -634,14 +637,16 @@ def site_settings(request):
         ("AI-hulp", f"Claude ({settings.AI_MODEL})" if ai_configured() else "Testmodus (geen API-sleutel)", not ai_configured()),
         ("Publieke adres", settings.BASE_URL, settings.BASE_URL.startswith("http://")),
         ("Database", settings.DATABASES["default"]["ENGINE"].rsplit(".", 1)[-1], False),
-        # Controle van de proxy-instelling: open dit scherm vanaf je eigen apparaat. Is het getoonde adres je eigen publieke
-        # IP-adres, dan klopt VIERLIEF_TRUSTED_PROXY_HOPS. Een ander adres (of het adres van de hosting) betekent: aanpassen.
-        ("Jouw IP-adres zoals de site het ziet", client_ip(request), False),
+        # Controle van de proxy-instelling: open dit scherm vanaf je eigen apparaat. Er staat bewust geen volledig IP-adres.
+        ("Herkenning van bezoekers (IP)", ip_status_text, not ip_status.reliable),
         ("Vertrouwde proxy's (VIERLIEF_TRUSTED_PROXY_HOPS)",
-         f"{settings.TRUSTED_PROXY_HOPS}; adressen in X-Forwarded-For: "
-         f"{len([p for p in request.META.get('HTTP_X_FORWARDED_FOR', '').split(',') if p.strip()])}",
-         settings.TRUSTED_PROXY_HOPS == 0 and not settings.DEBUG),
+         f"{settings.TRUSTED_PROXY_HOPS}; adressen in X-Forwarded-For: {len(ipinfo._forwarded(request))}",
+         not ip_status.reliable),
+        ("Blokkade onbekende links (VIERLIEF_LINKBLOKKADE)",
+         "Aan" if settings.LINK_BLOCK_ENABLED else "Uit (alleen melding bij uitzonderlijk veel)", False),
     ]
+    if settings.IP_MEASURE and settings.TEST_MODE:
+        integrations += ipinfo.measure(request)
     return render(request, "beheer/settings.html", {"form": form, "integrations": integrations})
 
 

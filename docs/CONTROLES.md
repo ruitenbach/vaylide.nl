@@ -302,6 +302,12 @@ Gebouwd en getest op de productiecommit `cf5184d`. Zie `docs/BEVEILIGING.md`.
 - **Negatieve controle**: dezelfde 35 tests zonder de wijzigingen in `config/settings.py`, `core/utils.py`, `invitations/views.py` en `beheer/views.py` gedraaid: 14 mislukten, zoals bedoeld. Met de wijzigingen slagen ze allemaal.
 - **Niet gecontroleerd**: de echte keten van proxy's bij Render (hoeveel adressen er in `X-Forwarded-For` staan), een deploy op staging of productie, en PostgreSQL.
 
+### Stap 1 (22 oktober 2026, lokaal, nog niet live)
+
+- **Volledige suite** (`python manage.py test tests`, lokaal op SQLite): 1498 tests, alle geslaagd, 11 overgeslagen.
+- **31 extra tests** in `tests/test_beveiliging_fase1.py` (66 in dat bestand): beoordeling van het adres (openbaar, privé, intern, Cloudflare, ongeldig, te korte keten, 0 lokaal en op Render, vervalste `X-Forwarded-For`, `CF-Connecting-IP`, `True-Client-IP` en `X-Real-IP`, een door de bezoeker gekozen privé-adres), logregel hooguit eens per uur en zonder adressen (500 verzoeken, 1 regel), meetblok (standaard uit, genegeerd in live-modus, alleen staff, geen volledige adressen, geen databasequery's), blokkade van links standaard uit en uit bij onbetrouwbaar IP of ontbrekende instelling op Render, alleen de bot geblokkeerd als ze aan staat, melding bij veel onbekende links (één logregel en één e-mail bij 400 missers, ook vanaf 200 adressen, geen tweede e-mail binnen 6 uur, geen adressen of linkteksten in log of e-mail, een kapotte e-mail laat de pagina niet falen, verlopen links tellen niet) en inloggen bij onbetrouwbaar IP (accountteller blijft werken, andere accounts niet gedeeld geblokkeerd, bij betrouwbaar IP blijft de IP-teller).
+- **Niet gecontroleerd**: de echte proxyketen van Render, een deploy op staging of productie, PostgreSQL, het echt versturen van de meldingsmail via SMTP, en een negatieve controle (tests zonder de wijzigingen) voor deze stap.
+
 ## Niet gecontroleerd
 
 - **Echte apparaten en andere browsers**: alleen Chromium is gebruikt, op telefoon- en computerformaat. Safari/WebKit (iPhone) en Firefox zijn niet getest. Test vóór de lancering op echte iPhones en Android-telefoons.
