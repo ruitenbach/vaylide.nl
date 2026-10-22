@@ -70,7 +70,9 @@
     };
     function resize() {
       var r = section.getBoundingClientRect();
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Op touchapparaten onder 900 px (telefoons) tekent het canvas op 1x: de sterretjes zijn zachte gloeipunten, en een canvas van de hele kop op 2x maakt het vegen door de carrousel schokkerig.
+      var telefoon = window.matchMedia && matchMedia("(pointer: coarse)").matches && window.innerWidth < 900;
+      dpr = telefoon ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       veld.width = r.width; veld.height = r.height;
       canvas.width = Math.round(r.width * dpr);
       canvas.height = Math.round(r.height * dpr);
