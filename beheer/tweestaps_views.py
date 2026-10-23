@@ -32,6 +32,13 @@ def _volgende(request, default=None) -> str:
     return safe_next(request, request.POST.get("next") or request.GET.get("next") or "", default or reverse("beheer:dashboard"))
 
 
+def _sleutelprobleem(request):
+    """De sleutel ontbreekt of past niet bij de opgeslagen geheimen. We controleren dan niets en laten niemand door (geen terugval)."""
+    response = render(request, "beheer/tweestaps_sleutel.html")
+    response.status_code = 503
+    return response
+
+
 def _geblokkeerd_antwoord(request, template, context):
     context["error"] = tweestaps.BLOCK_MESSAGE
     response = render(request, template, context)
@@ -51,7 +58,10 @@ def controle(request):
     if request.method == "POST":
         if tweestaps.geblokkeerd(request, request.user):
             return _geblokkeerd_antwoord(request, "beheer/tweestaps_controle.html", context)
-        soort = tweestaps.controleer_invoer(tf, request.POST.get("code", ""))
+        try:
+            soort = tweestaps.controleer_invoer(tf, request.POST.get("code", ""))
+        except tweestaps.sleutelfouten():
+            return _sleutelprobleem(request)
         if soort:
             tweestaps.registreer_succes(request.user)
             tweestaps.markeer_geverifieerd(request, tf)
@@ -133,7 +143,11 @@ def beheren(request):
             raise Http404()
         if tweestaps.geblokkeerd(request, request.user):
             return _geblokkeerd_antwoord(request, "beheer/tweestaps.html", context)
-        if not tweestaps.controleer_invoer(tf, request.POST.get("code", "")):
+        try:
+            geldig = tweestaps.controleer_invoer(tf, request.POST.get("code", ""))
+        except tweestaps.sleutelfouten():
+            return _sleutelprobleem(request)
+        if not geldig:
             tweestaps.registreer_mislukking(request, request.user)
             context["error"] = "Deze code klopt niet of is al gebruikt. Wacht op een nieuwe code van je app en probeer opnieuw."
             return render(request, "beheer/tweestaps.html", context)

@@ -309,7 +309,7 @@ Gebouwd en getest op de productiecommit `cf5184d`. Zie `docs/BEVEILIGING.md`.
 - **Niet gecontroleerd**: de echte proxyketen van Render, een deploy op staging of productie, PostgreSQL, het echt versturen van de meldingsmail via SMTP, en een negatieve controle (tests zonder de wijzigingen) voor deze stap.
 
 ## Tweestapsverificatie Beheer en admin (23 oktober 2026, werkbranch, niet live)
-Uitgevoerd: `manage.py test tests` (SQLite, `DJANGO_DEBUG=true`): 1537 tests, alle geslaagd (11 overgeslagen, zoals voorheen); daarvan 39 nieuw in `tests/test_tweestaps.py` (RFC 6238-testvector, versleuteld geheim en gehashte herstelcodes, activeren pas na juiste eerste code, poort voor Beheer, admin en losse beheerroutes, bestaande sessies, hergebruik van een code, begrenzing, herstelcodes, nieuwe codes, uitzetten, `reset_2fa`, verplicht-modus, klanten onaangetast). `makemigrations --check`: geen openstaande wijzigingen.
+Uitgevoerd: `manage.py test tests` (SQLite, `DJANGO_DEBUG=true`): 1539 tests, alle geslaagd (11 overgeslagen, zoals voorheen); daarvan 41 nieuw in `tests/test_tweestaps.py` (RFC 6238-testvector, versleuteld geheim en gehashte herstelcodes, activeren pas na juiste eerste code, poort voor Beheer, admin en losse beheerroutes, bestaande sessies, hergebruik van een code, begrenzing, herstelcodes, nieuwe codes, uitzetten, `reset_2fa`, verplicht-modus, klanten onaangetast). `makemigrations --check`: geen openstaande wijzigingen.
 Niet uitgevoerd: een echte authenticator-app, PostgreSQL (alleen SQLite), Render of staging, en een controle van de schermen op 360/390/768/1366 pixels of met de toegankelijkheidscontrole. Zie `docs/TWEESTAPS.md` voor het stagingplan.
 
 ## Niet gecontroleerd

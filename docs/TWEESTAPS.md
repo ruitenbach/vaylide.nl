@@ -19,6 +19,15 @@ Ingelogd in Beheer → **Beveiliging** (of `/beheer/2fa/instellen/`): scan de QR
 ## Begrenzing
 Foute codes en herstelcodes: 5 per account en 20 per IP-netwerk per 15 minuten (daarna ook een juiste code geweigerd, 429). Deze tellers staan los van de wachtwoordtellers en zijn alleen bereikbaar na een juist wachtwoord. **Het restrisico uit stap 1 blijft**: wie het e-mailadres van de eigenaar kent, kan met 10 foute wachtwoorden het account 15 minuten laten blokkeren; 2FA verandert dat niet. Er is bewust geen vertrouwd-apparaat-cookie en geen blokkademail gebouwd.
 
+## Sleutel per omgeving, ontbrekend of verkeerd
+- `VIERLIEF_2FA_SLEUTEL` is een gewone omgevingsvariabele per dienst (niet in `render.yaml`, niet in de gedeelde groep `vaylide-taken`). Gebruik op staging en productie **twee verschillende sleutels**; ze worden nergens gedeeld of gesynchroniseerd.
+- **Sleutel ontbreekt, nog geen 2FA ingesteld:** niemand kan 2FA instellen (melding op het scherm); inloggen met wachtwoord werkt zoals nu.
+- **Sleutel ontbreekt of is verkeerd, terwijl een account 2FA heeft:** het codescherm geeft een duidelijke melding (HTTP 503), er wordt niets gecontroleerd, geen herstelcode verbruikt en niemand doorgelaten. Er is bewust **geen terugval** naar alleen wachtwoord. Herstel: de juiste sleutel terugzetten, of `reset_2fa` (werkt zonder sleutel).
+- Een ongeldig opgemaakte sleutel meldt `manage.py check` (`vaylide.E003`). Een geldige maar onjuiste sleutel merk je pas bij de eerste codecontrole.
+
+## Terugdraaien
+De migratie voegt alleen twee tabellen toe. De vorige code kan zonder migratie-terugdraaiing weer draaien: ze negeert de tabellen. Let op: met de oude code is er geen tweede stap meer, dus alleen het wachtwoord beschermt de accounts weer. Wil je de tabellen ook weg: `migrate accounts 0002`.
+
 ## Noodprocedure (telefoon en herstelcodes kwijt)
 Alleen op de server (Render-shell):
 ```

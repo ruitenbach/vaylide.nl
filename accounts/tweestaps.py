@@ -46,6 +46,13 @@ class NietBeschikbaar(Exception):
     """Er is geen sleutel voor het versleutelen van 2FA-geheimen ingesteld."""
 
 
+def sleutelfouten() -> tuple[type[Exception], ...]:
+    """Fouten die betekenen dat de sleutel ontbreekt of niet bij de opgeslagen geheimen past."""
+    from cryptography.fernet import InvalidToken
+
+    return (NietBeschikbaar, InvalidToken)
+
+
 # --- versleuteling ------------------------------------------------------------
 def _keys() -> list[str]:
     return [key for key in getattr(settings, "TWOFA_KEYS", []) if key]
@@ -201,7 +208,8 @@ def controleer_totp(tf: TwoFactor, invoer: str) -> bool:
 
 
 def controleer_invoer(tf: TwoFactor, invoer: str) -> str | None:
-    """'totp' of 'herstel' als de invoer klopt, anders None."""
+    """'totp' of 'herstel' als de invoer klopt, anders None. Geeft een sleutelfout (zie sleutelfouten) als de sleutel niet past."""
+    ontsleutel(tf.secret_enc)       # past de sleutel niet, dan stopt het hier, ook voor herstelcodes
     schoon = "".join(invoer.split())
     if schoon.isdigit() and len(schoon) == DIGITS:
         return "totp" if controleer_totp(tf, schoon) else None

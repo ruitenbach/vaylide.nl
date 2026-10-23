@@ -106,6 +106,31 @@ class OpslagTests(TweestapsBase):
             self.assertEqual(client.get("/beheer/").status_code, 200)       # inloggen met wachtwoord blijft werken
 
 
+class SleutelProbleemTests(TweestapsBase):
+    def test_ontbrekende_of_verkeerde_sleutel_laat_niemand_door_en_geeft_geen_serverfout(self):
+        _, geheim, codes = self.schakel_in()
+        self.stap += 1
+        for keys in ([], [Fernet.generate_key().decode()]):
+            with override_settings(TWOFA_KEYS=keys):
+                client = self.login()
+                for invoer in (self.code(geheim), codes[0]):
+                    response = client.post("/beheer/2fa/controle/", {"code": invoer})
+                    self.assertEqual(response.status_code, 503)
+                    self.assertContains(response, "VIERLIEF_2FA_SLEUTEL", status_code=503)
+                    self.assertEqual(client.get("/beheer/").status_code, 302)       # geen onveilige terugval naar alleen wachtwoord
+                    self.assertEqual(client.get(ADMIN).status_code, 302)
+        self.assertEqual(tweestaps.herstelcodes_over(self.staff), 10)               # niets is verbruikt
+        # met de juiste sleutel terug werkt alles weer
+        client = self.login()
+        self.assertEqual(client.post("/beheer/2fa/controle/", {"code": self.code(geheim)}).status_code, 302)
+
+    def test_reset_werkt_zonder_sleutel(self):
+        self.schakel_in()
+        with override_settings(TWOFA_KEYS=[]):
+            call_command("reset_2fa", self.staff.email, "--bevestig", stdout=StringIO())
+        self.assertFalse(TwoFactor.objects.exists())
+
+
 class ActiverenTests(TweestapsBase):
     def test_pas_na_juiste_eerste_code_aan(self):
         client = self.login()
