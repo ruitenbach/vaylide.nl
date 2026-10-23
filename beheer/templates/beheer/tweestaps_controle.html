@@ -1,0 +1,16 @@
+{% extends "beheer/base.html" %}
+{% block title %}Tweede stap{% endblock %}
+{% block content %}
+<div class="panel auth-card">
+  <h1 class="auth-card__title">Tweede stap</h1>
+  <p>Vul de 6-cijferige code uit je authenticator-app in. Geen telefoon bij de hand? Gebruik een herstelcode (één keer bruikbaar).</p>
+  <form method="post" class="form" novalidate>
+    {% csrf_token %}
+    {% if error %}<div class="form-errors" role="alert">{{ error }}</div>{% endif %}
+    <div class="field"><label for="id_code">Code of herstelcode</label><input class="input" type="text" name="code" id="id_code" inputmode="text" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" required autofocus></div>
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" class="btn btn--primary btn--block">Doorgaan</button>
+  </form>
+  <form method="post" action="{% url 'accounts:logout' %}" class="inline-form">{% csrf_token %}<button type="submit" class="link-button small">Uitloggen</button></form>
+</div>
+{% endblock %}

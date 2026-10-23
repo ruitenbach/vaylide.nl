@@ -149,3 +149,33 @@ class LoginCode(models.Model):
         if not token or len(token) > 100:
             return None
         return cls.objects.filter(token_hash=_digest(f"token:{token}")).first()
+
+
+class TwoFactor(models.Model):
+    """Tweestapsverificatie (TOTP) van een beheerder. Het geheim staat versleuteld in de database (zie accounts/tweestaps.py)."""
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tweestaps")
+    secret_enc = models.TextField()
+    confirmed_at = models.DateTimeField()
+    last_used_step = models.BigIntegerField(default=0)   # laatst gebruikte periode van 30 seconden: een code werkt maar één keer
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "tweestapsverificatie"
+        verbose_name_plural = "tweestapsverificaties"
+
+    def __str__(self) -> str:
+        return f"2FA van {self.user_id}"
+
+
+class RecoveryCode(models.Model):
+    """Eenmalige herstelcode; alleen de hash wordt bewaard."""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="herstelcodes")
+    code_hash = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "herstelcode"
+        verbose_name_plural = "herstelcodes"

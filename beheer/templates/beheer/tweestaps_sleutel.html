@@ -1,0 +1,10 @@
+{% extends "beheer/base.html" %}
+{% block title %}Tweede stap niet beschikbaar{% endblock %}
+{% block content %}
+<div class="panel auth-card">
+  <h1 class="auth-card__title">Tweede stap niet beschikbaar</h1>
+  <p class="form-errors" role="alert">De code kan nu niet worden gecontroleerd: de sleutel voor tweestapsverificatie (<code>VIERLIEF_2FA_SLEUTEL</code>) ontbreekt of hoort niet bij de opgeslagen gegevens. Je wordt daarom niet doorgelaten.</p>
+  <p class="small muted">Herstel de juiste sleutel op de server, of zet 2FA van dit account uit met <code>manage.py reset_2fa</code>.</p>
+  <form method="post" action="{% url 'accounts:logout' %}" class="inline-form">{% csrf_token %}<button type="submit" class="link-button small">Uitloggen</button></form>
+</div>
+{% endblock %}

@@ -155,6 +155,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "accounts.middleware.TwoFactorGateMiddleware",   # medewerker zonder bevestigde tweede stap = anoniem (docs/BEVEILIGING.md)
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.SecurityHeadersMiddleware",
     "catalog.prijsbeheer.PrijsCacheMiddleware",    # de prijstabel hoogstens één keer per verzoek lezen
@@ -406,6 +407,17 @@ TRUSTED_PROXY_HOPS = int(env("VIERLIEF_TRUSTED_PROXY_HOPS", "0"))
 LINK_BLOCK_ENABLED = env_bool("VIERLIEF_LINKBLOKKADE", False)
 # Meetscherm voor de proxyketen in Beheer → Instellingen (alleen staff, alleen in testmodus, standaard uit).
 IP_MEASURE = env_bool("VIERLIEF_IP_METING", False)
+
+# Tweestapsverificatie (TOTP) voor medewerkers in Beheer en Django-admin (docs/TWEESTAPS.md).
+# VIERLIEF_2FA_SLEUTEL: Fernet-sleutel(s) (komma-gescheiden; de eerste versleutelt) om de TOTP-geheimen te versleutelen; zonder sleutel kan niemand 2FA instellen.
+# VIERLIEF_2FA_VERPLICHT: standaard uit; aan = elke medewerker moet 2FA hebben (pas na bevestiging van de eigenaar).
+TWOFA_KEYS = env_list("VIERLIEF_2FA_SLEUTEL")
+if not TWOFA_KEYS and DEBUG:
+    # Alleen lokaal ontwikkelen: een vaste afgeleide sleutel. Nooit in productie (daar is DEBUG uit).
+    import base64 as _b64
+    import hashlib as _hashlib
+    TWOFA_KEYS = [_b64.urlsafe_b64encode(_hashlib.sha256(b"dev-2fa:" + SECRET_KEY.encode()).digest()).decode()]
+TWOFA_REQUIRED = env_bool("VIERLIEF_2FA_VERPLICHT", False)
 
 ADMIN_URL = env("VIERLIEF_DJANGO_ADMIN_PATH", "systeembeheer/").strip("/") + "/"
 

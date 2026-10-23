@@ -19,6 +19,8 @@ Uitkomst van de beveiligingsaudit van QR-codes, uitnodigingslinks en aanmelden. 
 | Beheer en Django-admin | 10 mislukte pogingen per IP-netwerk én 10 per account | alleen de teller per account (10 per 15 minuten) |
 | Aanmelden (RSVP) en inlogcodes voor klanten | ongewijzigd (limiet per adres en per uitnodiging) | ongewijzigd: de bestaande limieten blijven werken, maar delen dan een emmer als het adres te laag is gekozen; de limiet per uitnodiging (600 per uur), formuliertijd en honeypot blijven. Aanpassing hiervan staat in fase 2 |
 
+6. **Tweestapsverificatie voor Beheer en Django-admin** (optioneel, nog niet in productie): zie `docs/TWEESTAPS.md`.
+
 ## Stap 1 en stap 2
 
 - **Stap 1 (nu gebouwd, werkt zonder kennis van de proxyketen):** modusbeveiliging, bescherming tegen mislukte logins (altijd per account), waarschuwing bij onbetrouwbaar IP, meetmogelijkheid (uit), melding bij uitzonderlijk veel onbekende links, blokkade van links standaard uit.

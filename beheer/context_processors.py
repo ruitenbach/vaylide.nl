@@ -3,7 +3,7 @@ from django.db.models import Q
 
 
 def nav_counts(request):
-    if not request.path.startswith("/beheer/") or not getattr(request, "user", None) or not request.user.is_authenticated or not request.user.is_staff:
+    if not request.path.startswith("/beheer/") or not getattr(request, "user", None) or not request.user.is_authenticated or not request.user.is_staff or not getattr(request, "tweestaps_ok", True):
         return {}
     from core.models import ContactMessage
     from orders.models import Order

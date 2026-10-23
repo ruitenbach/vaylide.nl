@@ -1,0 +1,27 @@
+{% extends "beheer/base.html" %}
+{% block title %}Tweestapsverificatie instellen{% endblock %}
+{% block content %}
+<div class="panel auth-card">
+  <h1 class="auth-card__title">Tweestapsverificatie instellen</h1>
+  {% if verplicht %}<p class="notice notice--warning">Voor dit account is een tweede stap verplicht. Stel hem eerst in om verder te gaan.</p>{% endif %}
+  {% if niet_beschikbaar %}
+  <p class="form-errors" role="alert">Instellen is nu niet mogelijk: er is nog geen versleutelingssleutel voor tweestapsverificatie ingesteld op de server (<code>VIERLIEF_2FA_SLEUTEL</code>). Je kunt gewoon inloggen met je wachtwoord.</p>
+  {% else %}
+  <ol>
+    <li>Open een authenticator-app op je telefoon en kies "Account toevoegen".</li>
+    <li>Scan deze QR-code, of typ de sleutel hieronder over.
+      <p><img src="{% url 'beheer:tweestaps_qr' %}" alt="QR-code voor je authenticator-app" width="220" height="220"></p>
+      <p class="small muted">Sleutel: <code>{{ geheim }}</code></p></li>
+    <li>Vul de 6-cijferige code in die de app nu laat zien.</li>
+  </ol>
+  <form method="post" class="form" novalidate>
+    {% csrf_token %}
+    {% if error %}<div class="form-errors" role="alert">{{ error }}</div>{% endif %}
+    <div class="field"><label for="id_code">Code uit de app</label><input class="input" type="text" name="code" id="id_code" inputmode="numeric" pattern="[0-9 ]*" autocomplete="one-time-code" required autofocus></div>
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" class="btn btn--primary btn--block">Bevestigen en aanzetten</button>
+  </form>
+  <p class="small muted">Pas als deze code klopt gaat de tweede stap aan. Daarna krijg je herstelcodes.</p>
+  {% endif %}
+</div>
+{% endblock %}
