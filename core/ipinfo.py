@@ -58,6 +58,21 @@ def _forwarded(request) -> list[str]:
     return [p for p in request.META.get("HTTP_X_FORWARDED_FOR", "").split(",") if p.strip()]
 
 
+def _visitor_entry(request, hops: int) -> str | None:
+    """De plaats in X-Forwarded-For die de bezoeker is. Normaal `hops` van rechts. Is die plaats een gepubliceerd
+    Cloudflare-adres, dan hoorde ze bij de keten (bezoeker, Cloudflare, Render) en is de bezoeker één plaats verder naar
+    links. Dat geldt alleen als de rechterplaats echt Cloudflare is: die plaats voegt onze eigen hosting toe vanaf de
+    verbinding die ze zelf zag, dus een bezoeker kan haar niet vervalsen. Alles verder naar links is bezoekersinvoer
+    en telt nooit mee."""
+    forwarded = _forwarded(request)
+    if len(forwarded) < hops:
+        return None
+    chosen = forwarded[-hops]
+    if kind_of(chosen) == "cloudflare" and len(forwarded) > hops:
+        return forwarded[-hops - 1]
+    return chosen
+
+
 def client_ip(request) -> str:
     """Het IP-adres van de bezoeker, alleen op basis van wat onze eigen proxy's achteraan hebben toegevoegd.
 
@@ -67,9 +82,9 @@ def client_ip(request) -> str:
     """
     hops = getattr(settings, "TRUSTED_PROXY_HOPS", 0)
     if hops > 0:
-        forwarded = _forwarded(request)
-        if len(forwarded) >= hops:
-            candidate = _valid_ip(forwarded[-hops])
+        entry = _visitor_entry(request, hops)
+        if entry is not None:
+            candidate = _valid_ip(entry)
             if candidate:
                 return candidate
     return _valid_ip(request.META.get("REMOTE_ADDR", "")) or "onbekend"
@@ -135,10 +150,9 @@ def assess(request) -> IpStatus:
         if os.environ.get("RENDER"):
             return IpStatus(ip, False, "geen-proxyinstelling")
         return IpStatus(ip, True)
-    forwarded = _forwarded(request)
-    if len(forwarded) < hops:
+    chosen = _visitor_entry(request, hops)
+    if chosen is None:
         return IpStatus(ip, False, "keten-te-kort")
-    chosen = forwarded[-hops]
     kind = kind_of(chosen)
     if kind == "ongeldig":
         return IpStatus(ip, False, "ongeldig")

@@ -325,7 +325,7 @@ class AssessTests(VaylideTestCase):
 
     @override_settings(TRUSTED_PROXY_HOPS=2)
     def test_cloudflare_address_is_unreliable(self):
-        status = ipinfo.assess(make_request("81.107.0.5, 172.71.10.1, 10.1.2.3"))
+        status = ipinfo.assess(make_request("172.71.10.1, 10.1.2.3"))
         self.assertFalse(status.reliable)
         self.assertEqual(status.reason, "cloudflare")
 
