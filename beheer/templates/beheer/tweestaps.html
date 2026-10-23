@@ -1,0 +1,15 @@
+{% extends "beheer/base.html" %}
+{% block title %}Beveiliging{% endblock %}
+{% block content %}
+<div class="panel auth-card">
+  <h1 class="auth-card__title">Beveiliging van je account</h1>
+  <p>Tweestapsverificatie staat <strong>aan</strong>. Je hebt nog <strong>{{ over }}</strong> herstelcode{{ over|pluralize:"s" }} over.</p>
+  {% if error %}<div class="form-errors" role="alert">{{ error }}</div>{% endif %}
+  <form method="post" class="form" novalidate>
+    {% csrf_token %}
+    <div class="field"><label for="id_code">Code uit je app (voor deze handelingen vragen we hem opnieuw)</label><input class="input" type="text" name="code" id="id_code" inputmode="numeric" autocomplete="one-time-code" required></div>
+    <button type="submit" name="actie" value="nieuwe_codes" class="btn btn--primary btn--block">Nieuwe herstelcodes maken</button>
+    {% if not verplicht %}<button type="submit" name="actie" value="uitzetten" class="btn btn--block">Tweestapsverificatie uitzetten</button>{% endif %}
+  </form>
+</div>
+{% endblock %}

@@ -1,12 +1,16 @@
 from django.urls import path
 
-from . import prijzen_views, views
+from . import prijzen_views, tweestaps_views, views
 
 app_name = "beheer"
 
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
     path("inloggen/", views.StaffLoginView.as_view(), name="login"),
+    path("2fa/", tweestaps_views.beheren, name="tweestaps"),
+    path("2fa/controle/", tweestaps_views.controle, name="tweestaps_controle"),
+    path("2fa/instellen/", tweestaps_views.instellen, name="tweestaps_instellen"),
+    path("2fa/qr.svg", tweestaps_views.qr, name="tweestaps_qr"),
     path("bestellingen/", views.orders, name="orders"),
     path("bestellingen/<uuid:uid>/", views.order_detail, name="order"),
     path("uitnodigingen/", views.invitations, name="invitations"),

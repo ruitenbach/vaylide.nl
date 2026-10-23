@@ -21,12 +21,13 @@
     <div class="beheer-bar__user">
       <a href="{% url 'core:home' %}" target="_blank" rel="noopener">Website</a>
       <span>{{ user.email }}</span>
+      {% if request.tweestaps_ok %}<a href="{% url 'beheer:tweestaps' %}">Beveiliging</a>{% endif %}
       <form method="post" action="{% url 'accounts:logout' %}" class="inline-form">{% csrf_token %}<button type="submit" class="link-button">Uitloggen</button></form>
     </div>
     {% endif %}
   </div>
 </header>
-{% if user.is_authenticated and user.is_staff %}
+{% if user.is_authenticated and user.is_staff and request.tweestaps_ok %}
 {% with n=request.resolver_match.url_name %}
 <nav class="beheer-nav" aria-label="Beheermenu">
   <div class="container"><ul>

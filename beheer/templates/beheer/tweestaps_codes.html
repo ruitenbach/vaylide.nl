@@ -1,0 +1,11 @@
+{% extends "beheer/base.html" %}
+{% block title %}Herstelcodes{% endblock %}
+{% block content %}
+<div class="panel auth-card">
+  <h1 class="auth-card__title">{% if nieuw %}Tweestapsverificatie staat aan{% else %}Nieuwe herstelcodes{% endif %}</h1>
+  <p><strong>Bewaar deze herstelcodes nu.</strong> Je ziet ze hier één keer en daarna nooit meer. Elke code werkt één keer, voor als je telefoon weg of stuk is. Bewaar ze in een wachtwoordmanager of op papier, niet in je e-mail.</p>
+  <ul style="list-style:none;padding:0;font-size:1.1rem;line-height:2" aria-label="Herstelcodes">{% for code in codes %}<li><code>{{ code }}</code></li>{% endfor %}</ul>
+  {% if not nieuw %}<p class="small muted">De oude codes werken niet meer.</p>{% endif %}
+  <a class="btn btn--primary btn--block" href="{{ next }}">Ik heb de codes bewaard</a>
+</div>
+{% endblock %}
