@@ -36,6 +36,16 @@ class KerstKopTests(VaylideTestCase):
         self.assertIn('href="/maken/?gelegenheid=kerst"', html)
 
 
+class KortePhoneTests(VaylideTestCase):
+    def test_op_een_korte_telefoon_staan_de_knoppen_voor_de_inleiding_via_css(self):
+        """Op 360 × 740 begon de cookiebanner boven de hoofdknop. Alleen de volgorde verandert (CSS); de elementen en teksten zijn dezelfde."""
+        self.assertRegex(CSS, r"@media \(max-width: 640px\) and \(max-height: 780px\) \{\s*\.kerst-kop__tekst \{ display: flex; flex-direction: column; \}")
+        for regel in (".kerst-kop__tekst > .btn-row { order: 1", ".kerst-kop__tekst > .lead { order: 3"):
+            self.assertIn(regel, CSS)
+        html = Client().get("/digitale-kerstkaarten/").content.decode()
+        self.assertLess(html.index("kerst-kop__tekst"), html.index('class="lead"'), "de volgorde in de HTML blijft: inleiding vóór de knoppen (zonder CSS en voor schermlezers)")
+
+
 class OntwerppaginaTests(VaylideTestCase):
     @override_settings(PRICING_V2=True)
     def test_prijs_knop_en_keuzes_zijn_er_nog_en_de_volgorde_op_mobiel_komt_uit_css(self):
