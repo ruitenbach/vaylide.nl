@@ -1453,6 +1453,13 @@ Echt uitgevoerd:
 - Op mobiel staat 26 px tussen "uitnodiging." en de bovenkant van de kaarten (was 11 px); de eerste kaart begint op 366 px.
 Niet uitgevoerd: echte iPhone/Safari en Android.
 
+## Envelop op het Gefeliciteerd-scherm begint dicht (24 oktober 2026, lokaal)
+Bestanden: `static/css/onthulling.css`, `static/js/onthulling.js`, `tests/test_onthulling.py`. De homepage, de gastweergave, `vierlief.css` en de gedeelde envelop (`templates/partials/envelop.html`) zijn niet aangeraakt.
+- **Oorzaak:** de pagina komt met een open envelop uit de server (eindstand zonder JavaScript). Het script haalde "open" pas na het laden weg en zette het 1 s later weer terug, terwijl het sluiten 1,7 s duurt: eerst een open envelop, dan een half sluitende klep met de kaart al zichtbaar.
+- **Oplossing:** met beweging en JavaScript staat de envelop vanaf de eerste tekening dicht en zonder overgang (`html.js .onthulling:not(.is-spelen)`); bij "Nog een keer vieren" zet het script `is-dicht` (geen overgang) tot het openen begint. Tijden en uiterlijk zijn gelijk gebleven.
+- Gecontroleerd in Chromium met een nagebouwde statische versie van het scherm (de kaart als gekleurd vlak, niet de echte kaart in het kader): eerste tekening dicht met zegel (script geblokkeerd); op 390 en 1366 breed, bij de eerste keer en bij "Nog een keer vieren": de klep draait nooit terug naar dicht en de kaart komt pas omhoog als de klep open is; bij 'minder beweging' en zonder JavaScript staat de envelop open met de kaart omhoog.
+- Niet gecontroleerd: staging/Render, de echte kaart in het kader, een echte telefoon.
+
 ## Prijsregel zonder termijn (21 oktober 2026, lokaal, branch `claude/homepage-carrousel`)
 Op de ontwerppagina staat de prijsregel nu als "Special € 89,95 incl. btw, eenmalig" (zonder "12 maanden online"). Bedragen, indelingen, btw en looptijd zijn ongewijzigd. De looptijd blijft vindbaar op Prijzen ("12 maanden online" bij "Wat altijd geldt"), in de bestelstap vóór het betalen ("blijft 12 maanden online vanaf de aankoopdatum ... Er is geen automatische verlenging") en in artikel 6 van de voorwaarden. Echt uitgevoerd: `tests.test_prijsstructuur` (ook een nieuwe test voor de zichtbaarheid van de looptijd), `tests.test_kerstmagie`, `tests.test_info`, de volledige set, en een Chromium-controle van de prijsregel op 390 en 1366 breed (geen horizontale scroll).
 
