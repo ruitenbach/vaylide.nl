@@ -15,8 +15,8 @@
     <h1 id="kerst-titel">Digitale kerstkaarten die echt <em>tot leven</em> komen</h1>
     <p class="lead">Maak van jullie kerstgroet meer dan een afbeelding. Kies een VAYLIDE-kaart met een bijzondere opening, beweging en sfeer en deel hem eenvoudig digitaal met familie, vrienden, klanten of relaties.</p>
     <div class="btn-row btn-row--center">
-      <a class="btn btn--goud btn--lg" href="#kerstontwerpen">Bekijk de kerstkaarten {% icon "pijl" %}</a>
-      <a class="btn btn--secondary btn--lg" href="{% url 'studio:start' %}?gelegenheid=kerst">Maak jullie kerstkaart</a>
+      <a class="btn btn--goud btn--lg" href="{% url 'studio:start' %}?gelegenheid=kerst">Maak jullie kerstkaart {% icon "pijl" %}</a>
+      <a class="btn btn--secondary btn--lg" href="#kerstontwerpen">Bekijk de kerstkaarten</a>
     </div>
     {% if vanaf_kerst %}<p class="kerst-vanaf">Vanaf <strong>{{ vanaf_kerst }}</strong> · eenmalig, incl. btw · eerst gratis bekijken{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</p>{% endif %}
   </div>

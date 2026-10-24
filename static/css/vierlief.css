@@ -1417,6 +1417,23 @@ a[href] img[src^="/static/"] { pointer-events: none; }
   .kerst-grid .design-card__meta { display: none; }
   .kerst-kop .btn-row .btn, .kerst-cta .btn-row .btn { flex: 1 1 100%; }
 }
+/* Mobiel: de echte bestelknop (Maak jullie kerstkaart) staat in het eerste scherm; de waaier is iets lager, de beschrijving van de kaart komt na prijs en knop. */
+@media (max-width: 640px) {
+  .kerst-kop { padding-top: 1rem; }
+  .kerst-kop__kaarten { margin-bottom: 1rem; }
+  .kerst-waaier { height: clamp(9.5rem, 40vw, 13.5rem); }
+  .kerst-kop h1 { margin-bottom: .35em; }
+  .kerst-kop .lead { margin-bottom: 1.1rem; }
+  .kerst-vanaf { margin-top: .75rem; }
+}
+@media (max-width: 899px) {
+  .detail-text { display: flex; flex-direction: column; }
+  .detail-text > .detail-prijs { order: 1; margin: .9rem 0 0; }
+  .detail-text > .btn-row { order: 2; margin-top: 1rem; }
+  .detail-text > .lead { order: 3; margin-top: 1.5rem; }
+  .detail-text > .meta-list { order: 4; }
+  .detail-text > .occasion-picker { order: 5; }
+}
 @media (prefers-reduced-motion: reduce) { .kerst-waaier__kaart, .kerst-waaier__kaart a, .kerst-zakelijk__kaart { transition: none; } }
 .kerstpodium__meer { margin: 1.1rem 0 0; font-size: .95rem; color: #F2DCC9; }
 .kerstpodium__meer a { color: #FFF3D6; }
