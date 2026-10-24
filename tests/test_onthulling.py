@@ -49,6 +49,39 @@ class RevealTests(VaylideTestCase):
             if "animation:" in line:
                 self.assertIn(".is-spelen", line, line)
 
+    def test_envelope_starts_closed_without_a_visible_closing_move(self):
+        """De pagina komt open uit de server (eindstand); met beweging moet de envelop vanaf de eerste tekening dicht
+        staan, en bij 'Nog een keer vieren' zonder zichtbare sluitbeweging, anders sluit hij half en gaat weer open."""
+        customer = self.make_customer()
+        inv = self.published(owner=customer)
+        client = Client()
+        client.force_login(customer)
+        order = Order.objects.get(invitation=inv)
+        page = client.get(f"/bestelling/{order.uid}/")
+        # eindstand zonder script of bij 'minder beweging': de envelop staat open uit de server
+        self.assertContains(page, 'class="zenv is-open"')
+        css = (settings.BASE_DIR / "static/css/onthulling.css").read_text(encoding="utf-8")
+        start = css.index("De envelop begint dicht")
+        block = css[start:]
+        # alleen als beweging mag, alleen met JavaScript, alleen voor de show zelf (niet de homepage)
+        self.assertIn("@media (prefers-reduced-motion: no-preference)", block)
+        for line in block.splitlines():
+            if ".zenv" in line:
+                self.assertIn("html.js .onthulling", line, line)
+        self.assertIn(".onthulling:not(.is-spelen) .zenv.is-open .zenv__klep {", block)
+        self.assertIn(".zenv.is-dicht * { transition: none !important; }", block)
+        js = (settings.BASE_DIR / "static/js/onthulling.js").read_text(encoding="utf-8")
+        # eerst dicht (zonder overgang), pas daarna open
+        self.assertLess(js.index('env.classList.add("is-dicht")'), js.index('env.classList.remove("is-dicht")'))
+        self.assertLess(js.index('env.classList.remove("is-dicht")'), js.index('env.classList.add("is-open")'))
+        # bij 'minder beweging' doet het script niets met de envelop
+        self.assertLess(js.index("prefers-reduced-motion: reduce"), js.index('env.classList.add("is-dicht")'))
+
+    def test_shared_envelope_styles_are_untouched_by_the_reveal_fix(self):
+        """De envelop van de homepage (vierlief.css) en de gastweergave blijven buiten deze correctie."""
+        css = (settings.BASE_DIR / "static/css/vierlief.css").read_text(encoding="utf-8")
+        self.assertNotIn("is-dicht", css)
+
 
 class BrandMarkAndFlipTests(VaylideTestCase):
     def test_every_invitation_carries_the_v_monogram(self):

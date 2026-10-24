@@ -155,10 +155,10 @@
     sparks = [];
     var env = stage.querySelector(".zenv");
     stage.classList.remove("is-spelen");
-    if (env) env.classList.remove("is-open");  // dicht beginnen; in de eindstand (zonder show) staat hij open
+    if (env) { env.classList.add("is-dicht"); env.classList.remove("is-open"); }  // meteen dicht, zonder zichtbaar sluiten; in de eindstand (zonder show) staat hij open
     void stage.offsetWidth;  // de CSS-animaties opnieuw laten beginnen
     stage.classList.add("is-spelen");
-    if (env) later(1000, function () { env.classList.add("is-open"); });
+    if (env) later(1000, function () { env.classList.remove("is-dicht"); void env.offsetWidth; env.classList.add("is-open"); });
     if (!ctx) return;
     size();
     dustUntil = performance.now() + 14000;
