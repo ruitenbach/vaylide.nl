@@ -50,7 +50,23 @@ def _aanbod_voor_kaart(template, occasion, ctx):
     return info if info and info["aanbieding"] else None
 
 
-def _design_cards(designs, occasion=""):
+def _prijs_voor_kaart(template, occasion):
+    """De vaste prijs van een kaart voor één gelegenheid ('Luxe € 24,95'), uit dezelfde plek als de ontwerppagina en Bestellen (catalog.prijzen).
+    Leeg zonder nieuwe prijsstructuur, zonder gelegenheid of zonder prijs voor dit ontwerp: er wordt nooit een prijs verzonnen."""
+    if not prijzen.actief() or occasion not in template.occasions:
+        return None
+    return prijzen.prijs_info(template, occasion, "")
+
+
+def _special_label(template):
+    """Het label Special op een kaart. In de nieuwe prijsstructuur volgt het de echte indeling van het ontwerp (catalog.prijzen.INDELING), want de oude
+    vlag klopt daar niet altijd (Golden Noël had de vlag maar is Luxe). Zonder nieuwe prijsstructuur geldt de oude vlag, zoals altijd."""
+    if prijzen.actief():
+        return prijzen.tier(template) == prijzen.SPECIAL
+    return bool(template.special)
+
+
+def _design_cards(designs, occasion="", toon_prijs=False):
     cards = []
     ctx = aanbiedingen.Context() if aanbiedingen.enabled() else None
     if ctx is not None and not ctx.active:
@@ -66,6 +82,8 @@ def _design_cards(designs, occasion=""):
                 "detail_url": reverse("core:design_detail", args=[template.slug]) + query,
                 "image": design_image_url(template.slug),
                 "aanbod": _aanbod_voor_kaart(template, occasion, ctx) if ctx is not None else None,
+                "special_label": _special_label(template),
+                "prijs": _prijs_voor_kaart(template, occasion) if toon_prijs else None,
             }
         )
     return cards
@@ -140,6 +158,22 @@ def wedding_cards(request):
     )
 
 
+def _kerst_opties(kerst):
+    """De indelingen (met bedrag) die een klant bij Kerst echt kan kiezen: [(indeling, cents)], uit dezelfde plek als de prijzentabel."""
+    return prijzen.beschikbaar("kerst", kerst) if prijzen.actief() else []
+
+
+def _vanaf_kerst(kerst):
+    """De laagste prijs die een klant bij Kerst echt kan betalen, als tekst ('€ 24,95'); leeg als er geen prijs te tonen is."""
+    opties = _kerst_opties(kerst)
+    return format_euro(min(c for _, c in opties)) if opties else ""
+
+
+def _indelingen_kerst(kerst):
+    """Per beschikbare indeling bij Kerst de naam, het bedrag en de korte uitleg (BESCHRIJVING), voor de regel onder het kaartenraster."""
+    return [{"naam": prijzen.TIER_NAAM[i], "prijs": format_euro(c), "uitleg": prijzen.BESCHRIJVING[i]} for i, c in _kerst_opties(kerst)]
+
+
 def christmas_cards(request):
     """SEO-landingspagina /digitale-kerstkaarten/: echte kerstontwerpen uit de collectie, beleving, familie en zakelijk, delen, stappen en vragen."""
     kerst = [d for d in _designs() if "kerst" in d.occasions]
@@ -161,7 +195,9 @@ def christmas_cards(request):
         "core/kerstkaarten.html",
         {
             "kop_cards": _design_cards(kies(KERST_KOP), "kerst"),
-            "cards": _design_cards(kies(KERST_ONTWERPEN), "kerst"),
+            "cards": _design_cards(kies(KERST_ONTWERPEN), "kerst", toon_prijs=True),
+            "vanaf_kerst": _vanaf_kerst(kerst),
+            "indelingen_kerst": _indelingen_kerst(kerst),
             "familie_card": familie[0] if familie else None,
             "zakelijk_cards": _design_cards(kies(KERST_ZAKELIJK), "kerst"),
             "kerst_count": len(kerst),
@@ -340,8 +376,8 @@ def designs(request):
             "only_specials": only_specials,
             "indeling": indeling,
             "indeling_naam": prijzen.TIER_NAAM.get(indeling, ""),
-            "special_cards": _design_cards(specials, occasion),
-            "cards": _design_cards(shown, occasion),
+            "special_cards": _design_cards(specials, occasion, toon_prijs=occasion == "kerst"),
+            "cards": _design_cards(shown, occasion, toon_prijs=occasion == "kerst"),
             "occasions": OCCASION_CHOICES,
             "occasion": occasion,
             "occasion_label": OCCASION_LABELS.get(occasion, ""),
