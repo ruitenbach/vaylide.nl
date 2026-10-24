@@ -18,6 +18,7 @@
       <a class="btn btn--goud btn--lg" href="#kerstontwerpen">Bekijk de kerstkaarten {% icon "pijl" %}</a>
       <a class="btn btn--secondary btn--lg" href="{% url 'studio:start' %}?gelegenheid=kerst">Maak jullie kerstkaart</a>
     </div>
+    {% if vanaf_kerst %}<p class="kerst-vanaf">Vanaf <strong>{{ vanaf_kerst }}</strong> · eenmalig, incl. btw · eerst gratis bekijken{% if config.prices_provisional %} <span class="provisional">Voorlopige prijzen</span>{% endif %}</p>{% endif %}
   </div>
   <div class="container kerst-kop__kaarten">
     <ul class="kerst-waaier" style="--n:{{ kop_cards|length }}">
@@ -145,6 +146,7 @@
     <div class="kerst-grid">
       {% for card in cards %}{% include "partials/design_card.html" %}{% endfor %}
     </div>
+    {% if indelingen_kerst %}<ul class="kerst-legenda">{% for i in indelingen_kerst %}<li><strong>{{ i.naam }} {{ i.prijs }}</strong>: {{ i.uitleg }}</li>{% endfor %}</ul>{% endif %}
     <p class="kerst-meer"><a class="btn btn--secondary" href="{% url 'core:designs' %}?gelegenheid=kerst">Bekijk de hele kerstcollectie {% icon "pijl" %}</a></p>
   </div>
 </section>
