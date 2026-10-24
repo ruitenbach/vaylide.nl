@@ -328,6 +328,23 @@ Niet uitgevoerd: een echte authenticator-app, PostgreSQL (alleen SQLite), Render
 - **Kerstkaarten (ronde 7)**: alles alleen in Chromium, op een server zonder grafische kaart. Niet getest: Safari op een iPhone (daar vooral de gouden golf, die een nieuwere CSS-techniek gebruikt, en het krassen met de vinger), Firefox, een echt ouder Android-toestel en schermlezers. De muziek ("Stille nacht" als speeldoosje) is gecontroleerd op starten en pauzeren, niet beluisterd. De beweging is beoordeeld op schermafbeeldingen, niet als bewegend beeld. De schermopname van de eigenaar is bekeken als losse beelden; het geluid ervan niet. Of het resultaat het gewenste warme kerstgevoel geeft, is aan de eigenaar.
 - **Nieuwe ontwerpen (ronde 4)**: de openingen zijn alleen in Chromium bekeken (dicht, tijdens het openen en geopend), niet in Safari of Firefox en niet op echte telefoons. De voorbeelden gebruiken eigen illustraties; met echte foto's zijn ze alleen via de testuitnodigingen bekeken (met dezelfde illustraties als foto). De 90 kleurvarianten zijn automatisch gecontroleerd (contrast en axe), niet allemaal met het oog.
 
+## Kerstpagina: prijs en mobiele bestelroute (24 oktober 2026, branch, nog niet live)
+
+Wat er veranderde (alleen weergave; geen wijziging in betalen, bestellen, offertes, QR, RSVP of bestaande bestellingen):
+
+- **Prijs:** de kerstpagina en de kerstcollectie tonen "Vanaf € …" (kop), "Luxe € …" of "Special € …" per kaart en één regel per indeling onder het raster. Alles uit `catalog.prijzen` (`beschikbaar`, `prijs_info`, `BESCHRIJVING`), niets vast in de tekst; zonder `PRICING_V2` verschijnt er niets. Het label Special volgt de indeling (Golden Noël is Luxe en heeft het label niet meer).
+- **Mobiel:** "Maak jullie kerstkaart" is de gouden hoofdknop; de kaartenwaaier is op ≤ 640 px lager; op de ontwerppagina staan prijs en "Kies dit ontwerp" op ≤ 899 px direct onder de titel (alleen CSS-volgorde). De cookiebanner is niet gewijzigd.
+- **Tegengehouden: wenskaart als standaard vanaf de kerstpagina.** Een kerstwenskaart houdt de hoofdfoto, maar verliest de eigen muziek van het ontwerp (bijvoorbeeld Kerststad), de fotogalerij en het verhaal. Lokaal bevestigd: het voorbeeld van Kerststad bevat de muziekspeler als uitnodiging en niet als wenskaart. De kerstpagina belooft die muziek, dus de standaard is niet doorgevoerd. Keuze voor de eigenaar: ofwel de belofte op de kerstpagina aanpassen, ofwel de wenskaart de ontwerpmuziek laten behouden; pas daarna kan de standaard veranderen.
+
+Wat echt is uitgevoerd (lokaal, ontwikkelserver in testmodus met `VIERLIEF_PRICING_V2=1`, Chromium; niet op productie of staging):
+
+- `manage.py test tests`: 1552 tests, 11 nieuwe (`tests/test_kerst_prijzen.py`, `tests/test_kerst_mobiel.py`). Twee bestaande tests in `tests.test_voorwaarden_nieuw` falen ook op 546c7b6 (zie `homepage/AANDACHTSPUNT-voorwaarden-tests.md` in de projectmap); niet aangeraakt.
+- Metingen vóór en na op 360 × 740, 390 × 844, 768 × 1024 en 1366 × 768 (kerstpagina en Winterlicht, met en zonder cookiebanner). Op 390 × 844 staat de hoofdknop nu op 579 tot 633 px en de cookiebanner begint op 643 px (eerst: knop op 677 tot 731 px, dus erachter). Op 360 × 740 begint de banner op 501 px en blijft de knop (575 tot 629 px) erachter tot de bezoeker een keuze maakt. Winterlicht op 390 px: "Kies dit ontwerp" op 276 px in plaats van 1267 px.
+- axe-core (WCAG 2.0, 2.1 en 2.2 niveau A en AA) op de kerstpagina, de kerstcollectie en drie ontwerppagina's (Winterlicht, Golden Noël, Kerstbol) op vier breedtes, met en zonder banner, vóór en na: 40 combinaties per versie, 0 bevindingen, geen horizontale overloop, geen consolefouten.
+- `e2e/controle2.cjs` (CHECKS=0, vier breedtes): 17 websitepagina's per breedte zonder overloop of fouten. De runs eindigden bij de voorbeelden van de ontwerpen met een time-out omdat de testsuite er tegelijk draaide; de 404-meldingen bij verborgen ontwerpen zijn dezelfde als op 546c7b6. De kerstpagina zit niet in dat script.
+- Niet gedaan: Safari/iPhone, een echte telefoon, `e2e/toegankelijkheid.cjs` (dat gaat over de uitnodigingsontwerpen, niet over de websitepagina's), een server met `DEBUG` uit.
+- Beelden voor en na: `commercieel/kerst-conversie/` in de projectmap.
+
 ## Zelf herhalen
 
 ```bash
