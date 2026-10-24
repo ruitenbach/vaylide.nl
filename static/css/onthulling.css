@@ -118,3 +118,16 @@
 .bestel-bon__regels tfoot th span { font-family: var(--font-body); font-size: .78rem; color: var(--muted); }
 .bestel-bon__link { display: inline-block; margin-top: .9rem; font-size: .9rem; font-weight: 600; color: var(--accent-text, #7A5A2E); }
 .bestel-bon__klein { margin: .6rem 0 0; font-size: .82rem; color: var(--muted); }
+
+/* ---------- De envelop begint dicht ---------- */
+/* De pagina komt open uit de server (eindstand voor wie geen script of beweging heeft). Is beweging toegestaan, dan staat de
+   envelop vanaf de eerste tekening dicht en zonder overgang, tot het script de show start; .is-dicht doet hetzelfde bij
+   'Nog een keer vieren'. Anders sluit hij eerst zichtbaar terwijl de kaart al te zien is. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js .onthulling:not(.is-spelen) .zenv.is-open *, html.js .onthulling .zenv.is-dicht * { transition: none !important; }
+  html.js .onthulling:not(.is-spelen) .zenv.is-open .zenv__zegel { opacity: 1; transform: none; }
+  html.js .onthulling:not(.is-spelen) .zenv.is-open .zenv__klep { transform: scaleY(1); z-index: 4; opacity: 1; }
+  html.js .onthulling:not(.is-spelen) .zenv.is-open .zenv__klep-buiten { opacity: 1; }
+  html.js .onthulling:not(.is-spelen) .zenv.is-open .zenv__klep-binnen { opacity: 0; }
+  html.js .onthulling:not(.is-spelen) .zenv.is-open .zenv__kaart { transform: none; }
+}
