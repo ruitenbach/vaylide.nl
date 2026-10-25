@@ -67,10 +67,15 @@
       var entry = { url: url, li: li };
       btn.addEventListener("click", function () {
         URL.revokeObjectURL(url);
+        var next = li.nextElementSibling || li.previousElementSibling;
         li.remove();
         photos = photos.filter(function (p) { return p !== entry; });
         say(msg, d.txtRemoved, true);
         renderCounter();
+        /* Toetsenbord: de focus blijft in de buurt in plaats van naar het begin van de pagina te springen. */
+        var target = next && next.querySelector(".mm-remove");
+        if (!target) target = inputs[inputs.length - 1];
+        if (target) target.focus();
       });
       li.appendChild(img); li.appendChild(btn);
       grid.appendChild(li);
@@ -102,7 +107,7 @@
       vinputs.forEach(function (i) { i.disabled = false; });
     }
 
-    clear.addEventListener("click", function () { reset(); say(vmsg, d.txtRemoved, true); });
+    clear.addEventListener("click", function () { reset(); say(vmsg, d.txtRemoved, true); if (vinputs[0]) vinputs[0].focus(); });
 
     vinputs.forEach(function (input) {
       input.addEventListener("change", function () {
@@ -124,6 +129,7 @@
           say(vmsg, fill(d.txtVideoOk, { n: secs }), true);
           clear.hidden = false;
           vinputs.forEach(function (i) { i.disabled = true; });
+          clear.focus();
         };
         probe.onerror = function () { URL.revokeObjectURL(url); say(vmsg, d.txtUnreadable, false); };
         probe.src = url;
