@@ -7,7 +7,7 @@
 <title>{% trans "Deel jouw momenten" %} · {{ event.names }} · VAYLIDE</title>
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#1E251C">
+<meta name="theme-color" content="#FBF8F2">
 {% include "partials/icons.html" %}
 <link rel="preload" href="{% static 'fonts/playfair-display-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="{% static 'fonts/dm-sans-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
@@ -17,7 +17,7 @@
 </head>
 <body class="mm-body">
 <a class="skip-link" href="#delen">{% trans "Direct naar het delen" %}</a>
-{% if TEST_MODE %}<div class="test-banner" role="note"><strong>{% trans "Demonstratie" %}</strong> · {% trans "Alleen om te bekijken. Er wordt niets verstuurd of bewaard." %}</div>{% endif %}
+{% if TEST_MODE %}<div class="test-banner" role="note"><strong>{% trans "Demonstratie" %}</strong> · {% trans "niets wordt verstuurd of bewaard" %}</div>{% endif %}
 
 {% include "moments/_icons.html" %}
 
@@ -32,6 +32,7 @@
 {% blocktrans asvar txt_added %}Foto toegevoegd.{% endblocktrans %}
 {% blocktrans asvar txt_removed %}Verwijderd.{% endblocktrans %}
 {% blocktrans asvar txt_remove_label %}Verwijder deze foto{% endblocktrans %}
+{% blocktrans asvar txt_your_photos %}Jouw foto's{% endblocktrans %}
 
 <div class="mm" id="moments-root"
      data-photos-max="{{ event.photos_max }}" data-video-seconds="{{ event.video_seconds }}"
@@ -39,110 +40,96 @@
      data-txt-full="{{ txt_full }}" data-txt-not-video="{{ txt_not_video }}" data-txt-too-long="{{ txt_too_long }}"
      data-txt-unreadable="{{ txt_unreadable }}" data-txt-video-ok="{{ txt_video_ok }}" data-txt-added="{{ txt_added }}" data-txt-removed="{{ txt_removed }}" data-txt-remove-label="{{ txt_remove_label }}">
 
-  <header class="mm-hero">
-    <div class="mm-hero__frame">
-      <p class="mm-eyebrow">{% trans "Moments" %} · {{ event.kicker }}</p>
+  <header class="mm-top">
+    <div class="mm-photo" role="img" aria-label="{% trans 'Plaats voor een foto van het feest (demonstratie)' %}">
+      <span class="mm-chip mm-chip--on-photo">{% trans "Demonstratie · plaats voor een foto" %}</span>
+    </div>
+    <div class="mm-intro">
+      <p class="mm-eyebrow">{{ event.kicker }} · <time datetime="{{ event.date|date:'Y-m-d' }}">{{ event.date|date:"l j F Y" }}</time></p>
       <h1 class="mm-names"><span class="visually-hidden">{% trans "Moments van" %} </span>{{ event.names }}</h1>
-      <p class="mm-when">
-        <time datetime="{{ event.date|date:'Y-m-d' }}">{{ event.date|date:"l j F Y" }}</time>
-        <span aria-hidden="true">·</span> {{ event.venue }}
-      </p>
-      <span class="mm-ornament" aria-hidden="true"></span>
-      <p class="mm-welcome" aria-live="polite"><span data-greeting>{% trans "Welkom." %}</span> {{ event.welcome }}</p>
-      <div class="mm-name-field">
-        <label for="mm-naam">{% trans "Hoe mogen we je noemen?" %} <span class="mm-optional">{% trans "(optioneel)" %}</span></label>
-        <input id="mm-naam" type="text" name="naam" autocomplete="given-name" maxlength="40" inputmode="text" enterkeyhint="done" data-greeting-input
-               data-greeting-template="{% blocktrans %}Welkom, {name}.{% endblocktrans %}" data-greeting-default="{% trans 'Welkom.' %}">
-      </div>
-      <a class="mm-cta" href="#delen">{% trans "Begin met delen" %}<svg class="mm-ic" aria-hidden="true"><use href="#mm-i-down"/></svg></a>
+      <p class="mm-quote"><span data-greeting>{% trans "Welkom." %}</span> {{ event.welcome }}</p>
     </div>
   </header>
 
   <main id="delen" class="mm-main" tabindex="-1">
+    <div class="mm-cols">
 
-    <section class="mm-card" aria-labelledby="mm-h-fotos">
-      <div class="mm-card__head">
-        <h2 id="mm-h-fotos">{% trans "Deel je foto's" %}</h2>
-        <p class="mm-counter" data-photo-counter role="status" aria-live="polite">{% blocktrans with n=0 max=event.photos_max %}{{ n }} van {{ max }}{% endblocktrans %}</p>
-      </div>
-      <p class="mm-lead">{% blocktrans with max=event.photos_max %}Kies hoe je wilt delen. Je kunt tot {{ max }} foto's toevoegen.{% endblocktrans %}</p>
-
-      <div class="mm-choices" role="group" aria-label="{% trans 'Kies hoe je een foto toevoegt' %}">
-        <div class="mm-choice">
-          <input class="mm-file" id="mm-foto-camera" type="file" accept="image/*" capture="environment" data-photo-input>
-          <label class="mm-choice__btn" for="mm-foto-camera">
-            <svg class="mm-ic mm-ic--lg" aria-hidden="true"><use href="#mm-i-camera"/></svg>
-            <span class="mm-choice__t">{% trans "Maak een foto" %}</span>
-            <span class="mm-choice__s">{% trans "Open de camera van je telefoon" %}</span>
-          </label>
+      <section class="mm-sec" aria-labelledby="mm-h-fotos">
+        <div class="mm-sec__head">
+          <h2 id="mm-h-fotos">{% trans "Deel je foto's" %}</h2>
+          <p class="mm-counter" data-photo-counter role="status" aria-live="polite">{% blocktrans with n=0 max=event.photos_max %}{{ n }} van {{ max }}{% endblocktrans %}</p>
         </div>
-        <div class="mm-choice">
-          <input class="mm-file" id="mm-foto-galerij" type="file" accept="image/*" multiple data-photo-input>
-          <label class="mm-choice__btn" for="mm-foto-galerij">
-            <svg class="mm-ic mm-ic--lg" aria-hidden="true"><use href="#mm-i-gallery"/></svg>
-            <span class="mm-choice__t">{% trans "Kies uit je galerij" %}</span>
-            <span class="mm-choice__s">{% trans "Meerdere foto's tegelijk kan" %}</span>
-          </label>
+
+        <div class="mm-choices" role="group" aria-label="{% trans 'Kies hoe je een foto toevoegt' %}">
+          <span class="mm-act">
+            <input class="mm-file" id="mm-foto-camera" type="file" accept="image/*" capture="environment" data-photo-input>
+            <label class="mm-btn" for="mm-foto-camera"><svg class="mm-ic" aria-hidden="true"><use href="#mm-i-camera"/></svg>{% trans "Maak een foto" %}</label>
+          </span>
+          <span class="mm-act">
+            <input class="mm-file" id="mm-foto-galerij" type="file" accept="image/*" multiple data-photo-input>
+            <label class="mm-btn mm-btn--ghost" for="mm-foto-galerij"><svg class="mm-ic" aria-hidden="true"><use href="#mm-i-gallery"/></svg>{% trans "Uit galerij" %}</label>
+          </span>
         </div>
-      </div>
 
-      <p class="mm-msg" data-photo-msg role="status" aria-live="polite" hidden></p>
+        <details class="mm-name">
+          <summary>{% trans "Je naam toevoegen (optioneel)" %}</summary>
+          <label for="mm-naam" class="visually-hidden">{% trans "Hoe mogen we je noemen?" %}</label>
+          <input id="mm-naam" type="text" name="naam" autocomplete="given-name" maxlength="40" enterkeyhint="done" placeholder="{% trans 'Je voornaam' %}" data-greeting-input
+                 data-greeting-template="{% blocktrans %}Welkom, {name}.{% endblocktrans %}" data-greeting-default="{% trans 'Welkom.' %}">
+        </details>
 
-      <h3 class="mm-sub">{% trans "Jouw foto's" %}</h3>
-      <ul class="mm-grid" data-photo-grid>
-        {% for src, label in event.examples %}
-        <li class="mm-thumb mm-thumb--example"><img src="{% static src %}" alt="{{ label }}" width="400" height="400" decoding="async"><span class="mm-tag">{% trans "Voorbeeld" %}</span></li>
-        {% endfor %}
-      </ul>
-      <p class="mm-hint" data-photo-hint>{% trans "Dit zijn voorbeelden. In deze demonstratie blijven de foto's die je kiest op je eigen telefoon." %}</p>
-    </section>
+        <p class="mm-msg" data-photo-msg role="status" aria-live="polite" hidden></p>
 
-    <section class="mm-card" aria-labelledby="mm-h-video">
-      <div class="mm-card__head">
-        <h2 id="mm-h-video">{% trans "Twee videoboodschappen" %}</h2>
-        <p class="mm-chip">{% trans "Optioneel" %}</p>
-      </div>
-      <p class="mm-lead">{% blocktrans with s=event.video_seconds %}Liever iets zeggen dan schrijven? Neem een korte boodschap op, van hooguit {{ s }} seconden. Overslaan is prima.{% endblocktrans %}</p>
+        <ul class="mm-grid" data-photo-grid aria-label="{{ txt_your_photos }}">
+          {% for tone, label in event.examples %}
+          <li class="mm-thumb mm-thumb--example mm-ph mm-ph--{{ tone }}"><span class="visually-hidden">{{ label }}</span><button type="button" class="mm-remove" aria-label="{% trans 'Verwijder dit voorbeeld' %}"></button></li>
+          {% endfor %}
+        </ul>
+        <p class="mm-hint" data-photo-hint>{% trans "Voorbeelden uit de demonstratie. Foto's die je kiest blijven op je eigen telefoon." %}</p>
+      </section>
 
-      <ol class="mm-videos">
-        {% for q in event.questions %}
-        <li class="mm-video" data-video>
-          <p class="mm-video__n" aria-hidden="true">{{ forloop.counter }}</p>
-          <div class="mm-video__body">
-            <h3 class="mm-video__q" id="mm-vq-{{ forloop.counter }}">{{ q }}</h3>
-            <p class="mm-video__max">{% blocktrans with s=event.video_seconds %}Hooguit {{ s }} seconden{% endblocktrans %}</p>
+      <section class="mm-sec" aria-labelledby="mm-h-video">
+        <div class="mm-sec__head">
+          <h2 id="mm-h-video">{% trans "Twee korte videoboodschappen" %}</h2>
+          <p class="mm-chip">{% trans "Optioneel" %}</p>
+        </div>
+
+        <ol class="mm-videos">
+          {% for v in event.videos %}
+          <li class="mm-video" data-video>
+            <p class="mm-video__k">{% blocktrans with n=forloop.counter total=event.videos|length kind=v.kind %}Video {{ n }} van {{ total }} · {{ kind }}{% endblocktrans %}</p>
+            <h3 class="mm-video__q" id="mm-vq-{{ forloop.counter }}">{{ v.question }}</h3>
             <div class="mm-video__acts" role="group" aria-labelledby="mm-vq-{{ forloop.counter }}">
               <span class="mm-act">
                 <input class="mm-file" id="mm-v{{ forloop.counter }}-cam" type="file" accept="video/*" capture="user" data-video-input>
-                <label class="mm-btn" for="mm-v{{ forloop.counter }}-cam"><svg class="mm-ic" aria-hidden="true"><use href="#mm-i-video"/></svg>{% trans "Neem op" %}<span class="visually-hidden"> – {{ q }}</span></label>
+                <label class="mm-btn mm-btn--sm" for="mm-v{{ forloop.counter }}-cam"><svg class="mm-ic" aria-hidden="true"><use href="#mm-i-video"/></svg>{% trans "Opnemen" %}</label>
               </span>
               <span class="mm-act">
                 <input class="mm-file" id="mm-v{{ forloop.counter }}-gal" type="file" accept="video/*" data-video-input>
-                <label class="mm-btn mm-btn--ghost" for="mm-v{{ forloop.counter }}-gal"><svg class="mm-ic" aria-hidden="true"><use href="#mm-i-gallery"/></svg>{% trans "Kies uit galerij" %}<span class="visually-hidden"> – {{ q }}</span></label>
+                <label class="mm-btn mm-btn--sm mm-btn--ghost" for="mm-v{{ forloop.counter }}-gal"><svg class="mm-ic" aria-hidden="true"><use href="#mm-i-gallery"/></svg>{% trans "Uit galerij" %}</label>
               </span>
             </div>
+            <p class="mm-video__max">{% blocktrans with s=event.video_seconds %}Hooguit {{ s }} seconden{% endblocktrans %}</p>
             <p class="mm-msg" data-video-msg role="status" aria-live="polite" hidden></p>
             <button type="button" class="mm-link" data-video-clear hidden>{% trans "Verwijder deze video" %}</button>
-          </div>
-        </li>
-        {% endfor %}
-      </ol>
-    </section>
+          </li>
+          {% endfor %}
+        </ol>
+      </section>
+    </div>
 
-    <section class="mm-card mm-card--calm" aria-labelledby="mm-h-privacy">
-      <h2 id="mm-h-privacy"><svg class="mm-ic" aria-hidden="true"><use href="#mm-i-lock"/></svg> {% trans "Privé en veilig" %}</h2>
+    <details class="mm-priv">
+      <summary><svg class="mm-ic" aria-hidden="true"><use href="#mm-i-lock"/></svg> {% trans "Privé: alleen jij ziet wat je zelf deelt" %}</summary>
       <ul class="mm-points">
-        <li>{% trans "Alleen jij ziet wat je zelf hebt gedeeld. Andere gasten zien jouw foto's en video's niet." %}</li>
+        <li>{% trans "Andere gasten zien jouw foto's en video's niet." %}</li>
         <li>{% blocktrans with names=event.names %}{{ names }} ontvangen alle bijdragen in hun album.{% endblocktrans %}</li>
         <li>{% blocktrans with m=event.retention_months %}Het album blijft {{ m }} maanden bewaard. Je hoeft geen account te maken.{% endblocktrans %}</li>
       </ul>
-    </section>
-
+    </details>
   </main>
 
   <footer class="mm-foot">
     <a class="logo mm-foot__logo" href="{% url 'core:home' %}" aria-label="VAYLIDE">{% include "partials/logo.html" %}</a>
-    <p>{% trans "Moments is een product van VAYLIDE." %}</p>
   </footer>
 </div>
 </body>

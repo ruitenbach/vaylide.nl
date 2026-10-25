@@ -30,6 +30,14 @@
   var inputs = root.querySelectorAll("[data-photo-input]");
   var photos = [];
 
+  /* De voorbeeldplaatsen kun je wegklikken; ze tellen niet mee. */
+  grid.querySelectorAll(".mm-thumb--example .mm-remove").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      btn.closest(".mm-thumb").remove();
+      if (!grid.querySelector(".mm-thumb--example") && hint) hint.hidden = true;
+    });
+  });
+
   function say(el, text, ok) {
     if (!el) return;
     el.hidden = !text;

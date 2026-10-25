@@ -43,12 +43,15 @@ class PaginaTests(TestCase):
 
     def test_inhoud(self):
         self.assertEqual(self.response.status_code, 200)
-        for tekst in ("Anna &amp; Bram", "Maak een foto", "Kies uit je galerij", "Twee videoboodschappen", "Optioneel",
-                      "Welke wens heb je voor Anna en Bram?", "Wat is jouw mooiste herinnering", "Alleen jij ziet wat je zelf hebt gedeeld",
-                      "Demonstratie"):
+        for tekst in ("Anna &amp; Bram", "Maak een foto", "Uit galerij", "Twee korte videoboodschappen", "Optioneel",
+                      "Welke wens heb je voor Anna en Bram?", "Wat is jouw mooiste herinnering", "alleen jij ziet wat je zelf deelt",
+                      "Demonstratie", "Video 1 van 2 · Een wens", "Video 2 van 2 · Een herinnering"):
             self.assertIn(tekst, self.html)
         self.assertIn("0 van 15", self.html)
         self.assertIn("Hooguit 30 seconden", self.html)
+        self.assertNotIn("Kasteel", self.html)       # geen verzonnen locatie
+        self.assertNotIn("Hun verhaal", self.html)   # besluit 25 oktober: niet toevoegen
+        self.assertLessEqual(self.html.count("mm-thumb--example"), 3)   # hoogstens drie voorbeeldplaatsen
 
     def test_geen_zoekmachines_geen_opslag_in_cache(self):
         self.assertIn("noindex", self.html)
@@ -77,7 +80,7 @@ class PaginaTests(TestCase):
         # elke bestandskeuze heeft een label dat ernaar verwijst
         for ident in re.findall(r'<input class="mm-file" id="([^"]+)"', self.html):
             self.assertIn(f'for="{ident}"', self.html, ident)
-        self.assertGreaterEqual(len(re.findall(r'type="file"', self.html)), 6)
+        self.assertEqual(len(re.findall(r'type="file"', self.html)), 6)
 
     def test_camera_en_galerij_zijn_te_kiezen(self):
         self.assertIn('accept="image/*" capture="environment"', self.html)
@@ -88,9 +91,15 @@ class PaginaTests(TestCase):
         self.assertIn("vaylide-logo.webp", self.html)
         self.assertNotRegex(self.html, r'(src|href)="https?://')
 
-    def test_demo_bestanden_bestaan(self):
-        for src, _ in demo_event()["examples"]:
-            self.assertTrue((Path(settings.BASE_DIR) / "static" / src).is_file(), src)
+    def test_stijl_licht_en_zonder_vaste_balk(self):
+        css = (Path(settings.BASE_DIR) / "moments" / "static" / "moments" / "moments.css").read_text()
+        self.assertNotRegex(css, r"position:\s*(fixed|sticky)")      # geen vaste uploadbalk, geen vaste zijkolom
+        self.assertNotIn("Pinyon", css)                              # twee lettertypes: Playfair Display en DM Sans
+        self.assertNotIn("outline-offset: 6px", css)                 # geen dubbele gouden kaders
+        self.assertEqual(len(demo_event()["examples"]), 3)
+
+    def test_geen_externe_of_vrije_afbeeldingen_in_de_demo(self):
+        self.assertEqual(re.findall(r'<img[^>]*src="([^"]+)"', self.html), ["/static/img/merk/vaylide-logo.webp"])  # alleen het logo; fotoplaatsen zijn vlakken
 
 
 @override_settings(**AAN)
