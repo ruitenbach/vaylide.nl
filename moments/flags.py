@@ -11,6 +11,11 @@ def moments_enabled() -> bool:
     return bool(getattr(settings, "MOMENTS_ENABLED", False))
 
 
+def moments_demo_enabled() -> bool:
+    """De demonstratiepagina bestaat alleen met de vlag aan én in testmodus: nooit op een live omgeving."""
+    return moments_enabled() and bool(getattr(settings, "TEST_MODE", False))
+
+
 def require_moments(view):
     """Voor views van latere stappen: bij een uitgeschakelde vlag bestaat de pagina niet (404), ook niet voor medewerkers."""
 

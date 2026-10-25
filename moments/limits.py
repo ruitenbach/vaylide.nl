@@ -12,3 +12,10 @@ ALBUM_MASTER_MAX_EDGE_PX = 6000
 
 # Gasten zien alleen hun eigen inzendingen (nooit die van andere gasten of de organisator-weergave).
 GUEST_VISIBILITY = "own"
+
+# Voorlopige pakketten (besluit 25 oktober 2026, variant A). Prijzen, opslagleverancier en definitieve limieten volgen later.
+PACKAGES = {
+    "classic": {"guests": 100, "photos_per_guest": 15, "videos_per_guest": 2, "video_seconds": 30},
+    "signature": {"guests": 200, "photos_per_guest": 25, "videos_per_guest": 2, "video_seconds": 60},
+}
+RETENTION_MONTHS = 12

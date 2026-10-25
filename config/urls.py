@@ -17,6 +17,7 @@ urlpatterns = [
     path("maken/", include("gezichten.urls")),  # vóór de editor: /maken/<id>/gezichten/
     path("maken/", include("studio.urls")),
     path("account/", include("portal.urls")),
+    path("moments/", include("moments.urls")),  # alleen de demonstratiepagina, achter de vlag (moments/flags.py)
     path("beheer/", include("beheer.urls")),
     path(f"{settings.ADMIN_URL}login/", admin_login),  # vóór admin.site.urls: dezelfde adres, mét begrenzing
     path(settings.ADMIN_URL, admin.site.urls),

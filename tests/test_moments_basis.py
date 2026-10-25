@@ -35,10 +35,9 @@ class VlagTests(TestCase):
         with override_settings(**AAN):
             self.assertEqual(view(request), "ok")
 
-    def test_geen_routes_in_stap_1(self):
-        namen = {p.pattern.regex.pattern for p in get_resolver().url_patterns}
-        self.assertFalse([n for n in namen if "moments" in n.lower()])
-        self.assertNotIn("moments", {getattr(p, "app_name", None) for p in get_resolver().url_patterns})
+    def test_alleen_de_demonstratieroute(self):
+        namen = [p.pattern.regex.pattern for p in get_resolver().url_patterns if "moments" in p.pattern.regex.pattern.lower()]
+        self.assertEqual(len(namen), 1)
 
     def test_migraties_zijn_compleet(self):
         out = StringIO()
