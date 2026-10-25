@@ -152,7 +152,10 @@ class Submission(models.Model):
     client_id = models.UUIDField(null=True, blank=True)
     storage_key = models.CharField(max_length=200, blank=True)
     original_key = models.CharField(max_length=200, blank=True)
+    # Drie aparte bedragen: gereserveerd (maximale master, tot klaar), origineel (tijdelijk, groter dan de master mogelijk) en master (definitief).
     reserved_bytes = models.PositiveBigIntegerField(default=0)
+    original_bytes = models.PositiveBigIntegerField(default=0)
+    master_bytes = models.PositiveBigIntegerField(default=0)
     reservation_expires_at = models.DateTimeField(null=True, blank=True)
     sha256 = models.CharField(max_length=64, blank=True)
     failure_code = models.CharField(max_length=30, blank=True)

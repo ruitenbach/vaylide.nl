@@ -137,6 +137,34 @@ class S3Storage:
         )
 
 
+def _same(a, b) -> bool:
+    return bool(a) and bool(b) and str(a).strip().lower() == str(b).strip().lower()
+
+
+def check_s3_settings() -> None:
+    """Beschermt tegen onbedoeld gebruik van een productie- of back-upbucket. Weigert (StorageNotReady) in elk van deze gevallen:
+    - onvolledige instellingen;
+    - dezelfde bucket, dezelfde toegangssleutel of dezelfde geheime sleutel als de back-up (een gedeelde sleutel kan ook andere buckets lezen en wissen);
+    - testmodus met een bucket zonder 'test' in de naam: een testomgeving mag nooit op een echte bucket schrijven;
+    - live-modus, tenzij de eigenaar dat uitdrukkelijk aanzet (VIERLIEF_MOMENTS_S3_PRODUCTION_OK) én de bucket geen 'test' in de naam heeft."""
+    bucket = settings.MOMENTS_S3_BUCKET
+    if not all([bucket, settings.MOMENTS_S3_ACCESS_KEY, settings.MOMENTS_S3_SECRET_KEY]):
+        raise StorageNotReady("S3-opslag is niet volledig ingesteld.")
+    if _same(bucket, getattr(settings, "BACKUP_S3_BUCKET", "")):
+        raise StorageNotReady("De bucket voor Moments mag niet de back-upbucket zijn.")
+    if _same(settings.MOMENTS_S3_ACCESS_KEY, getattr(settings, "BACKUP_S3_ACCESS_KEY", "")) or _same(settings.MOMENTS_S3_SECRET_KEY, getattr(settings, "BACKUP_S3_SECRET_KEY", "")):
+        raise StorageNotReady("Moments mag niet met de sleutels van de back-up werken.")
+    is_test_bucket = "test" in bucket.lower()
+    if settings.TEST_MODE:
+        if not is_test_bucket:
+            raise StorageNotReady("In testmodus is alleen een bucket met 'test' in de naam toegestaan.")
+    else:
+        if not getattr(settings, "MOMENTS_S3_PRODUCTION_OK", False):
+            raise StorageNotReady("Productieopslag voor Moments is niet goedgekeurd door de eigenaar.")
+        if is_test_bucket:
+            raise StorageNotReady("Een testbucket mag niet in live-modus worden gebruikt.")
+
+
 def get_storage():
     kind = (getattr(settings, "MOMENTS_STORAGE", "") or "lokaal").lower()
     if kind == "lokaal":
@@ -144,11 +172,7 @@ def get_storage():
             raise StorageNotReady("Lokale opslag bestaat alleen in testmodus.")
         return LocalStorage(settings.MOMENTS_LOCAL_DIR)
     if kind == "s3":
-        values = [settings.MOMENTS_S3_BUCKET, settings.MOMENTS_S3_ACCESS_KEY, settings.MOMENTS_S3_SECRET_KEY]
-        if not all(values):
-            raise StorageNotReady("S3-opslag is niet volledig ingesteld.")
-        if settings.MOMENTS_S3_BUCKET == getattr(settings, "BACKUP_S3_BUCKET", None):
-            raise StorageNotReady("De bucket voor Moments mag niet de back-upbucket zijn.")
+        check_s3_settings()
         return S3Storage(settings.MOMENTS_S3_BUCKET, settings.MOMENTS_S3_ENDPOINT, settings.MOMENTS_S3_REGION, settings.MOMENTS_S3_ACCESS_KEY, settings.MOMENTS_S3_SECRET_KEY)
     raise StorageNotReady("Onbekende opslag.")
 

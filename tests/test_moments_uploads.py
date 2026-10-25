@@ -23,6 +23,8 @@ from tests.helpers import VaylideTestCase, jpeg_file
 
 
 ORIGIN = "https://testserver"
+LOS_OUD = "moments/00000000-0000-0000-0000-000000000000/orig/" + "a" * 32 + ".jpg"
+LOS_NIEUW = "moments/00000000-0000-0000-0000-000000000000/orig/" + "b" * 32 + ".jpg"
 
 
 def jpeg_bytes(color=(180, 140, 150), size=(1200, 900), gps=False) -> bytes:
@@ -570,14 +572,17 @@ class OnderhoudTests(UploadTestCase):
         Submission.objects.update(reservation_expires_at=timezone.now() - timedelta(minutes=1))
         self.assertEqual(services.expire_reservations(self.storage), 1)
         self.assertEqual(self.sub(res.json()["id"]).status, "mislukt")
-        self.storage.write("moments/los/orig/oud.jpg", b"x" * 10)
-        self.storage.write("moments/los/orig/nieuw.jpg", b"x" * 10)
+        self.storage.write(LOS_OUD, b"x" * 10)
+        self.storage.write(LOS_NIEUW, b"x" * 10)
         import os
         old = timezone.now().timestamp() - 48 * 3600
-        os.utime(Path(self.dir) / "moments/los/orig/oud.jpg", (old, old))
+        os.utime(Path(self.dir) / LOS_OUD, (old, old))
+        self.storage.write("moments/vreemd/bestand.txt", b"x")  # geen sleutel van ons: blijft altijd staan
+        os.utime(Path(self.dir) / "moments/vreemd/bestand.txt", (old, old))
         self.assertEqual(services.cleanup_orphans(self.storage), 1)
-        self.assertIsNone(self.storage.size("moments/los/orig/oud.jpg"))
-        self.assertEqual(self.storage.size("moments/los/orig/nieuw.jpg"), 10)  # jong: mogelijk een lopende upload
+        self.assertIsNone(self.storage.size(LOS_OUD))
+        self.assertEqual(self.storage.size("moments/vreemd/bestand.txt"), 1)
+        self.assertEqual(self.storage.size(LOS_NIEUW), 10)  # jong: mogelijk een lopende upload
 
     def test_opruimen_laat_bestanden_met_een_databaseregel_staan(self):
         client = self.guest()
@@ -676,7 +681,7 @@ from django.db import connection, connections  # noqa: E402
 from django.test import TransactionTestCase  # noqa: E402
 
 
-class GelijktijdigheidTests(TransactionTestCase):
+class PostgresBasis(TransactionTestCase):
     """Echte gelijktijdigheid kan alleen op PostgreSQL (SQLite vergrendelt rijen niet). Elders wordt deze klasse overgeslagen.
     Draaien: DATABASE_URL=postgres://... python manage.py test tests.test_moments_uploads.GelijktijdigheidTests"""
 
@@ -720,6 +725,8 @@ class GelijktijdigheidTests(TransactionTestCase):
     def reserve(self, token, cid=None):
         return lambda: services.reserve_photo_upload(token, client_id=cid or uuid.uuid4(), content_type="image/jpeg", size_bytes=5000, storage=self.storage)[0].uid
 
+
+class GelijktijdigheidTests(PostgresBasis):
     def test_albumplafond_houdt_bij_tegelijk_reserveren(self):
         tokens = [services.issue_token(self.album)[0] for _ in range(10)]
         results = self.race([self.reserve(t) for t in tokens])
@@ -749,9 +756,346 @@ class GelijktijdigheidTests(TransactionTestCase):
         data = jpeg_bytes()
         sub, target = services.reserve_photo_upload(token, client_id=uuid.uuid4(), content_type="image/jpeg", size_bytes=len(data), storage=self.storage)
         self.storage.write(sub.original_key, data)
+        reads = []
+        real_read = self.storage.read
+        self.storage.read = lambda *a, **k: (reads.append(1), real_read(*a, **k))[1]
         results = self.race([lambda: services.complete_photo_upload(token, sub.uid, self.storage).status for _ in range(6)])
-        self.assertEqual(set(results), {"ontvangen"}, results)
+        self.assertEqual(len(reads), 1, "het object wordt maar één keer gecontroleerd")
+        self.assertTrue(set(results) <= {"ontvangen", "uploaden"}, results)  # een gelijktijdige melding ziet de lopende controle
+        self.assertEqual(Submission.objects.get(pk=sub.pk).status, "ontvangen")
         done = self.race([lambda: getattr(services.process_next_photo(self.storage), "status", None) for _ in range(4)])
         self.assertEqual(Submission.objects.get(pk=sub.pk).status, "klaar")
         self.assertEqual(Submission.objects.get(pk=sub.pk).attempts, 1)
         self.assertEqual(len([k for k, _ in self.storage.keys("moments/")]), 1, done)
+
+
+class SpyStorage:
+    """Omhult de lokale opslag: noteert of een aanroep binnen een databasetransactie valt, en kan storingen en vertragingen nabootsen."""
+
+    def __init__(self, inner, base_depth):
+        self.inner, self.base, self.calls, self.fail, self.hooks = inner, base_depth, [], {}, {}
+        self.name = inner.name
+
+    def _spy(self, name, *args, **kwargs):
+        self.calls.append((name, len(connection.savepoint_ids) - self.base))
+        hook = self.hooks.get(name)
+        if hook:
+            hook()
+        exc = self.fail.get(name)
+        if exc:
+            raise exc
+        return getattr(self.inner, name)(*args, **kwargs)
+
+    def __getattr__(self, name):
+        if name in {"upload_target", "write", "size", "read", "delete", "keys", "download_url", "open"}:
+            return lambda *a, **k: self._spy(name, *a, **k)
+        raise AttributeError(name)
+
+    def in_transaction(self):
+        return [c for c in self.calls if c[1] > 0]
+
+
+class OpslagBuitenTransactieTests(UploadTestCase):
+    def setUp(self):
+        super().setUp()
+        self.spy = SpyStorage(self.storage, len(connection.savepoint_ids))
+        self.token = services.issue_token(self.album)[0]
+
+    def reserve_one(self, data=None, **kw):
+        data = data or jpeg_bytes(color=tuple(uuid.uuid4().bytes[:3]))
+        sub, target = services.reserve_photo_upload(self.token, client_id=uuid.uuid4(), content_type="image/jpeg", size_bytes=len(data), storage=self.spy, **kw)
+        return sub, data
+
+    def upload(self, sub, data):
+        self.storage.write(sub.original_key, data)
+
+    def test_geen_enkele_opslagaanroep_binnen_een_transactie(self):
+        sub, data = self.reserve_one()
+        self.upload(sub, data)
+        services.complete_photo_upload(self.token, sub.uid, self.spy)
+        services.process_next_photo(self.spy)
+        sub2, data2 = self.reserve_one()
+        self.upload(sub2, data2)
+        Submission.objects.filter(pk=sub2.pk).update(reservation_expires_at=timezone.now() - timedelta(seconds=1))
+        services.expire_reservations(self.spy)
+        bad, baddata = self.reserve_one(), b"\xff\xd8\xff" + b"x" * 3000
+        self.upload(bad[0], baddata)
+        services.complete_photo_upload(self.token, bad[0].uid, self.spy)  # mislukt: verwijderen van het origineel
+        services.cleanup_orphans(self.spy)
+        names = {c[0] for c in self.spy.calls}
+        self.assertTrue({"upload_target", "size", "read", "write", "delete", "keys"} <= names, names)
+        self.assertEqual(self.spy.in_transaction(), [])
+
+    def test_time_out_bij_het_opvragen_behoudt_de_reservering(self):
+        sub, data = self.reserve_one()
+        self.upload(sub, data)
+        self.spy.fail["size"] = TimeoutError("opslag traag")
+        with self.assertRaises(services.SubmissionRefused) as ctx:
+            services.complete_photo_upload(self.token, sub.uid, self.spy)
+        self.assertEqual(ctx.exception.code, "opslag_niet_klaar")
+        sub.refresh_from_db()
+        self.assertEqual((sub.status, sub.processing_started_at), ("uploaden", None))
+        self.assertEqual(sub.reserved_bytes, limits.PHOTO_MAX_STORED_BYTES)
+        self.spy.fail.clear()
+        self.assertEqual(services.complete_photo_upload(self.token, sub.uid, self.spy).status, "ontvangen")  # opnieuw melden lukt
+
+    def test_time_out_tijdens_het_lezen_behoudt_de_reservering(self):
+        sub, data = self.reserve_one()
+        self.upload(sub, data)
+        self.spy.fail["read"] = TimeoutError("lezen afgebroken")
+        with self.assertRaises(services.SubmissionRefused):
+            services.complete_photo_upload(self.token, sub.uid, self.spy)
+        sub.refresh_from_db()
+        self.assertEqual((sub.status, sub.processing_started_at, sub.failure_code), ("uploaden", None, ""))
+        self.assertIsNotNone(self.storage.size(sub.original_key))  # het origineel is niet weggegooid door een storing
+
+    def test_opslagfout_via_http_geeft_503_en_geen_foute_status(self):
+        client = self.guest()
+        data = jpeg_bytes()
+        res = self.reserve(client, data)
+        self.put(client, res, data)
+        boom = mock.Mock(wraps=self.storage)
+        boom.size.side_effect = ConnectionError("netwerk weg")
+        with mock.patch("moments.api.get_storage", return_value=boom):
+            done = self.post(client, f"/moments/api/uploads/{res.json()['id']}/klaar/")
+        self.assertEqual((done.status_code, done.json()["fout"]), (503, "opslag_niet_klaar"))
+        self.assertEqual(self.sub(res.json()["id"]).status, "uploaden")
+        self.assertEqual(self.post(client, f"/moments/api/uploads/{res.json()['id']}/klaar/").json()["status"], "ontvangen")
+
+    def test_tweede_melding_tijdens_lopende_controle_leest_niet_opnieuw(self):
+        sub, data = self.reserve_one()
+        self.upload(sub, data)
+        Submission.objects.filter(pk=sub.pk).update(processing_started_at=timezone.now())
+        again = services.complete_photo_upload(self.token, sub.uid, self.spy)
+        self.assertEqual(again.status, "uploaden")
+        self.assertEqual([c for c in self.spy.calls if c[0] in {"size", "read"}], [])
+
+    def test_vervallen_claim_wordt_overgenomen(self):
+        sub, data = self.reserve_one()
+        self.upload(sub, data)
+        Submission.objects.filter(pk=sub.pk).update(processing_started_at=timezone.now() - timedelta(seconds=limits.VALIDATE_CLAIM_SECONDS + 5))
+        self.assertEqual(services.complete_photo_upload(self.token, sub.uid, self.spy).status, "ontvangen")
+
+    def test_opruimtaak_laat_een_lopende_controle_met_rust(self):
+        sub, data = self.reserve_one()
+        self.upload(sub, data)
+        Submission.objects.filter(pk=sub.pk).update(reservation_expires_at=timezone.now() + timedelta(seconds=1))
+        self.spy.hooks["read"] = lambda: (
+            Submission.objects.filter(pk=sub.pk).update(reservation_expires_at=timezone.now() - timedelta(seconds=5)),
+            self.assertEqual(services.expire_reservations(self.spy), 0),
+        )
+        self.assertEqual(services.complete_photo_upload(self.token, sub.uid, self.spy).status, "ontvangen")
+
+    def test_overgenomen_uitslag_wordt_niet_overschreven(self):
+        sub, data = self.reserve_one()
+        self.upload(sub, data)
+        self.spy.hooks["read"] = lambda: Submission.objects.filter(pk=sub.pk).update(status="verwijderd", processing_started_at=None)
+        res = services.complete_photo_upload(self.token, sub.uid, self.spy)
+        self.assertEqual(res.status, "verwijderd")
+        self.assertEqual(Submission.objects.get(pk=sub.pk).status, "verwijderd")
+
+    def test_herhaald_verzoek_met_zelfde_client_id_verbruikt_geen_tempo(self):
+        data = jpeg_bytes()
+        cid = uuid.uuid4()
+        with mock.patch.object(limits, "MAX_STARTS_PER_10_MIN", 2):
+            for _ in range(10):
+                services.reserve_photo_upload(self.token, client_id=cid, content_type="image/jpeg", size_bytes=len(data), storage=self.spy)
+        self.assertEqual(Submission.objects.filter(guest_token=self.token).count(), 1)
+
+    def test_schrijven_van_de_master_faalt_origineel_blijft_en_daarna_mislukt(self):
+        sub, data = self.reserve_one()
+        self.upload(sub, data)
+        services.complete_photo_upload(self.token, sub.uid, self.spy)
+        self.spy.fail["write"] = OSError("schijf vol")
+        for expected in ("ontvangen", "ontvangen", "mislukt"):
+            services.process_next_photo(self.spy)
+            sub.refresh_from_db()
+            self.assertEqual(sub.status, expected)
+            if expected == "ontvangen":
+                self.assertIsNotNone(self.storage.size(sub.original_key))  # niets kwijt bij een storing
+        self.assertEqual((sub.failure_code, sub.reserved_bytes, sub.original_key), ("verwerking", 0, ""))
+
+    def test_mislukte_verwijdering_blijft_niet_voor_altijd_bekend(self):
+        sub, _ = self.reserve_one()
+        self.storage.write(sub.original_key, b"\xff\xd8\xff" + b"x" * 3000)
+        key = sub.original_key
+        self.spy.fail["delete"] = OSError("verwijderen mislukt")
+        self.assertEqual(services.complete_photo_upload(self.token, sub.uid, self.spy).status, "mislukt")
+        self.spy.fail.clear()
+        self.assertIsNotNone(self.storage.size(key))  # restant staat er nog
+        import os
+
+        old = timezone.now().timestamp() - 48 * 3600
+        os.utime(Path(self.dir) / key, (old, old))
+        self.assertEqual(services.cleanup_orphans(self.storage), 1)  # de sleutel stond niet meer in de database: opruimen vindt hem
+        self.assertIsNone(self.storage.size(key))
+
+    def test_master_geschreven_maar_database_wint_niet_laat_geen_wees_achter(self):
+        sub, data = self.reserve_one()
+        self.upload(sub, data)
+        services.complete_photo_upload(self.token, sub.uid, self.spy)
+        self.spy.hooks["write"] = lambda: Submission.objects.filter(pk=sub.pk).update(status="verwijderd")  # iemand anders verwijdert tijdens het verwerken
+        services.process_next_photo(self.spy)
+        self.assertEqual(Submission.objects.get(pk=sub.pk).status, "verwijderd")
+        self.assertEqual([k for k, _ in self.storage.keys("moments/") if "/master/" in k], [])
+
+
+class BytesTests(UploadTestCase):
+    def test_grote_originelen_vullen_het_album_niet_ten_onrechte(self):
+        """Regressie: een ontvangen origineel van 20 MB telde als 20 MB tegen het plafond, terwijl de master hoogstens 8 MB wordt."""
+        MB = 1024 * 1024
+        Album.objects.filter(pk=self.album.pk).update(max_per_album=3)
+        album = Album.objects.get(pk=self.album.pk)
+        token = services.issue_token(album)[0]
+        for _ in range(2):
+            Submission.objects.create(
+                album=album, guest_token=token, kind="foto", status="ontvangen", client_id=uuid.uuid4(), content_type="image/jpeg",
+                size_bytes=20 * MB, original_bytes=20 * MB, reserved_bytes=limits.PHOTO_MAX_STORED_BYTES, original_key="moments/x/orig/y",
+            )
+        info = services.album_storage(album)
+        self.assertEqual(info["reserved"], 2 * limits.PHOTO_MAX_STORED_BYTES)
+        self.assertEqual(info["originals"], 40 * MB)
+        self.assertEqual(info["committed"], 16 * MB)  # niet 40 MB
+        self.assertLess(info["committed"] + limits.PHOTO_MAX_STORED_BYTES, album.bytes_cap + 1)
+        client = self.guest()
+        self.assertEqual(self.reserve(client, jpeg_bytes()).status_code, 201)  # de derde foto past
+
+    def test_klare_masters_tellen_met_hun_werkelijke_omvang(self):
+        client = self.guest()
+        self.upload_ok(client, jpeg_bytes(size=(800, 600)))
+        info_before = services.album_storage(self.album)
+        self.assertEqual(info_before["reserved"], limits.PHOTO_MAX_STORED_BYTES)
+        self.assertEqual(info_before["masters"], 0)
+        self.process_all()
+        info = services.album_storage(self.album)
+        sub = Submission.objects.get()
+        self.assertEqual((info["reserved"], info["masters"], info["originals"]), (0, sub.master_bytes, 0))
+        self.assertEqual(sub.master_bytes, self.storage.size(sub.storage_key))
+        self.assertLess(info["committed"], limits.PHOTO_MAX_STORED_BYTES)
+
+    def test_mislukte_en_verlopen_posten_tellen_niet_mee(self):
+        client = self.guest()
+        _, bad = self.upload_ok(client, b"\xff\xd8\xff" + b"x" * 3000)
+        self.assertEqual(bad.json()["status"], "mislukt")
+        res = self.reserve(client, jpeg_bytes())
+        Submission.objects.filter(uid=res.json()["id"]).update(reservation_expires_at=timezone.now() - timedelta(seconds=1))
+        info = services.album_storage(self.album)
+        self.assertEqual((info["reserved"], info["masters"], info["originals"]), (0, 0, 0))
+
+    def test_bytesplafond_blokkeert_alleen_als_gereserveerd_plus_masters_te_veel_is(self):
+        client = self.guest()
+        with mock.patch.object(Album, "bytes_cap", new=limits.PHOTO_MAX_STORED_BYTES * 2 - 1):
+            self.assertEqual(self.reserve(client, jpeg_bytes()).status_code, 201)
+            res = self.reserve(client, jpeg_bytes())
+        self.assertEqual((res.status_code, res.json()["fout"]), (409, "plafond_album"))
+
+
+class S3BeschermingTests(UploadTestCase):
+    GOED = dict(MOMENTS_STORAGE="s3", MOMENTS_S3_BUCKET="vaylide-moments-test", MOMENTS_S3_ACCESS_KEY="AKIAMOMENTS", MOMENTS_S3_SECRET_KEY="geheim-moments",
+                MOMENTS_S3_ENDPOINT="https://s3.example.test", MOMENTS_S3_REGION="nl-ams", BACKUP_S3_BUCKET="vaylide-backups",
+                BACKUP_S3_ACCESS_KEY="AKIABACKUP", BACKUP_S3_SECRET_KEY="geheim-backup", MOMENTS_S3_PRODUCTION_OK=False)
+
+    def check(self, **extra):
+        with override_settings(**{**self.GOED, **extra}):
+            return get_storage()
+
+    def refused(self, **extra):
+        with self.assertRaises(StorageNotReady):
+            self.check(**extra)
+
+    def test_een_aparte_testbucket_in_testmodus_is_toegestaan(self):
+        self.assertIsInstance(self.check(), S3Storage)
+
+    def test_back_upbucket_en_back_upsleutels_worden_geweigerd(self):
+        self.refused(MOMENTS_S3_BUCKET="vaylide-backups")
+        self.refused(MOMENTS_S3_BUCKET="  VAYLIDE-Backups ")
+        self.refused(MOMENTS_S3_ACCESS_KEY="AKIABACKUP")
+        self.refused(MOMENTS_S3_SECRET_KEY="geheim-backup")
+        self.refused(BACKUP_S3_BUCKET="vaylide-moments-test")
+
+    def test_in_testmodus_alleen_een_bucket_met_test_in_de_naam(self):
+        self.refused(MOMENTS_S3_BUCKET="vaylide-moments")
+        self.refused(MOMENTS_S3_BUCKET="vaylide-productie")
+
+    def test_live_vraagt_uitdrukkelijk_akkoord_en_geen_testbucket(self):
+        self.refused(TEST_MODE=False, MOMENTS_S3_BUCKET="vaylide-moments")  # geen akkoord van de eigenaar
+        self.refused(TEST_MODE=False, MOMENTS_S3_PRODUCTION_OK=True)  # akkoord, maar een testbucket in live
+        self.assertIsInstance(self.check(TEST_MODE=False, MOMENTS_S3_PRODUCTION_OK=True, MOMENTS_S3_BUCKET="vaylide-moments"), S3Storage)
+
+    def test_onvolledige_instellingen_en_standaard_zijn_veilig(self):
+        self.refused(MOMENTS_S3_ACCESS_KEY="")
+        self.refused(MOMENTS_S3_SECRET_KEY="")
+        self.refused(MOMENTS_S3_BUCKET="")
+        from django.conf import settings
+
+        self.assertFalse(getattr(settings, "MOMENTS_S3_PRODUCTION_OK", False))
+        self.assertEqual(settings.MOMENTS_STORAGE, "lokaal")
+
+    def test_via_http_geeft_een_geweigerde_opslag_een_503_en_geen_inzending(self):
+        client = self.guest()
+        with override_settings(**{**self.GOED, "MOMENTS_S3_BUCKET": "vaylide-backups"}):
+            res = self.reserve(client, jpeg_bytes())
+        self.assertEqual((res.status_code, res.json()["fout"]), (503, "opslag_niet_klaar"))
+        self.assertEqual(Submission.objects.count(), 0)
+
+    def test_onderhoud_wijst_een_gevaarlijke_opslag_af(self):
+        with override_settings(**{**self.GOED, "MOMENTS_S3_ACCESS_KEY": "AKIABACKUP"}):
+            from django.core.management.base import CommandError
+
+            with self.assertRaises(CommandError):
+                call_command("moments_onderhoud", stdout=io.StringIO())
+
+    def test_opruimen_raakt_alleen_eigen_sleutels(self):
+        fake = mock.Mock()
+        fake.keys.return_value = [("moments/ander/bestand.txt", 0), ("backups/vaylide/db.enc", 0), ("moments/00000000-0000-0000-0000-000000000000/orig/" + "c" * 32 + ".jpg", 0)]
+        self.assertEqual(services.cleanup_orphans(fake), 1)
+        fake.delete.assert_called_once_with("moments/00000000-0000-0000-0000-000000000000/orig/" + "c" * 32 + ".jpg")
+
+
+class GelijktijdigheidVerloopTests(PostgresBasis):
+    """Voortzetting op PostgreSQL: melden en opruimen van verlopen reserveringen tegelijk, en tegelijk verwerken."""
+
+    def test_melden_en_opruimen_tegelijk_geeft_een_consistente_uitslag(self):
+        Album.objects.filter(pk=self.album.pk).update(max_per_album=100, max_per_guest=50)
+        token = services.issue_token(self.album)[0]
+        data = jpeg_bytes()
+        outcomes = set()
+        for _ in range(5):
+            sub, _target = services.reserve_photo_upload(token, client_id=uuid.uuid4(), content_type="image/jpeg", size_bytes=len(data), storage=self.storage)
+            self.storage.write(sub.original_key, data)
+            Submission.objects.filter(pk=sub.pk).update(reservation_expires_at=timezone.now() + timedelta(milliseconds=50))
+            import time
+
+            time.sleep(0.1)
+            self.race([lambda: services.complete_photo_upload(token, sub.uid, self.storage), lambda: services.expire_reservations(self.storage)])
+            final = Submission.objects.get(pk=sub.pk)
+            outcomes.add(final.status)
+            self.assertIn(final.status, {"mislukt", "ontvangen"})
+            if final.status == "mislukt":
+                self.assertEqual((final.failure_code, final.reserved_bytes, final.original_key), ("verlopen", 0, ""))
+            else:
+                self.assertTrue(final.original_key and self.storage.size(final.original_key))
+        self.assertTrue(outcomes)
+
+    def test_twee_verwerkers_tegelijk_verwerken_elke_foto_een_keer(self):
+        Album.objects.filter(pk=self.album.pk).update(max_per_album=100, max_per_guest=50)
+        token = services.issue_token(self.album)[0]
+        ids = []
+        for i in range(4):
+            data = jpeg_bytes(color=(i * 60, 5, 200 - i * 40))
+            sub, _t = services.reserve_photo_upload(token, client_id=uuid.uuid4(), content_type="image/jpeg", size_bytes=len(data), storage=self.storage)
+            self.storage.write(sub.original_key, data)
+            services.complete_photo_upload(token, sub.uid, self.storage)
+            ids.append(sub.pk)
+
+        def worker():
+            n = 0
+            while services.process_next_photo(self.storage):
+                n += 1
+            return n
+
+        done = self.race([worker, worker, worker])
+        self.assertEqual(sum(r for r in done if isinstance(r, int)), 4, done)
+        self.assertEqual(set(Submission.objects.filter(pk__in=ids).values_list("status", flat=True)), {"klaar"})
+        self.assertEqual(set(Submission.objects.filter(pk__in=ids).values_list("attempts", flat=True)), {1})
+        self.assertEqual(len([k for k, _ in self.storage.keys("moments/")]), 4)

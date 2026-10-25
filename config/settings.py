@@ -344,6 +344,8 @@ MOMENTS_S3_ENDPOINT = env("VIERLIEF_MOMENTS_S3_ENDPOINT")
 MOMENTS_S3_REGION = env("VIERLIEF_MOMENTS_S3_REGION")
 MOMENTS_S3_ACCESS_KEY = env("VIERLIEF_MOMENTS_S3_ACCESS_KEY")
 MOMENTS_S3_SECRET_KEY = env("VIERLIEF_MOMENTS_S3_SECRET_KEY")
+# Productieopslag voor Moments blijft geweigerd tot de eigenaar dit uitdrukkelijk goedkeurt. Niet aanzetten zonder akkoord.
+MOMENTS_S3_PRODUCTION_OK = env_bool("VIERLIEF_MOMENTS_S3_PRODUCTION_OK", False)
 
 # Microsoft Clarity (bezoekersanalyse, alleen na toestemming; zie core/analytics.py en docs/CLARITY.md). Leeg = uit.
 CLARITY_ID = env("VIERLIEF_CLARITY_ID", "").strip().lower()
