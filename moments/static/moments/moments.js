@@ -30,14 +30,6 @@
   var inputs = root.querySelectorAll("[data-photo-input]");
   var photos = [];
 
-  /* De voorbeeldplaatsen kun je wegklikken; ze tellen niet mee. */
-  grid.querySelectorAll(".mm-thumb--example .mm-remove").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      btn.closest(".mm-thumb").remove();
-      if (!grid.querySelector(".mm-thumb--example") && hint) hint.hidden = true;
-    });
-  });
-
   function say(el, text, ok) {
     if (!el) return;
     el.hidden = !text;
@@ -49,7 +41,7 @@
     if (counter) counter.textContent = fill(d.txtCounter, { n: photos.length, max: photosMax });
     var full = photos.length >= photosMax;
     inputs.forEach(function (i) { i.disabled = full; });
-    if (full) say(msg, d.txtFull, true);
+    if (full) say(msg, fill(d.txtFull, { max: photosMax }), true);
   }
 
   function addPhotos(fileList) {
@@ -129,7 +121,7 @@
           if (secs > videoSeconds) { URL.revokeObjectURL(url); say(vmsg, fill(d.txtTooLong, { n: secs, max: videoSeconds }), false); return; }
           reset();
           current = url;
-          say(vmsg, fill(d.txtVideoOk, { name: file.name, n: secs }), true);
+          say(vmsg, fill(d.txtVideoOk, { n: secs }), true);
           clear.hidden = false;
           vinputs.forEach(function (i) { i.disabled = true; });
         };

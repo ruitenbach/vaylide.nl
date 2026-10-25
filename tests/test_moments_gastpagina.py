@@ -43,7 +43,7 @@ class PaginaTests(TestCase):
 
     def test_inhoud(self):
         self.assertEqual(self.response.status_code, 200)
-        for tekst in ("Anna &amp; Bram", "Maak een foto", "Uit galerij", "Twee korte videoboodschappen", "Optioneel",
+        for tekst in ("Anna &amp; Bram", "Maak een foto", "Uit galerij", "Videoboodschappen", "Beide video's zijn optioneel",
                       "Welke wens heb je voor Anna en Bram?", "Wat is jouw mooiste herinnering", "alleen jij ziet wat je zelf deelt",
                       "Demonstratie", "Video 1 van 2 · Een wens", "Video 2 van 2 · Een herinnering"):
             self.assertIn(tekst, self.html)
@@ -52,6 +52,13 @@ class PaginaTests(TestCase):
         self.assertNotIn("Kasteel", self.html)       # geen verzonnen locatie
         self.assertNotIn("Hun verhaal", self.html)   # besluit 25 oktober: niet toevoegen
         self.assertLessEqual(self.html.count("mm-thumb--example"), 3)   # hoogstens drie voorbeeldplaatsen
+        self.assertNotIn("Twee korte", self.html)
+        # voorbeeldplaatsen zijn niet te verwijderen; alleen foto's die de gebruiker zelf kiest krijgen een verwijderknop (JavaScript)
+        self.assertNotIn("mm-remove", self.html)
+        # in de demonstratie wordt niets gedeeld, toegevoegd of verstuurd: het woord is "geselecteerd"
+        for woord in ("gedeeld", "toegevoegd", "verstuurd,"):
+            self.assertNotIn(woord, re.sub(r'<div class="test-banner".*?</div>', "", self.html, flags=re.S), woord)
+        self.assertIn("0 van 15 geselecteerd", self.html)
 
     def test_geen_zoekmachines_geen_opslag_in_cache(self):
         self.assertIn("noindex", self.html)
@@ -90,6 +97,13 @@ class PaginaTests(TestCase):
     def test_gebruikt_het_logo_ongewijzigd_en_geen_externe_bronnen(self):
         self.assertIn("vaylide-logo.webp", self.html)
         self.assertNotRegex(self.html, r'(src|href)="https?://')
+
+    def test_javascript_meldingen_zijn_klantvriendelijk(self):
+        html = self.client.get(URL, secure=True).content.decode()
+        self.assertIn('data-txt-video-ok="Video geselecteerd · {n} seconden"', html)
+        self.assertNotIn("{name}", re.search(r'data-txt-video-ok="[^"]*"', html).group(0))   # geen bestandsnaam
+        js = (Path(settings.BASE_DIR) / "moments" / "static" / "moments" / "moments.js").read_text()
+        self.assertNotIn("mm-thumb--example .mm-remove", js)
 
     def test_stijl_licht_en_zonder_vaste_balk(self):
         css = (Path(settings.BASE_DIR) / "moments" / "static" / "moments" / "moments.css").read_text()

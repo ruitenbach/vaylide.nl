@@ -26,6 +26,7 @@
 .mm-main { width: 100%; max-width: 36rem; margin: 0 auto; padding: 1.1rem 1rem .5rem; }
 .mm-cols { display: grid; gap: 1.75rem; }
 .mm-sec__head { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; margin-bottom: .7rem; }
+.mm-sub { margin: -.35rem 0 .35rem; font-size: .93rem; color: var(--muted); }
 .mm-sec h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.4rem; line-height: 1.2; color: var(--ink); }
 .mm-counter { margin: 0; font-weight: 600; font-size: .95rem; color: var(--accent-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
 

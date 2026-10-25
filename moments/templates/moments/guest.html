@@ -16,21 +16,21 @@
 <script src="{% static 'moments/moments.js' %}" defer></script>
 </head>
 <body class="mm-body">
-<a class="skip-link" href="#delen">{% trans "Direct naar het delen" %}</a>
+<a class="skip-link" href="#delen">{% trans "Direct naar de keuze" %}</a>
 {% if TEST_MODE %}<div class="test-banner" role="note"><strong>{% trans "Demonstratie" %}</strong> · {% trans "niets wordt verstuurd of bewaard" %}</div>{% endif %}
 
 {% include "moments/_icons.html" %}
 
-{% blocktrans asvar txt_counter %}{n} van {max}{% endblocktrans %}
-{% blocktrans asvar txt_room_photos %}Je kunt nog {n} foto's toevoegen. De rest is overgeslagen.{% endblocktrans %}
-{% blocktrans asvar txt_not_photo %}Dit bestand is geen foto. Kies een foto uit je galerij.{% endblocktrans %}
-{% blocktrans asvar txt_full %}Je hebt alle foto's gedeeld die bij dit evenement horen. Dank je wel!{% endblocktrans %}
-{% blocktrans asvar txt_not_video %}Dit bestand is geen video. Kies een video uit je galerij.{% endblocktrans %}
-{% blocktrans asvar txt_too_long %}Deze video is {n} seconden. Kies een video van hooguit {max} seconden.{% endblocktrans %}
+{% blocktrans asvar txt_counter %}{n} van {max} geselecteerd{% endblocktrans %}
+{% blocktrans asvar txt_room_photos %}Je kunt nog {n} foto's selecteren. De rest is overgeslagen.{% endblocktrans %}
+{% blocktrans asvar txt_not_photo %}Dit is geen foto. Kies een foto uit je galerij.{% endblocktrans %}
+{% blocktrans asvar txt_full %}Je hebt het maximum van {max} foto's geselecteerd.{% endblocktrans %}
+{% blocktrans asvar txt_not_video %}Dit is geen video. Kies een video uit je galerij.{% endblocktrans %}
+{% blocktrans asvar txt_too_long %}Deze video duurt {n} seconden. Kies een video van hooguit {max} seconden.{% endblocktrans %}
 {% blocktrans asvar txt_unreadable %}We kunnen deze video niet lezen. Probeer een andere.{% endblocktrans %}
-{% blocktrans asvar txt_video_ok %}Gekozen: {name} ({n} seconden){% endblocktrans %}
-{% blocktrans asvar txt_added %}Foto toegevoegd.{% endblocktrans %}
-{% blocktrans asvar txt_removed %}Verwijderd.{% endblocktrans %}
+{% blocktrans asvar txt_video_ok %}Video geselecteerd · {n} seconden{% endblocktrans %}
+{% blocktrans asvar txt_added %}Foto geselecteerd.{% endblocktrans %}
+{% blocktrans asvar txt_removed %}Selectie verwijderd.{% endblocktrans %}
 {% blocktrans asvar txt_remove_label %}Verwijder deze foto{% endblocktrans %}
 {% blocktrans asvar txt_your_photos %}Jouw foto's{% endblocktrans %}
 
@@ -56,8 +56,8 @@
 
       <section class="mm-sec" aria-labelledby="mm-h-fotos">
         <div class="mm-sec__head">
-          <h2 id="mm-h-fotos">{% trans "Deel je foto's" %}</h2>
-          <p class="mm-counter" data-photo-counter role="status" aria-live="polite">{% blocktrans with n=0 max=event.photos_max %}{{ n }} van {{ max }}{% endblocktrans %}</p>
+          <h2 id="mm-h-fotos">{% trans "Kies je foto's" %}</h2>
+          <p class="mm-counter" data-photo-counter role="status" aria-live="polite">{% blocktrans with n=0 max=event.photos_max %}{{ n }} van {{ max }} geselecteerd{% endblocktrans %}</p>
         </div>
 
         <div class="mm-choices" role="group" aria-label="{% trans 'Kies hoe je een foto toevoegt' %}">
@@ -82,7 +82,7 @@
 
         <ul class="mm-grid" data-photo-grid aria-label="{{ txt_your_photos }}">
           {% for tone, label in event.examples %}
-          <li class="mm-thumb mm-thumb--example mm-ph mm-ph--{{ tone }}"><span class="visually-hidden">{{ label }}</span><button type="button" class="mm-remove" aria-label="{% trans 'Verwijder dit voorbeeld' %}"></button></li>
+          <li class="mm-thumb mm-thumb--example mm-ph mm-ph--{{ tone }}"><span class="visually-hidden">{{ label }}</span></li>
           {% endfor %}
         </ul>
         <p class="mm-hint" data-photo-hint>{% trans "Voorbeelden uit de demonstratie. Foto's die je kiest blijven op je eigen telefoon." %}</p>
@@ -90,9 +90,9 @@
 
       <section class="mm-sec" aria-labelledby="mm-h-video">
         <div class="mm-sec__head">
-          <h2 id="mm-h-video">{% trans "Twee korte videoboodschappen" %}</h2>
-          <p class="mm-chip">{% trans "Optioneel" %}</p>
+          <h2 id="mm-h-video">{% trans "Videoboodschappen" %}</h2>
         </div>
+        <p class="mm-sub">{% trans "Beide video's zijn optioneel. Overslaan is prima." %}</p>
 
         <ol class="mm-videos">
           {% for v in event.videos %}
