@@ -2126,3 +2126,13 @@ html:not(.js) .hero__carrousel { --cw: 11rem; }
   .hero--carrousel .hero__knoppen .btn--primary { background: transparent; color: var(--accent-text); border: 1.5px solid var(--accent); box-shadow: none; min-height: 44px; font-size: .94rem; }
   .hero--carrousel .hero__knoppen .btn--primary:hover { background: var(--paper); color: var(--accent-text); }
 }
+
+/* Voettekst: één rij met de hoofdonderwerpen (interne links), rustiger dan de gewone links */
+.site-footer__links--thema { margin-bottom: .15rem; }
+.site-footer__links--thema a { color: var(--accent-text); font-weight: 500; }
+.trouw-tekst { max-width: 44rem; margin-inline: auto; display: grid; gap: 1rem; }
+.trouw-tekst p { margin: 0; color: var(--ink-2); line-height: 1.7; }
+.kerst-versturen { max-width: 44rem; margin: clamp(1.5rem, 3vw, 2.25rem) auto 0; }
+.kerst-versturen h3 { margin: 0 0 .6rem; }
+.kerst-versturen ol { margin: 0 0 1rem; padding-left: 1.25rem; display: grid; gap: .4rem; color: var(--ink-2); line-height: 1.6; }
+.kerst-versturen p { margin: 0; color: var(--ink-2); line-height: 1.6; }

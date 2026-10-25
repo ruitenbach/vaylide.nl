@@ -7,6 +7,13 @@
       <p class="site-footer__slogan">Elk bijzonder moment begint met een uitnodiging.</p>
     </div>
     <nav aria-label="Voettekst">
+      <ul class="site-footer__links site-footer__links--thema" aria-label="Digitale uitnodigingen en kaarten">
+        <li><a href="{% url 'core:wedding_cards' %}">Digitale trouwkaarten</a></li>
+        <li><a href="{% url 'core:christmas_cards' %}">Digitale kerstkaarten</a></li>
+        <li><a href="{% url 'core:birthday_invitations' %}">Verjaardag</a></li>
+        <li><a href="{% url 'core:business_invitations' %}">Zakelijk</a></li>
+        <li><a href="{% url 'core:make_invitation' %}">Uitnodiging maken</a></li>
+      </ul>
       <ul class="site-footer__links">
         <li><a href="{% url 'core:designs' %}">Collectie</a></li>
         <li><a href="{% url 'core:how' %}">Zo werkt het</a></li>

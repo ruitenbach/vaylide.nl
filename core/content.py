@@ -186,6 +186,9 @@ TROUW_FAQ = [
     ("Wat is een digitale trouwkaart?",
      "Een trouwkaart die je gasten als link openen op hun telefoon of computer, in plaats van een kaart in de brievenbus. "
      "Bij VAYLIDE heeft elke kaart een eigen opening, zoals een envelop met lakzegel, en staan datum, programma, route en aanmelden op één plek."),
+    ("Wat is het verschil tussen een digitale trouwkaart en een online trouwuitnodiging?",
+     "Dat is hetzelfde: je gasten ontvangen de uitnodiging als link in plaats van op papier. Bij VAYLIDE bepaal je zelf of je de link deelt via WhatsApp of e-mail, "
+     "of de QR-code op een papieren kaartje zet. Gasten zien hetzelfde: de opening, het programma, de route en het aanmeldformulier."),
     ("Kunnen gasten zich aanmelden zonder account?",
      "Ja. Gasten openen de link en geven aan of ze komen, eventueel met hoeveel personen. Ze hoeven geen account aan te maken en kunnen hun antwoord later zelf wijzigen."),
     ("Hoe deel ik de trouwkaart met mijn gasten?",

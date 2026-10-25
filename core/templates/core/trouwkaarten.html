@@ -1,8 +1,8 @@
 {% extends "base.html" %}{% load static vl %}
-{% block title %}Digitale trouwkaart maken | Luxe online trouwuitnodiging{% endblock %}
-{% block description %}Maak een digitale trouwkaart die echt tot leven komt. Met interactieve opening, RSVP, programma, locatie en eenvoudig delen via WhatsApp of QR-code.{% endblock %}
-{% block og_title %}Digitale trouwkaart maken | Luxe online trouwuitnodiging · VAYLIDE{% endblock %}
-{% block og_description %}Maak een digitale trouwkaart die echt tot leven komt. Met interactieve opening, RSVP, programma, locatie en eenvoudig delen via WhatsApp of QR-code.{% endblock %}
+{% block title %}Digitale trouwkaart en online trouwuitnodiging maken{% endblock %}
+{% block description %}Maak een digitale trouwkaart of online trouwuitnodiging met een opening die je gasten beleven. Met aanmelden, programma, route en delen via WhatsApp of QR-code.{% endblock %}
+{% block og_title %}Digitale trouwkaart en online trouwuitnodiging maken · VAYLIDE{% endblock %}
+{% block og_description %}Maak een digitale trouwkaart of online trouwuitnodiging met een opening die je gasten beleven. Met aanmelden, programma, route en delen via WhatsApp of QR-code.{% endblock %}
 {% block body_class %}page-trouw{% endblock %}
 {% block extra_js %}<script src="{% static 'js/hero3d.js' %}" defer></script>{% endblock %}
 {% block content %}
@@ -13,7 +13,7 @@
     <div class="trouw-kop__tekst">
       <p class="eyebrow">Digitale trouwkaarten</p>
       <h1 id="trouw-titel">Digitale trouwkaarten die je gasten <em>echt beleven</em></h1>
-      <p class="lead">Een trouwkaart die opent als echte post: met een envelop, gouden deuren of een ringdoosje. Met aanmelden, programma, route en eenvoudig delen via WhatsApp of QR-code.</p>
+      <p class="lead">Een digitale trouwkaart of online trouwuitnodiging die opent als echte post: met een envelop, gouden deuren of een ringdoosje. Met aanmelden, programma, route en eenvoudig delen via WhatsApp of QR-code.</p>
       <div class="btn-row">
         <a class="btn btn--primary btn--lg" href="{% url 'studio:start' %}?gelegenheid=bruiloft">Maak jullie trouwkaart {% icon "pijl" %}</a>
         <a class="btn btn--secondary btn--lg" href="#trouwontwerpen">Bekijk de trouwontwerpen</a>
@@ -84,6 +84,20 @@
       </li>
       {% endfor %}
     </ul>
+  </div>
+</section>
+
+<section class="section section--flush" aria-labelledby="online-titel">
+  <div class="container container--mid">
+    <div class="sectie-kop">
+      <p class="eyebrow">Online trouwuitnodiging</p>
+      <h2 id="online-titel">Een online trouwuitnodiging die alles op één plek brengt</h2>
+    </div>
+    <div class="trouw-tekst">
+      <p>Een digitale trouwuitnodiging is meer dan een plaatje in WhatsApp. Jullie gasten krijgen één link die opent als een echte trouwkaart, met een envelop, gouden deuren of een ringdoosje. Daarachter staan alle gegevens die ze nodig hebben: de datum met een afteller, het programma van de dag, de locatie met een knop naar de route en een knop om de trouwdag in hun agenda te zetten.</p>
+      <p>Gasten laten met één tik weten of ze komen en met hoeveel personen. Ze hoeven daarvoor geen app te installeren en geen account aan te maken. Jullie zien de aanmeldingen terug in Mijn VAYLIDE en exporteren de gastenlijst voor Excel of Numbers.</p>
+      <p>Jullie online trouwuitnodiging maak je zelf, in je eigen tempo: kies een ontwerp, vul jullie gegevens in en bekijk het voorbeeld voordat je betaalt. Verandert er later iets, bijvoorbeeld de aanvangstijd? Dan pas je de kaart aan en publiceer je opnieuw, op dezelfde link en met dezelfde QR-code. Wil je ook een papieren kaart versturen? Zet de QR-code op het kaartje, dan komen gasten met één scan bij de digitale uitnodiging.</p>
+    </div>
   </div>
 </section>
 
