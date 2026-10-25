@@ -381,6 +381,8 @@ def designs(request):
             "occasions": OCCASION_CHOICES,
             "occasion": occasion,
             "occasion_label": OCCASION_LABELS.get(occasion, ""),
+            "hub_url": reverse(GELEGENHEID_HUBS[occasion]) if occasion in GELEGENHEID_HUBS and not indeling and not only_specials else "",
+            "hub_tekst": dict(HUB_LINKS).get(occasion, ""),
             "canonical_path": list_path,
             "seo_title": seo_title,
             "seo_description": seo_description,

@@ -37,3 +37,11 @@ De iconen in de voettekst zijn de officiële merktekens in hun eigen kleuren (In
 
 Geen `lastmod` in de sitemap (geen betrouwbare wijzigingsdatum), geen `Product`/`Offer` (prijzen horen niet in gestructureerde gegevens zolang ze voorlopig zijn),
 geen `contactPoint` (geen vastgelegde bedrijfsgegevens), geen zoekfunctie in `WebSite`.
+
+## Interne links en aangevulde teksten (25 oktober 2026, ontwikkelbranch, nog niet samengevoegd)
+
+- **Voettekst** (`templates/partials/footer.html`): op elke pagina een rij met Digitale trouwkaarten, Digitale kerstkaarten, Verjaardag, Zakelijk en Uitnodiging maken (`.site-footer__links--thema`). Op 390 px komt er twee regels hoogte bij, op 1366 px niets.
+- **Filterpagina's kerst en bruiloft** (`core/templates/core/designs.html`, `hub_url` in `core.views.designs`): één regel "Meer weten over digitale kerstkaarten/trouwkaarten?" naar de landingspagina. Canonicals zijn niet veranderd.
+- **Trouwpagina**: nieuwe titel en beschrijving, een sectie "Een online trouwuitnodiging die alles op één plek brengt" en een extra vraag in `TROUW_FAQ` (dus ook in het FAQPage-schema). Alleen bestaande functies.
+- **Kerstpagina**: sectie "Zo verstuur je een digitale kerstkaart" onder het delen-blok. Geen prijzen.
+- Geen prijs, bestelstap, ontwerp of animatie is aangeraakt.

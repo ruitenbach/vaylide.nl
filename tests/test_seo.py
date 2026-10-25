@@ -181,8 +181,8 @@ class TrouwkaartenHubTests(VaylideTestCase):
         self.assertEqual(self.response.status_code, 200)
         self.assertNotIn("X-Robots-Tag", self.response.headers)
         self.assertEqual(meta(self.html, "robots"), "")
-        self.assertEqual(titel(self.html), "Digitale trouwkaart maken | Luxe online trouwuitnodiging · VAYLIDE")
-        self.assertEqual(meta(self.html, "description"), "Maak een digitale trouwkaart die echt tot leven komt. Met interactieve opening, RSVP, programma, locatie en eenvoudig delen via WhatsApp of QR-code.")
+        self.assertEqual(titel(self.html), "Digitale trouwkaart en online trouwuitnodiging maken · VAYLIDE")
+        self.assertEqual(meta(self.html, "description"), "Maak een digitale trouwkaart of online trouwuitnodiging met een opening die je gasten beleven. Met aanmelden, programma, route en delen via WhatsApp of QR-code.")
         self.assertEqual(canonical(self.html), f"{settings.BASE_URL}/digitale-trouwkaarten/")
         self.assertEqual(meta(self.html, "og:url", "property"), canonical(self.html))
         self.assertEqual(re.findall(r"<h1[^>]*>(.*?)</h1>", self.html, re.S), ["Digitale trouwkaarten die je gasten <em>echt beleven</em>"])
@@ -220,7 +220,7 @@ class TrouwkaartenHubTests(VaylideTestCase):
         trouw = Client().get("/ontwerpen/balzaal/").content.decode()
         self.assertIn('href="/digitale-trouwkaarten/"', trouw)
         zonder = Client().get("/ontwerpen/kerstbol/").content.decode()          # geen bruiloftontwerp: geen verwijzing
-        self.assertNotIn('href="/digitale-trouwkaarten/"', zonder)
+        self.assertNotIn('href="/digitale-trouwkaarten/"', zonder.split('<footer')[0])      # de voettekst linkt op elke pagina naar de landingspagina's
 
 
 class KerstkaartenHubTests(VaylideTestCase):
@@ -275,7 +275,7 @@ class KerstkaartenHubTests(VaylideTestCase):
         kerst = Client().get("/ontwerpen/winterlicht/").content.decode()
         self.assertIn('href="/digitale-kerstkaarten/"', kerst)
         zonder = Client().get("/ontwerpen/balzaal/").content.decode()          # geen kerstontwerp: geen verwijzing
-        self.assertNotIn('href="/digitale-kerstkaarten/"', zonder)
+        self.assertNotIn('href="/digitale-kerstkaarten/"', zonder.split('<footer')[0])      # de voettekst linkt op elke pagina naar de landingspagina's
 
 
 class VerjaardagHubTests(VaylideTestCase):
@@ -329,7 +329,7 @@ class VerjaardagHubTests(VaylideTestCase):
         glitter = Client().get("/ontwerpen/glitter/").content.decode()
         self.assertIn('href="/digitale-verjaardagsuitnodigingen/"', glitter)
         zonder = Client().get("/ontwerpen/winterlicht/").content.decode()          # geen verjaardagsontwerp: geen verwijzing
-        self.assertNotIn('href="/digitale-verjaardagsuitnodigingen/"', zonder)
+        self.assertNotIn('href="/digitale-verjaardagsuitnodigingen/"', zonder.split('<footer')[0])      # de voettekst linkt op elke pagina naar de landingspagina's
 
     def test_een_ontwerp_voor_meer_gelegenheden_noemt_alle_bijpassende_pagina_s_in_een_regel(self):
         html = Client().get("/ontwerpen/tropisch/").content.decode()          # bruiloft en verjaardag
@@ -388,7 +388,7 @@ class ZakelijkHubTests(VaylideTestCase):
         gala = Client().get("/ontwerpen/gala/").content.decode()
         self.assertIn('href="/digitale-zakelijke-uitnodigingen/"', gala)
         zonder = Client().get("/ontwerpen/winterlicht/").content.decode()          # geen zakelijk ontwerp: geen verwijzing
-        self.assertNotIn('href="/digitale-zakelijke-uitnodigingen/"', zonder)
+        self.assertNotIn('href="/digitale-zakelijke-uitnodigingen/"', zonder.split('<footer')[0])      # de voettekst linkt op elke pagina naar de landingspagina's
 
     def test_de_combinatieregel_noemt_alleen_de_hubs_van_het_ontwerp(self):
         def regel(slug):
@@ -447,3 +447,38 @@ class UitnodigingMakenHubTests(VaylideTestCase):
             self.assertEqual(canonical(html), f"{settings.BASE_URL}{canoniek}", pad)
         self.assertEqual(titel(Client().get("/").content.decode()), "Digitale uitnodigingen die je beleeft · VAYLIDE")
 
+
+
+class InterneLinksEnInhoudTests(VaylideTestCase):
+    """Interne links naar de landingspagina's (voettekst, filterpagina's) en de aangevulde teksten van de trouw- en kerstpagina."""
+
+    def test_de_voettekst_linkt_op_elke_pagina_naar_de_landingspagina_s(self):
+        for pad in ("/", "/prijzen/", "/ontwerpen/", "/ontwerpen/kerstbol/"):
+            html = Client().get(pad).content.decode()
+            voet = html[html.index("<footer"):]
+            for doel in ("/digitale-trouwkaarten/", "/digitale-kerstkaarten/", "/digitale-verjaardagsuitnodigingen/", "/digitale-zakelijke-uitnodigingen/", "/digitale-uitnodiging-maken/"):
+                self.assertIn(f'href="{doel}"', voet, (pad, doel))
+
+    def test_het_kerst_en_bruiloftfilter_verwijzen_naar_hun_landingspagina(self):
+        kerst = Client().get("/ontwerpen/?gelegenheid=kerst").content.decode()
+        bruiloft = Client().get("/ontwerpen/?gelegenheid=bruiloft").content.decode()
+        self.assertIn('Meer weten over digitale kerstkaarten? <a href="/digitale-kerstkaarten/">', kerst)
+        self.assertIn('Meer weten over digitale trouwkaarten? <a href="/digitale-trouwkaarten/">', bruiloft)
+        self.assertNotIn("Meer weten over", Client().get("/ontwerpen/").content.decode())
+        self.assertNotIn("Meer weten over", Client().get("/ontwerpen/?gelegenheid=verloving").content.decode())
+
+    def test_de_trouwpagina_heeft_de_online_trouwuitnodiging_sectie_en_vraag(self):
+        html = Client().get("/digitale-trouwkaarten/").content.decode()
+        self.assertIn("Een online trouwuitnodiging die alles op één plek brengt", html)
+        self.assertIn("Wat is het verschil tussen een digitale trouwkaart en een online trouwuitnodiging?", html)
+        self.assertEqual(len(re.findall(r"<h1[ >]", html)), 1)
+
+    def test_de_kerstpagina_legt_het_versturen_uit_met_alleen_bestaande_mogelijkheden(self):
+        html = Client().get("/digitale-kerstkaarten/").content.decode()
+        self.assertIn("Zo verstuur je een digitale kerstkaart", html)
+        self.assertIn("Een digitale kerstkaart versturen en delen", html)
+        blok = html[html.index("Zo verstuur je een digitale kerstkaart"):]
+        blok = blok[:blok.index("</div>")]
+        self.assertNotIn("€", blok)          # geen prijzen in deze sectie
+        self.assertIn("QR-code", blok)
+        self.assertIn("WhatsApp", blok)
