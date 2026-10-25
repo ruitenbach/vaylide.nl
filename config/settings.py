@@ -141,6 +141,7 @@ INSTALLED_APPS = [
     "portal",
     "beheer",
     "gezichten",
+    "moments",
 ]
 
 MIDDLEWARE = [
@@ -331,6 +332,10 @@ PAYMENT_METHODS_SHOWN = env_list("VIERLIEF_PAYMENT_METHODS_SHOWN", "ideal,credit
 # Standaard UIT. Pas aanzetten na akkoord over beeld-API, kosten, kwaliteit, privacytekst en de prijs (extra optie
 # met functie 'gezichten' in Beheer → Prijzen). Zonder sleutel of optie blijft de knop onzichtbaar.
 FACES_ENABLED = env_bool("VIERLIEF_FACES_ENABLED", False)
+
+# Moments (gasten delen foto's en video's in een album bij de uitnodiging; app moments, stapsgewijs in ontwikkeling). Standaard UIT: dan is
+# er geen pagina, geen token die werkt en geen inzending mogelijk. Alleen aanzetten met akkoord van de eigenaar.
+MOMENTS_ENABLED = env_bool("VIERLIEF_MOMENTS_ENABLED", False)
 
 # Microsoft Clarity (bezoekersanalyse, alleen na toestemming; zie core/analytics.py en docs/CLARITY.md). Leeg = uit.
 CLARITY_ID = env("VIERLIEF_CLARITY_ID", "").strip().lower()
