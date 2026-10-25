@@ -41,7 +41,9 @@ class Album(models.Model):
     max_per_album = models.PositiveIntegerField(null=True, blank=True)
     # Gasttoegang. De publieke code staat in de QR: geheim is hij niet, hij geeft alleen de kans een gast te worden.
     public_code = models.CharField(max_length=24, unique=True, null=True, blank=True, editable=False)
+    # Technische waarschuwingsgrens voor actieve gastsessies (standaard 200; Signature 400). Weigert nooit een upload.
     max_guests = models.PositiveSmallIntegerField(null=True, blank=True)
+    guest_warning_at = models.DateTimeField(null=True, blank=True)
     accepting_new_guests = models.BooleanField(default=True)
     # Emmer voor nieuwe gastsessies op albumniveau (zie services.take_signup_slot).
     signup_tokens = models.FloatField(default=limits.SIGNUP_BUCKET_CAPACITY)
@@ -73,8 +75,8 @@ class Album(models.Model):
         return min(self.max_per_album or limits.DEFAULT_MAX_PER_ALBUM, limits.HARD_MAX_PER_ALBUM)
 
     @property
-    def guest_cap(self) -> int:
-        return min(self.max_guests or limits.DEFAULT_MAX_GUESTS, limits.HARD_MAX_GUESTS)
+    def guest_warning_threshold(self) -> int:
+        return self.max_guests or limits.DEFAULT_MAX_GUESTS
 
     @property
     def bytes_cap(self) -> int:

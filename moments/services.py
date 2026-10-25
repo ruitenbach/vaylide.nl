@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import re
 import secrets
 import uuid
@@ -18,6 +19,9 @@ from . import limits, photos
 from .flags import moments_enabled
 from .models import Album, GuestToken, Submission
 from .storage import new_key
+
+
+logger = logging.getLogger("vaylide.moments")
 
 
 class SubmissionRefused(Exception):
@@ -107,7 +111,7 @@ def rotate_public_code(album: Album) -> str:
 
 
 def take_signup_slot(album_id: int, now=None) -> None:
-    """Emmer voor nieuwe sessies per album (60 vooraf, 30 per minuut erbij). Bewust op het album, niet op het netwerk:
+    """Emmer voor nieuwe sessies per album (300 vooraf, 120 per minuut erbij). Bewust op het album, niet op het netwerk:
     een zaal-wifi deelt één adres. Een lege emmer geeft 'even geduld', nooit een blokkade. Aanroepen binnen een transactie op het album."""
     now = now or timezone.now()
     album = Album.objects.select_for_update().get(pk=album_id)
@@ -150,6 +154,15 @@ def start_guest_session(public_code: str, *, network_hash: str = "", existing: G
 def _active_guest_count(album: Album, now) -> int:
     live = Q(submissions__status=Submission.Status.UPLOADING, submissions__reservation_expires_at__gt=now)
     return GuestToken.objects.filter(album=album, revoked_at__isnull=True).filter(Q(first_upload_at__isnull=False) | live).distinct().count()
+
+
+def _note_active_guests(album: Album, now) -> None:
+    """Een nieuwe actieve gast. Boven de technische grens (200 Classic, 400 Signature) wordt dat alleen intern vastgelegd, voor het
+    organisatordashboard en onderzoek. Het weigert nooit een upload. Aanroepen binnen de albumvergrendeling."""
+    if album.guest_warning_at is None and _active_guest_count(album, now) + 1 > album.guest_warning_threshold:
+        album.guest_warning_at = now
+        album.save(update_fields=["guest_warning_at"])
+        logger.warning("moments: album %s heeft meer dan %s actieve gastsessies (alleen een waarschuwing, uploads gaan door)", album.uid, album.guest_warning_threshold)
 
 
 def album_storage(album: Album, now=None) -> dict:
@@ -221,8 +234,8 @@ def reserve_photo_upload(token: GuestToken, *, client_id, content_type: str, siz
                 raise SubmissionRefused("plafond_album")
             if album_storage(album, now)["committed"] + limits.PHOTO_MAX_STORED_BYTES > album.bytes_cap:
                 raise SubmissionRefused("plafond_album")
-            if token.first_upload_at is None and not own.exists() and _active_guest_count(album, now) >= album.guest_cap:
-                raise SubmissionRefused("max_gasten")
+            if token.first_upload_at is None and not own.exists():
+                _note_active_guests(album, now)
             sub = Submission.objects.create(
                 album=album, guest_token=token, kind=Submission.Kind.PHOTO, status=Submission.Status.UPLOADING, client_id=client_id,
                 content_type=content_type.lower(), size_bytes=size_bytes, original_bytes=size_bytes, reserved_bytes=limits.PHOTO_MAX_STORED_BYTES,

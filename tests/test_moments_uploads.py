@@ -156,11 +156,49 @@ class SessieTests(UploadTestCase):
         res = self.post(Client(enforce_csrf_checks=True), f"/moments/api/start/{self.album.public_code}/")
         self.assertEqual((res.status_code, res.json()["fout"]), (409, "album_dicht"))
 
+    def test_emmer_is_300_met_120_per_minuut(self):
+        self.assertEqual((limits.SIGNUP_BUCKET_CAPACITY, limits.SIGNUP_BUCKET_REFILL_PER_MIN), (300, 120))
+
+    def test_driehonderd_sessiestarts_gaan_door_en_de_301e_wacht(self):
+        start = timezone.now()
+        with mock.patch("moments.services.timezone.now", return_value=start):  # vaste klok: precies de emmer, zonder aanvulling tijdens de test
+            for i in range(300):
+                token, raw = services.start_guest_session(self.album.public_code)
+                self.assertIsNotNone(raw, i)
+            with self.assertRaises(services.SubmissionRefused) as ctx:
+                services.start_guest_session(self.album.public_code)
+        self.assertEqual(ctx.exception.code, "even_wachten")
+        self.assertLessEqual(ctx.exception.retry_after, 3)  # 120 per minuut: hooguit enkele seconden wachten
+        self.assertEqual(GuestToken.objects.count(), 300)
+        # Na 30 seconden zijn er 60 plekken bij (120 per minuut), na een minuut 120 (niet meer dan de emmer groot is).
+        Album.objects.filter(pk=self.album.pk).update(signup_refilled_at=start)
+        for n, expected in ((30, 60), (60, 120)):
+            Album.objects.filter(pk=self.album.pk).update(signup_tokens=0, signup_refilled_at=start)
+            granted = 0
+            later = start + timedelta(seconds=n)
+            while True:
+                try:
+                    services.take_signup_slot(self.album.pk, now=later)
+                    granted += 1
+                except services.SubmissionRefused:
+                    break
+            self.assertEqual(granted, expected)
+
+    def test_driehonderd_sessiestarts_via_http_en_de_301e_krijgt_429(self):
+        statuses = []
+        with mock.patch("moments.services.timezone.now", return_value=timezone.now()):
+            for _ in range(301):
+                client = Client(enforce_csrf_checks=True)
+                statuses.append(self.post(client, f"/moments/api/start/{self.album.public_code}/").status_code)
+        self.assertEqual(statuses.count(200), 300)
+        self.assertEqual(statuses[-1], 429)
+
     def test_emmer_op_albumniveau_geeft_even_geduld_en_vult_aan(self):
-        for _ in range(limits.SIGNUP_BUCKET_CAPACITY):
-            services.start_guest_session(self.album.public_code)
-        with self.assertRaises(services.SubmissionRefused) as ctx:
-            services.start_guest_session(self.album.public_code)
+        with mock.patch("moments.services.timezone.now", return_value=timezone.now()):
+            for _ in range(limits.SIGNUP_BUCKET_CAPACITY):
+                services.start_guest_session(self.album.public_code)
+            with self.assertRaises(services.SubmissionRefused) as ctx:
+                services.start_guest_session(self.album.public_code)
         self.assertEqual(ctx.exception.code, "even_wachten")
         self.assertGreaterEqual(ctx.exception.retry_after, 1)
         self.album.refresh_from_db()
@@ -292,20 +330,66 @@ class ReserveringTests(UploadTestCase):
             self.assertEqual(self.reserve(client, jpeg_bytes()).status_code, 201)
             self.assertEqual(self.reserve(client, jpeg_bytes()).status_code, 429)
 
-    def test_maximum_actieve_gasten(self):
+    def test_overschrijding_van_de_technische_gastengrens_weigert_geen_upload(self):
         Album.objects.filter(pk=self.album.pk).update(max_guests=2)
         a, b, c = self.guest(), self.guest(), self.guest()
         self.assertEqual(self.upload_ok(a)[1].status_code, 200)
         self.assertEqual(self.upload_ok(b)[1].status_code, 200)
-        res = self.reserve(c, jpeg_bytes())  # een derde gast die echt wil uploaden
-        self.assertEqual((res.status_code, res.json()["fout"]), (409, "max_gasten"))
-        self.assertEqual(self.reserve(a, jpeg_bytes()).status_code, 201)  # bestaande gasten gaan gewoon door
+        self.assertIsNone(Album.objects.get(pk=self.album.pk).guest_warning_at)
+        self.assertEqual(self.reserve(c, jpeg_bytes()).status_code, 201)  # een derde gast boven de grens van 2 mag gewoon uploaden
+        self.assertEqual(self.upload_ok(c)[1].status_code, 200)
+        self.assertIsNotNone(Album.objects.get(pk=self.album.pk).guest_warning_at)  # alleen intern vastgelegd
+        self.assertEqual(self.reserve(a, jpeg_bytes()).status_code, 201)
+
+    def test_waarschuwing_wordt_gelogd_en_maar_een_keer_gezet(self):
+        Album.objects.filter(pk=self.album.pk).update(max_guests=1)
+        a, b, c = self.guest(), self.guest(), self.guest()
+        self.upload_ok(a)
+        with self.assertLogs("vaylide.moments", level="WARNING") as logs:
+            self.upload_ok(b)
+        first = Album.objects.get(pk=self.album.pk).guest_warning_at
+        self.assertIn("alleen een waarschuwing", logs.output[0])
+        self.upload_ok(c)
+        self.assertEqual(Album.objects.get(pk=self.album.pk).guest_warning_at, first)
+
+    def _vul_actieve_gasten(self, n):
+        GuestToken.objects.bulk_create([GuestToken(album=self.album, token_hash=f"h{i:060d}", first_upload_at=timezone.now()) for i in range(n)])
+
+    def test_classic_200_actieve_sessies_waarschuwing_zonder_weigering(self):
+        self.assertEqual(limits.DEFAULT_MAX_GUESTS, 200)
+        self.assertEqual(self.album.guest_warning_threshold, 200)
+        self._vul_actieve_gasten(200)
+        self.assertIsNone(Album.objects.get(pk=self.album.pk).guest_warning_at)  # precies op de grens: nog niets
+        res = self.reserve(self.guest(), jpeg_bytes())  # de 201e actieve gast
+        self.assertEqual(res.status_code, 201, res.content)
+        self.assertIsNotNone(Album.objects.get(pk=self.album.pk).guest_warning_at)
+        self.assertEqual(self.upload_ok(self.guest())[1].status_code, 200)  # en de 202e
+
+    def test_signature_400_actieve_sessies_waarschuwing_zonder_weigering(self):
+        Album.objects.filter(pk=self.album.pk).update(max_guests=limits.SIGNATURE_MAX_GUESTS, max_per_album=6250, max_per_guest=25)
+        self.album.refresh_from_db()
+        self.assertEqual(self.album.guest_warning_threshold, 400)
+        self._vul_actieve_gasten(399)
+        self.assertEqual(self.reserve(self.guest(), jpeg_bytes()).status_code, 201)  # de 400e: nog onder of op de grens
+        self.assertIsNone(Album.objects.get(pk=self.album.pk).guest_warning_at)
+        self.assertEqual(self.reserve(self.guest(), jpeg_bytes()).status_code, 201)  # de 401e
+        self.assertIsNotNone(Album.objects.get(pk=self.album.pk).guest_warning_at)
+        self.assertEqual(self.upload_ok(self.guest())[1].status_code, 200)
+
+    def test_foto_en_albumplafonds_blijven_gelden_ook_boven_de_gastengrens(self):
+        Album.objects.filter(pk=self.album.pk).update(max_guests=1, max_per_album=2, max_per_guest=1)
+        a, b, c = self.guest(), self.guest(), self.guest()
+        self.assertEqual(self.upload_ok(a)[1].status_code, 200)
+        self.assertEqual(self.reserve(a, jpeg_bytes()).json()["fout"], "plafond_gast")
+        self.assertEqual(self.upload_ok(b)[1].status_code, 200)
+        self.assertEqual(self.reserve(c, jpeg_bytes()).json()["fout"], "plafond_album")
 
     def test_sessies_zonder_upload_tellen_niet_mee_als_actieve_gast(self):
         Album.objects.filter(pk=self.album.pk).update(max_guests=1)
         for _ in range(5):
             self.guest()  # scanners en bots die alleen een sessie openen
         self.assertEqual(self.upload_ok(self.guest())[1].status_code, 200)
+        self.assertIsNone(Album.objects.get(pk=self.album.pk).guest_warning_at)
 
     def test_type_en_grootte_worden_vooraf_geweigerd(self):
         client = self.guest()
@@ -1050,6 +1134,24 @@ class S3BeschermingTests(UploadTestCase):
         fake.keys.return_value = [("moments/ander/bestand.txt", 0), ("backups/vaylide/db.enc", 0), ("moments/00000000-0000-0000-0000-000000000000/orig/" + "c" * 32 + ".jpg", 0)]
         self.assertEqual(services.cleanup_orphans(fake), 1)
         fake.delete.assert_called_once_with("moments/00000000-0000-0000-0000-000000000000/orig/" + "c" * 32 + ".jpg")
+
+
+class GelijktijdigeSessiestartsTests(PostgresBasis):
+    def test_driehonderd_vrijwel_gelijktijdige_starts_en_extra_starts_worden_netjes_geweigerd(self):
+        import time
+
+        jobs = [lambda: services.start_guest_session(self.album.public_code)[0].pk for _ in range(320)]
+        # 320 starts in golven van 20 tegelijk (PostgreSQL staat standaard 100 verbindingen toe)
+        results, begin = [], time.time()
+        for i in range(0, len(jobs), 20):
+            results += self.race(jobs[i:i + 20])
+        elapsed = time.time() - begin
+        ok = [r for r in results if isinstance(r, int)]
+        refused = [r for r in results if not isinstance(r, int)]
+        self.assertGreaterEqual(len(ok), 300, results)
+        self.assertLessEqual(len(ok), 300 + int(elapsed * limits.SIGNUP_BUCKET_REFILL_PER_MIN / 60) + 2)  # niet meer dan emmer plus aanvulling
+        self.assertTrue(all(r == "even_wachten" for r in refused), refused)  # nooit een andere fout of crash
+        self.assertEqual(GuestToken.objects.filter(album=self.album).count(), len(ok))  # elke gelukte start is precies een gast
 
 
 class GelijktijdigheidVerloopTests(PostgresBasis):

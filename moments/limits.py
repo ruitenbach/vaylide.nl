@@ -7,9 +7,11 @@ DEFAULT_MAX_PER_GUEST = 15
 DEFAULT_MAX_PER_ALBUM = 1875
 HARD_MAX_PER_GUEST = 50
 HARD_MAX_PER_ALBUM = 6250
-# Gasten die echt iets uploadden ("actieve gasten"): 1,5 x het pakketaantal.
-DEFAULT_MAX_GUESTS = 150
-HARD_MAX_GUESTS = 300
+# Actieve gastsessies (gasten die echt iets uploadden): een technische WAARSCHUWINGSgrens, geen weigergrens. Classic 200 (2 x 100 gasten),
+# Signature 400 (2 x 200). Overschrijding wordt alleen intern vastgelegd (`Album.guest_warning_at`); een geldige upload wordt daardoor nooit geweigerd.
+# De foto-, opslag-, reserverings- en tempolimieten blijven de bescherming tegen misbruik.
+DEFAULT_MAX_GUESTS = 200
+SIGNATURE_MAX_GUESTS = 400
 
 # Toekomstige eis (nog niet gebouwd): de albummaster, het hoogwaardige eindbestand, is hoogstens 6000 px op de lange zijde.
 ALBUM_MASTER_MAX_EDGE_PX = 6000
@@ -38,8 +40,8 @@ PHOTO_JPEG_QUALITIES = (90, 88, 85, 80)
 RESERVATION_MINUTES = 30
 MAX_CONCURRENT_UPLOADS = 3
 MAX_STARTS_PER_10_MIN = 60
-SIGNUP_BUCKET_CAPACITY = 60
-SIGNUP_BUCKET_REFILL_PER_MIN = 30
+SIGNUP_BUCKET_CAPACITY = 300
+SIGNUP_BUCKET_REFILL_PER_MIN = 120
 VALIDATE_CLAIM_SECONDS = 120  # hoe lang een lopende controle van één upload als 'bezig' geldt
 PROCESS_MAX_ATTEMPTS = 3
 PROCESS_STALE_MINUTES = 15

@@ -38,7 +38,6 @@ REFUSALS = {
     "geen_sessie": (401, _("Open eerst de link of QR-code van het evenement.")),
     "album_dicht": (409, _("Dit album neemt geen foto's meer aan.")),
     "geen_nieuwe_gasten": (409, _("Er kunnen nu geen nieuwe gasten meedoen. Vraag het aan de organisator.")),
-    "max_gasten": (409, _("Er zijn al veel gasten aan het delen. Vraag het aan de organisator.")),
     "plafond_gast": (409, _("Je hebt het maximum aantal foto's bereikt.")),
     "plafond_album": (409, _("Dit album is vol. Vraag het aan de organisator.")),
     "even_wachten": (429, _("Het is even druk. Probeer het over een minuut opnieuw.")),
