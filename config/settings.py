@@ -336,6 +336,14 @@ FACES_ENABLED = env_bool("VIERLIEF_FACES_ENABLED", False)
 # Moments (gasten delen foto's en video's in een album bij de uitnodiging; app moments, stapsgewijs in ontwikkeling). Standaard UIT: dan is
 # er geen pagina, geen token die werkt en geen inzending mogelijk. Alleen aanzetten met akkoord van de eigenaar.
 MOMENTS_ENABLED = env_bool("VIERLIEF_MOMENTS_ENABLED", False)
+# Opslag van Moments-foto's: "lokaal" (eigen testmap, alleen in testmodus) of "s3" (aparte, privé testbucket). Zie moments/storage.py.
+MOMENTS_STORAGE = env("VIERLIEF_MOMENTS_STORAGE", "lokaal").lower()
+MOMENTS_LOCAL_DIR = Path(env("VIERLIEF_MOMENTS_DIR", str(DATA_DIR / "moments-test")))
+MOMENTS_S3_BUCKET = env("VIERLIEF_MOMENTS_S3_BUCKET")
+MOMENTS_S3_ENDPOINT = env("VIERLIEF_MOMENTS_S3_ENDPOINT")
+MOMENTS_S3_REGION = env("VIERLIEF_MOMENTS_S3_REGION")
+MOMENTS_S3_ACCESS_KEY = env("VIERLIEF_MOMENTS_S3_ACCESS_KEY")
+MOMENTS_S3_SECRET_KEY = env("VIERLIEF_MOMENTS_S3_SECRET_KEY")
 
 # Microsoft Clarity (bezoekersanalyse, alleen na toestemming; zie core/analytics.py en docs/CLARITY.md). Leeg = uit.
 CLARITY_ID = env("VIERLIEF_CLARITY_ID", "").strip().lower()

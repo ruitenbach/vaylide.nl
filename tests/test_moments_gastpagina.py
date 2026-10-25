@@ -15,7 +15,8 @@ AAN = dict(MOMENTS_ENABLED=True, TEST_MODE=True)
 
 class ToegangTests(TestCase):
     def test_standaard_niet_bereikbaar(self):
-        self.assertEqual(self.client.get(URL, secure=True).status_code, 404)
+        with override_settings(MOMENTS_ENABLED=False):
+            self.assertEqual(self.client.get(URL, secure=True).status_code, 404)
 
     def test_vlag_aan_maar_live_modus_blijft_dicht(self):
         with override_settings(MOMENTS_ENABLED=True, TEST_MODE=False):
@@ -138,10 +139,13 @@ class VertalingTests(TestCase):
 
 
 class Stap1BlijftIntactTests(TestCase):
-    def test_enige_route_is_de_demonstratie(self):
+    def test_gastpagina_blijft_de_enige_pagina(self):
         from django.urls import get_resolver
 
         moments = [p for p in get_resolver().url_patterns if "moments" in p.pattern.regex.pattern]
         self.assertEqual(len(moments), 1)
         namen = [u.name for u in moments[0].url_patterns]
-        self.assertEqual(namen, ["demo_guest"])
+        # Stap 3A voegt alleen JSON-adressen toe onder api/; de enige pagina blijft de demonstratie.
+        paginas = [u.name for u in moments[0].url_patterns if not str(u.pattern).startswith("api/")]
+        self.assertEqual(paginas, ["demo_guest"])
+        self.assertIn("demo_guest", namen)

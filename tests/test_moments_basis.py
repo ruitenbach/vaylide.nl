@@ -19,10 +19,22 @@ AAN = dict(MOMENTS_ENABLED=True)
 
 class VlagTests(TestCase):
     def test_standaard_uit(self):
+        # Onafhankelijk van de omgeving: de ingebouwde standaard en het gedrag zonder vlag, ook als de testrun de vlag aanzet.
+        import os
+        from pathlib import Path
+        from unittest import mock
+
         from django.conf import settings
 
-        self.assertFalse(settings.MOMENTS_ENABLED)
-        self.assertFalse(moments_enabled())
+        from config.settings import env_bool
+
+        bron = (Path(settings.BASE_DIR) / "config" / "settings.py").read_text()
+        self.assertIn('MOMENTS_ENABLED = env_bool("VIERLIEF_MOMENTS_ENABLED", False)', bron)
+        with mock.patch.dict(os.environ):
+            os.environ.pop("VIERLIEF_MOMENTS_ENABLED", None)
+            self.assertFalse(env_bool("VIERLIEF_MOMENTS_ENABLED", False))
+        with override_settings(MOMENTS_ENABLED=False):
+            self.assertFalse(moments_enabled())
 
     def test_view_bestaat_niet_als_vlag_uit(self):
         @require_moments
@@ -30,12 +42,14 @@ class VlagTests(TestCase):
             return "ok"
 
         request = RequestFactory().get("/")
-        with self.assertRaises(Http404):
-            view(request)
+        with override_settings(MOMENTS_ENABLED=False):
+            with self.assertRaises(Http404):
+                view(request)
         with override_settings(**AAN):
             self.assertEqual(view(request), "ok")
 
-    def test_alleen_de_demonstratieroute(self):
+    def test_alleen_de_moments_routes(self):
+        # Eén ingang in de hoofd-urls ('moments/'); de adressen daaronder staan in moments/urls.py.
         namen = [p.pattern.regex.pattern for p in get_resolver().url_patterns if "moments" in p.pattern.regex.pattern.lower()]
         self.assertEqual(len(namen), 1)
 
@@ -241,5 +255,6 @@ class BasisTests(MomentsTestCase):
         self.assertNotEqual(pad1, pad2)
 
     def test_geen_moments_adres_met_vlag_uit(self):
-        self.assertEqual(self.client.get("/moments/", secure=True).status_code, 404)
-        self.assertEqual(self.client.get("/moments/abc/", secure=True).status_code, 404)
+        with override_settings(MOMENTS_ENABLED=False):
+            self.assertEqual(self.client.get("/moments/", secure=True).status_code, 404)
+            self.assertEqual(self.client.get("/moments/abc/", secure=True).status_code, 404)

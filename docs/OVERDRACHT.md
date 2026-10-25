@@ -151,3 +151,7 @@ De kaart die uit de envelop in de hero komt, is nu de echte Rozenboog-kaart (`st
 
 ## Homepage-carrousel (21 oktober 2026, branch `claude/homepage-carrousel`, PR ter beoordeling)
 Draaibare 3D-carrousel met uitgelichte Luxe- en Special-ontwerpen, te kiezen in Beheer; bij minder dan vijf geschikte ontwerpen blijft de envelop-hero. Niet gemerged, niet op staging, niets geactiveerd. Zie `docs/HOMEPAGE-CARROUSEL.md`. Open: echte iPhone- en Androidcontrole, keuze van de staging-branch.
+
+## Moments, stap 3A (25 oktober 2026, dev-branch `claude/project-thread-88do4p`, nog niet beoordeeld)
+
+Beveiligde technische basis voor foto-uploads in `moments/`, achter de vlag `VIERLIEF_MOMENTS_ENABLED` (standaard uit; alle adressen bestaan dan niet). Gastsessie zonder account (HttpOnly-cookie), uploadreservering vóór het uploaden, controle op type, grootte en inhoud, albummaster zonder metadata, eigen wachtrij en onderhoudscommando. Alleen een lokale testopslag (testmodus) en een voorbereide S3-uitvoering voor een aparte testbucket; er is geen externe opslag of account aangemaakt. De gastpagina is nog een demonstratie en roept deze adressen niet aan. Nog niet: video, Mollie, QR-pagina, organisatorscherm, HEIC, formuliertijd en verborgen veld bij het starten van een sessie, PostgreSQL-belastingtest. Zie CLAUDE.md voor de plek in de code.

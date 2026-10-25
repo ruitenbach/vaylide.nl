@@ -39,6 +39,7 @@ Visuele controles (Node met Playwright en Chromium): zie "Zelf herhalen" in `doc
 | Klantomgeving, extra wensen, beheer | `portal/`, `wishes/`, `beheer/` |
 | Beveiligingsheaders en CSP | `core/middleware.py`, `core/csp.py` |
 | Privacyverklaring | `core/templates/core/privacy.html`; feiten, aanbieders, cookies en open besluiten in `core/privacyverklaring.py` (in live-modus weigert `manage.py check` zolang er iets open staat). Zie `docs/PRIVACY.md` |
+| Moments (gasten delen foto's in een album; vlag `VIERLIEF_MOMENTS_ENABLED`, standaard uit) | `moments/`: datamodel en regels in `models.py`/`services.py`/`limits.py`, JSON voor gasten in `api.py`, privé-opslag in `storage.py` (lokaal alleen testmodus; S3 alleen een aparte testbucket), fotocontrole en albummaster in `photos.py`, onderhoud `manage.py moments_onderhoud` (eigen wachtrij, los van `processing/`), gastpagina (demonstratie) `/moments/demo/`. Alleen foto's; geen video, geen Mollie. Tests: `tests/test_moments_*.py` |
 | Aanmelden (RSVP) | Extra vragen alleen uit de vaste, neutrale lijst in `invitations/vragen.py` (geen eigen vraagteksten; niet uitbreiden zonder beoordeling), controle in `invitations/rsvp.py`, tellen van oude eigen vragen: `manage.py rsvp_vragen_rapport` |
 
 ## Vaste regels van de eigenaar
